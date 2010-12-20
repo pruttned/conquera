@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 ##################################################################
-#  Copyright (C) 2010 by Etrak Studios <etrakstudios@gmail.com >
+#  Copyright (C) 2010 by Conquera Team
 #  Part of the Conquera Project
 #
 #  This program is free software: you can redistribute it and/or modify
