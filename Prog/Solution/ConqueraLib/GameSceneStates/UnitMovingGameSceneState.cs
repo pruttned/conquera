@@ -57,6 +57,7 @@ namespace Conquera
         {
             if (null == mScene.SelectedUnit || mScene.SelectedUnit.IsIdle)
             {
+                mScene.SelectedCell = mScene.GetCell(mScene.SelectedUnit.CellIndex);
                 mScene.State = mScene.GetGameSceneState(GameSceneStates.VictoryEvaluation);
             }
         }
