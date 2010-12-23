@@ -333,7 +333,7 @@ namespace Conquera
 
         private void SetCameraAnimationGameSceneState()
         {
-            CameraAnimationGameSceneState cameraAnimationGameSceneState = (CameraAnimationGameSceneState)mGameScene.States[typeof(CameraAnimationGameSceneState)];
+            CameraAnimationGameSceneState cameraAnimationGameSceneState = (CameraAnimationGameSceneState)mGameScene.GetGameSceneState(GameSceneStates.CameraAnimation);
             cameraAnimationGameSceneState.PreviousGameSceneState = mGameScene.State;
             mGameScene.State = cameraAnimationGameSceneState;
         }

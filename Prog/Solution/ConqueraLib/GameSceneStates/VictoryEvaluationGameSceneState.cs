@@ -36,7 +36,7 @@ namespace Conquera
         public void OnStart()
         {
             //todo
-            mScene.State = mScene.States[typeof(IdleGameSceneState)];
+            mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
         }
 
         public void OnEnd()
