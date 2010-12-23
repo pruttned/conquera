@@ -61,18 +61,11 @@ namespace Conquera
 
         private IGameSceneState mState;
 
-        private Dictionary<Type, IGameSceneState> mStates = new Dictionary<Type, IGameSceneState>();
-
         private CellLabelManager mCellLabelManager;
 
         public string Name { get; private set; }
 
         public GameSceneContextState GameSceneContextState { get; private set; }
-
-        public Dictionary<Type, IGameSceneState> States
-        {
-            get { return mStates; }
-        }
 
         public IGameSceneState State
         {
@@ -189,6 +182,11 @@ namespace Conquera
             }
 
             return scene;
+        }
+
+        public IGameSceneState GetGameSceneState(string name)
+        {
+            return CurrentPlayer.GetGameSceneState(name);
         }
 
         public void Save()
@@ -786,16 +784,7 @@ namespace Conquera
 
             RegisterFrameListener(GameCamera);
 
-            //states
-            mStates.Add(typeof(IdleGameSceneState), new IdleGameSceneState(this));
-            mStates.Add(typeof(UnitMovingGameSceneState), new UnitMovingGameSceneState(this));
-            mStates.Add(typeof(CameraAnimationGameSceneState), new CameraAnimationGameSceneState(this));
-            mStates.Add(typeof(VictoryEvaluationGameSceneState), new VictoryEvaluationGameSceneState(this));
-            mStates.Add(typeof(BeginTurnGameSceneState), new BeginTurnGameSceneState(this));
-            mStates.Add(typeof(ReadyGameUnitSelectedGameSceneState), new ReadyGameUnitSelectedGameSceneState(this));
-            mStates.Add(typeof(BattleGameSceneState), new BattleGameSceneState(this));
-
-            State = mStates[typeof(IdleGameSceneState)];
+            State = GetGameSceneState(GameSceneStates.Idle);
 
             //temp
             mCursor3dCellSel.IsVisible = false;
@@ -814,9 +803,17 @@ namespace Conquera
             v2.Z = 100;
             return new BoundingBox(v1, v2);
         }
+
     }
 
-
-
-
+    public static class GameSceneStates
+    {
+        public static readonly string Idle = "Idle";
+        public static readonly string UnitMoving = "UnitMoving";
+        public static readonly string CameraAnimation = "CameraAnimation";
+        public static readonly string VictoryEvaluation = "VictoryEvaluation";
+        public static readonly string BeginTurn = "BeginTurn";
+        public static readonly string ReadyGameUnitSelected = "ReadyGameUnitSelected";
+        public static readonly string Battle = "Battle";
+    }
 }

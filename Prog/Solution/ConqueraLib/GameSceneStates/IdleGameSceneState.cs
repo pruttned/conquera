@@ -41,7 +41,7 @@ namespace Conquera
         {
             if (IsSelectedUnitReady())
             {
-                mScene.State = mScene.States[typeof(ReadyGameUnitSelectedGameSceneState)];
+                mScene.State = mScene.GetGameSceneState(GameSceneStates.ReadyGameUnitSelected);
             }
             else
             {
@@ -61,7 +61,7 @@ namespace Conquera
                 mScene.SelectedCell = cellUnderCur;
                 if (IsSelectedUnitReady())
                 {
-                    mScene.State = mScene.States[typeof(ReadyGameUnitSelectedGameSceneState)];
+                    mScene.State = mScene.GetGameSceneState(GameSceneStates.ReadyGameUnitSelected);
                 }
             }
         }

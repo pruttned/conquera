@@ -49,7 +49,7 @@ namespace Conquera
         {
             if (null == SelectedUnit) //hotfix
             {
-                mScene.State = mScene.States[typeof(IdleGameSceneState)];
+                mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
             }
 
             mScene.EnableMouseCameraControl = true;
@@ -68,13 +68,13 @@ namespace Conquera
             {
                 if (SelectedUnit.MoveTo(cellUnderCur.Index))
                 {
-                    mScene.State = mScene.States[typeof(UnitMovingGameSceneState)];
+                    mScene.State = mScene.GetGameSceneState(GameSceneStates.UnitMoving);
                 }
                 else
                 {
                     if (SelectedUnit.Attack(cellUnderCur.Index))
                     {
-                        mScene.State = mScene.States[typeof(BattleGameSceneState)];
+                        mScene.State = mScene.GetGameSceneState(GameSceneStates.Battle);
                     }
                 }
             }
@@ -84,7 +84,7 @@ namespace Conquera
                 {
                     mScene.SelectedCell = cellUnderCur;
                     var selectedUnit = mScene.SelectedUnit;
-                    mScene.State = mScene.States[typeof(IdleGameSceneState)];
+                    mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
                 }
             }
         }
@@ -93,7 +93,7 @@ namespace Conquera
         {
             if (null == mScene.SelectedUnit) //e.g. unit has died
             {
-                mScene.State = mScene.States[typeof(IdleGameSceneState)];
+                mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
             }
             else
             {

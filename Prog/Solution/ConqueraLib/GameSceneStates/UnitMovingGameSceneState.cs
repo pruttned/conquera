@@ -37,7 +37,7 @@ namespace Conquera
         {
             if (null == mScene.SelectedUnit)
             {
-                mScene.State = mScene.States[typeof(VictoryEvaluationGameSceneState)];
+                mScene.State = mScene.GetGameSceneState(GameSceneStates.VictoryEvaluation);
             }
             else
             {
@@ -57,7 +57,7 @@ namespace Conquera
         {
             if (null == mScene.SelectedUnit || mScene.SelectedUnit.IsIdle)
             {
-                mScene.State = mScene.States[typeof(VictoryEvaluationGameSceneState)];
+                mScene.State = mScene.GetGameSceneState(GameSceneStates.VictoryEvaluation);
             }
         }
     }

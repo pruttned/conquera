@@ -47,6 +47,8 @@ namespace Conquera
         private int mGold;
         private int mMaxUnitCnt;
 
+        private Dictionary<string, IGameSceneState> mGameSceneStates = new Dictionary<string, IGameSceneState>();
+
         public ReadOnlyCollection<HexCell> Cells { get; private set; }
 
         //Computed - not saved
@@ -129,6 +131,11 @@ namespace Conquera
             Color = color;
         }
 
+        public IGameSceneState GetGameSceneState(string name)
+        {
+            return mGameSceneStates[name];
+        }
+
         public void AddCard(GameCard card)
         {
             int cardCnt = 0;
@@ -193,6 +200,8 @@ namespace Conquera
                 unit.OwningPlayer = this;
                 scene.AddGameUnit(unit);
             }
+
+            CreateGameSceneStates(mScene, mGameSceneStates);
         }
 
         /// <summary>
@@ -229,6 +238,8 @@ namespace Conquera
         {
             Cells = new ReadOnlyCollection<HexCell>(mCells);
         }
+
+        protected abstract void CreateGameSceneStates(GameScene scene, Dictionary<string, IGameSceneState> gameSceneStates);
 
         private void CheckInit()
         {
@@ -273,6 +284,17 @@ namespace Conquera
         /// </summary>
         protected HumanPlayer()
         {
+        }
+
+        protected override void CreateGameSceneStates(GameScene scene, Dictionary<string, IGameSceneState> gameSceneStates)
+        {
+            gameSceneStates.Add(GameSceneStates.Idle, new IdleGameSceneState(scene));
+            gameSceneStates.Add(GameSceneStates.UnitMoving, new UnitMovingGameSceneState(scene));
+            gameSceneStates.Add(GameSceneStates.CameraAnimation, new CameraAnimationGameSceneState(scene));
+            gameSceneStates.Add(GameSceneStates.VictoryEvaluation, new VictoryEvaluationGameSceneState(scene));
+            gameSceneStates.Add(GameSceneStates.BeginTurn, new BeginTurnGameSceneState(scene));
+            gameSceneStates.Add(GameSceneStates.ReadyGameUnitSelected, new ReadyGameUnitSelectedGameSceneState(scene));
+            gameSceneStates.Add(GameSceneStates.Battle, new BattleGameSceneState(scene));
         }
     }
 }
