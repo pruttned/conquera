@@ -53,7 +53,6 @@ namespace Conquera
             }
 
             mScene.EnableMouseCameraControl = true;
-            MovementArrow.IsVisible = true;
             MovementArrow.StartCell = mScene.GetCell(SelectedUnit.CellIndex);
         }
 
