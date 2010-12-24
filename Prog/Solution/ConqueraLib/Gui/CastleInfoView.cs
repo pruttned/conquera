@@ -40,7 +40,8 @@ namespace Conquera.Gui
         public override void Update(HexCell cell)
         {
             mCell = cell;
-            mBuyHeroButton.Visible = mCell.OwningPlayer == cell.Scene.CurrentPlayer && mCell.GameUnit == null && mCell.OwningPlayer.HasEnoughGoldForUnit("GameUnit1");
+            mBuyHeroButton.Visible = mCell.OwningPlayer == cell.Scene.CurrentPlayer && mCell.GameUnit == null &&
+                mCell.OwningPlayer.HasEnoughGoldForUnit("GameUnit1") && mCell.OwningPlayer.Units.Count < mCell.OwningPlayer.MaxUnitCnt;
         }
 
         private void mBuyHeroButton_Click(object sender, ControlEventArgs e)

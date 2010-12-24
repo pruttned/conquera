@@ -17,13 +17,28 @@
 ////////////////////////////////////////////////////////////////////////
 
 using Microsoft.Xna.Framework;
+using System;
 
 namespace Ale.Gui
 {
     public class Dialog : Control
     {
-        public void Show(bool modal)
+        private Control mOldModalControl;
+        private bool mModal;
+        private bool mShown = false;
+
+        public bool Shown
         {
+            get { return mShown; }
+        }
+
+        public bool Show(bool modal)
+        {
+            if (Shown)
+            {
+                return false;
+            }
+
             System.Drawing.SizeF screenSize = GuiManager.Instance.ScreenSize;
             Location = new Point((int)(screenSize.Width / 2 - Size.Width / 2), (int)(screenSize.Height / 2 - Size.Height / 2));
 
@@ -31,13 +46,30 @@ namespace Ale.Gui
             
             if (modal)
             {
+                mOldModalControl = GuiManager.Instance.ActiveScene.ModalControl;
                 GuiManager.Instance.ActiveScene.ModalControl = this;
             }
+            mModal = modal;
+
+            mShown = true;
+            return true;
         }
 
-        public void Hide()
+        public bool Hide()
         {
+            if (!Shown)
+            {
+                return false;
+            }
+
+            if (mModal)
+            {
+                GuiManager.Instance.ActiveScene.ModalControl = mOldModalControl;
+            }
+
             SiblingColleciton.Remove(this);
+            mShown = false;
+            return true;
         }
     }
 }

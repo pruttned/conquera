@@ -36,6 +36,7 @@ namespace Conquera
     {
         public event EventHandler GoldChanged;
         public event EventHandler MaxUnitCntChanged;
+        public event EventHandler UnitsChanged;
 
         private List<GameUnit> mUnits = new List<GameUnit>();
         private List<HexCell> mCells = new List<HexCell>();
@@ -46,8 +47,6 @@ namespace Conquera
         private Material mInactiveBorderMaterial;
         private int mGold;
         private int mMaxUnitCnt;
-
-        private Dictionary<string, IGameSceneState> mGameSceneStates = new Dictionary<string, IGameSceneState>();
 
         public ReadOnlyCollection<HexCell> Cells { get; private set; }
 
@@ -101,7 +100,7 @@ namespace Conquera
         [DataProperty(NotNull = true)]
         public Vector3 Color { get; private set; }
         [DataListProperty(NotNull=true)]
-        private List<GameUnit> Units
+        internal List<GameUnit> Units
         {
             get { return mUnits; }
             set { mUnits = value; }
@@ -128,12 +127,7 @@ namespace Conquera
         public GamePlayer(Vector3 color)
             :this()
         {
-            Color = color;
-        }
-
-        public IGameSceneState GetGameSceneState(string name)
-        {
-            return mGameSceneStates[name];
+            Color = color;            
         }
 
         public void AddCard(GameCard card)
@@ -172,12 +166,20 @@ namespace Conquera
 
         internal void AddGameUnit(GameUnit unit)
         {
+            if (mUnits.Count >= MaxUnitCnt)
+            {
+                throw new InvalidOperationException("MaxUnitCnt already reached.");
+            }
+
             mUnits.Add(unit);
+            RaiseUnitsChanged();
         }
 
         internal bool RemoveGameUnit(GameUnit unit)
         {
-            return mUnits.Remove(unit);
+            bool removed = mUnits.Remove(unit);
+            RaiseUnitsChanged();
+            return removed;
         }
 
         public abstract void OnBegineTurn();
@@ -200,8 +202,6 @@ namespace Conquera
                 unit.OwningPlayer = this;
                 scene.AddGameUnit(unit);
             }
-
-            CreateGameSceneStates(mScene, mGameSceneStates);
         }
 
         /// <summary>
@@ -237,13 +237,20 @@ namespace Conquera
         protected GamePlayer()
         {
             Cells = new ReadOnlyCollection<HexCell>(mCells);
+            MaxUnitCnt = 3;
         }
-
-        protected abstract void CreateGameSceneStates(GameScene scene, Dictionary<string, IGameSceneState> gameSceneStates);
 
         private void CheckInit()
         {
             if (null == mScene) { throw new InvalidOperationException("Init has not yet been called"); }
+        }
+
+        private void RaiseUnitsChanged()
+        {
+            if (UnitsChanged != null)
+            {
+                UnitsChanged(this, EventArgs.Empty);
+            }
         }
     }
 
@@ -284,17 +291,6 @@ namespace Conquera
         /// </summary>
         protected HumanPlayer()
         {
-        }
-
-        protected override void CreateGameSceneStates(GameScene scene, Dictionary<string, IGameSceneState> gameSceneStates)
-        {
-            gameSceneStates.Add(GameSceneStates.Idle, new IdleGameSceneState(scene));
-            gameSceneStates.Add(GameSceneStates.UnitMoving, new UnitMovingGameSceneState(scene));
-            gameSceneStates.Add(GameSceneStates.CameraAnimation, new CameraAnimationGameSceneState(scene));
-            gameSceneStates.Add(GameSceneStates.VictoryEvaluation, new VictoryEvaluationGameSceneState(scene));
-            gameSceneStates.Add(GameSceneStates.BeginTurn, new BeginTurnGameSceneState(scene));
-            gameSceneStates.Add(GameSceneStates.ReadyGameUnitSelected, new ReadyGameUnitSelectedGameSceneState(scene));
-            gameSceneStates.Add(GameSceneStates.Battle, new BattleGameSceneState(scene));
         }
     }
 }

@@ -45,6 +45,8 @@
     <image name="TileInfoPanelBackground" textureFileName="Palette" locationX="0" locationY="259" width="243" height="199"/>
     <image name="HeroInfoPanelBackground" textureFileName="Palette" locationX="0" locationY="259" width="243" height="199"/>
     <image name="GameCardInfoDialogBackground" textureFileName="Palette" locationX="257" locationY="1" width="510" height="475"/>
+    <image name="ShowMainMenuButtonDefault" textureFileName="Palette" locationX="0" locationY="0" width="42" height="42"/>
+    <image name="ShowMainMenuButtonMouseOver" textureFileName="Palette" locationX="43" locationY="0" width="42" height="42"/>
     
     <!--Castle-->
     <image name="CastleBuyHeroDefault" textureFileName="Palette" locationX="0" locationY="0" width="42" height="42"/>
@@ -60,6 +62,11 @@
     <image name="CursorAttack" textureFileName="Palette" locationX="50" locationY="43" width="24" height="24"/>
     <image name="CursorMove" textureFileName="Palette" locationX="25" locationY="43" width="24" height="24"/>
     <image name="CursorMoveDisabled" textureFileName="Palette" locationX="75" locationY="43" width="24" height="24"/>
+    
+    <!--Main Menu-->
+    <image name="MainMenuDialogBackground" textureFileName="Palette" locationX="257" locationY="1" width="510" height="475"/>
+    <image name="MainMenuButtonDefault" textureFileName="Palette" locationX="0" locationY="0" width="42" height="42"/>
+    <image name="MainMenuButtonMouseOver" textureFileName="Palette" locationX="43" locationY="0" width="42" height="42"/>    
   </graphicElements>
 
 </guiPalette>
