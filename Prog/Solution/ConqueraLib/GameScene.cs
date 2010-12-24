@@ -57,15 +57,22 @@ namespace Conquera
         private HexCell mSelectedCell = null;
 
         SoundEmitter mSoundEmitter = new SoundEmitter();
-        private GameGuiScene mGuiScene = new GameGuiScene();
+        private GameGuiScene mGuiScene;
 
         private IGameSceneState mState;
+
+        private Dictionary<Type, IGameSceneState> mStates = new Dictionary<Type, IGameSceneState>();
 
         private CellLabelManager mCellLabelManager;
 
         public string Name { get; private set; }
 
         public GameSceneContextState GameSceneContextState { get; private set; }
+
+        public Dictionary<Type, IGameSceneState> States
+        {
+            get { return mStates; }
+        }
 
         public IGameSceneState State
         {
@@ -150,8 +157,8 @@ namespace Conquera
 
             GameSceneContextState.Players.Add(new HumanPlayer(Color.Blue.ToVector3()));
             GameSceneContextState.Players.Add(new HumanPlayer(Color.Red.ToVector3()));
-            GameSceneContextState.Players[0].Gold = 1000;
-            GameSceneContextState.Players[1].Gold = 1000;
+            GameSceneContextState.Players[0].Gold = 1000;            
+            GameSceneContextState.Players[1].Gold = 1000;            
 
             Init();
         }
@@ -182,11 +189,6 @@ namespace Conquera
             }
 
             return scene;
-        }
-
-        public IGameSceneState GetGameSceneState(string name)
-        {
-            return CurrentPlayer.GetGameSceneState(name);
         }
 
         public void Save()
@@ -285,6 +287,7 @@ namespace Conquera
 
         public void EndTurn()
         {
+            GamePlayer oldPlayer = CurrentPlayer;
             CurrentPlayer.OnEndTurn();
 
             GameSceneContextState.EndTurn();
@@ -301,6 +304,8 @@ namespace Conquera
                     }
                 }
             }
+
+            mGuiScene.HandleEndTurn(oldPlayer);
         }
 
 
@@ -784,7 +789,19 @@ namespace Conquera
 
             RegisterFrameListener(GameCamera);
 
-            State = GetGameSceneState(GameSceneStates.Idle);
+            //gui
+            mGuiScene = new GameGuiScene(this);
+
+            //states
+            mStates.Add(typeof(IdleGameSceneState), new IdleGameSceneState(this));
+            mStates.Add(typeof(UnitMovingGameSceneState), new UnitMovingGameSceneState(this));
+            mStates.Add(typeof(CameraAnimationGameSceneState), new CameraAnimationGameSceneState(this));
+            mStates.Add(typeof(VictoryEvaluationGameSceneState), new VictoryEvaluationGameSceneState(this));
+            mStates.Add(typeof(BeginTurnGameSceneState), new BeginTurnGameSceneState(this));
+            mStates.Add(typeof(ReadyGameUnitSelectedGameSceneState), new ReadyGameUnitSelectedGameSceneState(this));
+            mStates.Add(typeof(BattleGameSceneState), new BattleGameSceneState(this));
+
+            State = mStates[typeof(IdleGameSceneState)];
 
             //temp
             mCursor3dCellSel.IsVisible = false;
@@ -803,17 +820,9 @@ namespace Conquera
             v2.Z = 100;
             return new BoundingBox(v1, v2);
         }
-
     }
 
-    public static class GameSceneStates
-    {
-        public static readonly string Idle = "Idle";
-        public static readonly string UnitMoving = "UnitMoving";
-        public static readonly string CameraAnimation = "CameraAnimation";
-        public static readonly string VictoryEvaluation = "VictoryEvaluation";
-        public static readonly string BeginTurn = "BeginTurn";
-        public static readonly string ReadyGameUnitSelected = "ReadyGameUnitSelected";
-        public static readonly string Battle = "Battle";
-    }
+
+
+
 }
