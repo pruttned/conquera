@@ -30,19 +30,25 @@ namespace Conquera
     {
         static void Main(string[] args)
         {
-           // GenerateContent();
-            using (Application app = new Application())
+            if (1 == 0)
             {
-                //try
-                //{
-                app.Run();
-                //}
-                //catch (Exception ex)
-                //{
-                //    Tracer.WriteError(ex.ToString());
-                //    //MessageBox.Show(ex.ToString());
-                //    throw;
-                //}
+                GenerateContent();
+            }
+            else
+            {
+                using (Application app = new Application())
+                {
+                    //try
+                    //{
+                    app.Run();
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    Tracer.WriteError(ex.ToString());
+                    //    //MessageBox.Show(ex.ToString());
+                    //    throw;
+                    //}
+                }
             }
         }
 
@@ -461,7 +467,8 @@ namespace Conquera
 
 
                     {
-                        GameUnitSttings obj = new GameUnitSttings();
+                        GameUnitSettings obj = new GameUnitSettings();
+                        obj.Description = "Test Game Unit";
                         obj.Name = "GameUnit1";
                         obj.GraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'ujoGm'");
                         obj.AttackAnimation = "Attack";
@@ -469,12 +476,8 @@ namespace Conquera
                         obj.MoveAnimation = "Run";
                         obj.MaxHp = 20;
                         obj.Cost = 100;
-                        obj.BaseAttackPurple = 5;
-                        obj.BaseDefensePurple = 1;
-                        obj.BaseAttackGreen = 3;
-                        obj.BaseDefenseGreen = 2;
-                        obj.BaseAttackBlack = 2;
-                        obj.BaseDefenseBlack = 3;
+                        obj.Attack = 5;
+                        obj.Defense = 3;
                         obj.BloodParticleSystem = ormManager.FindObject(typeof(ParticleSystemSettings), "Name = 'BloodParticleSystem'"); ;
                         obj.DamageAnimationTime = 1.0f;
                         ormManager.SaveObject(obj);

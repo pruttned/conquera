@@ -247,7 +247,7 @@ namespace Conquera
             }
 
             SetCellOwner(index, gamePlayer);
-            long descId = Content.ParentContentManager.OrmManager.FindObject(typeof(GameUnitSttings), string.Format("Name='{0}'", desc));
+            long descId = Content.ParentContentManager.OrmManager.FindObject(typeof(GameUnitSettings), string.Format("Name='{0}'", desc));
             if (0 >= descId)
             {
                 throw new ArgumentException(string.Format("Unit desc '{0}' doesn't exists", desc));

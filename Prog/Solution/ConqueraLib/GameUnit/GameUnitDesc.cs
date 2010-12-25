@@ -28,7 +28,7 @@ namespace Conquera
     [NonContentPipelineAsset(typeof(GameUnitDescLoader))]
     public class GameUnitDesc : OctreeSceneObjectDesc
     {
-        private GameUnitSttings mSettings;
+        private GameUnitSettings mSettings;
 
         public string IdleAnimation
         {
@@ -50,29 +50,13 @@ namespace Conquera
         {
             get { return mSettings.MaxHp; }
         }
-        public int BaseRedAttack
+        public int Attack
         {
-            get { return mSettings.BaseAttackPurple; }
+            get { return mSettings.Attack; }
         }
-        public int BaseRedDefense
+        public int Defense
         {
-            get { return mSettings.BaseDefensePurple; }
-        }
-        public int BaseGreenAttack
-        {
-            get { return mSettings.BaseAttackGreen; }
-        }
-        public int BaseGreenDefense
-        {
-            get { return mSettings.BaseDefenseGreen; }
-        }
-        public int BaseBlackAttack
-        {
-            get { return mSettings.BaseAttackBlack; }
-        }
-        public int BaseBlackDefense
-        {
-            get { return mSettings.BaseDefenseBlack; }
+            get { return mSettings.Defense; }
         }
         public float DamageAnimationTime
         {
@@ -81,7 +65,7 @@ namespace Conquera
 
         public ParticleSystemDesc BloodParticleSystem { get; private set; }
 
-        public GameUnitDesc(GameUnitSttings settings, ContentGroup content)
+        public GameUnitDesc(GameUnitSettings settings, ContentGroup content)
             : base(settings, content)
         {
             mSettings = settings;

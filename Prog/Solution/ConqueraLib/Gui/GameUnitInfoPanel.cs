@@ -59,9 +59,7 @@ namespace Conquera.Gui
                 mStatText.AppendLine(string.Format("Ready: {0}", !gameUnit.HasMovedThisTurn));
             }
 
-            mStatText.AppendLine(string.Format("Atck Red:   {0} | Dfs Red:   {1}", gameUnit.AttackPurple, gameUnit.DefensePurple));
-            mStatText.AppendLine(string.Format("Atck Green: {0} | Dfs Green: {1}", gameUnit.AttackGreen, gameUnit.DefenseGreen));
-            mStatText.AppendLine(string.Format("Atck Black: {0} | Dfs Black: {1}", gameUnit.AttackBlack, gameUnit.DefenseBlack));
+            mStatText.AppendLine(string.Format("Atck :   {0} | Dfs :   {1}", gameUnit.GameUnitDesc.Attack, gameUnit.GameUnitDesc.Defense));
 
             //Cards.
             //todo: spell

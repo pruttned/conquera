@@ -23,14 +23,14 @@ using Ale.Content;
 
 namespace Conquera
 {
-    public class GameUnitDescLoader : BaseAssetLoader<GameUnitSttings>
+    public class GameUnitDescLoader : BaseAssetLoader<GameUnitSettings>
     {
-        protected override object CreateDesc(GameUnitSttings settings, ContentGroup contentGroup)
+        protected override object CreateDesc(GameUnitSettings settings, ContentGroup contentGroup)
         {
             return new GameUnitDesc(settings, contentGroup);
         }
 
-        protected override string GetName(GameUnitSttings settings)
+        protected override string GetName(GameUnitSettings settings)
         {
             return settings.Name;
         }

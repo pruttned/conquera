@@ -25,8 +25,11 @@ using Ale.Scene;
 namespace Conquera
 {
     [DataObject(MaxCachedCnt = 0)]
-    public class GameUnitSttings : OctreeSceneObjectSettings
+    public class GameUnitSettings : OctreeSceneObjectSettings
     {
+        [DataProperty(NotNull = true)]
+        public string Description { get; set; }
+
         [DataProperty(NotNull = true)]
         public string IdleAnimation { get; set; }
         [DataProperty(NotNull = true)]
@@ -40,9 +43,9 @@ namespace Conquera
         public int MaxHp { get; set; }
 
         [DataProperty(NotNull = true)]
-        public int BaseAttackPurple { get; set; }
+        public int Attack { get; set; }
         [DataProperty(NotNull = true)]
-        public int BaseDefensePurple { get; set; }
+        public int Defense { get; set; }
         [DataProperty(NotNull = true)]
         public int BaseAttackGreen { get; set; }
         [DataProperty(NotNull = true)]
