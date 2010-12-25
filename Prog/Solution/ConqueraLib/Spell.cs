@@ -19,19 +19,11 @@
 using System;
 using System.Collections.ObjectModel;
 using Ale.Gui;
+using Ale;
 
 namespace Conquera
 {
-    public class SpellDescriptor
-    {
-        public GraphicElement Picture { get; set; }
-        public GraphicElement Icon { get; set; }
-        public string Name { get; set; }
-        public string DisplayName { get; set; }
-        public string Description { get; set; }
-    }
-
-    public class Spell
+    public abstract class Spell
     {
         public event EventHandler TotalCountChanged;
         public event EventHandler AvailableCountChanged;
@@ -39,7 +31,12 @@ namespace Conquera
         private int mTotalCount;
         private int mAvailableCount;
 
-        public SpellDescriptor SpellDescriptor { get; private set; }        
+        private bool mIsCasted = false;
+
+        public abstract GraphicElement Picture { get; }
+        public abstract GraphicElement Icon { get; }
+        public abstract string DisplayName { get; }
+        public abstract string Description { get; }
 
         public int TotalCount
         {
@@ -82,10 +79,45 @@ namespace Conquera
             }
         }
 
-        public Spell(SpellDescriptor spellDescriptor)
+        protected GameUnit CurrentCaster { get; private set; }
+        protected GameUnit CurrentTarget { get; private set; }
+
+
+        public bool Cast(GameUnit caster, GameUnit target)
         {
-            SpellDescriptor = spellDescriptor;
+            if (null == caster) throw new ArgumentNullException("caster");
+            if (null == target) throw new ArgumentNullException("target");
+            if (mIsCasted) throw new InvalidOperationException("Spell is currently casted");
+
+            CurrentCaster = caster;
+            CurrentTarget = target;
+
+            if (CastImpl(caster, target))
+            {
+                mIsCasted = true;
+
+                return true;
+            }
+            return false;
         }
+
+        public bool Update(AleGameTime time)
+        {
+            if (!mIsCasted)
+            {
+                return false;
+            }
+            if (!UpdateImpl(time))
+            {
+                mIsCasted = false;
+            }
+            return mIsCasted;
+        }
+
+        public abstract void ApplyAttackDefenseModifiers(ref int attack, ref int defense);
+
+        protected abstract bool CastImpl(GameUnit caster, GameUnit target);
+        protected abstract bool UpdateImpl(AleGameTime time);
     }
 
     public class SpellCollection : ReadOnlyCollection<Spell>

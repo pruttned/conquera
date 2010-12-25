@@ -227,9 +227,20 @@ namespace Conquera
             Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, angle);
         }
 
-        public int ComputeDamageTo(GameUnit unit)
+        public int ComputeDamageTo(GameUnit unit, Spell activeSpell)
         {
-            return Math.Max(GameUnitDesc.Attack - unit.GameUnitDesc.Defense, 0);
+            if (null != activeSpell)
+            {
+                int attack = GameUnitDesc.Attack;
+                int defense =unit.GameUnitDesc.Defense;
+                activeSpell.ApplyAttackDefenseModifiers(ref attack, ref defense);
+
+                return Math.Max(attack - defense, 0);
+            }
+            else
+            {
+                return Math.Max(GameUnitDesc.Attack - unit.GameUnitDesc.Defense, 0);
+            }
         }
 
         public void Heal(int amount)
@@ -274,6 +285,7 @@ namespace Conquera
             States.Add("Idle", new IdleGameUnitState(this));
             States.Add("Move", new MovingGameUnitState(this));
             States.Add("Attack", new AttackingGameUnitState(this));
+            States.Add("CastingSpell", new CastingSpellGameUnitState(this));
         }
 
         protected override bool IsSceneValid(BaseScene scene)

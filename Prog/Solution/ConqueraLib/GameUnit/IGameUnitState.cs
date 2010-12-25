@@ -56,6 +56,7 @@ namespace Conquera
         {
         }
     }
+
     public class MovingGameUnitState : IGameUnitState
     {
         private GameUnit mGameUnit;
@@ -99,6 +100,7 @@ namespace Conquera
             }
         }
     }
+
     public class AttackingGameUnitState : IGameUnitState
     {
         private GameUnit mGameUnit;
@@ -135,10 +137,59 @@ namespace Conquera
             }
             if(gameTime.TotalTime > mDamageTime)
             {
-                int damage = mGameUnit.ComputeDamageTo(TargetUnit);
+                var activeSpell = mGameUnit.GameScene.ActiveSpell;
+
+                int damage = mGameUnit.ComputeDamageTo(TargetUnit, activeSpell);
                 TargetUnit.ReceiveDamage(damage);
-                mGameUnit.State = mGameUnit.States["Idle"];
+
+                if (null != activeSpell)
+                {
+                    var spellState = (CastingSpellGameUnitState)mGameUnit.States["CastingSpell"];
+                    spellState.TargetUnit = TargetUnit;
+                    mGameUnit.State = mGameUnit.States["CastingSpell"];
+                }
+                else
+                {
+                    mGameUnit.State = mGameUnit.States["Idle"];
+                }
             }
         }
     }
+
+    public class CastingSpellGameUnitState : IGameUnitState
+    {
+        private GameUnit mGameUnit;
+        public GameUnit TargetUnit { get; set; }
+
+        public bool IsIdle
+        {
+            get { return false; }
+        }
+
+        public CastingSpellGameUnitState(GameUnit gameUnit)
+        {
+            if (null == gameUnit) throw new ArgumentNullException("gameUnit");
+            mGameUnit = gameUnit;
+        }
+
+        public void OnStart()
+        {
+            if (null == TargetUnit) throw new ArgumentNullException("TargetUnit");
+
+            if (!mGameUnit.GameScene.ActiveSpell.Cast(mGameUnit, TargetUnit))
+            {
+                //no animation
+                mGameUnit.State = mGameUnit.States["Idle"];
+            }
+        }
+
+        public void Update(AleGameTime gameTime)
+        {
+            if (!mGameUnit.GameScene.ActiveSpell.Update(gameTime))
+            {
+                  mGameUnit.State = mGameUnit.States["Idle"];
+            }
+        }
+    }
+
 }
