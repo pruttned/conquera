@@ -95,13 +95,6 @@ namespace Conquera
             get { return GameUnitDesc.MaxHp; } 
         }
 
-        public int AttackPurple { get; private set; }
-        public int AttackGreen { get; private set; }
-        public int AttackBlack { get; private set; }
-        public int DefensePurple { get; private set; }
-        public int DefenseGreen { get; private set; }
-        public int DefenseBlack { get; private set; }        
-
         public bool HasMovedThisTurn
         {
             get { return (LastMovedTurn == GameScene.GameSceneContextState.TurnNum); }
@@ -236,12 +229,8 @@ namespace Conquera
 
         public int ComputeDamageTo(GameUnit unit)
         {
-            return (Math.Max(AttackBlack - unit.DefenseBlack, 0) +
-                    Math.Max(AttackPurple - unit.DefensePurple, 0) +
-                    Math.Max(AttackGreen - unit.DefenseGreen, 0));
+            return Math.Max(GameUnitDesc.Attack - unit.GameUnitDesc.Defense, 0);
         }
-
-        //todo jednotka moze v jednom tahu ista a bojovat v lubovolnom poradi. Ked vsak zabije zlu jednotku, tak to neznamena, ze na to policko aj prejde.
 
         public void Heal(int amount)
         {
@@ -317,7 +306,6 @@ namespace Conquera
             {
                 Hp = GameUnitDesc.MaxHp;
             }
-            RecalculateAttackDefense();
         }
 
         protected virtual void OnCellIndexChanged(Point oldValue)
@@ -348,28 +336,6 @@ namespace Conquera
 
         void IDataObject.BeforeDelete(OrmManager ormManager)
         {
-        }
-
-        private void RecalculateAttackDefense()
-        {
-            AttackPurple = GameUnitDesc.BaseRedAttack;
-            AttackGreen = GameUnitDesc.BaseGreenAttack;
-            AttackBlack = GameUnitDesc.BaseBlackAttack;
-
-            DefensePurple = GameUnitDesc.BaseRedDefense;
-            DefenseGreen = GameUnitDesc.BaseGreenDefense;
-            DefenseBlack = GameUnitDesc.BaseBlackDefense;
-
-            //foreach (GameCard card in Cards)
-            //{
-            //    AttackPurple += card.AttackPurple;
-            //    AttackGreen += card.AttackGreen;
-            //    AttackBlack += card.AttackBlack;
-
-            //    DefensePurple += card.DefensePurple;
-            //    DefenseGreen += card.DefenseGreen;
-            //    DefenseBlack += card.DefenseBlack;
-            //}
         }
 
         private void CheckIdle()

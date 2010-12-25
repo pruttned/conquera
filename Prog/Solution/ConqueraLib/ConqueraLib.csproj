@@ -103,12 +103,11 @@
     <Compile Include="GameUnit\GameUnit.cs" />
     <Compile Include="GameUnit\GameUnitDesc.cs" />
     <Compile Include="GameUnit\GameUnitDescLoader.cs" />
-    <Compile Include="GameUnit\GameUnitSttings.cs" />
+    <Compile Include="GameUnit\GameUnitSettings.cs" />
     <Compile Include="GameUnit\IGameUnitState.cs" />
     <Compile Include="Gui\AlCursors.cs" />
     <Compile Include="Gui\CastleInfoView.cs" />
     <Compile Include="Gui\DimensionGateInfoView.cs" />
-    <Compile Include="Gui\GameCardInfoDialog.cs" />
     <Compile Include="Gui\GameGuiScene.cs" />
     <Compile Include="Gui\GameUnitInfoPanel.cs" />
     <Compile Include="Gui\GoldMineInfoView.cs" />
@@ -116,6 +115,7 @@
     <Compile Include="Gui\LandInfoView.cs" />
     <Compile Include="Gui\LandTempleInfoView.cs" />
     <Compile Include="Gui\MegaDebugLabel.cs" />
+    <Compile Include="Gui\SpellInfoDialog.cs" />
     <Compile Include="Gui\SpellSlot.cs" />
     <Compile Include="Gui\TileInfoPanel.cs" />
     <Compile Include="Gui\TileInfoView.cs" />
