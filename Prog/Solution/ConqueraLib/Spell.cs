@@ -23,7 +23,7 @@ using System.Text;
 
 namespace Conquera
 {
-    class Spell
+    public class Spell
     {
     }
 }

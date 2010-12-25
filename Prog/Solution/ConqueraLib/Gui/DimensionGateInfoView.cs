@@ -24,9 +24,9 @@ namespace Conquera.Gui
 {
     public class DimensionGateInfoView : TileInfoView
     {
-        private GameCardSlot mCardSlot1 = new GameCardSlot();
-        private GameCardSlot mCardSlot2 = new GameCardSlot();
-        private GameCardSlot mCardSlot3 = new GameCardSlot();
+        private SpellSlot mCardSlot1 = new SpellSlot();
+        private SpellSlot mCardSlot2 = new SpellSlot();
+        private SpellSlot mCardSlot3 = new SpellSlot();
 
         public DimensionGateInfoView()
         {
@@ -45,25 +45,25 @@ namespace Conquera.Gui
             card1.Description = "card1 description  - tralala tsdlakjf hslkdjh fklsajdhf lkjsdhf lkjsdhf lkjdhfkljdlfkjhsdl kfjhdskljfh dskjfh d";
             card1.Icon = GuiManager.Instance.Palette.CreateGraphicElement("TileIconCastle");
             //card1.Picture = GuiManager.Instance.Palette.CreateGraphicElement("composite");
-            mCardSlot1.Card = card1;
+            mCardSlot1.Spell = card1;
 
             GameCard card2 = new GameCard();
             card2.Name = "card2";
             card2.Description = "card2 description  - tralala tsdlakjf hslkdjh fklsajdhf lkjsdhf lkjsdhf lkjdhfkljdlfkjhsdl kfjhdskljfh dskjfh d";
             card2.Icon = GuiManager.Instance.Palette.CreateGraphicElement("TileIconDimensionGate");
             //card2.Picture = GuiManager.Instance.Palette.CreateGraphicElement("composite");
-            mCardSlot2.Card = card2;
+            mCardSlot2.Spell = card2;
 
             GameCard card3 = new GameCard();
             card3.Name = "card3";
             card3.Description = "card3 description  - tralala tsdlakjf hslkdjh fklsajdhf lkjsdhf lkjsdhf lkjdhfkljdlfkjhsdl kfjhdskljfh dskjfh d";
             card3.Icon = GuiManager.Instance.Palette.CreateGraphicElement("TileIconLand");
             //card3.Picture = GuiManager.Instance.Palette.CreateGraphicElement("composite");
-            mCardSlot3.Card = card3;
+            mCardSlot3.Spell = card3;
             //END TODO
         }
 
-        private void InitializeCardSlot(GameCardSlot slot, Point locaton)
+        private void InitializeCardSlot(SpellSlot slot, Point locaton)
         {
             slot.Location = locaton;
             ChildControls.Add(slot);

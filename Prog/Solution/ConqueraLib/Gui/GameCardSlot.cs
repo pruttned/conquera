@@ -20,52 +20,54 @@ using System;
 using Ale.Scene;
 using Ale.Gui;
 
+//todo: spell
+
 namespace Conquera.Gui
 {
-    public class GameCardSlot : Control
+    public class SpellSlot : Control
     {
-        private GameCardInfoDialog mDialog = new GameCardInfoDialog();
+        private SpellInfoDialog mDialog = new SpellInfoDialog();
 
-        public GameCard Card { get; set; }
+        public Spell Spell { get; set; }
 
-        public override System.Drawing.SizeF Size
-        {
-            get
-            {
-                if (Card == null)
-                {
-                    return System.Drawing.SizeF.Empty;
-                }
-                return Card.Icon.Size;
-            }
-        }
+        //public override System.Drawing.SizeF Size
+        //{
+        //    get
+        //    {
+        //        if (Spell == null)
+        //        {
+        //            return System.Drawing.SizeF.Empty;
+        //        }
+        //        return Spell.Icon.Size;
+        //    }
+        //}
 
-        public GameCardSlot()
-        {
-            MouseEnter += new EventHandler<ControlEventArgs>(GameCardInfoSlot_MouseEnter);
-            MouseLeave += new EventHandler<ControlEventArgs>(GameCardInfoSlot_MouseLeave);
-        }
+        //public SpellSlot()
+        //{
+        //    MouseEnter += new EventHandler<ControlEventArgs>(GameCardInfoSlot_MouseEnter);
+        //    MouseLeave += new EventHandler<ControlEventArgs>(GameCardInfoSlot_MouseLeave);
+        //}
 
-        protected override void OnDrawBackground()
-        {
-            if (Card != null)
-            {
-                Card.Icon.Draw(ScreenLocation);
-            }
-        }
+        //protected override void OnDrawBackground()
+        //{
+        //    if (Spell != null)
+        //    {
+        //        Spell.Icon.Draw(ScreenLocation);
+        //    }
+        //}
 
-        private void GameCardInfoSlot_MouseEnter(object sender, ControlEventArgs e)
-        {
-            if (Card != null)
-            {
-                mDialog.SetGameCard(Card);
-                mDialog.Show(false);
-            }
-        }
+        //private void GameCardInfoSlot_MouseEnter(object sender, ControlEventArgs e)
+        //{
+        //    if (Spell != null)
+        //    {
+        //        mDialog.SetGameCard(Spell);
+        //        mDialog.Show(false);
+        //    }
+        //}
 
-        private void GameCardInfoSlot_MouseLeave(object sender, ControlEventArgs e)
-        {
-            mDialog.Hide();
-        }
+        //private void GameCardInfoSlot_MouseLeave(object sender, ControlEventArgs e)
+        //{
+        //    mDialog.Hide();
+        //}
     }
 }

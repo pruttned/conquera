@@ -40,7 +40,6 @@ namespace Conquera
 
         private List<GameUnit> mUnits = new List<GameUnit>();
         private List<HexCell> mCells = new List<HexCell>();
-        private Dictionary<GameCard, int> mAllowedGameCards = new Dictionary<GameCard, int>();
 
         private GameScene mScene;
         private Material mActiveBorderMaterial;
@@ -135,30 +134,6 @@ namespace Conquera
         public IGameSceneState GetGameSceneState(string name)
         {
             return mGameSceneStates[name];
-        }
-
-        public void AddCard(GameCard card)
-        {
-            int cardCnt = 0;
-            mAllowedGameCards.TryGetValue(card, out cardCnt);
-            mAllowedGameCards[card] = cardCnt+1;
-        }
-
-        public void RemoveCard(GameCard card)
-        {
-            int cardCnt = 0;
-            if (mAllowedGameCards.TryGetValue(card, out cardCnt))
-            {
-                cardCnt--;
-                if (0 == cardCnt)
-                {
-                    mAllowedGameCards.Remove(card);
-                }
-                else
-                {
-                    mAllowedGameCards[card] = cardCnt;
-                }
-            }
         }
 
         internal void AddCell(HexCell cell)
