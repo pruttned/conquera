@@ -17,9 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections.ObjectModel;
 using Ale.Gui;
 
 namespace Conquera
@@ -90,13 +88,20 @@ namespace Conquera
         }
     }
 
-    public class SpellCollection
+    public class SpellCollection : ReadOnlyCollection<Spell>
     {
-        private Spell[] mSpells;
-
         public SpellCollection()
+            : base(new Spell[10])
         {
-            //todo: initialize mSpells and fill it with new Spell instances; bind to events of each spells and raise common events here
+            //todo: Fill Items with new Spell instances; bind to events of each spells and raise common events here
+        }
+
+        public void SetSpellAvailabilitiesToMax()
+        {
+            foreach(Spell spell in Items)
+            {
+                spell.AvailableCount = spell.TotalCount;
+            }
         }
     }
 

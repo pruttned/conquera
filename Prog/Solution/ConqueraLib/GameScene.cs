@@ -38,6 +38,8 @@ namespace Conquera
     public class GameScene : OctreeScene
     {
         //TODO !!! Doplnit co treba do Dispose
+        
+        public event EventHandler ActiveSpellChanged;
 
         //promoted collections
         private static HashSet<HexRegion> NewRegions = new HashSet<HexRegion>();
@@ -62,6 +64,7 @@ namespace Conquera
         private IGameSceneState mState;
 
         private CellLabelManager mCellLabelManager;
+        private Spell mActiveSpell = null;
 
         public string Name { get; private set; }
 
@@ -137,6 +140,19 @@ namespace Conquera
         }
 
         public bool EnableMouseCameraControl { get; set; }
+
+        public Spell ActiveSpell
+        {
+            get { return mActiveSpell; }
+            set
+            {
+                if (value != mActiveSpell)
+                {
+                    mActiveSpell = value;
+                    EventManager.RaiseEvent(ActiveSpellChanged, this);
+                }
+            }
+        }
 
         public GameScene(string name, SceneManager sceneManager, int width, int height, string defaultTile, ContentGroup content)
             : base(sceneManager, content, GetBoundsFromSize(width, height))

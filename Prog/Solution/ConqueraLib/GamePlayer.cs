@@ -124,6 +124,7 @@ namespace Conquera
             }
         }
 
+        public SpellCollection Spells { get; private set; }
 
         public GamePlayer(Vector3 color)
             :this()
@@ -222,6 +223,7 @@ namespace Conquera
         {
             Cells = new ReadOnlyCollection<HexCell>(mCells);
 			MaxUnitCnt = 3;
+            Spells = new SpellCollection();
         }
 
         protected abstract void CreateGameSceneStates(GameScene scene, Dictionary<string, IGameSceneState> gameSceneStates);
@@ -264,6 +266,7 @@ namespace Conquera
 //              Scene.GameCamera.MoveCameraTo(CameraTargetPos);
                 Scene.GameCamera.TargetWorldPosition = CameraTargetPos;
             }
+            Spells.SetSpellAvailabilitiesToMax();
         }
 
         public override void OnEndTurn()
