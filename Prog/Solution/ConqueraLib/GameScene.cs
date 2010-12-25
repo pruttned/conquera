@@ -176,7 +176,7 @@ namespace Conquera
                 }
                 var settings = ormManager.LoadObject<GameSceneSettings>(settingsId);
                 var terrain = ormManager.LoadObject<HexTerrain>(settings.TerrainId);
-                var gameSceneState = ormManager.LoadObject<GameSceneContextState>(ormManager.FindObject(typeof(GameSceneContextState), "Key=1"));
+                var gameSceneState = ormManager.LoadObject<GameSceneContextState>("Key=1");
 
                 scene = new GameScene(sceneManager, content, ormManager, settings, terrain, gameSceneState);
             }

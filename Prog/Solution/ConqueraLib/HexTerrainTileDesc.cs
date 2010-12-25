@@ -36,6 +36,21 @@ namespace Conquera
 
         private bool mIsDisposed = false;
 
+        public string Name
+        {
+            get { return Settings.Name; }
+        }
+        
+        public string DisplayName
+        {
+            get { return Settings.DisplayName; }
+        }
+
+        public string Description
+        {
+            get { return Settings.Description.Text; }
+        }
+
         public GraphicModel GroundGraphicModel { get; private set; }
         public GraphicModel WallGraphicModel { get; private set; }
         /// <summary>
@@ -70,13 +85,6 @@ namespace Conquera
             get { return Settings.IsPassable; }
         }
 
-        /// <summary>
-        /// E.g. Lava, Temple of Life, Gold Mine
-        /// </summary>
-        public string NameType
-        {
-            get { return Settings.TypeName; }
-        }
         public long Id
         {
             get { return Settings.Id; }

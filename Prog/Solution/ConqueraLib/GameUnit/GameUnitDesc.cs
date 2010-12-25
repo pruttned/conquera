@@ -30,6 +30,14 @@ namespace Conquera
     {
         private GameUnitSettings mSettings;
 
+        public string Name
+        {
+            get { return mSettings.Name; }
+        }
+        public string DisplayName
+        {
+            get { return mSettings.DisplayName; }
+        }
         public string IdleAnimation
         {
             get { return mSettings.IdleAnimation; }

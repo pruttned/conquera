@@ -291,33 +291,6 @@ namespace Conquera
                     }
 
                     {
-                        LandTileSettings obj = new LandTileSettings();
-                        obj.Name = "Grass1Tile";
-                        obj.TypeName = "Grass";
-                        obj.HpIncrement = 2;
-                        obj.UnitPosition = Vector3.Zero;
-                        obj.TileIndex = new Point(1, 0);
-                        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
-                        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
-                        obj.IsPassable = true;
-                        ormManager.SaveObject(obj);
-                    }
-
-                    {
-                        LandTileSettings obj = new LandTileSettings();
-                        obj.Name = "Dirt1Tile";
-                        obj.TypeName = "Dirt";
-                        obj.HpIncrement = 0;
-                        obj.UnitPosition = Vector3.Zero;
-                        obj.TileIndex = new Point(2, 0);
-                        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
-                        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
-                        obj.IsPassable = true;
-                        ormManager.SaveObject(obj);
-                    }
-
-
-                    {
                         MaterialSettings mat = new MaterialSettings("CastleMat", "Simple", DefaultRenderLayers.GroundStandingObjects);
                         mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "CastleText"));
                         ormManager.SaveObject(mat);
@@ -345,37 +318,6 @@ namespace Conquera
                         settings.MaterialAssignments.Add(new MaterialAssignmentsettings("m1", ormManager.FindObjects(typeof(MaterialSettings), "Name='CastleActiveMat'")[0]));
                         ormManager.SaveObject(settings);
                     }
-
-                    {
-                        CastleTileSettings obj = new CastleTileSettings();
-                        obj.Name = "CastleTile";
-                        obj.TypeName = "Castle";
-                        obj.HpIncrement = int.MaxValue;
-                        obj.UnitPosition = new Vector3(-0.4f, -0.4f, 0);
-                        obj.TileIndex = new Point(4, 0);
-                        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
-                        obj.ActiveGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'CastleActiveGm'");
-                        obj.InactiveGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'CastleGm'");
-                        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
-                        obj.IsPassable = true;
-                        ormManager.SaveObject(obj);
-                    }
-
-
-                    {
-                        GoldMineTileSettings obj = new GoldMineTileSettings();
-                        obj.Name = "GoldMineLv1Tile";
-                        obj.TypeName = "GoldMineLv1";
-                        obj.GoldIncrement = 100;
-                        obj.HpIncrement = int.MaxValue;
-                        obj.UnitPosition = new Vector3(0.2f, 0.2f, 0);
-                        obj.TileIndex = new Point(3, 0);
-                        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
-                        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
-                        obj.IsPassable = true;
-                        ormManager.SaveObject(obj);
-                    }
-
 
                     //{
                     //    HexTerrainTileSettings obj = new HexTerrainTileSettings();
@@ -468,7 +410,7 @@ namespace Conquera
 
                     {
                         GameUnitSettings obj = new GameUnitSettings();
-                        obj.Description = "Test Game Unit";
+                        obj.DisplayName = "Knight";
                         obj.Name = "GameUnit1";
                         obj.GraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'ujoGm'");
                         obj.AttackAnimation = "Attack";
@@ -527,10 +469,49 @@ namespace Conquera
                         ormManager.SaveObject(settings);
                     }
 
+
+
+
+                    {
+                        ormManager.SaveObject(new StringResource("GrassTileDescription", "Adds 2 hp each turn"));
+                        ormManager.SaveObject(new StringResource("DirtTileDescription", "Does nothing"));
+                        ormManager.SaveObject(new StringResource("MountainsTileDescription", "Unpassable mountains"));
+                        ormManager.SaveObject(new StringResource("CastleTileDescription", "Used to build new units"));
+                        ormManager.SaveObject(new StringResource("GoldMineLv1TileDescription", "Adds 100 gold each turn"));
+                    }
+
+                    {
+                        LandTileSettings obj = new LandTileSettings();
+                        obj.Name = "Grass1Tile";
+                        obj.DisplayName = "Grass Land";
+                        obj.Description = ormManager.LoadObject<StringResource>("Name = 'GrassTileDescription'");
+                        obj.HpIncrement = 2;
+                        obj.UnitPosition = Vector3.Zero;
+                        obj.TileIndex = new Point(1, 0);
+                        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
+                        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
+                        obj.IsPassable = true;
+                        ormManager.SaveObject(obj);
+                    }
+
+                    {
+                        LandTileSettings obj = new LandTileSettings();
+                        obj.Name = "Dirt1Tile";
+                        obj.DisplayName = "Dirt Land";
+                        obj.Description = ormManager.LoadObject<StringResource>("Name = 'DirtTileDescription'");
+                        obj.HpIncrement = 0;
+                        obj.UnitPosition = Vector3.Zero;
+                        obj.TileIndex = new Point(2, 0);
+                        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
+                        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
+                        obj.IsPassable = true;
+                        ormManager.SaveObject(obj);
+                    }
                     {
                         LandTileSettings obj = new LandTileSettings();
                         obj.Name = "MountainsTile";
-                        obj.TypeName = "Mountains";
+                        obj.DisplayName = "Mountains";
+                        obj.Description = ormManager.LoadObject<StringResource>("Name = 'MountainsTileDescription'");
                         obj.HpIncrement = 0;
                         obj.UnitPosition = Vector3.Zero;
                         obj.TileIndex = new Point(1, 0);
@@ -538,6 +519,35 @@ namespace Conquera
                         obj.GraphicModels.Add(ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'MountainsGm'"));
                         obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
                         obj.IsPassable = false;
+                        ormManager.SaveObject(obj);
+                    }
+                    {
+                        CastleTileSettings obj = new CastleTileSettings();
+                        obj.Name = "CastleTile";
+                        obj.DisplayName = "Castle";
+                        obj.Description = ormManager.LoadObject<StringResource>("Name = 'CastleTileDescription'");
+                        obj.HpIncrement = int.MaxValue;
+                        obj.UnitPosition = new Vector3(-0.4f, -0.4f, 0);
+                        obj.TileIndex = new Point(4, 0);
+                        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
+                        obj.ActiveGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'CastleActiveGm'");
+                        obj.InactiveGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'CastleGm'");
+                        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
+                        obj.IsPassable = true;
+                        ormManager.SaveObject(obj);
+                    }
+                    {
+                        GoldMineTileSettings obj = new GoldMineTileSettings();
+                        obj.Name = "GoldMineLv1Tile";
+                        obj.DisplayName = "Small Gold Mine";
+                        obj.Description = ormManager.LoadObject<StringResource>("Name = 'GoldMineLv1TileDescription'");
+                        obj.GoldIncrement = 100;
+                        obj.HpIncrement = int.MaxValue;
+                        obj.UnitPosition = new Vector3(0.2f, 0.2f, 0);
+                        obj.TileIndex = new Point(3, 0);
+                        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
+                        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
+                        obj.IsPassable = true;
                         ormManager.SaveObject(obj);
                     }
 
