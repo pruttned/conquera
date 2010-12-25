@@ -149,7 +149,7 @@ namespace Conquera
                 if (value != mActiveSpell)
                 {
                     mActiveSpell = value;
-                    EventManager.RaiseEvent(ActiveSpellChanged, this);
+                    EventHelper.RaiseEvent(ActiveSpellChanged, this);
                 }
             }
         }
