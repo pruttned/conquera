@@ -20,10 +20,99 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Ale.Gui;
 
 namespace Conquera
 {
+    public class SpellDescriptor
+    {
+        public GraphicElement Picture { get; set; }
+        public GraphicElement Icon { get; set; }
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
+        public string Description { get; set; }
+    }
+
     public class Spell
     {
+        public event EventHandler TotalCountChanged;
+        public event EventHandler AvailableCountChanged;
+
+        private int mTotalCount;
+        private int mAvailableCount;
+
+        public SpellDescriptor SpellDescriptor { get; private set; }        
+
+        public int TotalCount
+        {
+            get { return mTotalCount; }
+            set
+            {
+                if (value != mTotalCount)
+                {
+                    if (value < 0)
+                    {
+                        throw new ArgumentException("Value must be greater or equal to zero.");
+                    }
+
+                    if (value < AvailableCount)
+                    {
+                        AvailableCount = value;
+                    }
+
+                    mTotalCount = value;
+                    EventManager.RaiseEvent(TotalCountChanged, this);
+                }
+            }
+        }
+
+        public int AvailableCount
+        {
+            get { return mAvailableCount; }
+            set
+            {
+                if (value != mAvailableCount)
+                {
+                    if (value < 0 || value > TotalCount)
+                    {
+                        throw new ArgumentException("Value must be greater or equal to zero and lesser or equal than TotalCount.");
+                    }
+                    
+                    mAvailableCount = value;
+                    EventManager.RaiseEvent(AvailableCountChanged, this);
+                }
+            }
+        }
+
+        public Spell(SpellDescriptor spellDescriptor)
+        {
+            SpellDescriptor = spellDescriptor;
+        }
+    }
+
+    public class SpellCollection
+    {
+        private Spell[] mSpells;
+
+        public SpellCollection()
+        {
+            //todo: initialize mSpells and fill it with new Spell instances; bind to events of each spells and raise common events here
+        }
+    }
+
+    public static class EventManager
+    {
+        public static void RaiseEvent(EventHandler handler, object sender)
+        {
+            RaiseEvent(handler, sender, EventArgs.Empty);
+        }
+
+        public static void RaiseEvent(EventHandler handler, object sender, EventArgs e)
+        {
+            if (handler != null)
+            {
+                handler(sender, e);
+            }
+        }
     }
 }
