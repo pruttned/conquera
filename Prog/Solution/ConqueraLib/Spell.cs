@@ -59,7 +59,7 @@ namespace Conquera
                     }
 
                     mTotalCount = value;
-                    EventManager.RaiseEvent(TotalCountChanged, this);
+                    EventHelper.RaiseEvent(TotalCountChanged, this);
                 }
             }
         }
@@ -77,7 +77,7 @@ namespace Conquera
                     }
                     
                     mAvailableCount = value;
-                    EventManager.RaiseEvent(AvailableCountChanged, this);
+                    EventHelper.RaiseEvent(AvailableCountChanged, this);
                 }
             }
         }
@@ -105,7 +105,7 @@ namespace Conquera
         }
     }
 
-    public static class EventManager
+    public static class EventHelper
     {
         public static void RaiseEvent(EventHandler handler, object sender)
         {
