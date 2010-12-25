@@ -34,11 +34,11 @@ namespace Conquera
         [DataProperty(NotNull = true, Unique=true)]
         public string Name { get; set; }
 
-        /// <summary>
-        /// E.g. Lava, Temple of Life, Gold Mine
-        /// </summary>
         [DataProperty(NotNull = true)]
-        public string TypeName { get; set; }
+        public string DisplayName { get; set; }
+
+        [DataProperty(NotNull = true, WeakReference=true)]
+        public StringResource Description { get; set; }
 
         [DataProperty(NotNull = true)]
         public bool IsPassable { get; set; }

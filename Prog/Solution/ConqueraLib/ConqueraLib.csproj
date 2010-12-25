@@ -136,6 +136,7 @@
     <Compile Include="ShadowOrthoCamera.cs" />
     <Compile Include="ShadowScenePass.cs" />
     <Compile Include="Spell.cs" />
+    <Compile Include="StringResource.cs" />
     <Compile Include="WaterReflectionCamera.cs" />
     <Compile Include="WaterReflectionPass.cs" />
   </ItemGroup>

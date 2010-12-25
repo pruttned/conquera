@@ -28,7 +28,7 @@ namespace Conquera
     public class GameUnitSettings : OctreeSceneObjectSettings
     {
         [DataProperty(NotNull = true)]
-        public string Description { get; set; }
+        public string DisplayName { get; set; }
 
         [DataProperty(NotNull = true)]
         public string IdleAnimation { get; set; }

@@ -327,6 +327,17 @@ namespace SimpleOrmFramework
         }
 
         /// <summary>
+        /// Loads the data object from db
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public T LoadObject<T>(string sofQuery) where T : class, IDataObject
+        {
+            return (T)LoadObject(FindObject(typeof(T), sofQuery));
+        }
+
+        /// <summary>
         /// Deletes data object in the db
         /// </summary>
         /// <param name="id"></param>
