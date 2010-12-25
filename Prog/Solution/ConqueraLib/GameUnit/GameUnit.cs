@@ -95,7 +95,6 @@ namespace Conquera
             get { return GameUnitDesc.MaxHp; } 
         }
 
-        public ReadOnlyCollection<GameCard> Cards { get; private set; }
         public int AttackPurple { get; private set; }
         public int AttackGreen { get; private set; }
         public int AttackBlack { get; private set; }
@@ -148,7 +147,6 @@ namespace Conquera
         {
             DescId = descId;
             OwningPlayer = owningPlayer;
-            Cards = new ReadOnlyCollection<GameCard>(mCardsPrivate);
         }
 
         public override void Update(AleGameTime gameTime)
@@ -236,19 +234,6 @@ namespace Conquera
             Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, angle);
         }
 
-
-        public void AddCard(GameCard card)
-        {
-            mCardsPrivate.Add(card);
-            RecalculateAttackDefense();
-        }
-
-        public void RemoveCard(GameCard card)
-        {
-            mCardsPrivate.Remove(card);
-            RecalculateAttackDefense();
-        }
-
         public int ComputeDamageTo(GameUnit unit)
         {
             return (Math.Max(AttackBlack - unit.DefenseBlack, 0) +
@@ -293,8 +278,6 @@ namespace Conquera
 
         protected GameUnit()
         {
-            Cards = new ReadOnlyCollection<GameCard>(mCardsPrivate);
-
             IsIdle = true;
             LastMovedTurn = -1;
             LastAttackedTurn = -1;
@@ -377,16 +360,16 @@ namespace Conquera
             DefenseGreen = GameUnitDesc.BaseGreenDefense;
             DefenseBlack = GameUnitDesc.BaseBlackDefense;
 
-            foreach (GameCard card in Cards)
-            {
-                AttackPurple += card.AttackPurple;
-                AttackGreen += card.AttackGreen;
-                AttackBlack += card.AttackBlack;
+            //foreach (GameCard card in Cards)
+            //{
+            //    AttackPurple += card.AttackPurple;
+            //    AttackGreen += card.AttackGreen;
+            //    AttackBlack += card.AttackBlack;
 
-                DefensePurple += card.DefensePurple;
-                DefenseGreen += card.DefenseGreen;
-                DefenseBlack += card.DefenseBlack;
-            }
+            //    DefensePurple += card.DefensePurple;
+            //    DefenseGreen += card.DefenseGreen;
+            //    DefenseBlack += card.DefenseBlack;
+            //}
         }
 
         private void CheckIdle()
