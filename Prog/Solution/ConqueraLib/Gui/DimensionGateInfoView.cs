@@ -24,28 +24,18 @@ namespace Conquera.Gui
 {
     public class DimensionGateInfoView : TileInfoView
     {
-        private SpellSlot mCardSlot1 = new SpellSlot();
-        private SpellSlot mCardSlot2 = new SpellSlot();
-        private SpellSlot mCardSlot3 = new SpellSlot();
+        private SpellSlot mSpellSlot = new SpellSlot();
 
         public DimensionGateInfoView()
         {
-            InitializeCardSlot(mCardSlot1, GuiManager.Instance.Palette.CreateRectangle("DimensionGateCardSlot1").Location);
-            InitializeCardSlot(mCardSlot2, GuiManager.Instance.Palette.CreateRectangle("DimensionGateCardSlot2").Location);
-            InitializeCardSlot(mCardSlot3, GuiManager.Instance.Palette.CreateRectangle("DimensionGateCardSlot3").Location);
-
-            Setup("Dimension Gate", GuiManager.Instance.Palette.CreateGraphicElement("TileIconDimensionGate"), "This is a dimension gate. It is very important and it produces cards, and so on and so on. The Emperor be praised!");
+            mSpellSlot.Location = GuiManager.Instance.Palette.CreateRectangle("DimensionGateSpellSlot").Location;
+            ChildControls.Add(mSpellSlot);
         }
 
         public override void Update(HexCell cell)
         {
-            //todo: spell
-        }
-
-        private void InitializeCardSlot(SpellSlot slot, Point locaton)
-        {
-            slot.Location = locaton;
-            ChildControls.Add(slot);
+            base.Update(cell);
+            mSpellSlot.Spell = ((DimensionGateTileDesc)cell.HexTerrainTile).Spell;
         }
     }
 }

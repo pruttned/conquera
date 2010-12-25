@@ -8,9 +8,7 @@
     <rectangle name="TileInfoViewDescription" locationX="0" locationY="64" width="225" height="116"/> <!--in view-->
     
     <!--Dimension Gate-->
-    <rectangle name="DimensionGateCardSlot1" locationX="5" locationY="110" width="64" height="64"/> 
-    <rectangle name="DimensionGateCardSlot2" locationX="70" locationY="110" width="64" height="64"/>
-    <rectangle name="DimensionGateCardSlot3" locationX="140" locationY="110" width="64" height="64"/>
+    <rectangle name="DimensionGateSpellSlot" locationX="5" locationY="110" width="64" height="64"/> 
         
     <!--GameCard info-->
     <rectangle name="GameCardInfoDialogName" locationX="32" locationY="32" width="462" height="64"/> 

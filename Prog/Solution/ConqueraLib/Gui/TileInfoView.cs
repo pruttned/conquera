@@ -23,7 +23,7 @@ using Ale.Gui;
 
 namespace Conquera.Gui
 {
-    public abstract class TileInfoView : Control
+    public class TileInfoView : Control
     {
         private System.Drawing.SizeF mSize;
         private GraphicElementContainer mIconContainer;
@@ -58,9 +58,19 @@ namespace Conquera.Gui
             mSize = size;
         }
 
-        public abstract void Update(HexCell cell);
+        public virtual void Update(HexCell cell)
+        {
+            Setup(cell.HexTerrainTile.DisplayName, cell.HexTerrainTile.Icon, cell.HexTerrainTile.Description);
+        }        
 
-        public void Setup(string name, GraphicElement icon, string description)
+        protected override void OnDrawForeground()
+        {
+            mIconContainer.Draw(this);
+            mNameContainer.Draw(this);
+            mDescriptionContainer.Draw(this);
+        }
+
+        private void Setup(string name, GraphicElement icon, string description)
         {
             mIconContainer.GraphicElement = icon;
             ((TextElement)mDescriptionContainer.GraphicElement).Text = description;
@@ -69,13 +79,6 @@ namespace Conquera.Gui
             nameLabel.Text = name;
             mNameContainer.Location = new Point(mNameRectangle.Left + mNameRectangle.Width / 2 - nameLabel.Width / 2,
                                                 mNameRectangle.Top + mNameRectangle.Height / 2 - nameLabel.Height / 2);
-        }
-
-        protected override void OnDrawForeground()
-        {
-            mIconContainer.Draw(this);
-            mNameContainer.Draw(this);
-            mDescriptionContainer.Draw(this);
         }
     }
 }

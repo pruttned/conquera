@@ -491,6 +491,7 @@ namespace Conquera
                         obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
                         obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
                         obj.IsPassable = true;
+                        obj.Icon = "TileIconLand";
                         ormManager.SaveObject(obj);
                     }
 
@@ -505,6 +506,7 @@ namespace Conquera
                         obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
                         obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
                         obj.IsPassable = true;
+                        obj.Icon = "TileIconLand";
                         ormManager.SaveObject(obj);
                     }
                     {
@@ -519,6 +521,7 @@ namespace Conquera
                         obj.GraphicModels.Add(ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'MountainsGm'"));
                         obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
                         obj.IsPassable = false;
+                        obj.Icon = "TileIconLand";
                         ormManager.SaveObject(obj);
                     }
                     {
@@ -534,6 +537,7 @@ namespace Conquera
                         obj.InactiveGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'CastleGm'");
                         obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
                         obj.IsPassable = true;
+                        obj.Icon = "TileIconCastle";
                         ormManager.SaveObject(obj);
                     }
                     {
@@ -548,6 +552,7 @@ namespace Conquera
                         obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
                         obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
                         obj.IsPassable = true;
+                        obj.Icon = "TileIconDimensionGate";
                         ormManager.SaveObject(obj);
                     }
 

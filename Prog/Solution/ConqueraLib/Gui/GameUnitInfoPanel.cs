@@ -60,12 +60,6 @@ namespace Conquera.Gui
             }
 
             mStatText.AppendLine(string.Format("Atck :   {0} | Dfs :   {1}", gameUnit.GameUnitDesc.Attack, gameUnit.GameUnitDesc.Defense));
-
-            //Cards.
-            //todo: spell
-            //mCardSlot1.Spell = gameUnit.Cards.Count >= 1 ? gameUnit.Cards[0] : null;
-            //mCardSlot2.Spell = gameUnit.Cards.Count >= 2 ? gameUnit.Cards[1] : null;
-            //mCardSlot3.Spell = gameUnit.Cards.Count >= 3 ? gameUnit.Cards[2] : null;
         }
 
         protected override void OnDrawBackground()
