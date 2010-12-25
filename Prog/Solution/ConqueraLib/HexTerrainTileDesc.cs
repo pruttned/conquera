@@ -23,6 +23,7 @@ using Ale.Content;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Ale.Gui;
 
 namespace Conquera
 {
@@ -95,9 +96,9 @@ namespace Conquera
             get { return Settings.UnitPosition; }
         }
 
-        protected HexTerrainTileSettings Settings { get; private set; }
+        public GraphicElement Icon { get; private set; }
 
-        public abstract string InfoViewType { get; }
+        protected HexTerrainTileSettings Settings { get; private set; }
 
         static HexTerrainTileDesc()
         {
@@ -170,6 +171,8 @@ namespace Conquera
                     StaticGmConnectionPointAssigments = staticGmConnectionPointAssigments.ToArray();
                 }
             }
+
+            Icon = GuiManager.Instance.Palette.CreateGraphicElement(settings.Icon);
         }
 
         /// <summary>
@@ -318,10 +321,7 @@ namespace Conquera
 
     public class DimensionGateTileDesc : HexTerrainTileDesc
     {
-        public override string InfoViewType
-        {
-            get { return "DimensionGate"; }
-        }
+        public Spell Spell { get; private set; }
 
         public DimensionGateTileDesc(DimensionGateTileSettings settings, ContentGroup content)
             : base(settings, content)
@@ -352,11 +352,6 @@ namespace Conquera
 
     public class CastleTileDesc : HexTerrainTileDesc
     {
-        public override string InfoViewType
-        {
-            get { return "Castle"; }
-        }
-
         public CastleTileDesc(CastleTileSettings settings, ContentGroup content)
             : base(settings, content)
         {
@@ -380,10 +375,6 @@ namespace Conquera
         public int GoldIncrement
         {
             get { return ((GoldMineTileSettings)Settings).GoldIncrement; }
-        }
-        public override string InfoViewType
-        {
-            get { return "GoldMine"; }
         }
         private string NotificationString {get; set;}
 
@@ -416,11 +407,6 @@ namespace Conquera
 
     public class LandTileDesc : HexTerrainTileDesc
     {
-        public override string InfoViewType
-        {
-            get { return "Land"; }
-        }
-
         public LandTileDesc(LandTileSettings settings, ContentGroup content)
             : base(settings, content)
         {
@@ -441,11 +427,6 @@ namespace Conquera
 
     public class VillageTileDesc : HexTerrainTileDesc
     {
-        public override string InfoViewType
-        {
-            get { return "Village"; }
-        }
-
         public VillageTileDesc(VillageTileSettings settings, ContentGroup content)
             : base(settings, content)
         {
@@ -466,11 +447,6 @@ namespace Conquera
 
     public class LandTempleTileDesc : HexTerrainTileDesc
     {
-        public override string InfoViewType
-        {
-            get { return "LandTemple"; }
-        }
-
         public LandTempleTileDesc(LandTempleTileSettings settings, ContentGroup content)
             : base(settings, content)
         {

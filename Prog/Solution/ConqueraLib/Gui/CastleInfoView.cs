@@ -28,8 +28,6 @@ namespace Conquera.Gui
 
         public CastleInfoView()
         {
-            Setup("Castle", GuiManager.Instance.Palette.CreateGraphicElement("TileIconCastle"), "This is a castle. Here you can buy units and give them cards. And so on, and os on...");
-
             mBuyUnitButton = new GraphicButton(GuiManager.Instance.Palette.CreateGraphicElement("CastleBuyUnitDefault"),
                                                              GuiManager.Instance.Palette.CreateGraphicElement("CastleBuyUnitMouseOver"));
             mBuyUnitButton.Location = GuiManager.Instance.Palette.CreateRectangle("CastleBuyUnitButton").Location;
@@ -39,6 +37,8 @@ namespace Conquera.Gui
 
         public override void Update(HexCell cell)
         {
+            base.Update(cell);
+
             mCell = cell;
             mBuyUnitButton.Visible = mCell.OwningPlayer == cell.Scene.CurrentPlayer && mCell.GameUnit == null &&
                 mCell.OwningPlayer.HasEnoughGoldForUnit("GameUnit1") && mCell.OwningPlayer.Units.Count < mCell.OwningPlayer.MaxUnitCnt;

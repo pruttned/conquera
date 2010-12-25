@@ -75,7 +75,10 @@ namespace Conquera
         /// </summary>
         [DataProperty(NotNull = true)]
         public int HpIncrement  { get; set; }
- 
+
+        [DataProperty(NotNull = true)]
+        public string Icon { get; set; }
+
         public HexTerrainTileSettings()
         {
             GraphicModels = new List<long>();

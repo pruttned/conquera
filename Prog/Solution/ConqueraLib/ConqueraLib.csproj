@@ -110,16 +110,12 @@
     <Compile Include="Gui\DimensionGateInfoView.cs" />
     <Compile Include="Gui\GameGuiScene.cs" />
     <Compile Include="Gui\GameUnitInfoPanel.cs" />
-    <Compile Include="Gui\GoldMineInfoView.cs" />
     <Compile Include="Gui\HeaderPanel.cs" />
-    <Compile Include="Gui\LandInfoView.cs" />
-    <Compile Include="Gui\LandTempleInfoView.cs" />
     <Compile Include="Gui\MegaDebugLabel.cs" />
     <Compile Include="Gui\SpellInfoDialog.cs" />
     <Compile Include="Gui\SpellSlot.cs" />
     <Compile Include="Gui\TileInfoPanel.cs" />
     <Compile Include="Gui\TileInfoView.cs" />
-    <Compile Include="Gui\VillageInfoView.cs" />
     <Compile Include="HexCell.cs" />
     <Compile Include="HexRegion.cs" />
     <Compile Include="HexTerrain.cs" />
