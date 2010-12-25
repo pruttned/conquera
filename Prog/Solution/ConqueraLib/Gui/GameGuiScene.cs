@@ -27,7 +27,7 @@ namespace Conquera.Gui
     public class GameGuiScene : GuiScene
     {
         private GameScene mGameScene;
-        private HeroInfoPanel mHeroPanel = new HeroInfoPanel();
+        private GameUnitInfoPanel mGameUnitInfoPanel = new GameUnitInfoPanel();
         private TileInfoPanel mTilePanel = new TileInfoPanel();
         private MegaDebugLabel mDebugLabel = new MegaDebugLabel();
         private PlayerGoldView mPlayerGoldView = new PlayerGoldView();
@@ -36,10 +36,10 @@ namespace Conquera.Gui
 
         public bool SidePanelsVisible
         {
-            get { return mHeroPanel.Visible || mTilePanel.Visible; }
+            get { return mGameUnitInfoPanel.Visible || mTilePanel.Visible; }
             set
             {
-                mHeroPanel.Visible = value;
+                mGameUnitInfoPanel.Visible = value;
                 mTilePanel.Visible = value;
             }
         }
@@ -66,7 +66,7 @@ namespace Conquera.Gui
             RootControls.Add(mDebugLabel);
 
             //Side panels.
-            RootControls.Add(mHeroPanel);
+            RootControls.Add(mGameUnitInfoPanel);
             RootControls.Add(mTilePanel);
 
             //Player stats.
@@ -95,15 +95,15 @@ namespace Conquera.Gui
             }
             else
             {
-                //Hero info.
+                //Unit info.
                 if (cell.GameUnit == null)
                 {
-                    mHeroPanel.Visible = false;
+                    mGameUnitInfoPanel.Visible = false;
                 }
                 else
                 {
-                    mHeroPanel.Update(cell.GameUnit);
-                    mHeroPanel.Visible = true;
+                    mGameUnitInfoPanel.Update(cell.GameUnit);
+                    mGameUnitInfoPanel.Visible = true;
                 }
 
                 //Tile info.
@@ -168,7 +168,7 @@ namespace Conquera.Gui
             int screenHeight = (int)GuiManager.Instance.ScreenSize.Height;
 
             //Side panels.
-            mHeroPanel.Location = new Point(screenWidth - (int)mHeroPanel.Size.Width, 0);
+            mGameUnitInfoPanel.Location = new Point(screenWidth - (int)mGameUnitInfoPanel.Size.Width, 0);
             mTilePanel.Location = new Point(screenWidth - (int)mTilePanel.Size.Width, screenHeight - (int)mTilePanel.Size.Height);
 
             //Player stat views.

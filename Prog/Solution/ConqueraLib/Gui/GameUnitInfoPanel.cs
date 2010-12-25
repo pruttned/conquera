@@ -21,7 +21,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Conquera.Gui
 {
-    public class HeroInfoPanel : Control
+    public class GameUnitInfoPanel : Control
     {
         private GraphicElement mBackground;
         private TextElement mStatText;
@@ -34,9 +34,9 @@ namespace Conquera.Gui
             get { return mBackground.Size; }
         }
 
-        public HeroInfoPanel()
+        public GameUnitInfoPanel()
         {
-            mBackground = GuiManager.Instance.Palette.CreateGraphicElement("HeroInfoPanelBackground");
+            mBackground = GuiManager.Instance.Palette.CreateGraphicElement("UnitInfoPanelBackground");
 
             mStatText = new TextElement((int)Size.Width, (int)Size.Height, GuiManager.Instance.GetGuiFont("SpriteFontSmall"), true, Color.Black);
 
@@ -48,25 +48,26 @@ namespace Conquera.Gui
             ChildControls.Add(mCardSlot3);
         }
 
-        public void Update(GameUnit hero)
+        public void Update(GameUnit gameUnit)
         {
             //Statistics.
-            mStatText.Color = new Color(hero.OwningPlayer.Color);
-            mStatText.Text = string.Format("{0}/{1}", hero.Hp, hero.GameUnitDesc.MaxHp);
+            mStatText.Color = new Color(gameUnit.OwningPlayer.Color);
+            mStatText.Text = string.Format("{0}/{1}", gameUnit.Hp, gameUnit.GameUnitDesc.MaxHp);
             
-            if (hero.OwningPlayer == hero.GameScene.CurrentPlayer)
+            if (gameUnit.OwningPlayer == gameUnit.GameScene.CurrentPlayer)
             {
-                mStatText.AppendLine(string.Format("Ready: {0}", !hero.HasMovedThisTurn));
+                mStatText.AppendLine(string.Format("Ready: {0}", !gameUnit.HasMovedThisTurn));
             }
 
-            mStatText.AppendLine(string.Format("Atck Red:   {0} | Dfs Red:   {1}", hero.AttackPurple, hero.DefensePurple));
-            mStatText.AppendLine(string.Format("Atck Green: {0} | Dfs Green: {1}", hero.AttackGreen, hero.DefenseGreen));
-            mStatText.AppendLine(string.Format("Atck Black: {0} | Dfs Black: {1}", hero.AttackBlack, hero.DefenseBlack));
+            mStatText.AppendLine(string.Format("Atck Red:   {0} | Dfs Red:   {1}", gameUnit.AttackPurple, gameUnit.DefensePurple));
+            mStatText.AppendLine(string.Format("Atck Green: {0} | Dfs Green: {1}", gameUnit.AttackGreen, gameUnit.DefenseGreen));
+            mStatText.AppendLine(string.Format("Atck Black: {0} | Dfs Black: {1}", gameUnit.AttackBlack, gameUnit.DefenseBlack));
 
             //Cards.
-            mCardSlot1.Spell = hero.Cards.Count >= 1 ? hero.Cards[0] : null;
-            mCardSlot2.Spell = hero.Cards.Count >= 2 ? hero.Cards[1] : null;
-            mCardSlot3.Spell = hero.Cards.Count >= 3 ? hero.Cards[2] : null;
+            //todo: spell
+            //mCardSlot1.Spell = gameUnit.Cards.Count >= 1 ? gameUnit.Cards[0] : null;
+            //mCardSlot2.Spell = gameUnit.Cards.Count >= 2 ? gameUnit.Cards[1] : null;
+            //mCardSlot3.Spell = gameUnit.Cards.Count >= 3 ? gameUnit.Cards[2] : null;
         }
 
         protected override void OnDrawBackground()

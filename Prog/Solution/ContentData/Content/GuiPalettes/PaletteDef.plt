@@ -18,21 +18,21 @@
     <rectangle name="GameCardInfoDialogDescription" locationX="32" locationY="265" width="462" height="100"/>
 
     <!--Castle-->
-    <rectangle name="CastleBuyHeroButton" locationX="80" locationY="100" width="42" height="42"/>
+    <rectangle name="CastleBuyUnitButton" locationX="80" locationY="100" width="42" height="42"/>
 
-    <!--Hero panel-->
-    <!--<rectangle name="HeroInfoPanelOwningPlayer" locationX="0" locationY="0" width="243" height="42"/>
-    <rectangle name="HeroInfoPanelHp" locationX="0" locationY="45" width="0" height="0"/>
-    <rectangle name="HeroInfoPanelReady" locationX="0" locationY="" width="42" height="42"/>
-    <rectangle name="HeroInfoPanelAttackRed" locationX="80" locationY="100" width="42" height="42"/>
-    <rectangle name="HeroInfoPanelAttackGreen" locationX="80" locationY="100" width="42" height="42"/>
-    <rectangle name="HeroInfoPanelAttackRedBlack" locationX="80" locationY="100" width="42" height="42"/>
-    <rectangle name="HeroInfoPanelDefenseRed" locationX="80" locationY="100" width="42" height="42"/>
-    <rectangle name="HeroInfoPanelDefenseGreen" locationX="80" locationY="100" width="42" height="42"/>
-    <rectangle name="HeroInfoPanelDefenseBlack" locationX="80" locationY="100" width="42" height="42"/>
-    <rectangle name="HeroInfoPanelCard1" locationX="80" locationY="100" width="42" height="42"/>
-    <rectangle name="HeroInfoPanelCard2" locationX="80" locationY="100" width="42" height="42"/>
-    <rectangle name="HeroInfoPanelCard3" locationX="80" locationY="100" width="42" height="42"/>-->
+    <!--Uint panel-->
+    <!--<rectangle name="UnitInfoPanelOwningPlayer" locationX="0" locationY="0" width="243" height="42"/>
+    <rectangle name="UnitInfoPanelHp" locationX="0" locationY="45" width="0" height="0"/>
+    <rectangle name="UnitInfoPanelReady" locationX="0" locationY="" width="42" height="42"/>
+    <rectangle name="UnitInfoPanelAttackRed" locationX="80" locationY="100" width="42" height="42"/>
+    <rectangle name="UnitInfoPanelAttackGreen" locationX="80" locationY="100" width="42" height="42"/>
+    <rectangle name="UnitInfoPanelAttackRedBlack" locationX="80" locationY="100" width="42" height="42"/>
+    <rectangle name="UnitInfoPanelDefenseRed" locationX="80" locationY="100" width="42" height="42"/>
+    <rectangle name="UnitInfoPanelDefenseGreen" locationX="80" locationY="100" width="42" height="42"/>
+    <rectangle name="UnitInfoPanelDefenseBlack" locationX="80" locationY="100" width="42" height="42"/>
+    <rectangle name="UnitInfoPanelCard1" locationX="80" locationY="100" width="42" height="42"/>
+    <rectangle name="UnitInfoPanelCard2" locationX="80" locationY="100" width="42" height="42"/>
+    <rectangle name="UnitInfoPanelCard3" locationX="80" locationY="100" width="42" height="42"/>-->
     
     <!--Cursors-->
     <rectangle name="CursorDefaultHotSpot" locationX="3" locationY="4" width="0" height="0"/>
@@ -43,14 +43,14 @@
 
   <graphicElements>
     <image name="TileInfoPanelBackground" textureFileName="Palette" locationX="0" locationY="259" width="243" height="199"/>
-    <image name="HeroInfoPanelBackground" textureFileName="Palette" locationX="0" locationY="259" width="243" height="199"/>
+    <image name="UnitInfoPanelBackground" textureFileName="Palette" locationX="0" locationY="259" width="243" height="199"/>
     <image name="GameCardInfoDialogBackground" textureFileName="Palette" locationX="257" locationY="1" width="510" height="475"/>
     <image name="ShowMainMenuButtonDefault" textureFileName="Palette" locationX="0" locationY="0" width="42" height="42"/>
     <image name="ShowMainMenuButtonMouseOver" textureFileName="Palette" locationX="43" locationY="0" width="42" height="42"/>
     
     <!--Castle-->
-    <image name="CastleBuyHeroDefault" textureFileName="Palette" locationX="0" locationY="0" width="42" height="42"/>
-    <image name="CastleBuyHeroMouseOver" textureFileName="Palette" locationX="43" locationY="0" width="42" height="42"/>
+    <image name="CastleBuyUnitDefault" textureFileName="Palette" locationX="0" locationY="0" width="42" height="42"/>
+    <image name="CastleBuyUnitMouseOver" textureFileName="Palette" locationX="43" locationY="0" width="42" height="42"/>
     
     <!--Tile Icons-->
     <image name="TileIconCastle" textureFileName="Palette" locationX="1" locationY="460" width="64" height="64"/>

@@ -310,8 +310,6 @@ namespace Conquera
 
     public class DimensionGateTileDesc : HexTerrainTileDesc
     {
-        private GameCard[] mGameCards;
-
         public override string InfoViewType
         {
             get { return "DimensionGate"; }
@@ -328,18 +326,18 @@ namespace Conquera
 
         protected internal override void OnActivated(HexCell cell)
         {
-            foreach (GameCard card in mGameCards)
-            {
-                cell.OwningPlayer.AddCard(card);
-            }
+            //foreach (GameCard card in mGameCards)
+            //{
+            //    cell.OwningPlayer.AddCard(card);
+            //}
         }
 
         protected internal override void OnDeactivated(HexCell cell)
         {
-            foreach (GameCard card in mGameCards)
-            {
-                cell.OwningPlayer.RemoveCard(card);
-            }
+            //foreach (GameCard card in mGameCards)
+            //{
+            //    cell.OwningPlayer.RemoveCard(card);
+            //}
         }
     }
 
