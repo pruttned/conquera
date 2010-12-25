@@ -41,7 +41,6 @@ namespace Conquera
         private Point mCellIndex;
         private IGameUnitState mState;
         private Dictionary<string, IGameUnitState> mStates = new Dictionary<string, IGameUnitState>();
-        private List<GameCard> mCardsPrivate = new List<GameCard>();
         
         public GamePlayer OwningPlayer { get; internal set; }
 

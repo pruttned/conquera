@@ -23,7 +23,7 @@ using Ale.Gui;
 
 namespace Conquera.Gui
 {
-    public class GameCardInfoDialog : Dialog
+    public class SpellInfoDialog : Dialog
     {
         private GraphicElementContainer mNameContainer;
         private GraphicElementContainer mPictureContainer;
@@ -36,7 +36,7 @@ namespace Conquera.Gui
             get { return mBackground.Size; }
         }
 
-        public GameCardInfoDialog()
+        public SpellInfoDialog()
         {
             mBackground = GuiManager.Instance.Palette.CreateGraphicElement("GameCardInfoDialogBackground");
 
@@ -56,15 +56,18 @@ namespace Conquera.Gui
             mDescriptionContainer = new GraphicElementContainer(descriptionLabel, descriptionRectangle.Location);
         }
 
-        public void SetGameCard(GameCard card)
+        public void SetGameCard(Spell spell)
         {
-            TextElement nameLabel = (TextElement)mNameContainer.GraphicElement;
-            nameLabel.Text = card.Name;
-            mNameContainer.Location = new Point(mNameRectangle.Left + mNameRectangle.Width / 2 - nameLabel.Width / 2,
-                                                mNameRectangle.Top + mNameRectangle.Height / 2 - nameLabel.Height / 2);
+            //todo: spell
 
-            mPictureContainer.GraphicElement = card.Picture;
-            ((TextElement)mDescriptionContainer.GraphicElement).Text = card.Description;
+
+            //TextElement nameLabel = (TextElement)mNameContainer.GraphicElement;
+            //nameLabel.Text = spell.Name;
+            //mNameContainer.Location = new Point(mNameRectangle.Left + mNameRectangle.Width / 2 - nameLabel.Width / 2,
+            //                                    mNameRectangle.Top + mNameRectangle.Height / 2 - nameLabel.Height / 2);
+
+            //mPictureContainer.GraphicElement = spell.Picture;
+            //((TextElement)mDescriptionContainer.GraphicElement).Text = spell.Description;
         }
 
         protected override void OnDrawBackground()

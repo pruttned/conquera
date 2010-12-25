@@ -25,9 +25,9 @@ namespace Conquera.Gui
     {
         private GraphicElement mBackground;
         private TextElement mStatText;
-        private GameCardSlot mCardSlot1 = new GameCardSlot();
-        private GameCardSlot mCardSlot2 = new GameCardSlot();
-        private GameCardSlot mCardSlot3 = new GameCardSlot();
+        private SpellSlot mCardSlot1 = new SpellSlot();
+        private SpellSlot mCardSlot2 = new SpellSlot();
+        private SpellSlot mCardSlot3 = new SpellSlot();
 
         public override System.Drawing.SizeF Size
         {
@@ -64,9 +64,9 @@ namespace Conquera.Gui
             mStatText.AppendLine(string.Format("Atck Black: {0} | Dfs Black: {1}", hero.AttackBlack, hero.DefenseBlack));
 
             //Cards.
-            mCardSlot1.Card = hero.Cards.Count >= 1 ? hero.Cards[0] : null;
-            mCardSlot2.Card = hero.Cards.Count >= 2 ? hero.Cards[1] : null;
-            mCardSlot3.Card = hero.Cards.Count >= 3 ? hero.Cards[2] : null;
+            mCardSlot1.Spell = hero.Cards.Count >= 1 ? hero.Cards[0] : null;
+            mCardSlot2.Spell = hero.Cards.Count >= 2 ? hero.Cards[1] : null;
+            mCardSlot3.Spell = hero.Cards.Count >= 3 ? hero.Cards[2] : null;
         }
 
         protected override void OnDrawBackground()
