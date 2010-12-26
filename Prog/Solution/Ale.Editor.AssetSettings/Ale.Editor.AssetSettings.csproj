@@ -57,6 +57,8 @@
   <ItemGroup>
     <Compile Include="Material\Test2Material.cs" />
     <Compile Include="Material\TestMaterial.cs" />
+    <Compile Include="ParticleSystem\FireExplosionPsys.cs" />
+    <Compile Include="ParticleSystem\FireBallPsys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

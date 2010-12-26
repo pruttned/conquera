@@ -41,6 +41,7 @@ namespace Ale.Graphics
         private int mLoadedEmitterCnt;
         private bool mIsDisposed = false;
         private bool mHasDefaultBounds = true;
+        private bool mIsEnabled = true;
 
         #region IDynamicallyLoadableObject
 
@@ -52,6 +53,22 @@ namespace Ale.Graphics
         public bool IsLoaded
         {
             get { return (0 < mLoadedEmitterCnt); }
+        }
+
+        public bool IsEnabled
+        {
+            get { return mIsEnabled; }
+            set 
+            {
+                if (value != mIsEnabled)
+                {
+                    mIsEnabled = value;
+                    foreach (var emitter in mEmitters)
+                    {
+                        emitter.IsActive = mIsEnabled;
+                    }
+                }
+            }
         }
 
         #endregion IDynamicallyLoadableObject
@@ -103,14 +120,18 @@ namespace Ale.Graphics
         {
             if (IsVisible)
             {
-                if (!IsLoaded)
+                if (!IsLoaded && IsEnabled)
                 {
                     Load(gameTime);
                 }
 
                 mLastRenderFrameNum = gameTime.FrameNum;
 
-                for (int i = 0; i < mEmitters.Length; ++i)
+                //for (int i = 0; i < mEmitters.Length; ++i)
+                //{
+                //    mEmitters[i].EnqueRenderableUnits(renderer, gameTime);
+                //}
+                for (int i = mEmitters.Length-1; i >=0; --i)
                 {
                     mEmitters[i].EnqueRenderableUnits(renderer, gameTime);
                 }
@@ -149,6 +170,7 @@ namespace Ale.Graphics
                 AfterLoad.Invoke(this);
             }
         }
+
         #endregion IDynamicallyLoadableObject
 
         protected override void OnVisibleChanged(bool visible)

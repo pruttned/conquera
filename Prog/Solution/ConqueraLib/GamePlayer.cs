@@ -266,7 +266,7 @@ namespace Conquera
 //              Scene.GameCamera.MoveCameraTo(CameraTargetPos);
                 Scene.GameCamera.TargetWorldPosition = CameraTargetPos;
             }
-            Spells.SetSpellAvailabilitiesToMax();
+            Spells.ResetSpellAvailabilities();
         }
 
         public override void OnEndTurn()

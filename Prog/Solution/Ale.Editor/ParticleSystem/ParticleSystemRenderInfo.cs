@@ -16,38 +16,29 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using Ale.Settings;
-using System.IO;
+using Ale.Content;
+using Ale.Scene;
+using Ale.Graphics;
 
 namespace Ale.Editor
 {
-    static class Program
-    {        
-        public readonly static string AssetSettingsSourceRootDirectory;
+    [RenderInfo("ParticleSystem")]
+    public class ParticleSystemRenderInfo : IRenderInfo
+    {
+        private BaseScene mScene = null;
 
-        static Program()
-        {            
-            AssetSettingsSourceRootDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\Ale.Editor.AssetSettings");
+        public BaseScene Scene
+        {
+            get { return mScene; }
         }
 
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        //[STAThread]
-        static void Main()
+        public void Update(object assetSettings, SceneManager sceneManager, ContentGroup content)
         {
-            using (AleApplication app = new AleApplication())
+            if (Scene == null)
             {
-                app.Run();
+                mScene = new ParticleSystemScene(sceneManager, content);
             }
-
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new RendererWindow());
+            ((ParticleSystemScene)Scene).SetParticleSystemSettings((ParticleSystemSettings)assetSettings);
         }
     }
 }

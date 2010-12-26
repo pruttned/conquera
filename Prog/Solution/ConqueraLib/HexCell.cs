@@ -270,6 +270,13 @@ namespace Conquera
             return null;
         }
 
+        public List<HexCell> GetSiblings()
+        {
+            List<HexCell> siblings = new List<HexCell>();
+            GetSiblings(siblings);
+            return siblings;
+        }
+
         public void GetSiblings(List<HexCell> siblings)
         {
             int i = Index.X;

@@ -33,27 +33,46 @@ using Ale.Tools;
 
 namespace Ale.Editor
 {
-    public class DefaultScene : OctreeScene
+    public class ParticleSystemScene : OctreeScene
     {
-        Renderer mRenderer = new Renderer();
-        PostProcessEffectManager mPostProcessEffectManager;
-
-        AleContentManager mContentManager;
-
-        public DefaultScene(SceneManager sceneManager, ContentGroup content)
-            :base(sceneManager, content, new BoundingBox(new Vector3(-100, -100, -100), new Vector3(100, 100, 100)))
+        class MainScenePass : ScenePass
         {
-            mContentManager = content.ParentContentManager;
+            public MainScenePass(BaseScene scene, ICamera camera, AleRenderTarget renderTarget)
+                : base("Default", scene, camera, renderTarget)
+            {
+            }
+
+            protected override void Clear(GraphicsDevice graphicsDevice)
+            {
+                graphicsDevice.Clear(Color.Green);
+            }
+        }
 
 
+        Vector3LinearAnimator mPosAnim = new Vector3LinearAnimator();
+        Vector3[] mPosKeyFrames = new Vector3[]
+            {
+                new Vector3(-1,-1,0),
+                new Vector3(1,-1,0),
+                new Vector3(1,1,0),
+                new Vector3(-1,1,0)
+            };
+        int mKeyFrame = 0;
 
+        float mAnimSpeed = 0.0f;
 
+        ParticleSystem mParticleSystem;
+
+        public ParticleSystemScene(SceneManager sceneManager, ContentGroup content)
+            : base(sceneManager, content, new BoundingBox(new Vector3(-100, -100, -100), new Vector3(100, 100, 100)))
+        {
             //GraphicModel dom = new GraphicModel(Content.Load<GraphicModelDesc>("domGm"), Content);
-            GraphicModel gm = new GraphicModel(Content.Load<Mesh>("Sphere"), Content.Load<Material>("DomMat"));
-//            GraphicModel gm = new GraphicModel(Content.Load<Mesh>("Sphere"), new Material(null, Content));
+            //mGraphicModel = new GraphicModel(Content.Load<Mesh>("Sphere"), Content.Load<Material>("DomMat"));
+            //            GraphicModel gm = new GraphicModel(Content.Load<Mesh>("Sphere"), new Material(null, Content));
             //gm.SetMaterials(
-            Octree.AddObject(gm);
-            //gm.SetMaterials(new Material(
+            //Octree.AddObject(mGraphicModel);
+            
+
         }
 
         protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentGroup content)
@@ -63,7 +82,7 @@ namespace Ale.Editor
 
             //return null;
             List<ScenePass> scenePasses = new List<ScenePass>();
-            scenePasses.Add(new ScenePass("Default", this, mainCamera, null));
+            scenePasses.Add(new MainScenePass(this, mainCamera, null));
 
             //scenePasses[0].RenderTarget.Clear(Color.White);
 
@@ -74,6 +93,21 @@ namespace Ale.Editor
 
         public override void Update(AleGameTime gameTime)
         {
+            if (!mPosAnim.Update(gameTime))
+            {
+                Vector3 p1 = mPosKeyFrames[mKeyFrame];
+                mKeyFrame++;
+                if (mKeyFrame >= mPosKeyFrames.Length)
+                {
+                    mKeyFrame = 0;
+                }
+                mPosAnim.Animate(mAnimSpeed, p1, mPosKeyFrames[mKeyFrame]);
+            }
+            else
+            {
+                mParticleSystem.Position = mPosAnim.CurrentValue;
+            }
+
             Camera camera = (Camera)MainCamera;
 
             Vector2 curPos = SceneManager.MouseManager.CursorPosition;
@@ -93,8 +127,28 @@ namespace Ale.Editor
             }
         }
 
+        internal void SetParticleSystemSettings(ParticleSystemSettings settings)
+        {
+            if (null != mParticleSystem)
+            {
+                Octree.DestroyObject(mParticleSystem);
+                mParticleSystem.Position = mPosKeyFrames[0];
+                mKeyFrame = 1;
+                mParticleSystem = null;
+                mPosAnim.Animate(mAnimSpeed, mPosKeyFrames[0], mPosKeyFrames[1]);
+            }
+
+            mParticleSystem = ParticleSystemManager.CreateParticleSystem(new ParticleSystemDesc(this.SceneManager.GraphicsDeviceManager.GraphicsDevice,
+                settings, Content));
+
+            Octree.AddObject(mParticleSystem);
+        }
+
         protected override void UpdateSoundListener(Ale.Sound.SoundManager SoundManager)
         {
         }
+
+
     }
+
 }

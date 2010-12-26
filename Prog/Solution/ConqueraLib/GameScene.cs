@@ -64,7 +64,7 @@ namespace Conquera
         private IGameSceneState mState;
 
         private CellLabelManager mCellLabelManager;
-        private Spell mActiveSpell = null;
+        private SpellSlot mActiveSpell = null;
 
         public string Name { get; private set; }
 
@@ -136,12 +136,15 @@ namespace Conquera
                 //{
                 mSelectedUnit = value;
                 //}
+
+                //temp
+                ActiveSpell = CurrentPlayer.Spells[1];
             }
         }
 
         public bool EnableMouseCameraControl { get; set; }
 
-        public Spell ActiveSpell
+        public SpellSlot ActiveSpell
         {
             get { return mActiveSpell; }
             set
@@ -810,6 +813,7 @@ namespace Conquera
             mCursor3dCellSel.IsVisible = false;
             mMovementArrow.IsVisible = false;
         }
+
 
         private static BoundingBox GetBoundsFromSize(int width, int height)
         {
