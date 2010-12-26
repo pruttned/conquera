@@ -251,6 +251,11 @@ namespace Conquera
 
         public void ReceiveDamage(int damage)
         {
+            ReceiveDamage(damage, true);
+        }
+
+        public void ReceiveDamage(int damage, bool blood)
+        {
             Hp -= damage;
             GameScene.FireCellNotificationLabel(string.Format("-{0}", Math.Abs(damage)), CellNotificationIcons.BrokenHearth, Color.Red, CellIndex);
             if (Hp <= 0)
@@ -259,7 +264,10 @@ namespace Conquera
             }
             else
             {
-                GameScene.ParticleSystemManager.CreateFireAndforgetParticleSystem(GameUnitDesc.BloodParticleSystem, Position);
+                if (blood)
+                {
+                    GameScene.ParticleSystemManager.CreateFireAndforgetParticleSystem(GameUnitDesc.BloodParticleSystem, Position);
+                }
             }
         }
 

@@ -70,7 +70,7 @@ namespace Ale.Editor
 
             Vector2 curPos = SceneManager.MouseManager.CursorPosition;
             Vector3 mouseMovement = SceneManager.MouseManager.CursorPositionDelta;
-            if (SceneManager.MouseManager.IsButtonDown(MouseButton.Right)) // zoom
+            if (SceneManager.MouseManager.IsButtonDown(MouseButton.Left)) // zoom
             {
                 camera.DistanceToTarget += mouseMovement.Y / 1.0f;
 
@@ -78,7 +78,7 @@ namespace Ale.Editor
             }
             else
             {
-                if (SceneManager.MouseManager.IsButtonDown(MouseButton.Middle))
+                if (SceneManager.MouseManager.IsButtonDown(MouseButton.Right))
                 {//movement
                     camera.RotationArroundTarget -= new Vector2(mouseMovement.Y / 200.0f, mouseMovement.X / 200.0f);
                 }

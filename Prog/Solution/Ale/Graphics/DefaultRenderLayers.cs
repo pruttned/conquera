@@ -48,19 +48,20 @@ namespace Ale.Graphics
         public const int GroundLyingObjects = 3000;
 
         /// <summary>
-        /// Objects that are standing on the ground
-        /// </summary>
-        public const int GroundStandingObjects = 4000;
-
-        /// <summary>
         /// Cursor3dCellSel
         /// </summary>
-        public const int Cursor3dCellSel = 5000;
+        public const int Cursor3dCellSel = 3100;
 
         /// <summary>
         /// Cursor3D
         /// </summary>
-        public const int Cursor3D = 6000;
+        public const int Cursor3D = 3200;
+
+
+        /// <summary>
+        /// Objects that are standing on the ground
+        /// </summary>
+        public const int GroundStandingObjects = 4000;
 
         /// <summary>
         /// MovementArrow

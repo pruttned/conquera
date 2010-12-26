@@ -30,6 +30,7 @@ VsOutput mainVS(VsInput input)
 {
     VsOutput output;
     
+    input.Position.z*=0.5f;
     output.Position = mul(input.Position, gWorldViewProj);
     output.Color = float4(gColor, sin(gTime*2)*0.3+0.5);
     

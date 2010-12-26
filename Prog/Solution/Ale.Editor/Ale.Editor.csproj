@@ -59,15 +59,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IAssetSettingsDefinition.cs" />
+    <Compile Include="ParticleSystem\ParticleSystemRenderInfo.cs" />
+    <Compile Include="ParticleSystem\ParticleSystemScene.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="RendererWindow.resx">
-      <DependentUpon>RendererWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
@@ -79,22 +77,20 @@
     <Compile Include="MaterialRenderer\MaterialScene.cs" />
     <Compile Include="RenderInfo.cs" />
     <Compile Include="MaterialRenderer\MaterialRenderInfo.cs" />
-    <Compile Include="RendererWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="RendererWindow.Designer.cs">
-      <DependentUpon>RendererWindow.cs</DependentUpon>
-    </Compile>
     <Compile Include="DefaultScene.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AlContentData\AlContentData.csproj">
-      <Project>{0065E803-89E7-46A6-A1C4-5F607045A197}</Project>
-      <Name>AlContentData</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Ale\Ale.csproj">
       <Project>{ED4D5999-4D8A-46CE-B367-BD67B84E4DC8}</Project>
       <Name>Ale</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ConqueraLib\ConqueraLib.csproj">
+      <Project>{F2FFBE03-8E4B-4BB4-B9D2-1D039479C1D6}</Project>
+      <Name>ConqueraLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ContentData\ContentData.csproj">
+      <Project>{381DBE56-E2F9-4A96-AF6C-581FDD891D38}</Project>
+      <Name>ContentData</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimpleOrmFramework\SimpleOrmFramework.csproj">
       <Project>{257A9270-994A-48DF-8A2A-8687259822BC}</Project>

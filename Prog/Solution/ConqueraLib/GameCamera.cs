@@ -38,8 +38,9 @@ namespace Conquera
         /// <summary>
         /// x = distance form target
         /// y = x rot
+        /// z = y rot
         /// </summary>
-        private static Vector2[] ZoomLevels = new Vector2[] { new Vector2(15, -1.5f), new Vector2(10, -1.1f), new Vector2(5, -0.9f) };
+        private static Vector3[] ZoomLevels = new Vector3[] { new Vector3(15, -1.5f, 0.0f), new Vector3(10, -1.1f, 0.0f), new Vector3(5, -0.9f, 0.0f) };
 
         private Camera mCamera;
         private GameScene mGameScene;
@@ -49,7 +50,10 @@ namespace Conquera
         private int mZoomLevel = 1;
 
         private Vector3LinearAnimator mPositionAnimator = new Vector3LinearAnimator();
-        private Vector2LinearAnimator mZoomLevelAnimator = new Vector2LinearAnimator();
+        private Vector3LinearAnimator mZoomLevelAnimator = new Vector3LinearAnimator();
+
+        private float mShakeMagnitude = -1f;
+        private Vector2 mBaseRotationArroundTarget;
 
         public Matrix ViewTransformation
         {
@@ -159,6 +163,11 @@ namespace Conquera
             UpdateAspectRatio();
         }
 
+        public void Shake()
+        {
+            mShakeMagnitude = 0.03f;
+        }
+
         public void Dispose()
         {
             if (!mIsDisposed)
@@ -200,7 +209,7 @@ namespace Conquera
 
                 mZoomLevel++;
 
-                Vector2 curZommLevel = new Vector2(mCamera.DistanceToTarget, mCamera.RotationArroundTarget.X);
+                Vector3 curZommLevel = new Vector3(mCamera.DistanceToTarget, mBaseRotationArroundTarget.X, mBaseRotationArroundTarget.Y);
                 mZoomLevelAnimator.Animate(15, curZommLevel, ZoomLevels[mZoomLevel]);
             }
         }
@@ -213,7 +222,7 @@ namespace Conquera
             
                 mZoomLevel--;
 
-                Vector2 curZommLevel = new Vector2(mCamera.DistanceToTarget, mCamera.RotationArroundTarget.X);
+                Vector3 curZommLevel = new Vector3(mCamera.DistanceToTarget, mBaseRotationArroundTarget.X, mBaseRotationArroundTarget.Y);
                 mZoomLevelAnimator.Animate(15, curZommLevel, ZoomLevels[mZoomLevel]);
             }
         }
@@ -271,8 +280,24 @@ namespace Conquera
             }
             if(mPositionAnimator.Update(gameTime))
             {
-                    mCamera.TargetWorldPosition = mPositionAnimator.CurrentValue;
+                mCamera.TargetWorldPosition = mPositionAnimator.CurrentValue;
             }
+
+            if (0.0f < mShakeMagnitude)
+            {
+                Vector2 rotation = mBaseRotationArroundTarget;
+                rotation.Y += (float)Math.Sin(gameTime.TotalTime * 30) * mShakeMagnitude;
+                rotation.X += (float)Math.Sin(gameTime.TotalTime * 20) * mShakeMagnitude;
+                mCamera.RotationArroundTarget = rotation;
+
+                mShakeMagnitude -= 0.001f;
+                if (0.0f > mShakeMagnitude)
+                {
+                    mCamera.RotationArroundTarget = mBaseRotationArroundTarget;
+                    mShakeMagnitude = -1.0f;
+                }
+            }
+
         }
 
         void IFrameListener.AfterUpdate(AleGameTime gameTime)
@@ -325,10 +350,11 @@ namespace Conquera
             }
         }
 
-        private void UpdateDistanceToTarget(Vector2 zoomLevel)
+        private void UpdateDistanceToTarget(Vector3 zoomLevel)
         {
             mCamera.DistanceToTarget = zoomLevel.X;
-            mCamera.RotationArroundTarget = new Vector2(zoomLevel.Y, mCamera.RotationArroundTarget.Y);
+            mCamera.RotationArroundTarget = new Vector2(zoomLevel.Y, zoomLevel.Z);
+            mBaseRotationArroundTarget = mCamera.RotationArroundTarget;
         }
 
         private void SetCameraAnimationGameSceneState()

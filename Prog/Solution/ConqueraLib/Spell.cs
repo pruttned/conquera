@@ -20,10 +20,14 @@ using System;
 using System.Collections.ObjectModel;
 using Ale.Gui;
 using Ale;
+using System.Collections.Generic;
+using Ale.Tools;
+using Microsoft.Xna.Framework;
+using Ale.Graphics;
 
 namespace Conquera
 {
-    public abstract class Spell
+    public class SpellSlot
     {
         public event EventHandler TotalCountChanged;
         public event EventHandler AvailableCountChanged;
@@ -31,12 +35,7 @@ namespace Conquera
         private int mTotalCount;
         private int mAvailableCount;
 
-        private bool mIsCasted = false;
-
-        public abstract GraphicElement Picture { get; }
-        public abstract GraphicElement Icon { get; }
-        public abstract string DisplayName { get; }
-        public abstract string Description { get; }
+        public Spell Spell { get; private set; }
 
         public int TotalCount
         {
@@ -72,16 +71,31 @@ namespace Conquera
                     {
                         throw new ArgumentException("Value must be greater or equal to zero and lesser or equal than TotalCount.");
                     }
-                    
+
                     mAvailableCount = value;
                     EventHelper.RaiseEvent(AvailableCountChanged, this);
                 }
             }
         }
 
+        public SpellSlot(Spell spell)
+        {
+            Spell = spell;
+        }
+    }
+
+    public abstract class Spell
+    {
+        private bool mIsCasted = false;
+
+        public abstract GraphicElement Picture { get; }
+        public abstract GraphicElement Icon { get; }
+        public abstract string Name { get; }
+        public abstract string DisplayName { get; }
+        public abstract string Description { get; }
+
         protected GameUnit CurrentCaster { get; private set; }
         protected GameUnit CurrentTarget { get; private set; }
-
 
         public bool Cast(GameUnit caster, GameUnit target)
         {
@@ -120,20 +134,265 @@ namespace Conquera
         protected abstract bool UpdateImpl(AleGameTime time);
     }
 
-    public class SpellCollection : ReadOnlyCollection<Spell>
+    public class SlayerSpell : Spell
     {
-        public SpellCollection()
-            : base(new Spell[10])
+        private static int Damage = 5;
+
+        public override GraphicElement Picture
         {
-            //todo: Fill Items with new Spell instances; bind to events of each spells and raise common events here
+            get { throw new NotImplementedException(); }
         }
 
-        public void SetSpellAvailabilitiesToMax()
+        public override GraphicElement Icon
         {
-            foreach(Spell spell in Items)
+            get { throw new NotImplementedException(); }
+        }
+
+        public override string Name
+        {
+            get { return "Slayer"; }
+        }
+
+        public override string DisplayName
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override string Description
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override void ApplyAttackDefenseModifiers(ref int attack, ref int defense)
+        {
+            attack += Damage;
+        }
+
+        protected override bool CastImpl(GameUnit caster, GameUnit target)
+        {
+            return false;
+        }
+
+        protected override bool UpdateImpl(AleGameTime time)
+        {
+            return false;
+        }
+    }
+
+    public class FireStormSpell : Spell
+    {
+        private static int Damage = 3;
+        private static float FireBallPsysSpeed = 2.5f;
+        private static Vector3 FireBallPos = new Vector3(0.2f, 0.4f, 4);
+        private static readonly string FireBallPsys = "FireBallPsys";
+        private static readonly string ExplosionPsys = "FireExplosionPsys";
+
+        List<ParticleSystemMissile> mMissiles = new List<ParticleSystemMissile>();
+
+        public override GraphicElement Picture
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override GraphicElement Icon
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override string Name
+        {
+            get { return "FireStorm"; }
+        }
+
+        public override string DisplayName
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override string Description
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override void ApplyAttackDefenseModifiers(ref int attack, ref int defense)
+        {
+        }
+
+        protected override bool CastImpl(GameUnit caster, GameUnit target)
+        {
+            foreach (var cell in caster.GameScene.GetCell(caster.CellIndex).GetSiblings())
+            {
+                if (null != cell.GameUnit && cell.GameUnit.OwningPlayer != caster.OwningPlayer)
+                {
+                    var missile2 = new ParticleSystemMissile(cell.GameUnit, cell.GameUnit.Position + FireBallPos, cell.GameUnit.Position, FireBallPsys, FireBallPsysSpeed);
+                    missile2.OnHit += new ParticleSystemMissile.OnHitHandler(missile_OnHit);
+                    mMissiles.Add(missile2);
+                }
+            }
+
+            return true;
+        }
+
+        protected override bool UpdateImpl(AleGameTime time)
+        {
+            if (0 == mMissiles.Count)
+            {
+                return false;
+            }
+
+            for (int i = mMissiles.Count - 1; i >= 0; --i)
+            {
+                if (!mMissiles[i].Update(time))
+                {
+                    mMissiles[i].Dispose();
+                    mMissiles.RemoveAt(i);
+                }
+            }
+
+            return true;
+        }
+
+        private void missile_OnHit(ParticleSystemMissile missile, GameUnit target)
+        {
+            target.ReceiveDamage(Damage, false);
+            target.GameScene.ParticleSystemManager.CreateFireAndforgetParticleSystem(
+                target.GameScene.Content.Load<ParticleSystemDesc>(ExplosionPsys), target.Position);
+            target.GameScene.GameCamera.Shake();
+        }
+    }
+
+    public class ParticleSystemMissile : IDisposable
+    {
+        public delegate void OnHitHandler(ParticleSystemMissile missile, GameUnit target);
+
+        public event OnHitHandler OnHit;
+
+        private bool mIsDisposed = false;
+        private ParticleSystem mParticleSystem;
+        private Vector3LinearAnimator mPosAnimator = new Vector3LinearAnimator();
+
+        public GameUnit Target { get; private set; }
+        public GameScene GameScene { get { return Target.GameScene; } }
+
+        public ParticleSystemMissile(GameUnit target, Vector3 srcPos, Vector3 destPos, string pSysName, float speed)
+        {
+            Target = target;
+            mParticleSystem = GameScene.ParticleSystemManager.CreateParticleSystem(GameScene.Content, pSysName);
+            mPosAnimator.Animate(speed, srcPos, destPos);
+            mParticleSystem.Position = mPosAnimator.CurrentValue;
+
+            GameScene.Octree.AddObject(mParticleSystem);
+        }
+
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (!mIsDisposed)
+            {
+                if (isDisposing)
+                {
+                    mParticleSystem.Dispose();
+                }
+                mIsDisposed = true;
+            }
+        }
+
+        public bool Update(AleGameTime time)
+        {
+            if (mPosAnimator.Update(time))
+            {
+                mParticleSystem.Position = mPosAnimator.CurrentValue;
+            }
+            else
+            {
+                if (mParticleSystem.IsEnabled)
+                {
+                    mParticleSystem.IsEnabled = false;
+                    if (null != OnHit)
+                    {
+                        OnHit.Invoke(this, Target);
+                    }
+                }
+                else
+                {
+                    if (!mParticleSystem.IsLoaded)
+                    {
+                        GameScene.Octree.RemoveObject(mParticleSystem);
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+    }
+
+    public class SpellCollection : ReadOnlyCollection<SpellSlot>
+    {
+        public static Spell[] Spells;
+
+        public SpellSlot this[string name]
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
+                foreach (var spell in this)
+                {
+                    if (string.Equals(name, spell.Spell.Name))
+                    {
+                        return spell;
+                    }
+                }
+                throw new KeyNotFoundException(string.Format("Spell with name '{0}' doesn't exists", name));
+            }
+        }
+
+        static SpellCollection()
+        {
+            Spells = new Spell[] 
+            { 
+                new SlayerSpell(),
+                new FireStormSpell(),
+                new SlayerSpell(),
+                new SlayerSpell(),
+                new SlayerSpell(),
+                new SlayerSpell(),
+                new SlayerSpell(),
+                new SlayerSpell(),
+                new SlayerSpell(),
+                new SlayerSpell()
+            };
+        }
+
+        public SpellCollection()
+            : base(CreateSpellList())
+        {
+        }
+
+        public void ResetSpellAvailabilities()
+        {
+            foreach(var spell in Items)
             {
                 spell.AvailableCount = spell.TotalCount;
             }
+        }
+
+        private static SpellSlot[] CreateSpellList()
+        {
+            SpellSlot[] slots =  new SpellSlot[Spells.Length];
+            for (int i = 0; i < slots.Length; ++i)
+            {
+                slots[i] = new SpellSlot(Spells[i]);
+            }
+
+            return slots;
         }
     }
 
