@@ -321,6 +321,7 @@ namespace Conquera
                     }
                 }
             }
+            ActiveSpell = null;
 			mGuiScene.HandleEndTurn(oldPlayer);
         }
 

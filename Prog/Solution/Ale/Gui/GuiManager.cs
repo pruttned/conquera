@@ -210,9 +210,9 @@ namespace Ale.Gui
             {
                 mMouseDownControl.OnMouseUp(button, mouseManager);
 
-                if (mMouseDownControl == controlUnderMouse)
+                if (mMouseDownControl == controlUnderMouse && button == MouseButton.Left)
                 {
-                    mMouseDownControl.OnClick(button, mouseManager);
+                    mMouseDownControl.OnClick();
                 }
                 else
                 {

@@ -145,7 +145,7 @@ namespace Conquera
             {
                 var activeSpell = mGameUnit.GameScene.ActiveSpell;
 
-                int damage = mGameUnit.ComputeDamageTo(TargetUnit, activeSpell.Spell);
+                int damage = mGameUnit.ComputeDamageTo(TargetUnit, null != activeSpell ? activeSpell.Spell : null);
                 TargetUnit.ReceiveDamage(damage);
 
                 if (null != activeSpell)

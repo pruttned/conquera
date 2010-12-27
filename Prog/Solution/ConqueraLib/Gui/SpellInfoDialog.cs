@@ -25,10 +25,11 @@ namespace Conquera.Gui
 {
     public class SpellInfoDialog : Dialog
     {
-        private GraphicElementContainer mNameContainer;
-        private GraphicElementContainer mPictureContainer;
+        private GraphicElementContainer mDisplayNameContainer;
+        private GraphicElementContainer mIconContainer;
+        private GraphicElementContainer mPictureContainer;                
         private GraphicElementContainer mDescriptionContainer;
-        private Rectangle mNameRectangle;
+        
         private GraphicElement mBackground;
 
         public override System.Drawing.SizeF Size
@@ -38,36 +39,28 @@ namespace Conquera.Gui
 
         public SpellInfoDialog()
         {
-            mBackground = GuiManager.Instance.Palette.CreateGraphicElement("GameCardInfoDialogBackground");
+            mBackground = GuiManager.Instance.Palette.CreateGraphicElement("SpellInfoDialogBackground");
 
-            TextElement nameLabel = new TextElement(GuiManager.Instance.GetGuiFont("TileInfo/GameCardDialogCardName"), Color.White);
-            mNameContainer = new GraphicElementContainer(nameLabel, Point.Zero);
-            mNameRectangle = GuiManager.Instance.Palette.CreateRectangle("GameCardInfoDialogName");
+            TextElement displayNameLabel = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFont1"), Color.White);
+            mDisplayNameContainer = new GraphicElementContainer(displayNameLabel, Point.Zero);            
 
-            Rectangle pictureRectangle = GuiManager.Instance.Palette.CreateRectangle("GameCardInfoDialogPicture");
-            mPictureContainer = new GraphicElementContainer(null, pictureRectangle.Location);
+            mIconContainer = new GraphicElementContainer(null, new Point(0, 40));
+            mPictureContainer = new GraphicElementContainer(null, new Point(0, 110));
 
-            Rectangle descriptionRectangle = GuiManager.Instance.Palette.CreateRectangle("GameCardInfoDialogDescription");
-            TextElement descriptionLabel = new TextElement(GuiManager.Instance.GetGuiFont("TileInfo/GameCardDialogDescription"), Color.Yellow);
+            TextElement descriptionLabel = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFont1"), Color.Yellow);
             descriptionLabel.Warp = true;
             descriptionLabel.AutoSize = false;
-            descriptionLabel.Width = descriptionRectangle.Width;
-            descriptionLabel.Height = descriptionRectangle.Height;
-            mDescriptionContainer = new GraphicElementContainer(descriptionLabel, descriptionRectangle.Location);
+            descriptionLabel.Width = 200;
+            descriptionLabel.Height = 200;
+            mDescriptionContainer = new GraphicElementContainer(descriptionLabel, new Point(0, 300));
         }
 
-        public void SetGameCard(Spell spell)
+        public void SetSpell(Spell spell)
         {
-            //todo: spell
-
-
-            //TextElement nameLabel = (TextElement)mNameContainer.GraphicElement;
-            //nameLabel.Text = spell.Name;
-            //mNameContainer.Location = new Point(mNameRectangle.Left + mNameRectangle.Width / 2 - nameLabel.Width / 2,
-            //                                    mNameRectangle.Top + mNameRectangle.Height / 2 - nameLabel.Height / 2);
-
-            //mPictureContainer.GraphicElement = spell.Picture;
-            //((TextElement)mDescriptionContainer.GraphicElement).Text = spell.Description;
+            ((TextElement)mDisplayNameContainer.GraphicElement).Text = spell.DisplayName;
+            mIconContainer.GraphicElement = spell.Icon;
+            mPictureContainer.GraphicElement = spell.Picture;
+            ((TextElement)mDescriptionContainer.GraphicElement).Text = spell.Description;
         }
 
         protected override void OnDrawBackground()
@@ -77,7 +70,8 @@ namespace Conquera.Gui
 
         protected override void OnDrawForeground()
         {
-            mNameContainer.Draw(this);
+            mDisplayNameContainer.Draw(this);
+            mIconContainer.Draw(this);
             mPictureContainer.Draw(this);
             mDescriptionContainer.Draw(this);
         }

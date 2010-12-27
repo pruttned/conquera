@@ -25,9 +25,6 @@ namespace Conquera.Gui
     {
         private GraphicElement mBackground;
         private TextElement mStatText;
-        private SpellSlot mCardSlot1 = new SpellSlot();
-        private SpellSlot mCardSlot2 = new SpellSlot();
-        private SpellSlot mCardSlot3 = new SpellSlot();
 
         public override System.Drawing.SizeF Size
         {
@@ -39,13 +36,6 @@ namespace Conquera.Gui
             mBackground = GuiManager.Instance.Palette.CreateGraphicElement("UnitInfoPanelBackground");
 
             mStatText = new TextElement((int)Size.Width, (int)Size.Height, GuiManager.Instance.GetGuiFont("SpriteFontSmall"), true, Color.Black);
-
-            mCardSlot1.Location = new Microsoft.Xna.Framework.Point(15, 110);
-            mCardSlot2.Location = new Microsoft.Xna.Framework.Point(80, 110);
-            mCardSlot3.Location = new Microsoft.Xna.Framework.Point(150, 110);
-            ChildControls.Add(mCardSlot1);
-            ChildControls.Add(mCardSlot2);
-            ChildControls.Add(mCardSlot3);
         }
 
         public void Update(GameUnit gameUnit)

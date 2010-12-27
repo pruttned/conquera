@@ -124,7 +124,7 @@ namespace Conquera
             }
         }
 
-        public SpellCollection Spells { get; private set; }
+        public SpellSlotCollection Spells { get; private set; }
 
         public GamePlayer(Vector3 color)
             :this()
@@ -223,7 +223,7 @@ namespace Conquera
         {
             Cells = new ReadOnlyCollection<HexCell>(mCells);
 			MaxUnitCnt = 3;
-            Spells = new SpellCollection();
+            Spells = new SpellSlotCollection();
         }
 
         protected abstract void CreateGameSceneStates(GameScene scene, Dictionary<string, IGameSceneState> gameSceneStates);

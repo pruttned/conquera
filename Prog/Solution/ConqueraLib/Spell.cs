@@ -140,15 +140,17 @@ namespace Conquera
     {
         private static int Damage = 5;
         private static readonly string SlayerPsys = "SlayerPsys";
+        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSlayer");
+        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSlayer");
 
         public override GraphicElement Picture
         {
-            get { throw new NotImplementedException(); }
+            get { return mPictureGraphicElement; }
         }
 
         public override GraphicElement Icon
         {
-            get { throw new NotImplementedException(); }
+            get { return mIconGraphicElement; }
         }
 
         public override string Name
@@ -158,12 +160,12 @@ namespace Conquera
 
         public override string DisplayName
         {
-            get { throw new NotImplementedException(); }
+            get { return "Slayer spell"; }
         }
 
         public override string Description
         {
-            get { throw new NotImplementedException(); }
+            get { return "Increases attack +2 or so."; }
         }
 
         public override void BeforeAttack(GameUnit caster, GameUnit target)
@@ -196,17 +198,19 @@ namespace Conquera
         private static Vector3 FireBallPos = new Vector3(0.2f, 0.4f, 4);
         private static readonly string FireBallPsys = "FireBallPsys";
         private static readonly string ExplosionPsys = "FireExplosionPsys";
+        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconFireStorm");
+        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconFireStorm");
 
         List<ParticleSystemMissile> mMissiles = new List<ParticleSystemMissile>();
 
         public override GraphicElement Picture
         {
-            get { throw new NotImplementedException(); }
+            get { return mPictureGraphicElement; }
         }
 
         public override GraphicElement Icon
         {
-            get { throw new NotImplementedException(); }
+            get { return mIconGraphicElement; }
         }
 
         public override string Name
@@ -216,12 +220,12 @@ namespace Conquera
 
         public override string DisplayName
         {
-            get { throw new NotImplementedException(); }
+            get { return "Fire storm spell"; }
         }
 
         public override string Description
         {
-            get { throw new NotImplementedException(); }
+            get { return "Fireballs for everyone!"; }
         }
 
         public override void BeforeAttack(GameUnit caster, GameUnit target)
@@ -355,7 +359,7 @@ namespace Conquera
         }
     }
 
-    public class SpellCollection : ReadOnlyCollection<SpellSlot>
+    public class SpellSlotCollection : ReadOnlyCollection<SpellSlot>
     {
         public static Spell[] Spells;
 
@@ -375,7 +379,7 @@ namespace Conquera
             }
         }
 
-        static SpellCollection()
+        static SpellSlotCollection()
         {
             Spells = new Spell[] 
             { 
@@ -392,7 +396,7 @@ namespace Conquera
             };
         }
 
-        public SpellCollection()
+        public SpellSlotCollection()
             : base(CreateSpellList())
         {
         }
