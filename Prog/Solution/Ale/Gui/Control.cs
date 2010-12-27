@@ -48,6 +48,7 @@ namespace Ale.Gui
         public ControlCollection SiblingColleciton { get; internal set; }
         public Point Location { get; set; }
         public bool Visible { get; set; }
+        public bool IsHitTestEnabled { get; set; }
 
         public Point ScreenLocation
         {
@@ -71,6 +72,7 @@ namespace Ale.Gui
             ChildControls = new ControlCollection(this);
             Location = Point.Zero;
             Visible = true;
+            IsHitTestEnabled = true;
         }
 
         public void Draw()
@@ -88,7 +90,7 @@ namespace Ale.Gui
 
         public Control GetControl(Point screenLocation)
         {
-            if (Visible && OccupiesScreenLocation(screenLocation))
+            if (Visible && IsHitTestEnabled && OccupiesScreenLocation(screenLocation))
             {
                 for (int i = ChildControls.Count - 1; i >= 0; i--)
                 {
@@ -147,7 +149,7 @@ namespace Ale.Gui
             }
         }
 
-        protected internal virtual void OnClick(MouseButton button, MouseManager mouseManager)
+        protected internal virtual void OnClick()
         {
             if (null != Click)
             {

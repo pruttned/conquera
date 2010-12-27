@@ -8,12 +8,12 @@
     <rectangle name="TileInfoViewDescription" locationX="0" locationY="64" width="225" height="116"/> <!--in view-->
     
     <!--Dimension Gate-->
-    <rectangle name="DimensionGateSpellSlot" locationX="5" locationY="110" width="64" height="64"/> 
+    <!--<rectangle name="DimensionGateSpellSlot" locationX="5" locationY="110" width="64" height="64"/>--> 
         
-    <!--GameCard info-->
-    <rectangle name="GameCardInfoDialogName" locationX="32" locationY="32" width="462" height="64"/> 
-    <rectangle name="GameCardInfoDialogPicture" locationX="32" locationY="70" width="200" height="200"/> 
-    <rectangle name="GameCardInfoDialogDescription" locationX="32" locationY="265" width="462" height="100"/>
+    <!--Spell info-->
+    <!--<rectangle name="SpellInfoDialogName" locationX="32" locationY="32" width="462" height="64"/> 
+    <rectangle name="SpellInfoDialogPicture" locationX="32" locationY="70" width="200" height="200"/> 
+    <rectangle name="SpellInfoDialogDescription" locationX="32" locationY="265" width="462" height="100"/>-->
 
     <!--Castle-->
     <rectangle name="CastleBuyUnitButton" locationX="80" locationY="100" width="42" height="42"/>
@@ -42,7 +42,7 @@
   <graphicElements>
     <image name="TileInfoPanelBackground" textureFileName="Palette" locationX="0" locationY="259" width="243" height="199"/>
     <image name="UnitInfoPanelBackground" textureFileName="Palette" locationX="0" locationY="259" width="243" height="199"/>
-    <image name="GameCardInfoDialogBackground" textureFileName="Palette" locationX="257" locationY="1" width="510" height="475"/>
+    <image name="SpellInfoDialogBackground" textureFileName="Palette" locationX="257" locationY="1" width="510" height="475"/>
     <image name="ShowMainMenuButtonDefault" textureFileName="Palette" locationX="0" locationY="0" width="42" height="42"/>
     <image name="ShowMainMenuButtonMouseOver" textureFileName="Palette" locationX="43" locationY="0" width="42" height="42"/>
     
@@ -65,6 +65,10 @@
     <image name="MainMenuDialogBackground" textureFileName="Palette" locationX="257" locationY="1" width="510" height="475"/>
     <image name="MainMenuButtonDefault" textureFileName="Palette" locationX="0" locationY="0" width="42" height="42"/>
     <image name="MainMenuButtonMouseOver" textureFileName="Palette" locationX="43" locationY="0" width="42" height="42"/>    
+    
+    <!--Spell Icons-->
+    <image name="SpellIconFireStorm" textureFileName="CellNotificationText" locationX="64" locationY="0" width="64" height="64"/>
+    <image name="SpellIconSlayer" textureFileName="CellNotificationText" locationX="0" locationY="64" width="64" height="64"/>
   </graphicElements>
 
 </guiPalette>

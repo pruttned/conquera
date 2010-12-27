@@ -33,6 +33,7 @@ namespace Conquera.Gui
         private PlayerGoldView mPlayerGoldView = new PlayerGoldView();
         private PlayerUnitCountView mPlayerUnitCountView = new PlayerUnitCountView();
         private TextButton mMainMenuButton;
+        private SpellPanel mSpellPanel;
 
         public bool SidePanelsVisible
         {
@@ -82,6 +83,11 @@ namespace Conquera.Gui
             mMainMenuButton.Click += new EventHandler<ControlEventArgs>(mMainMenuButton_Click);
             RootControls.Add(mMainMenuButton);
 
+            //Spell panel.
+            mSpellPanel = new SpellPanel(gameScene);
+            RootControls.Add(mSpellPanel);
+            UpdateSpellPanel();
+
             //Other.
             UpdateLocations();
             GuiManager.Instance.ScreenSizeChanged += new EventHandler(ScreenSizeChanged);
@@ -126,6 +132,8 @@ namespace Conquera.Gui
 
             mPlayerGoldView.Update(mGameScene.CurrentPlayer.Gold);
             mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);
+
+            UpdateSpellPanel();
         }
 
         private void BindToCurrentPlayer()
@@ -177,12 +185,20 @@ namespace Conquera.Gui
 
             //MainMenuButton.
             mMainMenuButton.Location = new Point((int)(screenWidth - mMainMenuButton.Size.Width), 0);
+
+            //Spell panel.
+            mSpellPanel.Location = new Point(0, screenHeight - (int)mSpellPanel.Size.Height);
         }
 
         private void mMainMenuButton_Click(object sender, ControlEventArgs e)
         {
             MainMenuDialog dialog = new MainMenuDialog(mGameScene.SceneManager);
             dialog.Show(true);
+        }
+
+        private void UpdateSpellPanel()
+        {
+            mSpellPanel.SpellSlotCollection = mGameScene.CurrentPlayer.Spells;
         }
     }
 

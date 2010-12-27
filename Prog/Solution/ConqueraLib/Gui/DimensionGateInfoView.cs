@@ -24,18 +24,18 @@ namespace Conquera.Gui
 {
     public class DimensionGateInfoView : TileInfoView
     {
-        private SpellSlot mSpellSlot = new SpellSlot();
+        private SpellView mSpellView = new SpellView();
 
         public DimensionGateInfoView()
         {
-            mSpellSlot.Location = GuiManager.Instance.Palette.CreateRectangle("DimensionGateSpellSlot").Location;
-            ChildControls.Add(mSpellSlot);
+            mSpellView.Location = new Point(0, 100);
+            ChildControls.Add(mSpellView);
         }
 
         public override void Update(HexCell cell)
         {
             base.Update(cell);
-            mSpellSlot.Spell = ((DimensionGateTileDesc)cell.HexTerrainTile).Spell;
+            mSpellView.Spell = ((DimensionGateTileDesc)cell.HexTerrainTile).Spell;
         }
     }
 }
