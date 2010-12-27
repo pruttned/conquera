@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Conquera
 {
@@ -128,6 +129,7 @@ namespace Conquera
             return mIsCasted;
         }
 
+        public abstract void BeforeAttack(GameUnit caster, GameUnit target);
         public abstract void ApplyAttackDefenseModifiers(ref int attack, ref int defense);
 
         protected abstract bool CastImpl(GameUnit caster, GameUnit target);
@@ -137,6 +139,7 @@ namespace Conquera
     public class SlayerSpell : Spell
     {
         private static int Damage = 5;
+        private static readonly string SlayerPsys = "SlayerPsys";
 
         public override GraphicElement Picture
         {
@@ -161,6 +164,13 @@ namespace Conquera
         public override string Description
         {
             get { throw new NotImplementedException(); }
+        }
+
+        public override void BeforeAttack(GameUnit caster, GameUnit target)
+        {
+            caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.Slayer, Color.Red, caster.CellIndex);
+            caster.GameScene.ParticleSystemManager.CreateFireAndforgetParticleSystem(
+                caster.GameScene.Content.Load<ParticleSystemDesc>(SlayerPsys), caster.Position);
         }
 
         public override void ApplyAttackDefenseModifiers(ref int attack, ref int defense)
@@ -212,6 +222,17 @@ namespace Conquera
         public override string Description
         {
             get { throw new NotImplementedException(); }
+        }
+
+        public override void BeforeAttack(GameUnit caster, GameUnit target)
+        {
+            foreach (var cell in caster.GameScene.GetCell(caster.CellIndex).GetSiblings())
+            {
+                if (null != cell.GameUnit && cell.GameUnit.OwningPlayer != caster.OwningPlayer)
+                {
+                    caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.FireStorm, Color.Red, cell.Index);
+                }
+            } 
         }
 
         public override void ApplyAttackDefenseModifiers(ref int attack, ref int defense)

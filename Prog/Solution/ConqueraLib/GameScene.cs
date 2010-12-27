@@ -138,7 +138,7 @@ namespace Conquera
                 //}
 
                 //temp
-                ActiveSpell = CurrentPlayer.Spells[1];
+                ActiveSpell = CurrentPlayer.Spells[0];
             }
         }
 
@@ -455,6 +455,11 @@ namespace Conquera
         public void FireCellNotificationLabel(string text, string icon, Color textColor, Point cell)
         {
             mCellLabelManager.AddLabel(text, icon, textColor, GetCell(cell).CenterPos);
+        }
+
+        public void FireCellNotificationLabel(string text, string icon, Color textColor, Vector3 pos )
+        {
+            mCellLabelManager.AddLabel(text, icon, textColor, pos);
         }
 
         protected override void Dispose(bool isDisposing)

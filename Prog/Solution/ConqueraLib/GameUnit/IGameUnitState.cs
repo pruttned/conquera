@@ -123,6 +123,12 @@ namespace Conquera
             if (null == TargetUnit) throw new ArgumentNullException("TargetUnit");
             mGameUnit.RotateTo(TargetUnit.CellIndex);
 
+            var activeSpell = mGameUnit.GameScene.ActiveSpell;
+            if (null != activeSpell)
+            {
+                activeSpell.Spell.BeforeAttack(mGameUnit, TargetUnit);
+            }
+
             mGameUnit.AnimationPlayer.Animation = mGameUnit.GameUnitDesc.AttackAnimation;
             mGameUnit.AnimationPlayer.Play(false);
 

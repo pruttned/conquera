@@ -49,8 +49,8 @@ namespace Conquera
             mImage = image;
             mWorldPos = worldPos;
 
-            mAnimator.Animate(0.5f, 1.0f, 0.0f);
-            mPosAnimator.Animate(10, Point.Zero, new Point(10,10));
+            mAnimator.Animate(1.5f, 1.0f, 0.0f);
+            mPosAnimator.Animate(40, Point.Zero, new Point(10,10));
         }
 
         public bool Draw(AleGameTime gameTime, SpriteBatch spriteBatch)
@@ -202,5 +202,7 @@ namespace Conquera
         public static readonly string Coin = "Coin";
         public static readonly string Hearth = "Hearth";
         public static readonly string BrokenHearth = "BrokenHearth";
+        public static readonly string FireStorm = "FireStorm";
+        public static readonly string Slayer = "Slayer";
     }
 }
