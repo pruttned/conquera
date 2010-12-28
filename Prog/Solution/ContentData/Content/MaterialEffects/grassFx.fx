@@ -53,7 +53,7 @@ VsOutput mainVS(float4 pos: POSITION, float2 normalizedUv: TEXCOORD0)
     return output;
 }
 
-float4 mainPS(float2 uv: TEXCOORD0, float4 vColorVariation: COLOR, float2 colorIndex : TEXCOORD1) : COLOR 
+float4 mainPS(float2 uv: TEXCOORD0, float4 vColorVariation: TEXCOORD2, float2 colorIndex : TEXCOORD1) : COLOR 
 {
 	return tex2D(gDiffuseMapSampler, uv);
 }

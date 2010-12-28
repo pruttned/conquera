@@ -114,6 +114,7 @@
     <Compile Include="Graphics\Model\MeshConnectionPoint.cs" />
     <Compile Include="Graphics\ParticleSystem\ParticleDynamicGeometryManager.cs" />
     <Compile Include="Graphics\ParticleSystem\ParticleSystemLoader.cs" />
+    <Compile Include="Graphics\ParticleSystem\ZCylinderParticleEmitter.cs" />
     <Compile Include="Graphics\Renderable\GraphicModelRenderableFactory.cs" />
     <Compile Include="Graphics\Renderable\IRenderableFactory.cs" />
     <Compile Include="Graphics\Renderable\IRenderableUnit.cs" />
