@@ -39,6 +39,7 @@ namespace Ale.Gui
         private Control mControlUnderMouseOnLastUpdate = null;        
         private Control mMouseDownControl = null;
         private GraphicsDeviceManager mGraphicsDeviceManager;
+        private Control mControlUnderMouse = null;
 
         public static GuiManager Instance { get; private set; }
         public SpriteBatch SpriteBatch { get; private set; }
@@ -65,6 +66,17 @@ namespace Ale.Gui
             }
         }
 
+        public bool HandlesMouse
+        {
+            get
+            {
+                return ActiveScene.ModalControl != null || 
+                       DragDropInfo.Dragging || 
+                       mMouseDownControl != null ||
+                       (mControlUnderMouse != null && !IsAnyMouseButtonPressed());
+            }
+        }
+
         private GuiManager(GraphicsDeviceManager graphicsDeviceManager, Palette palette, ContentGroup content, MouseManager mouseManager)
         {
             GraphicsDevice device = graphicsDeviceManager.GraphicsDevice;
@@ -77,13 +89,9 @@ namespace Ale.Gui
             ScreenSize = new System.Drawing.SizeF(device.Viewport.Width, device.Viewport.Height);
 
             mMouseManager = mouseManager;
-            mMouseManager.MouseButtonDown += new MouseManager.MouseButtonEventHandler(mMouseManager_MouseButtonDown);
-            mMouseManager.MouseButtonUp += new MouseManager.MouseButtonEventHandler(mMouseManager_MouseButtonUp);
 
             AppSettingsManager.Default.AppSettingsCommitted += new AppSettingsManager.CommittedHandler(Default_AppSettingsCommitted);
         }
-
-
 
         public static void Initialize(GraphicsDeviceManager graphicsDeviceManager, Palette palette, ContentGroup content, MouseManager mouseManager)
         {
@@ -130,15 +138,11 @@ namespace Ale.Gui
 
         public void Update(AleGameTime gameTime)
         {
-            if (0.0f != mMouseManager.CursorPositionDelta.X || 0.0f != mMouseManager.CursorPositionDelta.Y) //mouse location changed
-            {
-                Control controlUnderMouse = GetControlUnderMouse();
-                if (!CheckModal(controlUnderMouse))
-                {
-                    controlUnderMouse = null;
-                }
+            //if (0.0f != mMouseManager.CursorPositionDelta.X || 0.0f != mMouseManager.CursorPositionDelta.Y) //mouse location changed
+            //{
+                UpdateControlUnderMouse();
 
-                if (mControlUnderMouseOnLastUpdate != controlUnderMouse) //control under mouse changed
+                if (mControlUnderMouseOnLastUpdate != mControlUnderMouse) //control under mouse changed
                 {
                     if (DragDropInfo.Dragging) //in drag mode
                     {
@@ -146,9 +150,9 @@ namespace Ale.Gui
                         {
                             mControlUnderMouseOnLastUpdate.OnDragLeave();
                         }
-                        if (null != controlUnderMouse) //new - drag enter
+                        if (null != mControlUnderMouse) //new - drag enter
                         {
-                            controlUnderMouse.OnDragEnter();
+                            mControlUnderMouse.OnDragEnter();
                         }
                     }
                     else if (!IsAnyMouseButtonPressed())
@@ -157,36 +161,32 @@ namespace Ale.Gui
                         {
                             mControlUnderMouseOnLastUpdate.OnMouseLeave();
                         }
-                        if (null != controlUnderMouse) //new - enter
+                        if (null != mControlUnderMouse) //new - enter
                         {
-                            controlUnderMouse.OnMouseEnter();
+                            mControlUnderMouse.OnMouseEnter();
                         }
                     }
 
-                    mControlUnderMouseOnLastUpdate = controlUnderMouse;
+                    mControlUnderMouseOnLastUpdate = mControlUnderMouse;
                 }
-            }
+            //}
         }
 
-        private void mMouseManager_MouseButtonDown(MouseButton button, MouseManager mouseManager)
+        public void HandleMouseDown(MouseButton button)        
         {
-            Control controlUnderMouse = GetControlUnderMouse();
-            mMouseDownControl = CheckModal(controlUnderMouse) ? controlUnderMouse : null;
+            UpdateControlUnderMouse();
+            mMouseDownControl = mControlUnderMouse;
 
             if (null != mMouseDownControl)
             {
-                mMouseDownControl.OnMouseDown(button, mouseManager);
+                mMouseDownControl.OnMouseDown(button, mMouseManager);
             }
         }
 
-        private void mMouseManager_MouseButtonUp(MouseButton button, MouseManager mouseManager)
+        public bool HandleMouseUp(MouseButton button) //returns Handled
         {
-            Control controlUnderMouse = GetControlUnderMouse();
-            if (!CheckModal(controlUnderMouse))
-            {
-                controlUnderMouse = null;
-            }
-
+            UpdateControlUnderMouse();
+            
             if (DragDropInfo.Dragging)
             {
                 DragDropInfo.EndDrag();
@@ -196,33 +196,52 @@ namespace Ale.Gui
                     DragDropInfo.EventArgs.SourceControl.OnDragFinished();
                 }
 
-                if (null != controlUnderMouse)
+                if (null != mControlUnderMouse)
                 {
                     if (DragDropInfo.EventArgs.AllowDrop)
                     {
-                        controlUnderMouse.OnDragDrop();
+                        mControlUnderMouse.OnDragDrop();
                     }
 
-                    controlUnderMouse.OnMouseEnter();
+                    mControlUnderMouse.OnMouseEnter();
                 }
+                mMouseDownControl = null;
+                return true;
             }
-            else if (null != mMouseDownControl)
+            
+            if (null != mMouseDownControl)
             {
-                mMouseDownControl.OnMouseUp(button, mouseManager);
+                mMouseDownControl.OnMouseUp(button, mMouseManager);
 
-                if (mMouseDownControl == controlUnderMouse && button == MouseButton.Left)
+                if (mMouseDownControl == mControlUnderMouse)
                 {
-                    mMouseDownControl.OnClick();
+                    if (button == MouseButton.Left)
+                    {
+                        mMouseDownControl.OnClick();
+                    }
                 }
                 else
                 {
                     mMouseDownControl.OnMouseLeave();
 
-                    if (null != controlUnderMouse)
+                    if (null != mControlUnderMouse)
                     {
-                        controlUnderMouse.OnMouseEnter();
+                        mControlUnderMouse.OnMouseEnter();
                     }
                 }
+                mMouseDownControl = null;
+                return true;
+            }
+            mMouseDownControl = null;
+            return false;
+        }
+        
+        private void UpdateControlUnderMouse()
+        {
+            mControlUnderMouse = GetControlUnderMouse();
+            if (!CheckModal(mControlUnderMouse))
+            {
+                mControlUnderMouse = null;
             }
         }
 

@@ -98,7 +98,7 @@ namespace Conquera
             {
                 var cellUnderCur = mScene.GetCellUnderCur();
 
-                if (null != cellUnderCur)
+                if (null != cellUnderCur && !GuiManager.Instance.HandlesMouse)
                 {
                     MovementArrow.EndCell = cellUnderCur;
                     if (SelectedUnit.HasMovedThisTurn || !SelectedUnit.CanMoveTo(cellUnderCur.Index))
