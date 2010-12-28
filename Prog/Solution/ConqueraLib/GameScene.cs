@@ -121,7 +121,7 @@ namespace Conquera
             {
                 if (mSelectedCell != value)
                 {
-                    mSelectedCell = value;
+                    mSelectedCell = value;                    
                     RefreshSelectedCell();
                 }
             }
@@ -136,9 +136,6 @@ namespace Conquera
                 //{
                 mSelectedUnit = value;
                 //}
-
-                //temp
-                ActiveSpellSlot = CurrentPlayer.Spells[0];
             }
         }
 
@@ -305,6 +302,7 @@ namespace Conquera
         public void EndTurn()
         {
             SelectedCell = null;
+            ActiveSpellSlot = null;
 			GamePlayer oldPlayer = CurrentPlayer;
             CurrentPlayer.OnEndTurn();
 
@@ -322,7 +320,7 @@ namespace Conquera
                     }
                 }
             }
-            ActiveSpellSlot = null;
+            
 			mGuiScene.HandleEndTurn(oldPlayer);
         }
 
@@ -330,7 +328,7 @@ namespace Conquera
         public override void Update(AleGameTime gameTime)
         {
             base.Update(gameTime);
-
+            GuiManager.Instance.Update(gameTime);
             State.Update(gameTime);
 
             if (EnableMouseCameraControl)
@@ -340,7 +338,7 @@ namespace Conquera
 
             var cellUnderCur = GetCellUnderCur();
             //3d cursor
-            if (null != cellUnderCur)
+            if (null != cellUnderCur && !GuiManager.Instance.HandlesMouse)
             {
                 Point index = cellUnderCur.Index;
                 mCursor3d.Position = cellUnderCur.CenterPos;
@@ -352,9 +350,6 @@ namespace Conquera
             }
 
             mGuiScene.DebugText = State.GetType().ToString();
-
-            //Gui
-            GuiManager.Instance.Update(gameTime);
         }
 
         public override void Draw(AleGameTime gameTime)
@@ -603,34 +598,37 @@ namespace Conquera
 
         private void HandleCameraControl()
         {
-            Vector3 mouseMovement = SceneManager.MouseManager.CursorPositionDelta;
-
-            //zoom
-            if (Math.Abs(mouseMovement.Z) > 0.00001f)
+            if (!GuiManager.Instance.HandlesMouse)
             {
-                if (mouseMovement.Z > 0)
+                Vector3 mouseMovement = SceneManager.MouseManager.CursorPositionDelta;
+
+                //zoom
+                if (Math.Abs(mouseMovement.Z) > 0.00001f)
                 {
-                    GameCamera.IncZoomLevel();
+                    if (mouseMovement.Z > 0)
+                    {
+                        GameCamera.IncZoomLevel();
+                    }
+                    else
+                    {
+                        GameCamera.DecZoomLevel();
+                    }
                 }
                 else
                 {
-                    GameCamera.DecZoomLevel();
-                }
-            }
-            else
-            {
-                if (SceneManager.MouseManager.IsButtonDown(MouseButton.Right))
-                {//movement
-                    Vector2 dirVec = new Vector2(GameCamera.TargetWorldPosition.X - MainCamera.WorldPosition.X,
-                        GameCamera.TargetWorldPosition.Y - MainCamera.WorldPosition.Y);
-                    dirVec.Normalize();
+                    if (SceneManager.MouseManager.IsButtonDown(MouseButton.Right))
+                    {//movement
+                        Vector2 dirVec = new Vector2(GameCamera.TargetWorldPosition.X - MainCamera.WorldPosition.X,
+                            GameCamera.TargetWorldPosition.Y - MainCamera.WorldPosition.Y);
+                        dirVec.Normalize();
 
-                    Vector2 perpDir;
-                    AleMathUtils.GetPerpVector(ref dirVec, out perpDir);
-                    perpDir *= mouseMovement.X / 10.0f;
-                    dirVec *= mouseMovement.Y / 10.0f;
+                        Vector2 perpDir;
+                        AleMathUtils.GetPerpVector(ref dirVec, out perpDir);
+                        perpDir *= mouseMovement.X / 10.0f;
+                        dirVec *= mouseMovement.Y / 10.0f;
 
-                    GameCamera.TargetWorldPosition += new Vector3(perpDir.X + dirVec.X, perpDir.Y + dirVec.Y, 0);
+                        GameCamera.TargetWorldPosition += new Vector3(perpDir.X + dirVec.X, perpDir.Y + dirVec.Y, 0);
+                    }
                 }
             }
         }
@@ -736,7 +734,15 @@ namespace Conquera
 
         private void MouseManager_MouseButtonUp(MouseButton button, MouseManager mouseManager)
         {
-            State.OnClickOnCell(GetCellUnderCur(), button);
+            if (!GuiManager.Instance.HandleMouseUp(button))
+            {
+                State.OnClickOnCell(GetCellUnderCur(), button);
+            }
+        }
+
+        private void MouseManager_MouseButtonDown(MouseButton button, MouseManager mouseManager)
+        {
+            GuiManager.Instance.HandleMouseDown(button);
         }
 
         private void unit_CellIndexChanged(GameUnit obj, Point oldValue)
@@ -776,6 +782,7 @@ namespace Conquera
         {
             SceneManager.KeyboardManager.KeyDown += new KeyboardManager.KeyEventHandler(KeyboardManager_KeyDown);
             SceneManager.MouseManager.MouseButtonUp += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonUp);
+            SceneManager.MouseManager.MouseButtonDown += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonDown);
 
             mCells = new HexCell[Terrain.Width, Terrain.Height];
 
