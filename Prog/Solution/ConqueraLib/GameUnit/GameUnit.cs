@@ -205,10 +205,21 @@ namespace Conquera
             if (!HasAttackedThisTurn && CanAttackTo(cell))
             {
                 LastAttackedTurn = GameScene.GameSceneContextState.TurnNum;
+                GameUnit target = GameScene.GetCell(cell).GameUnit;
+                RotateTo(target.CellIndex);
 
-                var state = (AttackingGameUnitState)States["Attack"];
-                state.TargetUnit = GameScene.GetCell(cell).GameUnit;
-                State = state;
+                if (null != GameScene.ActiveSpellSlot)
+                {
+                    var state = (CastingSpellBeforeAttackGameUnitState)States["CastingSpellBeforeAttack"];
+                    state.TargetUnit = target;
+                    State = state;
+                }
+                else
+                {
+                    var state = (AttackingGameUnitState)States["Attack"];
+                    state.TargetUnit = target;
+                    State = state;
+                }
                 
                 return true;
             }
@@ -292,8 +303,9 @@ namespace Conquera
 
             States.Add("Idle", new IdleGameUnitState(this));
             States.Add("Move", new MovingGameUnitState(this));
+            States.Add("CastingSpellBeforeAttack", new CastingSpellBeforeAttackGameUnitState(this));
             States.Add("Attack", new AttackingGameUnitState(this));
-            States.Add("CastingSpell", new CastingSpellGameUnitState(this));
+            States.Add("CastingSpellAfterHit", new CastingSpellAfterHitGameUnitState(this));
         }
 
         protected override bool IsSceneValid(BaseScene scene)

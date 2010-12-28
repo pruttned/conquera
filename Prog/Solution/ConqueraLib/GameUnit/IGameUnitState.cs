@@ -101,6 +101,49 @@ namespace Conquera
         }
     }
 
+    public class CastingSpellBeforeAttackGameUnitState : IGameUnitState
+    {
+        private GameUnit mGameUnit;
+        public GameUnit TargetUnit { get; set; }
+
+        public bool IsIdle
+        {
+            get { return false; }
+        }
+
+        public CastingSpellBeforeAttackGameUnitState(GameUnit gameUnit)
+        {
+            if (null == gameUnit) throw new ArgumentNullException("gameUnit");
+            mGameUnit = gameUnit;
+        }
+
+        public void OnStart()
+        {
+            if (null == TargetUnit) throw new ArgumentNullException("TargetUnit");
+
+            if (null == mGameUnit.GameScene.ActiveSpellSlot)
+            {//no spell
+                var state = (AttackingGameUnitState)mGameUnit.States["Attack"];
+                state.TargetUnit = TargetUnit;
+                mGameUnit.State = state;
+            }
+            else
+            {
+                mGameUnit.GameScene.ActiveSpellSlot.Spell.BeforeAttackCast(mGameUnit, TargetUnit);
+            }
+        }
+
+        public void Update(AleGameTime gameTime)
+        {
+            if (!mGameUnit.GameScene.ActiveSpellSlot.Spell.BeforeAttackUpdate(gameTime))
+            {
+                var state = (AttackingGameUnitState)mGameUnit.States["Attack"];
+                state.TargetUnit = TargetUnit;
+                mGameUnit.State = state;
+            }
+        }
+    }
+
     public class AttackingGameUnitState : IGameUnitState
     {
         private GameUnit mGameUnit;
@@ -121,13 +164,6 @@ namespace Conquera
         public void OnStart()
         {
             if (null == TargetUnit) throw new ArgumentNullException("TargetUnit");
-            mGameUnit.RotateTo(TargetUnit.CellIndex);
-
-            var activeSpell = mGameUnit.GameScene.ActiveSpellSlot;
-            if (null != activeSpell)
-            {
-                activeSpell.Spell.BeforeAttack(mGameUnit, TargetUnit);
-            }
 
             mGameUnit.AnimationPlayer.Animation = mGameUnit.GameUnitDesc.AttackAnimation;
             mGameUnit.AnimationPlayer.Play(false);
@@ -150,9 +186,9 @@ namespace Conquera
 
                 if (null != activeSpell)
                 {
-                    var spellState = (CastingSpellGameUnitState)mGameUnit.States["CastingSpell"];
+                    var spellState = (CastingSpellAfterHitGameUnitState)mGameUnit.States["CastingSpellAfterHit"];
                     spellState.TargetUnit = TargetUnit;
-                    mGameUnit.State = mGameUnit.States["CastingSpell"];
+                    mGameUnit.State = spellState;
                 }
                 else
                 {
@@ -162,7 +198,7 @@ namespace Conquera
         }
     }
 
-    public class CastingSpellGameUnitState : IGameUnitState
+    public class CastingSpellAfterHitGameUnitState : IGameUnitState
     {
         private GameUnit mGameUnit;
         public GameUnit TargetUnit { get; set; }
@@ -172,7 +208,7 @@ namespace Conquera
             get { return false; }
         }
 
-        public CastingSpellGameUnitState(GameUnit gameUnit)
+        public CastingSpellAfterHitGameUnitState(GameUnit gameUnit)
         {
             if (null == gameUnit) throw new ArgumentNullException("gameUnit");
             mGameUnit = gameUnit;
@@ -182,16 +218,12 @@ namespace Conquera
         {
             if (null == TargetUnit) throw new ArgumentNullException("TargetUnit");
 
-            if (!mGameUnit.GameScene.ActiveSpellSlot.Spell.Cast(mGameUnit, TargetUnit))
-            {
-                //no spell animation
-                mGameUnit.State = mGameUnit.States["Idle"];
-            }
+            mGameUnit.GameScene.ActiveSpellSlot.Spell.AfterAttackHitCast();
         }
 
         public void Update(AleGameTime gameTime)
         {
-            if (!mGameUnit.GameScene.ActiveSpellSlot.Spell.Update(gameTime))
+            if (!mGameUnit.GameScene.ActiveSpellSlot.Spell.AfterAttackHitUpdate(gameTime))
             {
                   mGameUnit.State = mGameUnit.States["Idle"];
             }
