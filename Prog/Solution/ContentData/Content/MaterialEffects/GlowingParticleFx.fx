@@ -109,6 +109,17 @@ float4 mainPS(float2 uv: TEXCOORD0, float4 vColorVariation: TEXCOORD2, float2 co
 	//return float4(alpha * color.xyz,alpha);     toto treba pre DestBlend = one;
 }
 
+float4 mainPS2(float2 uv: TEXCOORD0, float4 vColorVariation: TEXCOORD2, float2 colorIndex : TEXCOORD1) : COLOR 
+{
+	float4 color = vColorVariation + tex2D(gParticleColorFunctionMapSampler, colorIndex );
+	float4 colorFromTexture = tex2D(gDiffuseMapSampler, uv);
+	float alpha = (colorFromTexture.x + colorFromTexture.y + colorFromTexture.z) / 3.0f  * color.a;
+	
+	
+	return float4(color.xyz, alpha*0.5f);   
+	//return float4(alpha * color.xyz,alpha);     toto treba pre DestBlend = one;
+}
+
 
 technique Default
 {
@@ -145,5 +156,38 @@ technique Default
 		PixelShader = compile ps_2_0 mainPS();
 	}
 	
+		pass p1 
+	<
+		bool IsTransparent=true;
+		string MainTexture = "gDiffuseMap";  
+	>
+	{
+		AlphaFunc = Greater; 
+		AlphaRef = 0x000001;
+	
+		AlphaBlendEnable = true;
+		AlphaTestEnable = true;
+		ZEnable = true;
+		ZWriteEnable = false;
+		
+		BlendOp = add;
+
+	//	DestBlend = one;
+	//	SrcBlend = SRCCOLOR;
+
+//		DestBlend = INVSRCCOLOR;
+//		SrcBlend = SRCCOLOR;
+
+		//DestBlend = INVSRCCOLOR;
+	//	DestBlend = INVSRCALPHA;
+		DestBlend = one;
+	//	SrcBlend = SRCCOLOR;
+		SrcBlend = SRCALPHA;
+
+		VertexShader = compile vs_2_0 mainVS();
+		PixelShader = compile ps_2_0 mainPS2();
+	}
+
+
 }
 

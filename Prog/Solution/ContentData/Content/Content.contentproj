@@ -496,6 +496,34 @@
       <Processor>MeshProcessor</Processor>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\BeamParticleFx.fx">
+      <Name>BeamParticleFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\BeamText.png">
+      <Name>BeamText</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\BeamBottomParticleFx.fx">
+      <Name>BeamBottomParticleFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\GlowingParticleFx.fx">
+      <Name>GlowingParticleFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

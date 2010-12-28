@@ -141,6 +141,7 @@ namespace Ale.Editor
             mParticleSystem = ParticleSystemManager.CreateParticleSystem(new ParticleSystemDesc(this.SceneManager.GraphicsDeviceManager.GraphicsDevice,
                 settings, Content));
 
+            mParticleSystem.ShowWorldBounds = true;
             Octree.AddObject(mParticleSystem);
         }
 

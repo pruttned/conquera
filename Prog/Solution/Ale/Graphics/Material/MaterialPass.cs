@@ -208,7 +208,15 @@ namespace Ale.Graphics
         /// </summary>
         private void UpdateRenderBatchNumber()
         {
-            mRenderBatchNumber = (uint)(((uint)(mMaterialEffectPass.ParentTechnique.ParentMaterialEffect.Id & 0xFFF) << 20) | ((uint)(mMainTextureId & 0xFFFF) << 4) | (uint)(mMaterialEffectPass.OrderInTechnique & 0xF));
+            if (MaterialEffectPass.IsTransparent)
+            {
+                mRenderBatchNumber = (uint)(((uint)(mMaterialEffectPass.ParentTechnique.ParentMaterialEffect.Id & 0xFFF) << 20) | ((uint)(mMainTextureId & 0xFFFF) << 4) | (uint)((15 - mMaterialEffectPass.OrderInTechnique) & 0xF));
+            }
+            else
+            {
+                mRenderBatchNumber = (uint)(((uint)(mMaterialEffectPass.ParentTechnique.ParentMaterialEffect.Id & 0xFFF) << 20) | ((uint)(mMainTextureId & 0xFFFF) << 4) | (uint)(mMaterialEffectPass.OrderInTechnique & 0xF));
+            }
+
         }
 
         /// <summary>
