@@ -108,6 +108,7 @@
     <Compile Include="Gui\AlCursors.cs" />
     <Compile Include="Gui\CastleInfoView.cs" />
     <Compile Include="Gui\DimensionGateInfoView.cs" />
+    <Compile Include="EventHelper.cs" />
     <Compile Include="Gui\GameGuiScene.cs" />
     <Compile Include="Gui\GameUnitInfoPanel.cs" />
     <Compile Include="Gui\HeaderPanel.cs" />
@@ -133,7 +134,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShadowOrthoCamera.cs" />
     <Compile Include="ShadowScenePass.cs" />
-    <Compile Include="Spell.cs" />
+    <Compile Include="Spell\AnimationDelay.cs" />
+    <Compile Include="Spell\FireStormSpell.cs" />
+    <Compile Include="Spell\ParticleSystemMissile.cs" />
+    <Compile Include="Spell\SlayerSpell.cs" />
+    <Compile Include="Spell\SpellSlot.cs" />
+    <Compile Include="Spell\Spell.cs" />
+    <Compile Include="Spell\SpellSlotCollection.cs" />
     <Compile Include="StringResource.cs" />
     <Compile Include="WaterReflectionCamera.cs" />
     <Compile Include="WaterReflectionPass.cs" />
