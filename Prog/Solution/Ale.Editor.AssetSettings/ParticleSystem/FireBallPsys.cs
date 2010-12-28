@@ -10,10 +10,10 @@ namespace Ale.Editor.AssetSettings
     public class FireBallPsys : AssetSettingsDefinitionBase<ParticleSystemSettings>
     { 
         public override ParticleSystemSettings GetSettings(ContentGroup content)
-        {
+        { 
             ParticleSystemSettings particleSystemSettings = new ParticleSystemSettings();
             particleSystemSettings.Name = "FireBallPsys";
-
+			  
             PointParticleEmitterSettings particleEmitterSettings = new PointParticleEmitterSettings();
             particleSystemSettings.Emitters.Add(particleEmitterSettings);
              
