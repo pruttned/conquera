@@ -585,7 +585,6 @@ namespace Conquera
                     //}
 
 
-
                     //{
                     //    ParticleSystemSettings particleSystemSettings = new ParticleSystemSettings();
                     //    particleSystemSettings.Name = "FireBallPsys";
@@ -609,7 +608,7 @@ namespace Conquera
 
 
 
-                    //    particleEmitterSettings.Material = ormManager.FindObject(typeof(MaterialSettings), "Name='ParticleMaterial'");
+                    //    particleEmitterSettings.Material = ormManager.FindObject(typeof(MaterialSettings), "Name='FireParticleMat'");
                     //    particleEmitterSettings.Name = "Emitter1";
 
 
@@ -640,45 +639,85 @@ namespace Conquera
                     //    particleEmitterSettings.EmissionRateFunction = new TimeFunction(1000);
                     //    particleEmitterSettings.CycleTime = 0.5f;
 
-                    //    particleEmitterSettings.Material = ormManager.FindObject(typeof(MaterialSettings), "Name='ParticleMaterial'");
+                    //    particleEmitterSettings.Material = ormManager.FindObject(typeof(MaterialSettings), "Name='FireParticleMat'");
                     //    particleEmitterSettings.Name = "Emitter1";
 
                     //    ormManager.SaveObject(particleSystemSettings);
                     //}
-
 
                     //{
                     //    ParticleSystemSettings particleSystemSettings = new ParticleSystemSettings();
                     //    particleSystemSettings.Name = "SlayerPsys";
 
-                    //    SphereParticleEmitterSettings particleEmitterSettings = new SphereParticleEmitterSettings();
+                    //    ZCylinderParticleEmitterSettings particleEmitterSettings = new ZCylinderParticleEmitterSettings();
                     //    particleSystemSettings.Emitters.Add(particleEmitterSettings);
 
+                    //    particleEmitterSettings.Radius = 0.5f;
+                    //    particleEmitterSettings.Height = 0.0f;
+                    //    //
                     //    particleEmitterSettings.FastForwardTimeOnLoad = 0;
-                    //    particleEmitterSettings.Radius = 0.24f;
-                    //    particleEmitterSettings.MaxParticleCnt = 100;
+                    //    particleEmitterSettings.MaxParticleCnt = 20;
                     //    particleEmitterSettings.ParticleLifeDuration = 2f;
                     //    particleEmitterSettings.ParticleLifeDurationVariation = 0.5f;
-                    //    particleEmitterSettings.RelativePosition = new Vector3(0, 0, 1f);
-                    //    particleEmitterSettings.ParticleDirectionAngles = new Vector2(MathHelper.ToRadians(180), MathHelper.ToRadians(0));
+                    //    particleEmitterSettings.RelativePosition = new Vector3(0, 0, 0);
+                    //    //            particleEmitterSettings.ParticleDirectionAngles = new Vector2(MathHelper.ToRadians(180), MathHelper.ToRadians(0));
                     //    particleEmitterSettings.ParticleDirectionVariation = MathHelper.ToRadians(5.0f);
-                    //    particleEmitterSettings.ParticleSettings.ParticleColorRFunction = new TimeFunction(new Vector2(0, 0.8f), new Vector2(0.4f, 0.9f), new Vector2(0.6f, 0.1f), new Vector2(1.0f, 0.2f));
-                    //    particleEmitterSettings.ParticleSettings.ParticleColorGFunction = new TimeFunction(new Vector2(0, 0.1f), new Vector2(0.4f, 0.1f), new Vector2(0.6f, 0.0f), new Vector2(1.0f, 0.8f));
-                    //    particleEmitterSettings.ParticleSettings.ParticleColorBFunction = new TimeFunction(new Vector2(0, 1.0f), new Vector2(0.4f, 0.3f), new Vector2(0.6f, 0.9f), new Vector2(1.0f, 1.0f));
-                    //    particleEmitterSettings.ParticleSettings.ParticleColorAFunction = new TimeFunction(new Vector2(0, 0), new Vector2(0.5f, 0.8f), new Vector2(0.8f, 0.8f), new Vector2(1.0f, 0));
-                    //    particleEmitterSettings.ParticleSettings.ParticleSpeed = new TimeFunction(0.3f, 0.8f);
-                    //    particleEmitterSettings.ParticleSettings.ParticleSize = new TimeFunction(0.3f, 0.1f);
-                    //    particleEmitterSettings.ParticleSettings.ParticleRotation = new TimeFunction(0, 1);
-                    //    particleEmitterSettings.EmissionRateFunction = new TimeFunction(100);
+                    //    particleEmitterSettings.ParticleSettings.ParticleColorRFunction = new TimeFunction(new Vector2(0, 0.8f), new Vector2(1, 0.8f));
+                    //    particleEmitterSettings.ParticleSettings.ParticleColorGFunction = new TimeFunction(new Vector2(0, 0.8f), new Vector2(1, 0.1f));
+                    //    particleEmitterSettings.ParticleSettings.ParticleColorBFunction = new TimeFunction(new Vector2(0, 0.8f), new Vector2(1, 1.0f));
+                    //    particleEmitterSettings.ParticleSettings.ParticleColorAFunction = new TimeFunction(new Vector2(0, 0), new Vector2(0.5f, 0.8f), new Vector2(0.6f, 0.8f), new Vector2(1.0f, 0));
+                    //    particleEmitterSettings.ColorVariation = new Vector4(0.5f, 0.0f, 0.5f, 0.0f);
+                    //    particleEmitterSettings.ParticleSettings.ParticleSpeed = new TimeFunction(0);
+                    //    //particleEmitterSettings.ParticleSettings.ParticleSpeed = new TimeFunction(0.1f, 0.1f);
+                    //    particleEmitterSettings.ParticleSettings.ParticleSize = new TimeFunction(5f, 5f);
+                    //    //particleEmitterSettings.ParticleSettings.ParticleRotation = new TimeFunction(0, 0);
+                    //    particleEmitterSettings.EmissionRateFunction = new TimeFunction(10);
                     //    particleEmitterSettings.CycleTime = 1f;
 
-                    //    particleEmitterSettings.Material = ormManager.FindObject(typeof(MaterialSettings), "Name='ParticleMaterial'");
+                    //    particleEmitterSettings.Material = ormManager.FindObject(typeof(MaterialSettings), "Name='BeamParticleMat'");
                     //    particleEmitterSettings.Name = "Emitter1";
-
 
                     //    ormManager.SaveObject(particleSystemSettings);
                     //}
 
+                    //{
+                    //    MaterialSettings mat = new MaterialSettings("BeamParticleMat", "BeamParticleFx", DefaultRenderLayers.GroundStandingObjects);
+                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "BeamText"));
+                    //    mat.Params.Add(new Vector2ArrayMaterialParamSettings("gUvs", new Vector2[]
+                    //    {
+                    //        new Vector2(0,0),
+                    //        new Vector2(0.5f, 0),
+                    //        new Vector2(0, 0.5f),
+                    //        new Vector2(0.5f, 0.5f),
+                    //    }));
+                    //    ormManager.SaveObject(mat);
+                    //}
+
+                    //{
+                    //    MaterialSettings mat = new MaterialSettings("BeamBottomParticleMat", "BeamBottomParticleFx", DefaultRenderLayers.GroundStandingObjects);
+                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "smoke"));
+                    //    mat.Params.Add(new Vector2ArrayMaterialParamSettings("gUvs", new Vector2[]
+                    //    {
+                    //        new Vector2(0,0),
+                    //        new Vector2(0.5f, 0),
+                    //        new Vector2(0, 0.5f),
+                    //        new Vector2(0.5f, 0.5f),
+                    //    }));
+                    //    ormManager.SaveObject(mat);
+                    //}
+
+                    //{
+                    //    MaterialSettings mat = new MaterialSettings("FireParticleMat", "GlowingParticleFx", DefaultRenderLayers.GroundStandingObjects);
+                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "smoke"));
+                    //    mat.Params.Add(new Vector2ArrayMaterialParamSettings("gUvs", new Vector2[]
+                    //    {
+                    //        new Vector2(0,0),
+                    //        new Vector2(0.5f, 0),
+                    //        new Vector2(0, 0.5f),
+                    //        new Vector2(0.5f, 0.5f),
+                    //    }));
+                    //    ormManager.SaveObject(mat);
+                    //}
                     transaction.Commit();
                 }
             }
