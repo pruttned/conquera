@@ -304,6 +304,7 @@ namespace Conquera
 
         public void EndTurn()
         {
+            SelectedCell = null;
 			GamePlayer oldPlayer = CurrentPlayer;
             CurrentPlayer.OnEndTurn();
 
