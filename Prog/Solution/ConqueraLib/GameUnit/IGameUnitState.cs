@@ -123,7 +123,7 @@ namespace Conquera
             if (null == TargetUnit) throw new ArgumentNullException("TargetUnit");
             mGameUnit.RotateTo(TargetUnit.CellIndex);
 
-            var activeSpell = mGameUnit.GameScene.ActiveSpell;
+            var activeSpell = mGameUnit.GameScene.ActiveSpellSlot;
             if (null != activeSpell)
             {
                 activeSpell.Spell.BeforeAttack(mGameUnit, TargetUnit);
@@ -143,7 +143,7 @@ namespace Conquera
             }
             if(gameTime.TotalTime > mDamageTime)
             {
-                var activeSpell = mGameUnit.GameScene.ActiveSpell;
+                var activeSpell = mGameUnit.GameScene.ActiveSpellSlot;
 
                 int damage = mGameUnit.ComputeDamageTo(TargetUnit, null != activeSpell ? activeSpell.Spell : null);
                 TargetUnit.ReceiveDamage(damage);
@@ -182,7 +182,7 @@ namespace Conquera
         {
             if (null == TargetUnit) throw new ArgumentNullException("TargetUnit");
 
-            if (!mGameUnit.GameScene.ActiveSpell.Spell.Cast(mGameUnit, TargetUnit))
+            if (!mGameUnit.GameScene.ActiveSpellSlot.Spell.Cast(mGameUnit, TargetUnit))
             {
                 //no spell animation
                 mGameUnit.State = mGameUnit.States["Idle"];
@@ -191,7 +191,7 @@ namespace Conquera
 
         public void Update(AleGameTime gameTime)
         {
-            if (!mGameUnit.GameScene.ActiveSpell.Spell.Update(gameTime))
+            if (!mGameUnit.GameScene.ActiveSpellSlot.Spell.Update(gameTime))
             {
                   mGameUnit.State = mGameUnit.States["Idle"];
             }

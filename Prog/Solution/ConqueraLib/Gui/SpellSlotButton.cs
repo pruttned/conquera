@@ -29,6 +29,8 @@ namespace Conquera.Gui
         private SpellSlot mSpellSlot = null;
         private TextElement mCountLabel;
         private GraphicElementContainer mCountLabelContainer;
+        private GameScene mGameScene;
+        private GraphicElementContainer mIsActiveLabelContainer;
 
         public override System.Drawing.SizeF Size
         {
@@ -66,18 +68,31 @@ namespace Conquera.Gui
             }
         }
 
-        public SpellSlotButton()
+        public SpellSlotButton(GameScene gameScene)
         {
+            mGameScene = gameScene;
+
             mSpellView.Click += new EventHandler<ControlEventArgs>(mSpellView_Click);
             ChildControls.Add(mSpellView);
 
             mCountLabel = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFontSmall"), Color.White);
             mCountLabelContainer = new GraphicElementContainer(mCountLabel, Point.Zero);
+
+            TextElement isActiveLabel = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFontSmall"), Color.White);
+            isActiveLabel.Text = "[A]";
+            mIsActiveLabelContainer = new GraphicElementContainer(isActiveLabel, new Point(30, 30));
+
+            Click += new EventHandler<ControlEventArgs>(SpellSlotButton_Click);
         }
 
         protected override void OnDrawForeground()
         {
             mCountLabelContainer.Draw(this);
+
+            if (SpellSlot == mGameScene.ActiveSpellSlot)
+            {
+                mIsActiveLabelContainer.Draw(this);
+            }
         }
 
         private void mSpellSlot_TotalCountChanged(object sender, EventArgs e)
@@ -105,6 +120,11 @@ namespace Conquera.Gui
         private void mSpellView_Click(object sender, ControlEventArgs e)
         {
             OnClick();
+        }
+
+        private void SpellSlotButton_Click(object sender, ControlEventArgs e)
+        {
+            mGameScene.ActiveSpellSlot = mGameScene.ActiveSpellSlot != SpellSlot ? SpellSlot : null;
         }
     }
 }

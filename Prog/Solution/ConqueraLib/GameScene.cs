@@ -138,13 +138,13 @@ namespace Conquera
                 //}
 
                 //temp
-                ActiveSpell = CurrentPlayer.Spells[0];
+                ActiveSpellSlot = CurrentPlayer.Spells[0];
             }
         }
 
         public bool EnableMouseCameraControl { get; set; }
 
-        public SpellSlot ActiveSpell
+        public SpellSlot ActiveSpellSlot
         {
             get { return mActiveSpell; }
             set
@@ -321,7 +321,7 @@ namespace Conquera
                     }
                 }
             }
-            ActiveSpell = null;
+            ActiveSpellSlot = null;
 			mGuiScene.HandleEndTurn(oldPlayer);
         }
 

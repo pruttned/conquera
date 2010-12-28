@@ -7,7 +7,6 @@ namespace Conquera.Gui
     {
         private SpellSlotButton[] mButtons;
         private SpellSlotCollection mSpellSlotCollection;
-        private GameScene mGameScene;
 
         public SpellSlotCollection SpellSlotCollection
         {
@@ -47,22 +46,13 @@ namespace Conquera.Gui
 
         public SpellPanel(GameScene gameScene)
         {
-            mGameScene = gameScene;
-
             mButtons = new SpellSlotButton[SpellSlotCollection.Spells.Length];
             for (int i = 0; i < mButtons.Length; i++)
             {
-                mButtons[i] = new SpellSlotButton();
+                mButtons[i] = new SpellSlotButton(gameScene);
                 mButtons[i].Location = new Point(i * 72, 0);
-                mButtons[i].Click += new System.EventHandler<ControlEventArgs>(SpellSlotButton_Click);
                 ChildControls.Add(mButtons[i]);
             }
-        }
-
-        private void SpellSlotButton_Click(object sender, ControlEventArgs e)
-        {
-            SpellSlotButton button = (SpellSlotButton)e.Control;
-            mGameScene.ActiveSpell = button.SpellSlot;
         }
     }
 }
