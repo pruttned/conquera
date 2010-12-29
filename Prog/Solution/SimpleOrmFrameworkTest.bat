@@ -1,0 +1,1 @@
+C:\"Program Files (x86)\NUnit 2.5.3\bin\net-2.0"\nunit-x86.exe "D:\Prog\Projects\AL\Prog\Solution\bin\SimpleOrmFrameworkTest.dll"
