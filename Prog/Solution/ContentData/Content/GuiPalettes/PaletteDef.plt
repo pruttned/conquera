@@ -67,8 +67,17 @@
     <image name="MainMenuButtonMouseOver" textureFileName="Palette" locationX="43" locationY="0" width="42" height="42"/>    
     
     <!--Spell Icons-->
-    <image name="SpellIconFireStorm" textureFileName="CellNotificationText" locationX="64" locationY="0" width="64" height="64"/>
     <image name="SpellIconSlayer" textureFileName="CellNotificationText" locationX="0" locationY="64" width="64" height="64"/>
+    <image name="SpellIconSpikes" textureFileName="CellNotificationText" locationX="128" locationY="0" width="64" height="64"/>
+    <image name="SpellIconFireStorm" textureFileName="CellNotificationText" locationX="64" locationY="0" width="64" height="64"/>
+    <image name="SpellIconVampiricTouch" textureFileName="CellNotificationText" locationX="192" locationY="0" width="64" height="64"/>
+    <image name="SpellIconPackReinforcement" textureFileName="CellNotificationText" locationX="64" locationY="64" width="64" height="64"/>
+    <image name="SpellIconMindControl" textureFileName="CellNotificationText" locationX="128" locationY="64" width="64" height="64"/>
+    <image name="SpellIconBloodyFeast" textureFileName="CellNotificationText" locationX="192" locationY="64" width="64" height="64"/>
+    <image name="SpellIconBloodMadness" textureFileName="CellNotificationText" locationX="0" locationY="128" width="64" height="64"/>
+    <image name="SpellIconMassHeal" textureFileName="CellNotificationText" locationX="64" locationY="128" width="64" height="64"/>
+    <image name="SpellIconLastSacrifice" textureFileName="CellNotificationText" locationX="128" locationY="128" width="64" height="64"/>
+
   </graphicElements>
 
 </guiPalette>

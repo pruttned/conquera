@@ -47,9 +47,9 @@ namespace Conquera
             }
             if (time.TotalTime > mEndTime)
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
     }
 }
