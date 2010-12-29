@@ -53,15 +53,15 @@ namespace Conquera
             Spells = new Spell[] 
             { 
                 new SlayerSpell(),
+                new SpikesSpell(),
                 new FireStormSpell(),
-                new SlayerSpell(),
-                new SlayerSpell(),
-                new SlayerSpell(),
-                new SlayerSpell(),
-                new SlayerSpell(),
-                new SlayerSpell(),
-                new SlayerSpell(),
-                new SlayerSpell()
+                new VampiricTouchSpell(),
+                new PackReinforcementSpell(),
+                new MindControlSpell(),
+                new BloodyFeastSpell(),
+                new BloodMadnessSpell(),
+                new MassHealSpell(),
+                new LastSacrificeSpell()
             };
         }
 

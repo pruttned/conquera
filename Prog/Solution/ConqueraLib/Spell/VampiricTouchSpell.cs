@@ -28,12 +28,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Conquera
 {
-    public class SlayerSpell : Spell
+    public class VampiricTouchSpell : Spell
     {
-        private static int Damage = 50;
-        private static readonly string SlayerPsys = "SlayerPsys";
-        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSlayer");
-        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSlayer");
+        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconVampiricTouch");
+        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconVampiricTouch");
 
         private AnimationDelay mAttackDelay = new AnimationDelay();
 
@@ -49,36 +47,31 @@ namespace Conquera
 
         public override string Name
         {
-            get { return "Slayer"; }
+            get { return "VampiricTouch"; }
         }
 
         public override string DisplayName
         {
-            get { return "Slayer spell"; }
+            get { return "VampiricTouch spell"; }
         }
 
         public override string Description
         {
-            get { return string.Format("Increases attack +{0} or so.", Damage); }
+            get { return "etc."; }
         }
 
         public override int ApplyAttackModifiers(int baseAttack)
         {
-            return baseAttack + Damage;
+            return baseAttack;
         }
 
         protected override void BeforeAttackCastImpl()
         {
-            Caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.Slayer, Color.Red, Caster.CellIndex);
-            Caster.GameScene.ParticleSystemManager.CreateFireAndforgetParticleSystem(
-                Caster.GameScene.Content.Load<ParticleSystemDesc>(SlayerPsys), Caster.Position);
-
-            mAttackDelay.Start(1);
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
         {
-            return !mAttackDelay.HasPassed(time);
+            return mAttackDelay.HasPassed(time);
         }
 
         protected override void AfterAttackHitCastImpl()
