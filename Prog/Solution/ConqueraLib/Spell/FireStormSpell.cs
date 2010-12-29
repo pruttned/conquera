@@ -71,11 +71,13 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
-            foreach (var cell in Caster.GameScene.GetCell(Caster.CellIndex).GetSiblings())
+            var targetCell = Target.GameScene.GetCell(Target.CellIndex);
+            Target.GameScene.FireCellNotificationLabel("", CellNotificationIcons.FireStorm, Color.Red, targetCell.Index);
+            foreach (var cell in targetCell.GetSiblings())
             {
                 if (null != cell.GameUnit && cell.GameUnit.OwningPlayer != Caster.OwningPlayer)
                 {
-                    Caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.FireStorm, Color.Red, cell.Index);
+                    Target.GameScene.FireCellNotificationLabel("", CellNotificationIcons.FireStorm, Color.Red, cell.Index);
                 }
             }
         }
@@ -87,7 +89,16 @@ namespace Conquera
 
         protected override void AfterAttackHitCastImpl()
         {
-            foreach (var cell in Caster.GameScene.GetCell(Caster.CellIndex).GetSiblings())
+            var targetCell = Target.GameScene.GetCell(Target.CellIndex);
+
+            if(null != targetCell.GameUnit)
+            {
+                var missile2 = new ParticleSystemMissile(Target, Target.Position + FireBallPos, Target.Position, FireBallPsys, FireBallPsysSpeed);
+                missile2.OnHit += new ParticleSystemMissile.OnHitHandler(missile_OnHit);
+                mMissiles.Add(missile2);
+            }
+            
+            foreach (var cell in targetCell.GetSiblings())
             {
                 if (null != cell.GameUnit && cell.GameUnit.OwningPlayer != Caster.OwningPlayer)
                 {
