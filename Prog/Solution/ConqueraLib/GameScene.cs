@@ -734,7 +734,7 @@ namespace Conquera
 
         private void MouseManager_MouseButtonUp(MouseButton button, MouseManager mouseManager)
         {
-            if (!GuiManager.Instance.HandleMouseUp(button))
+            if (!GuiManager.Instance.HandleMouseUp(button) && !GuiManager.Instance.HandlesMouse)
             {
                 State.OnClickOnCell(GetCellUnderCur(), button);
             }
