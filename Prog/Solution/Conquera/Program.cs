@@ -407,7 +407,6 @@ namespace Conquera
                     //    ormManager.SaveObject(particleSystemSettings);
                     //}
 
-
                     //{
                     //    GameUnitSettings obj = new GameUnitSettings();
                     //    obj.DisplayName = "Knight";
@@ -416,10 +415,9 @@ namespace Conquera
                     //    obj.AttackAnimation = "Attack";
                     //    obj.IdleAnimation = "Run";
                     //    obj.MoveAnimation = "Run";
-                    //    obj.MaxHp = 20;
+                    //    obj.MaxHp = 200;
                     //    obj.Cost = 100;
-                    //    obj.Attack = 5;
-                    //    obj.Defense = 3;
+                    //    obj.Attack = 50;
                     //    obj.BloodParticleSystem = ormManager.FindObject(typeof(ParticleSystemSettings), "Name = 'BloodParticleSystem'"); ;
                     //    obj.DamageAnimationTime = 1.0f;
                     //    ormManager.SaveObject(obj);
@@ -557,6 +555,46 @@ namespace Conquera
                     //}
 
                     //{
+                    //    MaterialSettings mat = new MaterialSettings("BeamParticleMat", "BeamParticleFx", DefaultRenderLayers.GroundStandingObjects);
+                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "BeamText"));
+                    //    mat.Params.Add(new Vector2ArrayMaterialParamSettings("gUvs", new Vector2[]
+                    //    {
+                    //        new Vector2(0,0),
+                    //        new Vector2(0.5f, 0),
+                    //        new Vector2(0, 0.5f),
+                    //        new Vector2(0.5f, 0.5f),
+                    //    }));
+                    //    ormManager.SaveObject(mat);
+                    //}
+
+                    //{
+                    //    MaterialSettings mat = new MaterialSettings("BeamBottomParticleMat", "BeamBottomParticleFx", DefaultRenderLayers.GroundStandingObjects);
+                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "smoke"));
+                    //    mat.Params.Add(new Vector2ArrayMaterialParamSettings("gUvs", new Vector2[]
+                    //    {
+                    //        new Vector2(0,0),
+                    //        new Vector2(0.5f, 0),
+                    //        new Vector2(0, 0.5f),
+                    //        new Vector2(0.5f, 0.5f),
+                    //    }));
+                    //    ormManager.SaveObject(mat);
+                    //}
+
+                    //{
+                    //    MaterialSettings mat = new MaterialSettings("FireParticleMat", "GlowingParticleFx", DefaultRenderLayers.GroundStandingObjects);
+                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "smoke"));
+                    //    mat.Params.Add(new Vector2ArrayMaterialParamSettings("gUvs", new Vector2[]
+                    //    {
+                    //        new Vector2(0,0),
+                    //        new Vector2(0.5f, 0),
+                    //        new Vector2(0, 0.5f),
+                    //        new Vector2(0.5f, 0.5f),
+                    //    }));
+                    //    ormManager.SaveObject(mat);
+                    //}
+
+
+                    //{
                     //    ParticleSystemSettings particleSystemSettings = new ParticleSystemSettings();
 
                     //    SphereParticleEmitterSettings particleEmitterSettings = new SphereParticleEmitterSettings();
@@ -680,44 +718,7 @@ namespace Conquera
                     //    ormManager.SaveObject(particleSystemSettings);
                     //}
 
-                    //{
-                    //    MaterialSettings mat = new MaterialSettings("BeamParticleMat", "BeamParticleFx", DefaultRenderLayers.GroundStandingObjects);
-                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "BeamText"));
-                    //    mat.Params.Add(new Vector2ArrayMaterialParamSettings("gUvs", new Vector2[]
-                    //    {
-                    //        new Vector2(0,0),
-                    //        new Vector2(0.5f, 0),
-                    //        new Vector2(0, 0.5f),
-                    //        new Vector2(0.5f, 0.5f),
-                    //    }));
-                    //    ormManager.SaveObject(mat);
-                    //}
 
-                    //{
-                    //    MaterialSettings mat = new MaterialSettings("BeamBottomParticleMat", "BeamBottomParticleFx", DefaultRenderLayers.GroundStandingObjects);
-                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "smoke"));
-                    //    mat.Params.Add(new Vector2ArrayMaterialParamSettings("gUvs", new Vector2[]
-                    //    {
-                    //        new Vector2(0,0),
-                    //        new Vector2(0.5f, 0),
-                    //        new Vector2(0, 0.5f),
-                    //        new Vector2(0.5f, 0.5f),
-                    //    }));
-                    //    ormManager.SaveObject(mat);
-                    //}
-
-                    //{
-                    //    MaterialSettings mat = new MaterialSettings("FireParticleMat", "GlowingParticleFx", DefaultRenderLayers.GroundStandingObjects);
-                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "smoke"));
-                    //    mat.Params.Add(new Vector2ArrayMaterialParamSettings("gUvs", new Vector2[]
-                    //    {
-                    //        new Vector2(0,0),
-                    //        new Vector2(0.5f, 0),
-                    //        new Vector2(0, 0.5f),
-                    //        new Vector2(0.5f, 0.5f),
-                    //    }));
-                    //    ormManager.SaveObject(mat);
-                    //}
                     transaction.Commit();
                 }
             }

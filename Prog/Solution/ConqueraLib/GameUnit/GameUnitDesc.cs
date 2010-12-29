@@ -62,10 +62,6 @@ namespace Conquera
         {
             get { return mSettings.Attack; }
         }
-        public int Defense
-        {
-            get { return mSettings.Defense; }
-        }
         public float DamageAnimationTime
         {
             get { return mSettings.DamageAnimationTime; }

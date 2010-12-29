@@ -242,15 +242,11 @@ namespace Conquera
         {
             if (null != activeSpell)
             {
-                int attack = GameUnitDesc.Attack;
-                int defense =unit.GameUnitDesc.Defense;
-                activeSpell.ApplyAttackDefenseModifiers(ref attack, ref defense);
-
-                return Math.Max(attack - defense, 0);
+                return activeSpell.ApplyAttackModifiers(GameUnitDesc.Attack);
             }
             else
             {
-                return Math.Max(GameUnitDesc.Attack - unit.GameUnitDesc.Defense, 0);
+                return GameUnitDesc.Attack;
             }
         }
 

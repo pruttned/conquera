@@ -44,16 +44,6 @@ namespace Conquera
 
         [DataProperty(NotNull = true)]
         public int Attack { get; set; }
-        [DataProperty(NotNull = true)]
-        public int Defense { get; set; }
-        [DataProperty(NotNull = true)]
-        public int BaseAttackGreen { get; set; }
-        [DataProperty(NotNull = true)]
-        public int BaseDefenseGreen { get; set; }
-        [DataProperty(NotNull = true)]
-        public int BaseAttackBlack { get; set; }
-        [DataProperty(NotNull = true)]
-        public int BaseDefenseBlack { get; set; }
 
         [DataProperty(NotNull = true)]
         public float DamageAnimationTime{ get; set; }

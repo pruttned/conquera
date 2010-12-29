@@ -49,7 +49,7 @@ namespace Conquera.Gui
                 mStatText.AppendLine(string.Format("Ready: {0}", !gameUnit.HasMovedThisTurn));
             }
 
-            mStatText.AppendLine(string.Format("Atck :   {0} | Dfs :   {1}", gameUnit.GameUnitDesc.Attack, gameUnit.GameUnitDesc.Defense));
+            mStatText.AppendLine(string.Format("Atck :   {0}", gameUnit.GameUnitDesc.Attack));
         }
 
         protected override void OnDrawBackground()
