@@ -30,7 +30,7 @@ namespace Conquera
 {
     public class SlayerSpell : Spell
     {
-        private static int Damage = 5;
+        private static int Damage = 50;
         private static readonly string SlayerPsys = "SlayerPsys";
         private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSlayer");
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSlayer");
@@ -62,9 +62,9 @@ namespace Conquera
             get { return string.Format("Increases attack +{0} or so.", Damage); }
         }
 
-        public override void ApplyAttackDefenseModifiers(ref int attack, ref int defense)
+        public override int ApplyAttackModifiers(int baseAttack)
         {
-            attack += Damage;
+            return baseAttack + Damage;
         }
 
         protected override void BeforeAttackCastImpl()

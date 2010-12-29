@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////
 
+
 using System;
 using System.Collections.ObjectModel;
 using Ale.Gui;
@@ -30,7 +31,7 @@ namespace Conquera
 {
     public class FireStormSpell : Spell
     {
-        private static int Damage = 3;
+        private static int Damage = 30;
         private static float FireBallPsysSpeed = 2.5f;
         private static Vector3 FireBallPos = new Vector3(0.2f, 0.4f, 4);
         private static readonly string FireBallPsys = "FireBallPsys";
@@ -65,8 +66,9 @@ namespace Conquera
             get { return "Fireballs for everyone!"; }
         }
 
-        public override void ApplyAttackDefenseModifiers(ref int attack, ref int defense)
+        public override int ApplyAttackModifiers(int baseAttack)
         {
+            return baseAttack;
         }
 
         protected override void BeforeAttackCastImpl()

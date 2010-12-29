@@ -78,7 +78,7 @@ namespace Conquera
             return mIsCasted;
         }
         
-        public abstract void ApplyAttackDefenseModifiers(ref int attack, ref int defense);
+        public abstract int ApplyAttackModifiers(int baseAttack);
 
         protected abstract void BeforeAttackCastImpl();
         protected abstract bool BeforeAttackUpdateImpl(AleGameTime time);
