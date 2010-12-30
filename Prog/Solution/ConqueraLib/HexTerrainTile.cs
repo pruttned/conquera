@@ -67,7 +67,7 @@ namespace Conquera
             Desc.OnActivated(cell);
         }
 
-        internal void OnDeactivated(HexCell cell)
+        internal void OnDeactivating(HexCell cell)
         {
             if (null != mActiveGraphicModel)
             {
@@ -77,7 +77,7 @@ namespace Conquera
             {
                 mInactiveGraphicModel.IsVisible = true;
             }
-            Desc.OnDeactivated(cell);
+            Desc.OnDeactivating(cell);
         }
 
         internal void OnBeginTurn(HexCell cell)

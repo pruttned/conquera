@@ -42,7 +42,7 @@ namespace Conquera.Gui
             mTileInfoViewRectangle = GuiManager.Instance.Palette.CreateRectangle("TileInfoViewBounds");
 
             InitializeView(mDefaultTileInfoView);
-            RegisterDerivedView(typeof(DimensionGateTileDesc), new DimensionGateInfoView());
+            RegisterDerivedView(typeof(SpellTowerTileDesc), new SpellTowerInfoView());
             RegisterDerivedView(typeof(CastleTileDesc), new CastleInfoView());
         }
 

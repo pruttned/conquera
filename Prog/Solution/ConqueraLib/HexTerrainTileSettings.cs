@@ -99,19 +99,20 @@ namespace Conquera
     }
 
     [DataObject(MaxCachedCnt = 5)]
-    public class DimensionGateTileSettings : HexTerrainTileSettings
+    public class SpellTowerTileSettings : HexTerrainTileSettings
     {
-        [DataListProperty(NotNull = true)]
-        public List<string> GameCards { get; private set; }
+        [DataProperty(NotNull = true)]
+        public string Spell { get; set; }
+        [DataProperty(NotNull = true)]
+        public int SpellCnt { get; set; }
 
-        public DimensionGateTileSettings()
+        public SpellTowerTileSettings()
         {
-            GameCards = new List<string>();
         }
 
         public override HexTerrainTileDesc CreateDesc(ContentGroup content)
         {
-            return new DimensionGateTileDesc(this, content);
+            return new SpellTowerTileDesc(this, content);
         }
     }
 

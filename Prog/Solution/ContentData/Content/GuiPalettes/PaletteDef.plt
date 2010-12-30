@@ -7,8 +7,8 @@
     <rectangle name="TileInfoViewName" locationX="64" locationY="0" width="161" height="64"/> <!--in view-->
     <rectangle name="TileInfoViewDescription" locationX="0" locationY="64" width="225" height="116"/> <!--in view-->
     
-    <!--Dimension Gate-->
-    <!--<rectangle name="DimensionGateSpellSlot" locationX="5" locationY="110" width="64" height="64"/>--> 
+    <!--Spell Tower-->
+    <!--<rectangle name="SpellTowerSpellSlot" locationX="5" locationY="110" width="64" height="64"/>--> 
         
     <!--Spell info-->
     <!--<rectangle name="SpellInfoDialogName" locationX="32" locationY="32" width="462" height="64"/> 
@@ -52,7 +52,7 @@
     
     <!--Tile Icons-->
     <image name="TileIconCastle" textureFileName="Palette" locationX="1" locationY="460" width="64" height="64"/>
-    <image name="TileIconDimensionGate" textureFileName="Palette" locationX="67" locationY="460" width="64" height="64"/>
+    <image name="TileIconSpellTower" textureFileName="Palette" locationX="67" locationY="460" width="64" height="64"/>
     <image name="TileIconLand" textureFileName="Palette" locationX="133" locationY="460" width="64" height="64"/>    
     
     <!--Cursors-->
