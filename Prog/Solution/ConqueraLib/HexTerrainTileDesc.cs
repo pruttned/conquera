@@ -200,11 +200,18 @@ namespace Conquera
             GC.SuppressFinalize(this);
         }
 
-        protected internal abstract void OnBeginTurn(HexCell cell);
+        protected internal virtual void OnBeginTurn(HexCell cell)
+        {
+            var unit = cell.GameUnit;
+            if (null != unit)
+            {
+                unit.Heal(Settings.HpIncrement);
+            }
+        }
 
         protected internal abstract void OnActivated(HexCell cell);
 
-        protected internal abstract void OnDeactivated(HexCell cell);
+        protected internal abstract void OnDeactivating(HexCell cell);
 
         protected virtual void Dispose(bool isDisposing)
         {
@@ -319,17 +326,18 @@ namespace Conquera
 
 
 
-    public class DimensionGateTileDesc : HexTerrainTileDesc
+    public class SpellTowerTileDesc : HexTerrainTileDesc
     {
         public Spell Spell { get; private set; }
 
-        public DimensionGateTileDesc(DimensionGateTileSettings settings, ContentGroup content)
+        public SpellTowerTileDesc(SpellTowerTileSettings settings, ContentGroup content)
             : base(settings, content)
         {
         }
 
         protected internal override void OnBeginTurn(HexCell cell)
         {
+            base.OnBeginTurn(cell);
         }
 
         protected internal override void OnActivated(HexCell cell)
@@ -340,7 +348,7 @@ namespace Conquera
             //}
         }
 
-        protected internal override void OnDeactivated(HexCell cell)
+        protected internal override void OnDeactivating(HexCell cell)
         {
             //foreach (GameCard card in mGameCards)
             //{
@@ -359,13 +367,14 @@ namespace Conquera
 
         protected internal override void OnBeginTurn(HexCell cell)
         {
+            base.OnBeginTurn(cell);
         }
 
         protected internal override void OnActivated(HexCell cell)
         {
         }
 
-        protected internal override void OnDeactivated(HexCell cell)
+        protected internal override void OnDeactivating(HexCell cell)
         {
         }
     }
@@ -386,6 +395,7 @@ namespace Conquera
 
         protected internal override void OnBeginTurn(HexCell cell)
         {
+            base.OnBeginTurn(cell);
             if (cell.IsActive)
             {
                 cell.OwningPlayer.Gold += GoldIncrement;
@@ -400,7 +410,7 @@ namespace Conquera
         {
         }
 
-        protected internal override void OnDeactivated(HexCell cell)
+        protected internal override void OnDeactivating(HexCell cell)
         {
         }
     }
@@ -414,13 +424,14 @@ namespace Conquera
 
         protected internal override void OnBeginTurn(HexCell cell)
         {
+            base.OnBeginTurn(cell);
         }
 
         protected internal override void OnActivated(HexCell cell)
         {
         }
 
-        protected internal override void OnDeactivated(HexCell cell)
+        protected internal override void OnDeactivating(HexCell cell)
         {
         }
     }
@@ -434,14 +445,17 @@ namespace Conquera
 
         protected internal override void OnBeginTurn(HexCell cell)
         {
+            base.OnBeginTurn(cell);
         }
 
         protected internal override void OnActivated(HexCell cell)
         {
+            cell.OwningPlayer.MaxUnitCnt += ((VillageTileSettings)Settings).MaxUnitCntIncrement;
         }
 
-        protected internal override void OnDeactivated(HexCell cell)
+        protected internal override void OnDeactivating(HexCell cell)
         {
+            cell.OwningPlayer.MaxUnitCnt -= ((VillageTileSettings)Settings).MaxUnitCntIncrement;
         }
     }
 
@@ -454,13 +468,14 @@ namespace Conquera
 
         protected internal override void OnBeginTurn(HexCell cell)
         {
+            base.OnBeginTurn(cell);
         }
 
         protected internal override void OnActivated(HexCell cell)
         {
         }
 
-        protected internal override void OnDeactivated(HexCell cell)
+        protected internal override void OnDeactivating(HexCell cell)
         {
         }
     }

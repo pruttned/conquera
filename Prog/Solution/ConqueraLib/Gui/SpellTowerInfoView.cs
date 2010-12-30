@@ -22,11 +22,11 @@ using Ale.Gui;
 
 namespace Conquera.Gui
 {
-    public class DimensionGateInfoView : TileInfoView
+    public class SpellTowerInfoView : TileInfoView
     {
         private SpellView mSpellView = new SpellView();
 
-        public DimensionGateInfoView()
+        public SpellTowerInfoView()
         {
             mSpellView.Location = new Point(0, 100);
             ChildControls.Add(mSpellView);
@@ -35,7 +35,7 @@ namespace Conquera.Gui
         public override void Update(HexCell cell)
         {
             base.Update(cell);
-            mSpellView.Spell = ((DimensionGateTileDesc)cell.HexTerrainTile).Spell;
+            mSpellView.Spell = ((SpellTowerTileDesc)cell.HexTerrainTile).Spell;
         }
     }
 }

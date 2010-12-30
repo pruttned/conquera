@@ -107,7 +107,6 @@
     <Compile Include="GameUnit\IGameUnitState.cs" />
     <Compile Include="Gui\AlCursors.cs" />
     <Compile Include="Gui\CastleInfoView.cs" />
-    <Compile Include="Gui\DimensionGateInfoView.cs" />
     <Compile Include="EventHelper.cs" />
     <Compile Include="Gui\GameGuiScene.cs" />
     <Compile Include="Gui\GameUnitInfoPanel.cs" />
@@ -116,6 +115,7 @@
     <Compile Include="Gui\SpellInfoDialog.cs" />
     <Compile Include="Gui\SpellPanel.cs" />
     <Compile Include="Gui\SpellSlotButton.cs" />
+    <Compile Include="Gui\SpellTowerInfoView.cs" />
     <Compile Include="Gui\SpellView.cs" />
     <Compile Include="Gui\TileInfoPanel.cs" />
     <Compile Include="Gui\TileInfoView.cs" />

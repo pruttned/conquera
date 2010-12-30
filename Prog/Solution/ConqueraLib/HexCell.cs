@@ -148,7 +148,7 @@ namespace Conquera
                 {
                     if (oldIsActive)
                     {
-                        mHexTerrainTile.OnDeactivated(this);
+                        mHexTerrainTile.OnDeactivating(this);
                     }
                     mRegion = NewRegion;
 
@@ -172,7 +172,7 @@ namespace Conquera
                     }
                     else
                     {
-                        mHexTerrainTile.OnDeactivated(this);
+                        mHexTerrainTile.OnDeactivating(this);
                     }
                 }
                 mRegion = NewRegion;

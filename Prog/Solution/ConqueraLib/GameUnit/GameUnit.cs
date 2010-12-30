@@ -252,8 +252,16 @@ namespace Conquera
 
         public void Heal(int amount)
         {
-            GameScene.FireCellNotificationLabel(string.Format("+{0}", amount), CellNotificationIcons.Hearth, Color.Red, CellIndex);
-            Hp = Math.Min(Hp + amount, MaxHp);
+            if(amount > 0 && Hp < MaxHp)
+            {
+                int oldHp = Hp;
+                Hp = Math.Min(Hp + amount, MaxHp);
+                
+                int realHealAmount = Hp-oldHp;
+
+                GameScene.FireCellNotificationLabel(string.Format("+{0}", realHealAmount), CellNotificationIcons.Hearth, Color.Red, CellIndex);
+            }
+
         }
 
         public void ReceiveDamage(int damage)
@@ -261,11 +269,14 @@ namespace Conquera
             ReceiveDamage(damage, true);
         }
 
-        public void ReceiveDamage(int damage, bool blood)
+        public int ReceiveDamage(int damage, bool blood)
         {
-            Hp -= damage;
-            GameScene.FireCellNotificationLabel(string.Format("-{0}", Math.Abs(damage)), CellNotificationIcons.BrokenHearth, Color.Red, CellIndex);
-            if (Hp <= 0)
+            int oldHp = Hp;
+            Hp = Math.Max(Hp - damage, 0);
+            int realDamage = Hp - oldHp;
+
+            GameScene.FireCellNotificationLabel(string.Format("-{0}", Math.Abs(realDamage)), CellNotificationIcons.BrokenHearth, Color.Red, CellIndex);
+            if (Hp == 0)
             {
                 GameScene.KillUnit(this);
             }
@@ -276,6 +287,8 @@ namespace Conquera
                     GameScene.ParticleSystemManager.CreateFireAndforgetParticleSystem(GameUnitDesc.BloodParticleSystem, Position);
                 }
             }
+
+            return realDamage;
         }
 
         public Vector3 GetPositionFromIndex(Point index)
