@@ -33,8 +33,6 @@ namespace Conquera
         private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconVampiricTouch");
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconVampiricTouch");
 
-        private AnimationDelay mAttackDelay = new AnimationDelay();
-
         public override GraphicElement Picture
         {
             get { return mPictureGraphicElement; }
@@ -71,7 +69,7 @@ namespace Conquera
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
         {
-            return mAttackDelay.HasPassed(time);
+            return false;
         }
 
         protected override void AfterAttackHitCastImpl()

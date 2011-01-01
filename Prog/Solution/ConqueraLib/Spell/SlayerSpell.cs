@@ -70,7 +70,7 @@ namespace Conquera
         protected override void BeforeAttackCastImpl()
         {
             Caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.Slayer, Color.Red, Caster.CellIndex);
-            Caster.GameScene.ParticleSystemManager.CreateFireAndforgetParticleSystem(
+            Caster.GameScene.ParticleSystemManager.CreateFireAndForgetParticleSystem(
                 Caster.GameScene.Content.Load<ParticleSystemDesc>(SlayerPsys), Caster.Position);
 
             mAttackDelay.Start(1);

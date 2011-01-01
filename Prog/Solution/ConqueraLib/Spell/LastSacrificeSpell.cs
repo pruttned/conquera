@@ -32,6 +32,7 @@ namespace Conquera
     {
         private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconLastSacrifice");
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconLastSacrifice");
+        private static float DivCoef = 2;
 
         private AnimationDelay mAttackDelay = new AnimationDelay();
 
@@ -71,16 +72,54 @@ namespace Conquera
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
         {
-            return mAttackDelay.HasPassed(time);
+            return false;
         }
 
         protected override void AfterAttackHitCastImpl()
         {
+            //todo: fire some cool animation
+            Caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.LastSacrifice, Color.Red, Caster.CellIndex);
+            mAttackDelay.Start(1);
         }
 
         protected override bool AfterAttackHitUpdateImpl(AleGameTime time)
         {
-            return false;
+            if (mAttackDelay.HasPassed(time))
+            {
+                var casterCell = Caster.Cell;
+                List<GameUnit> friends = new List<GameUnit>();
+                List<GameUnit> enemies = new List<GameUnit>();
+
+                foreach (var cell in casterCell.GetSiblings())
+                {
+                    if (null != cell.GameUnit)
+                    {
+                        if (cell.GameUnit.OwningPlayer == Caster.OwningPlayer)
+                        {
+                            friends.Add(cell.GameUnit);
+                        }
+                        else
+                        {
+                            enemies.Add(cell.GameUnit);
+                        }
+                    }
+                }
+
+                int amount = (int)Math.Ceiling(Caster.Hp / (float)((friends.Count + enemies.Count) * DivCoef));
+                foreach (var unit in friends)
+                {
+                    unit.Heal(amount);
+                }
+                foreach (var unit in enemies)
+                {
+                    unit.ReceiveDamage(amount);
+                }
+
+                Caster.ReceiveDamage(Caster.Hp);
+
+                return false;
+            }
+            return true;
         }
     }
 
