@@ -70,6 +70,14 @@ namespace Conquera
             }
         }
 
+        public HexCell Cell
+        {
+            get
+            {
+                return GameScene.GetCell(CellIndex);
+            }
+        }
+
         public GameScene GameScene
         {
             get { return (GameScene)Scene; }
@@ -154,7 +162,7 @@ namespace Conquera
                 return false;
             }
 
-            HexCell srcCell = GameScene.GetCell(CellIndex);
+            HexCell srcCell = Cell;
             HexCell targetCell = GameScene.GetCell(cell);
 
             return targetCell.IsPassable && (srcCell.Region == targetCell.Region || srcCell.IsSiblingTo(targetCell));
@@ -167,7 +175,7 @@ namespace Conquera
                 return false;
             }
 
-            HexCell srcCell = GameScene.GetCell(CellIndex);
+            HexCell srcCell = Cell;
             HexCell targetCell = GameScene.GetCell(cell);
 
             if (null == targetCell.GameUnit)
@@ -284,7 +292,7 @@ namespace Conquera
             {
                 if (blood)
                 {
-                    GameScene.ParticleSystemManager.CreateFireAndforgetParticleSystem(GameUnitDesc.BloodParticleSystem, Position);
+                    GameScene.ParticleSystemManager.CreateFireAndForgetParticleSystem(GameUnitDesc.BloodParticleSystem, Position);
                 }
             }
 
