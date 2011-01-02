@@ -32,6 +32,9 @@ namespace Conquera
     {
         private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSpikes");
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSpikes");
+        private static int Damage = 50;
+
+        private AnimationDelay mAttackDelay = new AnimationDelay();
 
         public override GraphicElement Picture
         {
@@ -65,6 +68,14 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
+            var casterCell = Caster.Cell;
+            foreach (var cell in casterCell.GetSiblings())
+            {
+                if (null != cell.GameUnit && cell.GameUnit.OwningPlayer != Caster.OwningPlayer)
+                {
+                    Target.GameScene.FireCellNotificationLabel("", CellNotificationIcons.Spikes, Color.Red, cell.Index);
+                }
+            }
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
@@ -74,11 +85,24 @@ namespace Conquera
 
         protected override void AfterAttackHitCastImpl()
         {
+            mAttackDelay.Start(1);
         }
 
         protected override bool AfterAttackHitUpdateImpl(AleGameTime time)
         {
-            return false;
+            if (mAttackDelay.HasPassed(time))
+            {
+                var casterCell = Caster.Cell;
+                foreach (var cell in casterCell.GetSiblings())
+                {
+                    if (null != cell.GameUnit && cell.GameUnit.OwningPlayer != Caster.OwningPlayer)
+                    {
+                        cell.GameUnit.ReceiveDamage(Damage);
+                    }
+                }
+                return false;
+            }
+            return true;
         }
     }
 

@@ -68,6 +68,7 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
+            Caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.LastSacrifice, Color.Red, Caster.CellIndex);
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
@@ -78,7 +79,6 @@ namespace Conquera
         protected override void AfterAttackHitCastImpl()
         {
             //todo: fire some cool animation
-            Caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.LastSacrifice, Color.Red, Caster.CellIndex);
             mAttackDelay.Start(1);
         }
 

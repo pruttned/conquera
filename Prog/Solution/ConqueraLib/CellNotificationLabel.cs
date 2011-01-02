@@ -204,6 +204,7 @@ namespace Conquera
         public static readonly string BrokenHearth = "BrokenHearth";
         public static readonly string FireStorm = "FireStorm";
         public static readonly string Slayer = "Slayer";
+        public static readonly string Spikes = "Spikes";
         public static readonly string LastSacrifice = "LastSacrifice";
     }
 }
