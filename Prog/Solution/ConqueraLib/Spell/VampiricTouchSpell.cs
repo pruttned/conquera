@@ -32,6 +32,10 @@ namespace Conquera
     {
         private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconVampiricTouch");
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconVampiricTouch");
+        private static float DivCoef = 3;
+
+        private AnimationDelay mAttackDelay = new AnimationDelay();
+        private int mOldTargetHp;
 
         public override GraphicElement Picture
         {
@@ -65,6 +69,8 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
+            Caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.VampiricTouch, Color.Red, Caster.CellIndex);
+            mOldTargetHp = Target.Hp;
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
@@ -74,11 +80,18 @@ namespace Conquera
 
         protected override void AfterAttackHitCastImpl()
         {
+            mAttackDelay.Start(1);
         }
 
         protected override bool AfterAttackHitUpdateImpl(AleGameTime time)
         {
-            return false;
+            if (mAttackDelay.HasPassed(time))
+            {
+                int amount = (int)Math.Ceiling((float)(mOldTargetHp - Target.Hp) /  DivCoef);
+                Caster.Heal(amount);
+                return false;
+            }
+            return true;
         }
     }
 
