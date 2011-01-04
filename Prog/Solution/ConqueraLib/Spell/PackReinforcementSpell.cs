@@ -32,6 +32,9 @@ namespace Conquera
     {
         private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPackReinforcement");
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPackReinforcement");
+        private static float DivCoef = 10;
+
+        private AnimationDelay mAttackDelay = new AnimationDelay();
 
         public override GraphicElement Picture
         {
@@ -60,11 +63,20 @@ namespace Conquera
 
         public override int ApplyAttackModifiers(int baseAttack)
         {
+            foreach (var cell in Caster.Cell.GetSiblings())
+            {
+                if (null != cell.GameUnit && cell.GameUnit.OwningPlayer == Caster.OwningPlayer)
+                {
+                    baseAttack += (int)Math.Ceiling((float)(cell.GameUnit.GameUnitDesc.Attack) / DivCoef);
+                }
+            }
+
             return baseAttack;
         }
 
         protected override void BeforeAttackCastImpl()
         {
+            Caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.PackReinforcement, Color.Red, Caster.CellIndex);
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
