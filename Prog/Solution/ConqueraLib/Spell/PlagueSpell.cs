@@ -32,6 +32,11 @@ namespace Conquera
     {
         private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPlague");
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPlague");
+        private static int FirstZoneDamage = 60;
+        private static int[] RestZoneDamages = new int[] { 20, 10 };
+
+        private AnimationDelay mAttackDelay = new AnimationDelay();
+        private Dictionary<GameUnit, int> mUnitDamages = new Dictionary<GameUnit, int>();
 
         public override GraphicElement Picture
         {
@@ -65,6 +70,44 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
+            mUnitDamages.Clear();
+
+            var targetCell = Target.Cell;
+
+            List<GameUnit> leafUnits = new List<GameUnit>();
+            List<GameUnit> leafUnits2 = new List<GameUnit>();
+            List<HexCell> siblings = new List<HexCell>();
+
+            mUnitDamages.Add(Target, FirstZoneDamage);
+            leafUnits.Add(Target);
+
+            foreach (int dmg in RestZoneDamages)
+            {
+                if (0 == leafUnits.Count)
+                {
+                    break;
+                }
+
+                leafUnits2.Clear();
+
+                foreach (var leafUnit in leafUnits)
+                {
+                    siblings.Clear();
+                    leafUnit.Cell.GetSiblings(siblings);
+                    foreach (var cell in siblings)
+                    {
+                        if (null != cell.GameUnit && cell.GameUnit.OwningPlayer != Caster.OwningPlayer && !mUnitDamages.ContainsKey(cell.GameUnit))
+                        {
+                            mUnitDamages.Add(cell.GameUnit, dmg);
+                            leafUnits2.Add(cell.GameUnit);
+                        }
+                    }
+                }
+
+                List<GameUnit> auxLeafUnits = leafUnits;
+                leafUnits = leafUnits2;
+                leafUnits2 = auxLeafUnits;
+            }
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
@@ -74,11 +117,23 @@ namespace Conquera
 
         protected override void AfterAttackHitCastImpl()
         {
+            mAttackDelay.Start(1);
         }
 
         protected override bool AfterAttackHitUpdateImpl(AleGameTime time)
         {
-            return false;
+            if (mAttackDelay.HasPassed(time))
+            {
+                foreach (var dmg in mUnitDamages)
+                {
+                    if (0 < dmg.Key.Hp)
+                    {
+                        dmg.Key.ReceiveDamage(dmg.Value);
+                    }
+                }
+                return false;
+            }
+            return true;
         }
     }
 
