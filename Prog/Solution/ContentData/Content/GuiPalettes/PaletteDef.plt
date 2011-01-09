@@ -55,9 +55,8 @@
     <image name="SpellIconVampiricTouch" textureFileName="CellNotificationText" locationX="192" locationY="0" width="64" height="64"/>
     <image name="SpellIconPackReinforcement" textureFileName="CellNotificationText" locationX="64" locationY="64" width="64" height="64"/>
     <image name="SpellIconMindControl" textureFileName="CellNotificationText" locationX="128" locationY="64" width="64" height="64"/>
-    <image name="SpellIconBloodyFeast" textureFileName="CellNotificationText" locationX="192" locationY="64" width="64" height="64"/>
+    <image name="SpellIconPlague" textureFileName="CellNotificationText" locationX="192" locationY="64" width="64" height="64"/>
     <image name="SpellIconBloodMadness" textureFileName="CellNotificationText" locationX="0" locationY="128" width="64" height="64"/>
-    <image name="SpellIconMassHeal" textureFileName="CellNotificationText" locationX="64" locationY="128" width="64" height="64"/>
     <image name="SpellIconLastSacrifice" textureFileName="CellNotificationText" locationX="128" locationY="128" width="64" height="64"/>
 
   </graphicElements>

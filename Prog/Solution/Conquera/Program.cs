@@ -580,9 +580,8 @@ namespace Conquera
                 //            new KeyValuePair<string, Point>("VampiricTouch", new Point(3,1)),
                 //            new KeyValuePair<string, Point>("PackReinforcement", new Point(4,1)),
                 //            new KeyValuePair<string, Point>("MindControl", new Point(5,1)),
-                //            new KeyValuePair<string, Point>("BloodyFeast", new Point(0,2)),
+                //            new KeyValuePair<string, Point>("Plague", new Point(0,2)),
                 //            new KeyValuePair<string, Point>("BloodMadness", new Point(1,2)),
-                //            new KeyValuePair<string, Point>("MassHeal", new Point(2,2)),
                 //            new KeyValuePair<string, Point>("LastSacrifice", new Point(3, 2))})
                 //        {
                 //            SpellTowerTileSettings obj = new SpellTowerTileSettings();

@@ -105,14 +105,18 @@ namespace Conquera
                     }
                 }
 
-                int amount = (int)Math.Ceiling(Caster.Hp / (float)((friends.Count + enemies.Count) * DivCoef));
-                foreach (var unit in friends)
+                if (0 < friends.Count + enemies.Count)
                 {
-                    unit.Heal(amount);
-                }
-                foreach (var unit in enemies)
-                {
-                    unit.ReceiveDamage(amount);
+                    int amount = (int)Math.Ceiling(Caster.Hp / (float)((friends.Count + enemies.Count) * DivCoef));
+                    foreach (var unit in friends)
+                    {
+                        unit.Heal(amount);
+                    }
+                    foreach (var unit in enemies)
+                    {
+                        unit.ReceiveDamage(amount);
+                    }
+
                 }
 
                 Caster.ReceiveDamage(Caster.Hp);
