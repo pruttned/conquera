@@ -32,6 +32,7 @@ namespace Conquera
     {
         private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconMindControl");
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconMindControl");
+        private static float DivCoef = 3;
 
         private AnimationDelay mAttackDelay = new AnimationDelay();
 
@@ -62,16 +63,17 @@ namespace Conquera
 
         public override int ApplyAttackModifiers(int baseAttack)
         {
-            return baseAttack;
+            return baseAttack + (int)Math.Ceiling((float)Target.GameUnitDesc.Attack / DivCoef);
         }
 
         protected override void BeforeAttackCastImpl()
         {
+            Target.GameScene.FireCellNotificationLabel("", CellNotificationIcons.MindControl, Color.Red, Target.CellIndex);
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
         {
-            return mAttackDelay.HasPassed(time);
+            return false;
         }
 
         protected override void AfterAttackHitCastImpl()

@@ -136,13 +136,12 @@
     <Compile Include="ShadowScenePass.cs" />
     <Compile Include="Spell\AnimationDelay.cs" />
     <Compile Include="Spell\BloodMadnessSpell.cs" />
-    <Compile Include="Spell\BloodyFeastSpell.cs" />
     <Compile Include="Spell\FireStormSpell.cs" />
     <Compile Include="Spell\LastSacrificeSpell.cs" />
-    <Compile Include="Spell\MassHealSpell.cs" />
     <Compile Include="Spell\MindControlSpell.cs" />
     <Compile Include="Spell\PackReinforcementSpell.cs" />
     <Compile Include="Spell\ParticleSystemMissile.cs" />
+    <Compile Include="Spell\PlagueSpell.cs" />
     <Compile Include="Spell\SlayerSpell.cs" />
     <Compile Include="Spell\SpellSlot.cs" />
     <Compile Include="Spell\Spell.cs" />

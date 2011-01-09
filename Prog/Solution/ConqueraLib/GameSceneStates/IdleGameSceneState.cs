@@ -155,17 +155,13 @@ namespace Conquera
                         }
                         if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D7))
                         {
-                            mScene.GetCell(index).SetTile("BloodyFeastSpellTowerTile");
+                            mScene.GetCell(index).SetTile("PlagueSpellTowerTile");
                         }
                         if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D8))
                         {
                             mScene.GetCell(index).SetTile("BloodMadnessSpellTowerTile");
                         }
                         if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D9))
-                        {
-                            mScene.GetCell(index).SetTile("MassHealSpellTowerTile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D0))
                         {
                             mScene.GetCell(index).SetTile("LastSacrificeSpellTowerTile");
                         }

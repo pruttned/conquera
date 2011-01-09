@@ -28,14 +28,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Conquera
 {
-    public class VampiricTouchSpell : Spell
+    public class PlagueSpell : Spell
     {
-        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconVampiricTouch");
-        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconVampiricTouch");
-        private static float DivCoef = 3;
+        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPlague");
+        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPlague");
+        private static int FirstZoneDamage = 60;
+        private static int[] RestZoneDamages = new int[] { 20, 10 };
 
         private AnimationDelay mAttackDelay = new AnimationDelay();
-        private int mOldTargetHp;
+        private Dictionary<GameUnit, int> mUnitDamages = new Dictionary<GameUnit, int>();
 
         public override GraphicElement Picture
         {
@@ -49,12 +50,12 @@ namespace Conquera
 
         public override string Name
         {
-            get { return "VampiricTouch"; }
+            get { return "Plague"; }
         }
 
         public override string DisplayName
         {
-            get { return "VampiricTouch spell"; }
+            get { return "Plague spell"; }
         }
 
         public override string Description
@@ -69,8 +70,44 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
-            Target.GameScene.FireCellNotificationLabel("", CellNotificationIcons.VampiricTouch, Color.Red, Target.CellIndex);
-            mOldTargetHp = Target.Hp;
+            mUnitDamages.Clear();
+
+            var targetCell = Target.Cell;
+
+            List<GameUnit> leafUnits = new List<GameUnit>();
+            List<GameUnit> leafUnits2 = new List<GameUnit>();
+            List<HexCell> siblings = new List<HexCell>();
+
+            mUnitDamages.Add(Target, FirstZoneDamage);
+            leafUnits.Add(Target);
+
+            foreach (int dmg in RestZoneDamages)
+            {
+                if (0 == leafUnits.Count)
+                {
+                    break;
+                }
+
+                leafUnits2.Clear();
+
+                foreach (var leafUnit in leafUnits)
+                {
+                    siblings.Clear();
+                    leafUnit.Cell.GetSiblings(siblings);
+                    foreach (var cell in siblings)
+                    {
+                        if (null != cell.GameUnit && cell.GameUnit.OwningPlayer != Caster.OwningPlayer && !mUnitDamages.ContainsKey(cell.GameUnit))
+                        {
+                            mUnitDamages.Add(cell.GameUnit, dmg);
+                            leafUnits2.Add(cell.GameUnit);
+                        }
+                    }
+                }
+
+                List<GameUnit> auxLeafUnits = leafUnits;
+                leafUnits = leafUnits2;
+                leafUnits2 = auxLeafUnits;
+            }
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
@@ -87,8 +124,13 @@ namespace Conquera
         {
             if (mAttackDelay.HasPassed(time))
             {
-                int amount = (int)Math.Ceiling((float)(mOldTargetHp - Target.Hp) /  DivCoef);
-                Caster.Heal(amount);
+                foreach (var dmg in mUnitDamages)
+                {
+                    if (0 < dmg.Key.Hp)
+                    {
+                        dmg.Key.ReceiveDamage(dmg.Value);
+                    }
+                }
                 return false;
             }
             return true;

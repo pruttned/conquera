@@ -34,6 +34,8 @@ namespace Conquera.Gui
         private PlayerUnitCountView mPlayerUnitCountView = new PlayerUnitCountView();
         private TextButton mMainMenuButton;
         private SpellPanel mSpellPanel;
+        private TextButton mEndTurnButton;
+        private CurrentPlayerDisplay mCurrentPlayerDisplay;
 
         public bool SidePanelsVisible
         {
@@ -88,6 +90,18 @@ namespace Conquera.Gui
             RootControls.Add(mSpellPanel);
             UpdateSpellPanel();
 
+            //End turn button.
+            mEndTurnButton = new TextButton(GuiManager.Instance.Palette.CreateGraphicElement("EndTurnButtonDefault"),
+                GuiManager.Instance.Palette.CreateGraphicElement("EndTurnButtonMouseOver"), GuiManager.Instance.GetGuiFont("SpriteFont1"),
+                Color.White, "EndTurn");
+            mEndTurnButton.Click += new EventHandler<ControlEventArgs>(mEndTurnButton_Click);            
+            RootControls.Add(mEndTurnButton);
+
+            //Current player display.
+            mCurrentPlayerDisplay = new CurrentPlayerDisplay();
+            mCurrentPlayerDisplay.SetPlayer(mGameScene.CurrentPlayer);
+            RootControls.Add(mCurrentPlayerDisplay);
+
             //Other.
             UpdateLocations();
             GuiManager.Instance.ScreenSizeChanged += new EventHandler(ScreenSizeChanged);
@@ -131,9 +145,11 @@ namespace Conquera.Gui
             BindToCurrentPlayer();
 
             mPlayerGoldView.Update(mGameScene.CurrentPlayer.Gold);
-            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);
+            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);            
 
             UpdateSpellPanel();
+
+            mCurrentPlayerDisplay.SetPlayer(mGameScene.CurrentPlayer);
         }
 
         private void BindToCurrentPlayer()
@@ -188,6 +204,13 @@ namespace Conquera.Gui
 
             //Spell panel.
             mSpellPanel.Location = new Point(0, screenHeight - (int)mSpellPanel.Size.Height);
+
+            //EndTurnButton.
+            mEndTurnButton.Location = new Point(screenWidth - (int)mEndTurnButton.Size.Width, 
+                                                mMainMenuButton.Location.Y + (int)mMainMenuButton.Size.Height + 2);
+
+            //Current player display.
+            mCurrentPlayerDisplay.Location = new Point(screenWidth / 2 - (int)mCurrentPlayerDisplay.Size.Width / 2, 0);
         }
 
         private void mMainMenuButton_Click(object sender, ControlEventArgs e)
@@ -199,6 +222,11 @@ namespace Conquera.Gui
         private void UpdateSpellPanel()
         {
             mSpellPanel.SpellSlotCollection = mGameScene.CurrentPlayer.Spells;
+        }
+
+        private void mEndTurnButton_Click(object sender, ControlEventArgs e)
+        {
+            mGameScene.EndTurn();
         }
     }
 
@@ -320,6 +348,32 @@ namespace Conquera.Gui
             Point location = new Point((int)(ScreenLocation.X + Size.Width / 2 - mTextElement.Width / 2),
                                        (int)(ScreenLocation.Y + Size.Height / 2 - mTextElement.Height / 2));
             mTextElement.Draw(location);
+        }
+    }
+
+    public class CurrentPlayerDisplay : Control
+    {
+        private TextElement mPlayerColorLabel;
+
+        public override System.Drawing.SizeF Size
+        {
+            get { return mPlayerColorLabel.Size; }
+        }
+
+        public CurrentPlayerDisplay()
+        {
+            mPlayerColorLabel = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFont1"), Color.Black);
+        }
+
+        public void SetPlayer(GamePlayer player)
+        {            
+            mPlayerColorLabel.Color = new Color(player.Color);
+            mPlayerColorLabel.Text = mPlayerColorLabel.Color.ToString();
+        }
+
+        protected override void OnDrawForeground()
+        {
+            mPlayerColorLabel.Draw(ScreenLocation);
         }
     }
 }
