@@ -34,8 +34,6 @@ namespace Conquera
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPackReinforcement");
         private static float DivCoef = 10;
 
-        private AnimationDelay mAttackDelay = new AnimationDelay();
-
         public override GraphicElement Picture
         {
             get { return mPictureGraphicElement; }
