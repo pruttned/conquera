@@ -32,6 +32,9 @@ namespace Conquera
     {
         private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconMassHeal");
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconMassHeal");
+        private static int HpInc = 20;
+        private static int DmgDec = 40;
+
 
         public override GraphicElement Picture
         {
@@ -60,11 +63,19 @@ namespace Conquera
 
         public override int ApplyAttackModifiers(int baseAttack)
         {
-            return baseAttack;
+            return Math.Max(0, baseAttack - DmgDec);
         }
 
         protected override void BeforeAttackCastImpl()
         {
+            var casterCell = Caster.Cell;
+            foreach (var cell in casterCell.GetSiblings())
+            {
+                if (null != cell.GameUnit && cell.GameUnit.OwningPlayer == Caster.OwningPlayer)
+                {
+                    Target.GameScene.FireCellNotificationLabel("", CellNotificationIcons.MassHeal, Color.Red, cell.Index);
+                }
+            }
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
@@ -74,6 +85,14 @@ namespace Conquera
 
         protected override void AfterAttackHitCastImpl()
         {
+            var casterCell = Caster.Cell;
+            foreach (var cell in casterCell.GetSiblings())
+            {
+                if (null != cell.GameUnit && cell.GameUnit.OwningPlayer == Caster.OwningPlayer)
+                {
+                    cell.GameUnit.Heal(HpInc);
+                }
+            }
         }
 
         protected override bool AfterAttackHitUpdateImpl(AleGameTime time)
