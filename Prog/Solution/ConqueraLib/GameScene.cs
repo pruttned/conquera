@@ -720,7 +720,7 @@ namespace Conquera
         {
             if (null == unit) throw new ArgumentNullException("unit");
 
-            ParticleSystemManager.CreateFireAndforgetParticleSystem(mUnitDeathParticleSystemDesc, unit.Position);
+            ParticleSystemManager.CreateFireAndForgetParticleSystem(mUnitDeathParticleSystemDesc, unit.Position);
             RemoveUnit(unit);
         }
 
@@ -750,7 +750,7 @@ namespace Conquera
             HexCell cell = GetCell(obj.CellIndex);
             if (cell.OwningPlayer != obj.OwningPlayer) //has captured
             {
-                ParticleSystemManager.CreateFireAndforgetParticleSystem(mCaptureParticleSystemDesc, cell.CenterPos);
+                ParticleSystemManager.CreateFireAndForgetParticleSystem(mCaptureParticleSystemDesc, cell.CenterPos);
                 SetCellOwner(obj.CellIndex, obj.OwningPlayer);
             }
             GetCell(oldValue).GameUnit = null;

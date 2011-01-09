@@ -95,7 +95,7 @@ namespace Ale.Graphics
             mFireAndForgetParticleSystems.Add(particleSystem);
         }
 
-        public void CreateFireAndforgetParticleSystem(ParticleSystemDesc particleSystemDesc, Vector3 worldPosition)
+        public void CreateFireAndForgetParticleSystem(ParticleSystemDesc particleSystemDesc, Vector3 worldPosition)
         {
             CreateFireAndforgetParticleSystem(particleSystemDesc, ref worldPosition);
         }

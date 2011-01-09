@@ -73,7 +73,7 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
-            var targetCell = Target.GameScene.GetCell(Target.CellIndex);
+            var targetCell = Target.Cell;
             Target.GameScene.FireCellNotificationLabel("", CellNotificationIcons.FireStorm, Color.Red, targetCell.Index);
             foreach (var cell in targetCell.GetSiblings())
             {
@@ -91,7 +91,7 @@ namespace Conquera
 
         protected override void AfterAttackHitCastImpl()
         {
-            var targetCell = Target.GameScene.GetCell(Target.CellIndex);
+            var targetCell = Target.Cell;
 
             if(null != targetCell.GameUnit)
             {
@@ -133,7 +133,7 @@ namespace Conquera
         private void missile_OnHit(ParticleSystemMissile missile, GameUnit target)
         {
             target.ReceiveDamage(Damage, false);
-            target.GameScene.ParticleSystemManager.CreateFireAndforgetParticleSystem(
+            target.GameScene.ParticleSystemManager.CreateFireAndForgetParticleSystem(
                 target.GameScene.Content.Load<ParticleSystemDesc>(ExplosionPsys), target.Position);
             target.GameScene.GameCamera.Shake();
         }
