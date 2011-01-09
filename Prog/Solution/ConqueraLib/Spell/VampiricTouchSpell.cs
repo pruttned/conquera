@@ -69,7 +69,7 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
-            Caster.GameScene.FireCellNotificationLabel("", CellNotificationIcons.VampiricTouch, Color.Red, Caster.CellIndex);
+            Target.GameScene.FireCellNotificationLabel("", CellNotificationIcons.VampiricTouch, Color.Red, Target.CellIndex);
             mOldTargetHp = Target.Hp;
         }
 
