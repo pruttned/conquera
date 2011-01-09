@@ -30,8 +30,26 @@ namespace Conquera
 {
     public class BloodMadnessSpell : Spell
     {
+        class UnitDamage
+        {
+            public GameUnit GameUnit { get; private set; }
+            public int Damage { get; set; }
+
+            public UnitDamage(GameUnit gameUnit)
+            {
+                GameUnit = gameUnit;
+            }
+
+            public override string ToString()
+            {
+                return string.Format("{0}/{1}", Damage, GameUnit.Hp);
+            }
+        }
+
         private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconBloodMadness");
         private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconBloodMadness");
+
+        private AnimationDelay mAttackDelay = new AnimationDelay();
 
         public override GraphicElement Picture
         {
@@ -65,6 +83,7 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
+            Target.GameScene.FireCellNotificationLabel("", CellNotificationIcons.BloodMadness, Color.Red, Target.CellIndex);
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)
@@ -74,11 +93,65 @@ namespace Conquera
 
         protected override void AfterAttackHitCastImpl()
         {
+            if (0 < Target.Hp)
+            {
+                mAttackDelay.Start(1);
+            }
         }
 
         protected override bool AfterAttackHitUpdateImpl(AleGameTime time)
         {
-            return false;
+            if (mAttackDelay.HasPassed(time))
+            {
+                if (0 < Target.Hp)
+                {
+                    int hpToDrain = Target.GameUnitDesc.MaxHp - Target.Hp;
+                    int drainedHp = 0;
+
+                    if (0 < hpToDrain)
+                    {
+                        List<UnitDamage> fellowUnits = new List<UnitDamage>();
+                        var targetCell = Target.Cell;
+                        foreach (var cell in targetCell.GetSiblings())
+                        {
+                            if (null != cell.GameUnit && cell.GameUnit.OwningPlayer != Caster.OwningPlayer)
+                            {
+                                fellowUnits.Add(new UnitDamage(cell.GameUnit));
+                            }
+                        }
+
+                        while (0 < fellowUnits.Count && 0 < hpToDrain)
+                        {
+                            int singleDamage = Math.Max(1, hpToDrain / fellowUnits.Count);
+                            for (int i = fellowUnits.Count - 1; i >= 0 && 0 < hpToDrain; --i)
+                            {
+                                var unitDmg = fellowUnits[i];
+                                int singleDrainedHp = Math.Min((unitDmg.GameUnit.Hp - unitDmg.Damage), singleDamage);
+                                drainedHp += singleDrainedHp;
+                                hpToDrain -= singleDrainedHp;
+                                unitDmg.Damage += singleDrainedHp;
+                                if (unitDmg.Damage == unitDmg.GameUnit.Hp) //is going to kill the unit
+                                {
+                                    unitDmg.GameUnit.ReceiveDamage(unitDmg.Damage);
+                                    fellowUnits.RemoveAt(i);
+                                }
+                            }
+                        }
+
+                        if (0 < fellowUnits.Count)
+                        {
+                            foreach (var unitDmg in fellowUnits)
+                            {
+                                unitDmg.GameUnit.ReceiveDamage(unitDmg.Damage);
+                            }
+                        }
+
+                        Target.Heal(drainedHp);
+                    }
+                }
+                return false;
+            }
+            return true;
         }
     }
 

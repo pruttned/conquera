@@ -58,9 +58,8 @@ namespace Conquera
                 new VampiricTouchSpell(),
                 new PackReinforcementSpell(),
                 new MindControlSpell(),
-                new BloodyFeastSpell(),
+                new PlagueSpell(),
                 new BloodMadnessSpell(),
-                new MassHealSpell(),
                 new LastSacrificeSpell()
             };
         }

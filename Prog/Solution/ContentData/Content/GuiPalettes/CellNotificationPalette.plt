@@ -10,9 +10,8 @@
     <image name="VampiricTouch" textureFileName="CellNotificationText" locationX="192" locationY="0" width="64" height="64"/>
     <image name="PackReinforcement" textureFileName="CellNotificationText" locationX="64" locationY="64" width="64" height="64"/>
     <image name="MindControl" textureFileName="CellNotificationText" locationX="128" locationY="64" width="64" height="64"/>
-    <image name="BloodyFeast" textureFileName="CellNotificationText" locationX="192" locationY="64" width="64" height="64"/>
+    <image name="Plague" textureFileName="CellNotificationText" locationX="192" locationY="64" width="64" height="64"/>
     <image name="BloodMadness" textureFileName="CellNotificationText" locationX="0" locationY="128" width="64" height="64"/>
-    <image name="MassHeal" textureFileName="CellNotificationText" locationX="64" locationY="128" width="64" height="64"/>
     <image name="LastSacrifice" textureFileName="CellNotificationText" locationX="128" locationY="128" width="64" height="64"/>
   </graphicElements>
 

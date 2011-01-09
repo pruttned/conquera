@@ -208,9 +208,8 @@ namespace Conquera
         public static readonly string VampiricTouch = "VampiricTouch";
         public static readonly string PackReinforcement = "PackReinforcement";
         public static readonly string MindControl = "MindControl";
-        public static readonly string BloodyFeast = "BloodyFeast";
+        public static readonly string Plague = "Plague";
         public static readonly string BloodMadness = "BloodMadness";
-        public static readonly string MassHeal = "MassHeal";
         public static readonly string LastSacrifice = "LastSacrifice";
     }
 }
