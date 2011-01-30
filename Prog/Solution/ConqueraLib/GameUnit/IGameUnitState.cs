@@ -129,6 +129,7 @@ namespace Conquera
             }
             else
             {
+                mGameUnit.GameScene.ActiveSpellSlot.OnCast(); 
                 mGameUnit.GameScene.ActiveSpellSlot.Spell.BeforeAttackCast(mGameUnit, TargetUnit);
             }
         }

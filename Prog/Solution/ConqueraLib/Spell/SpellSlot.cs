@@ -25,16 +25,16 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using SimpleOrmFramework;
 
 namespace Conquera
 {
-    public class SpellSlot
+    public class SpellSlot :BaseDataObject
     {
         public event EventHandler TotalCountChanged;
         public event EventHandler AvailableCountChanged;
 
         private int mTotalCount;
-        private int mAvailableCount;
 
         public Spell Spell { get; private set; }
 
@@ -50,38 +50,49 @@ namespace Conquera
                         throw new ArgumentException("Value must be greater or equal to zero.");
                     }
 
-                    if (value < AvailableCount)
-                    {
-                        AvailableCount = value;
-                    }
-
                     mTotalCount = value;
                     EventHelper.RaiseEvent(TotalCountChanged, this);
+
+                    if (mTotalCount < UsedCount)
+                    {
+                        UsedCount = mTotalCount;
+                    }
+
+                    EventHelper.RaiseEvent(AvailableCountChanged, this);
                 }
             }
         }
 
         public int AvailableCount
         {
-            get { return mAvailableCount; }
-            set
-            {
-                if (value != mAvailableCount)
-                {
-                    if (value < 0 || value > TotalCount)
-                    {
-                        throw new ArgumentException("Value must be greater or equal to zero and lesser or equal than TotalCount.");
-                    }
+            get { return mTotalCount - UsedCount; }
+        }
 
-                    mAvailableCount = value;
-                    EventHelper.RaiseEvent(AvailableCountChanged, this);
-                }
+        /// <summary>
+        /// Only for save/load purposes - used in SpellSlotCollection
+        /// </summary>
+        internal int UsedCount { get; set; }
+
+        public void OnCast()
+        {
+            if (0 == AvailableCount)
+            {
+                throw new InvalidOperationException("AvailableCount < 0");
             }
+            UsedCount++;
+            EventHelper.RaiseEvent(AvailableCountChanged, this);
         }
 
         public SpellSlot(Spell spell)
         {
             Spell = spell;
         }
+
+        public void ResetAvailableCount()
+        {
+            UsedCount = 0;
+            EventHelper.RaiseEvent(AvailableCountChanged, this);
+        }
+
     }
 }

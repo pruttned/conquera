@@ -25,12 +25,16 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using SimpleOrmFramework;
 
 namespace Conquera
 {
-    public class SpellSlotCollection : ReadOnlyCollection<SpellSlot>
+    [DataObject(MaxCachedCnt=0)]
+    public class SpellSlotCollection : BaseDataObject, IEnumerable<SpellSlot>
     {
         public static Spell[] Spells;
+
+        private SpellSlot[] mSpellSlots;
 
         public SpellSlot this[string name]
         {
@@ -47,6 +51,20 @@ namespace Conquera
                 throw new KeyNotFoundException(string.Format("Spell with name '{0}' doesn't exists", name));
             }
         }
+
+        public SpellSlot this[int i]
+        {
+            get
+            {
+                return mSpellSlots[i];
+            }
+        }
+
+        /// <summary>
+        /// Only for load/save purposes
+        /// </summary>
+        [DataListProperty]
+        private List<int> SpellUsageCnts { get; set; }
 
         static SpellSlotCollection()
         {
@@ -65,19 +83,41 @@ namespace Conquera
         }
 
         public SpellSlotCollection()
-            : base(CreateSpellList())
         {
+            mSpellSlots = CreateSpellSlotList();
         }
 
         public void ResetSpellAvailabilities()
         {
-            foreach (var spell in Items)
+            foreach (var spell in mSpellSlots)
             {
-                spell.AvailableCount = spell.TotalCount;
+                spell.ResetAvailableCount();
             }
         }
 
-        private static SpellSlot[] CreateSpellList()
+        public IEnumerator<SpellSlot> GetEnumerator()
+        {
+            return ((IEnumerable<SpellSlot>)mSpellSlots).GetEnumerator();
+        }
+
+        public static Spell GetSpell(string name)
+        {
+            foreach (Spell spell in Spells)
+            {
+                if(string.Equals(spell.Name, name, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return spell;
+                }
+            }
+            throw new KeyNotFoundException(string.Format("Spell with name '{0}' doesn't exists", name));
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return mSpellSlots.GetEnumerator();
+        }
+
+        private static SpellSlot[] CreateSpellSlotList()
         {
             SpellSlot[] slots = new SpellSlot[Spells.Length];
             for (int i = 0; i < slots.Length; ++i)
@@ -87,6 +127,28 @@ namespace Conquera
 
             return slots;
         }
-    }
 
+        protected override void BeforeSaveImpl(OrmManager ormManager)
+        {
+            if (null == SpellUsageCnts)
+            {
+                SpellUsageCnts = new List<int>(new int[mSpellSlots.Length]);
+            }
+            for(int i =0; i< mSpellSlots.Length; ++i)
+            {
+                SpellUsageCnts[i] = mSpellSlots[i].UsedCount;
+            }
+            base.BeforeSaveImpl(ormManager);
+        }
+
+        protected override void AfterLoadImpl(OrmManager ormManager)
+        {
+            for (int i = 0; i < mSpellSlots.Length; ++i)
+            {
+                mSpellSlots[i].UsedCount = SpellUsageCnts[i];
+            }
+            
+            base.AfterLoadImpl(ormManager);
+        }
+    }
 }

@@ -124,6 +124,7 @@ namespace Conquera
             }
         }
 
+        [DataProperty] //Not a DataListProperty
         public SpellSlotCollection Spells { get; private set; }
 
         public GamePlayer(Vector3 color)
@@ -216,9 +217,6 @@ namespace Conquera
             return Scene.AddGameUnit(this, descName, cell);
         }
 
-        /// <summary>
-        /// Ctor only for Sof
-        /// </summary>
         protected GamePlayer()
         {
             Cells = new ReadOnlyCollection<HexCell>(mCells);

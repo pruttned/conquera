@@ -216,10 +216,15 @@ namespace Conquera
             var newTile = mScene.Terrain.SetTile(Index, tile);
             if(newTile != mHexTerrainTile)
             {
+                var owner = OwningPlayer;
+                mScene.SetCellOwner(Index, null); //not performance wise - but should be used in editor only
+
                 HexTerrainTileDesc oldDesc = HexTerrainTile;
                 mHexTerrainTile = newTile;
                 UpdatePassableness();
                 mScene.HexCellTileChanged(this, oldDesc);
+
+                mScene.SetCellOwner(Index, owner);
             }
         }
 

@@ -333,6 +333,7 @@ namespace Conquera
         public SpellTowerTileDesc(SpellTowerTileSettings settings, ContentGroup content)
             : base(settings, content)
         {
+            Spell = SpellSlotCollection.GetSpell(settings.Spell);
         }
 
         protected internal override void OnBeginTurn(HexCell cell)
@@ -342,18 +343,14 @@ namespace Conquera
 
         protected internal override void OnActivated(HexCell cell)
         {
-            //foreach (GameCard card in mGameCards)
-            //{
-            //    cell.OwningPlayer.AddCard(card);
-            //}
+            var slot = cell.OwningPlayer.Spells[Spell.Name];
+            slot.TotalCount++;
         }
 
         protected internal override void OnDeactivating(HexCell cell)
         {
-            //foreach (GameCard card in mGameCards)
-            //{
-            //    cell.OwningPlayer.RemoveCard(card);
-            //}
+            var slot = cell.OwningPlayer.Spells[Spell.Name];
+            slot.TotalCount--;
         }
     }
 
