@@ -66,6 +66,8 @@ namespace Conquera
         private CellLabelManager mCellLabelManager;
         private SpellSlot mActiveSpell = null;
 
+        private AleMessageBox mVictoryMessageBox;
+
         public string Name { get; private set; }
 
         public GameSceneContextState GameSceneContextState { get; private set; }
@@ -381,10 +383,6 @@ namespace Conquera
             return null;
         }
 
-        protected internal virtual void HexCellTileChanged(HexCell tile, HexTerrainTileDesc oldDesc)
-        {
-        }
-
         public HexCell GetCell(Point index)
         {
             return mCells[index.X, index.Y];
@@ -457,6 +455,22 @@ namespace Conquera
         public void FireCellNotificationLabel(string text, string icon, Color textColor, Vector3 pos )
         {
             mCellLabelManager.AddLabel(text, icon, textColor, pos);
+        }
+
+        public virtual void OnVictory(GamePlayer player)
+        {
+            mVictoryMessageBox = new AleMessageBox(string.Format("Player {0} has won", player.Color.ToString()));
+            mVictoryMessageBox.Closed += new EventHandler(msg_Closed);
+            mVictoryMessageBox.Show(true);
+        }
+
+        void msg_Closed(object sender, EventArgs e)
+        {
+            SceneManager.ExitApplication();
+        }
+
+        protected internal virtual void HexCellTileChanged(HexCell tile, HexTerrainTileDesc oldDesc)
+        {
         }
 
         protected override void Dispose(bool isDisposing)

@@ -369,10 +369,12 @@ namespace Conquera
 
         protected internal override void OnActivated(HexCell cell)
         {
+            cell.OwningPlayer.CastleCnt++;
         }
 
         protected internal override void OnDeactivating(HexCell cell)
         {
+            cell.OwningPlayer.CastleCnt--;
         }
     }
 
