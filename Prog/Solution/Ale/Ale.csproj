@@ -134,6 +134,7 @@
     <Compile Include="Graphics\SimpleVertex\SimpleVertexList.cs" />
     <Compile Include="Graphics\SimpleVertex\SimpleVertexPositionEnumerator.cs" />
     <Compile Include="Graphics\SimpleVertex\SimpleVertexReadOnlyArray.cs" />
+    <Compile Include="Gui\AleMessageBox.cs" />
     <Compile Include="Gui\ContentControl.cs" />
     <Compile Include="Gui\Control.cs" />
     <Compile Include="Gui\ControlCollection.cs" />
@@ -157,6 +158,7 @@
     <Compile Include="Gui\Palette\IGraphicElementCreator.cs" />
     <Compile Include="Gui\Palette\ImageCreator.cs" />
     <Compile Include="Gui\Palette\Palette.cs" />
+    <Compile Include="Gui\TextButton.cs" />
     <Compile Include="Scene\ISceneDrawableComponent.cs" />
     <Compile Include="Scene\Octree\OctreeSceneDrawableComponent.cs" />
     <Compile Include="Scene\Octree\OctreeSceneObjectDescLoader.cs" />

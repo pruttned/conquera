@@ -18,11 +18,14 @@
 
 using Microsoft.Xna.Framework;
 using System;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Ale.Gui
 {
     public class Dialog : Control
     {
+        public event EventHandler Closed;
+
         private Control mOldModalControl;
         private bool mModal;
         private bool mShown = false;
@@ -69,6 +72,12 @@ namespace Ale.Gui
 
             SiblingColleciton.Remove(this);
             mShown = false;
+
+            if (Closed != null)
+            {
+                Closed(this, EventArgs.Empty);
+            }
+
             return true;
         }
     }

@@ -324,32 +324,7 @@ namespace Conquera.Gui
         {
             Hide(); //todo if not in game, load last save
         }
-    }
-
-    public class TextButton : GraphicButton
-    {
-        private TextElement mTextElement;
-
-        public string Text
-        {
-            get { return mTextElement.Text; }
-            set { mTextElement.Text = value; }
-        }
-
-        public TextButton(GraphicElement defaultGraphicElement, GraphicElement mouseOverGraphicElement, GuiFont font, Color textColor, string text)
-            :base(defaultGraphicElement, mouseOverGraphicElement)
-        {
-            mTextElement = new TextElement(font, textColor);
-            mTextElement.Text = text;
-        }
-
-        protected override void OnDrawForeground()
-        {
-            Point location = new Point((int)(ScreenLocation.X + Size.Width / 2 - mTextElement.Width / 2),
-                                       (int)(ScreenLocation.Y + Size.Height / 2 - mTextElement.Height / 2));
-            mTextElement.Draw(location);
-        }
-    }
+    }    
 
     public class CurrentPlayerDisplay : Control
     {
