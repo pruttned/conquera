@@ -35,7 +35,12 @@ namespace Conquera
 
         public void OnStart()
         {
-            //todo
+            var player = mScene.CurrentPlayer;
+            if (EvaluateVictory(player))
+            {
+                mScene.OnVictory(player);
+            }
+            
             mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
         }
 
@@ -50,6 +55,22 @@ namespace Conquera
         public void Update(AleGameTime gameTime)
         {
         }
-    }
 
+        protected virtual bool EvaluateVictory(GamePlayer player)
+        {
+            if (0 < player.CastleCnt)
+            {
+                foreach (var p in mScene.GameSceneContextState.Players)
+                {
+                    if (p != player && 0 < p.CastleCnt)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            return false;
+        }
+    }
 }

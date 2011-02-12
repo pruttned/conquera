@@ -36,7 +36,7 @@ namespace Conquera
     {
         public event EventHandler GoldChanged;
         public event EventHandler MaxUnitCntChanged;
-		public event EventHandler UnitsChanged;
+        public event EventHandler UnitsChanged;
 
         private List<GameUnit> mUnits = new List<GameUnit>();
         private List<HexCell> mCells = new List<HexCell>();
@@ -50,6 +50,11 @@ namespace Conquera
         private Dictionary<string, IGameSceneState> mGameSceneStates = new Dictionary<string, IGameSceneState>();
 
         public ReadOnlyCollection<HexCell> Cells { get; private set; }
+
+        /// <summary>
+        /// Changed by CastleTileDesc
+        /// </summary>
+        public int CastleCnt { get; set; }
 
         //Computed - not saved
         public int MaxUnitCnt
@@ -69,12 +74,12 @@ namespace Conquera
             }
         }
 
-        public GameScene Scene 
+        public GameScene Scene
         {
-            get 
+            get
             {
                 CheckInit();
-                return mScene; 
+                return mScene;
             }
         }
 
@@ -100,7 +105,7 @@ namespace Conquera
 
         [DataProperty(NotNull = true)]
         public Vector3 Color { get; private set; }
-        [DataListProperty(NotNull=true)]
+        [DataListProperty(NotNull = true)]
         internal List<GameUnit> Units
         {
             get { return mUnits; }
@@ -128,7 +133,7 @@ namespace Conquera
         public SpellSlotCollection Spells { get; private set; }
 
         public GamePlayer(Vector3 color)
-            :this()
+            : this()
         {
             Color = color;
         }
@@ -220,7 +225,7 @@ namespace Conquera
         protected GamePlayer()
         {
             Cells = new ReadOnlyCollection<HexCell>(mCells);
-			MaxUnitCnt = 3;
+            MaxUnitCnt = 3;
             Spells = new SpellSlotCollection();
         }
 
@@ -252,16 +257,16 @@ namespace Conquera
         }
 
         public HumanPlayer(Vector3 color)
-            :base(color)
+            : base(color)
         {
             CameraTargetPos = new Vector3();
         }
 
         public override void OnBegineTurn()
         {
-            if(!Scene.GameCamera.IsInSight(new BoundingSphere(CameraTargetPos, 0.5f)))
+            if (!Scene.GameCamera.IsInSight(new BoundingSphere(CameraTargetPos, 0.5f)))
             {
-//              Scene.GameCamera.MoveCameraTo(CameraTargetPos);
+                //              Scene.GameCamera.MoveCameraTo(CameraTargetPos);
                 Scene.GameCamera.TargetWorldPosition = CameraTargetPos;
             }
             Spells.ResetSpellAvailabilities();
