@@ -47,15 +47,18 @@ namespace Ale.Graphics
         /// </summary>
         public const int GroundLyingObjects = 3000;
 
+        public const int MovementArea = 3100;
+        public const int Region = 3200;
+
         /// <summary>
         /// Cursor3dCellSel
         /// </summary>
-        public const int Cursor3dCellSel = 3100;
+        public const int Cursor3dCellSel = 3300;
 
         /// <summary>
         /// Cursor3D
         /// </summary>
-        public const int Cursor3D = 3200;
+        public const int Cursor3D = 3500;
 
 
         /// <summary>

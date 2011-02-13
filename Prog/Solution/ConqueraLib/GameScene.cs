@@ -70,6 +70,8 @@ namespace Conquera
 
         private AleMessageBox mVictoryMessageBox;
 
+        private MovementAreaRenderable mMovementAreaRenderable;
+
         public string Name { get; private set; }
 
         public GameSceneContextState GameSceneContextState { get; private set; }
@@ -466,6 +468,27 @@ namespace Conquera
             mVictoryMessageBox = new AleMessageBox(string.Format("Player {0} has won", player.Color.ToString()));
             mVictoryMessageBox.Closed += new EventHandler(msg_Closed);
             mVictoryMessageBox.Show(true);
+        }
+
+        /// <summary>
+        /// Null = hide
+        /// </summary>
+        /// <param name="unit"></param>
+        public void ShowMovementArea(GameUnit unit)
+        {
+            if (null != mMovementAreaRenderable)
+            {
+                Octree.DestroyObject(mMovementAreaRenderable);
+                mMovementAreaRenderable = null;
+            }
+            if (null != unit)
+            {
+                mMovementAreaRenderable = MovementAreaRenderable.TryCreate(GraphicsDeviceManager.GraphicsDevice, Content, unit);
+                if (null != mMovementAreaRenderable)
+                {
+                    Octree.AddObject(mMovementAreaRenderable);
+                }
+            }
         }
 
         void msg_Closed(object sender, EventArgs e)

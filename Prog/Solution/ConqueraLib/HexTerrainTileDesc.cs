@@ -176,7 +176,18 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Get a corners around 0,0
+        /// Gets corners around 0,0
+        /// </summary>
+        /// <returns></returns>
+        public static Vector3[] GetCorners()
+        {
+            Vector3[] corners = new Vector3[6];
+            Corners.CopyTo(corners, 0);
+            return corners;
+        }
+
+        /// <summary>
+        /// Get a corner around 0,0
         /// </summary>
         public static void GetCornerPos(HexTileCorner corner, out Vector3 pos)
         {

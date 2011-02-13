@@ -25,6 +25,9 @@ using Microsoft.Xna.Framework;
 using Ale.Gui;
 using Ale;
 using Conquera.Gui;
+using Ale.Graphics;
+using Microsoft.Xna.Framework.Graphics;
+using Ale.Content;
 
 namespace Conquera
 {
@@ -52,12 +55,15 @@ namespace Conquera
                 mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
             }
 
+            mScene.ShowMovementArea(SelectedUnit);
+
             mScene.EnableMouseCameraControl = true;
             MovementArrow.StartCell = mScene.GetCell(SelectedUnit.CellIndex);
         }
 
         public void OnEnd()
         {
+            mScene.ShowMovementArea(null);
             MovementArrow.IsVisible = false;
         }
 
@@ -130,5 +136,4 @@ namespace Conquera
             }
         }
     }
-
 }
