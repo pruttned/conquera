@@ -630,7 +630,7 @@ namespace Conquera
                 }
                 else
                 {
-                    if (SceneManager.MouseManager.IsButtonDown(MouseButton.Right))
+                    if (SceneManager.MouseManager.IsButtonDown(MouseButton.Middle))
                     {//movement
                         Vector2 dirVec = new Vector2(GameCamera.TargetWorldPosition.X - MainCamera.WorldPosition.X,
                             GameCamera.TargetWorldPosition.Y - MainCamera.WorldPosition.Y);

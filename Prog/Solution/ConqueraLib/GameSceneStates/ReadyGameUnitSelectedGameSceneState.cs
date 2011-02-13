@@ -63,7 +63,7 @@ namespace Conquera
 
         public void OnClickOnCell(HexCell cellUnderCur, MouseButton button)
         {
-            if (MouseButton.Right == button && mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl))
+            if (MouseButton.Right == button)
             {
                 if (SelectedUnit.MoveTo(cellUnderCur.Index))
                 {
