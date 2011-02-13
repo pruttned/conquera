@@ -110,6 +110,8 @@ namespace Ale.Graphics
             }
         }
 
+        protected Viewport Viewport { get; private set; }
+
         #endregion Properties
         
         #region Methods
@@ -178,6 +180,7 @@ namespace Ale.Graphics
         /// </summary>
         internal void LoadContent()
         {
+            Viewport = GraphicsDevice.Viewport;
             LoadContentImpl();
             mIsLoaded = true;
         }
@@ -221,6 +224,18 @@ namespace Ale.Graphics
             mSpriteBatch.End();
 
             MaterialEffect.Finish();
+        }
+
+        /// <summary>
+        /// Draws fullscreen quad. (First pass of the default technique is used)
+        /// Using Spritebatch
+        /// </summary>
+        /// <param name="effect"></param>
+        /// <param name="gameTime"></param>
+        /// <param name="texture">- First texture of the effect - it is set by spritebatch</param>
+        protected void DrawFullscreenQuad(MaterialEffect effect, AleGameTime gameTime, Texture2D texture)
+        {
+            DrawFullscreenQuad(effect, gameTime, texture, Viewport.Width, Viewport.Height);
         }
 
         /// <summary>

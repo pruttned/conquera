@@ -52,6 +52,8 @@ namespace Conquera
         private ParticleSystemDesc mCaptureParticleSystemDesc;
         private ParticleSystemDesc mUnitDeathParticleSystemDesc;
 
+        private GameSettings mGameSettings;
+
         private GraphicModel mCursor3d;
         private GraphicModel mCursor3dCellSel;
         private MovementArrow mMovementArrow;
@@ -155,6 +157,8 @@ namespace Conquera
                 }
             }
         }
+
+        public Viewport Viewport { get; private set; }
 
         public GameScene(string name, SceneManager sceneManager, int width, int height, string defaultTile, ContentGroup content)
             : base(sceneManager, content, GetBoundsFromSize(width, height))
@@ -478,6 +482,10 @@ namespace Conquera
             if (isDisposing)
             {
                 SceneManager.KeyboardManager.KeyDown -= KeyboardManager_KeyDown;
+                SceneManager.MouseManager.MouseButtonUp -= MouseManager_MouseButtonUp;
+                SceneManager.MouseManager.MouseButtonDown -= MouseManager_MouseButtonDown;
+                AppSettingsManager.Default.AppSettingsCommitted -= Default_AppSettingsCommitted;
+
                 Terrain.Dispose();
                 mMovementArrow.Dispose();
                 mCellLabelManager.Dispose();
@@ -612,6 +620,8 @@ namespace Conquera
 
         private void HandleCameraControl()
         {
+            Vector2 curPos = SceneManager.MouseManager.CursorPosition;
+            
             if (!GuiManager.Instance.HandlesMouse)
             {
                 Vector3 mouseMovement = SceneManager.MouseManager.CursorPositionDelta;
@@ -632,22 +642,84 @@ namespace Conquera
                 {
                     if (SceneManager.MouseManager.IsButtonDown(MouseButton.Middle))
                     {//movement
-                        Vector2 dirVec = new Vector2(GameCamera.TargetWorldPosition.X - MainCamera.WorldPosition.X,
-                            GameCamera.TargetWorldPosition.Y - MainCamera.WorldPosition.Y);
-                        dirVec.Normalize();
-
+                        Vector2 dirVec;
                         Vector2 perpDir;
-                        AleMathUtils.GetPerpVector(ref dirVec, out perpDir);
-                        perpDir *= mouseMovement.X / 10.0f;
-                        dirVec *= mouseMovement.Y / 10.0f;
+
+                        GetCameraPerpDirVec(out dirVec, out perpDir);
+
+                        float scrollSpeed = mGameSettings.CameraScrollSpeed;
+
+                        perpDir *= mouseMovement.X * scrollSpeed;
+                        dirVec *= mouseMovement.Y * scrollSpeed;
 
                         GameCamera.TargetWorldPosition += new Vector3(perpDir.X + dirVec.X, perpDir.Y + dirVec.Y, 0);
                     }
                 }
             }
+
+            if (!SceneManager.MouseManager.IsButtonDown(MouseButton.Left) && !SceneManager.MouseManager.IsButtonDown(MouseButton.Right)&&
+                !SceneManager.MouseManager.IsButtonDown(MouseButton.Middle))
+            {
+                float scrollSpeed = mGameSettings.CameraCornerScrollSpeed;
+                if (curPos.X <= 1)
+                {
+                    Vector2 dirVec;
+                    Vector2 perpDir;
+                    GetCameraPerpDirVec(out dirVec, out perpDir);
+                    perpDir *= scrollSpeed;
+                    dirVec *= scrollSpeed;
+
+                    GameCamera.TargetWorldPosition += new Vector3(perpDir.X + dirVec.X, 0, 0);
+                }
+                else
+                {
+                    if (curPos.X >= Viewport.Width - 1)
+                    {
+                        Vector2 dirVec;
+                        Vector2 perpDir;
+                        GetCameraPerpDirVec(out dirVec, out perpDir);
+                        perpDir *= scrollSpeed;
+                        dirVec *= scrollSpeed;
+
+                        GameCamera.TargetWorldPosition -= new Vector3(perpDir.X + dirVec.X, 0, 0);
+                    }
+                }
+                if (curPos.Y <= 1)
+                {
+                    Vector2 dirVec;
+                    Vector2 perpDir;
+                    GetCameraPerpDirVec(out dirVec, out perpDir);
+                    perpDir *= scrollSpeed;
+                    dirVec *= scrollSpeed;
+
+                    GameCamera.TargetWorldPosition += new Vector3(0, perpDir.Y + dirVec.Y, 0);
+                }
+                else
+                {
+                    if (curPos.Y >= Viewport.Height - 1)
+                    {
+                        Vector2 dirVec;
+                        Vector2 perpDir;
+                        GetCameraPerpDirVec(out dirVec, out perpDir);
+                        perpDir *= scrollSpeed;
+                        dirVec *= scrollSpeed;
+
+                        GameCamera.TargetWorldPosition -= new Vector3(0, perpDir.Y + dirVec.Y, 0);
+                    }
+                }
+            }
+
         }
 
+        private void GetCameraPerpDirVec(out Vector2 dirVec, out Vector2 perpDir)
+        {
+            dirVec = new Vector2(GameCamera.TargetWorldPosition.X - MainCamera.WorldPosition.X,
+                GameCamera.TargetWorldPosition.Y - MainCamera.WorldPosition.Y);
+            dirVec.Normalize();
 
+            AleMathUtils.GetPerpVector(ref dirVec, out perpDir);
+        }
+        
         private void KeyboardManager_KeyDown(Microsoft.Xna.Framework.Input.Keys key, KeyboardManager keyboardManager)
         {
             if (key == Microsoft.Xna.Framework.Input.Keys.S)
@@ -798,6 +870,11 @@ namespace Conquera
             SceneManager.MouseManager.MouseButtonUp += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonUp);
             SceneManager.MouseManager.MouseButtonDown += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonDown);
 
+            AppSettingsManager.Default.AppSettingsCommitted += new AppSettingsManager.CommittedHandler(Default_AppSettingsCommitted);
+
+            Viewport = GraphicsDeviceManager.GraphicsDevice.Viewport;
+            mGameSettings = AppSettingsManager.Default.GetSettings<GameSettings>();
+
             mCells = new HexCell[Terrain.Width, Terrain.Height];
 
             for (int i = 0; i < Terrain.Width; ++i)
@@ -856,6 +933,20 @@ namespace Conquera
             return new BoundingBox(v1, v2);
         }
 
+        private void Default_AppSettingsCommitted(IAppSettings settings)
+        {
+            if (settings is VideoSettings)
+            {
+                Viewport = GraphicsDeviceManager.GraphicsDevice.Viewport;
+            }
+            else
+            {
+                if (settings is GameSettings)
+                {
+                    mGameSettings = ((GameSettings)settings);
+                }
+            }
+        }
     }
 
     public static class GameSceneStates
