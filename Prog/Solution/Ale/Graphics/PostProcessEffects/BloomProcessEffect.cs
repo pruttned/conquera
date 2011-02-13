@@ -170,9 +170,8 @@ namespace Ale.Graphics
             //Bloom pass
             mBloomEffectScreenMap.Value = screen;
             mBloomEffectBluredBrightnessMap.Value = mBlurVertEffectTarget.Texture;
-            var viewport = GraphicsDevice.Viewport;
             //mBloomEffect.Apply(gameTime, mBloomEffect.DefaultTechnique.Passes[0]);
-            DrawFullscreenQuad(mBloomEffect, gameTime, screen, viewport.Width, viewport.Height);
+            DrawFullscreenQuad(mBloomEffect, gameTime, screen);
         }
 
         /// <summary>
