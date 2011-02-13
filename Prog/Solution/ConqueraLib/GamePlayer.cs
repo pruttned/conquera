@@ -179,7 +179,7 @@ namespace Conquera
             mScene = scene;
 
             MaterialSettings ms = new MaterialSettings("LineMat", "ActiveBorderFx");
-            ms.RenderLayer = DefaultRenderLayers.GroundLyingObjects;
+            ms.RenderLayer = DefaultRenderLayers.Region;
             ms.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "lineText"));
             ms.Params.Add(new Vector3MaterialParamSettings("gColor", Color));
             mActiveBorderMaterial = new Material(ms, content);

@@ -263,14 +263,14 @@ namespace Conquera
                 index.Y * TileH, GroundHeight);
         }
 
-        public Vector2 Get2DPosFromIndex(Point index)
+        public static Vector2 Get2DPosFromIndex(Point index)
         {
             Vector2 pos;
             Get2DPosFromIndex(index, out pos);
             return pos;
         }
 
-        public void Get2DPosFromIndex(Point index, out Vector2 pos)
+        public static void Get2DPosFromIndex(Point index, out Vector2 pos)
         {
             //http://www.gamedev.net/reference/articles/article747.asp
             //PlotX=MapX*Width+(MapY AND 1)*(Width/2)

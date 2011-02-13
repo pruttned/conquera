@@ -130,7 +130,6 @@ namespace Conquera
                 //        particleEmitterSettings.Material = particleMaterialId;
                 //        particleEmitterSettings.Name = "Emitter1";
 
-
                 //        SphereParticleEmitterSettings particleEmitterSettings2 = new SphereParticleEmitterSettings();
                 //        particleEmitterSettings2.Name = "Emitter2";
                 //        particleEmitterSettings2.Radius = 5;
@@ -769,6 +768,10 @@ namespace Conquera
                 //        ormManager.SaveObject(particleSystemSettings);
                 //    }
 
+                    //{
+                    //    MaterialSettings mat = new MaterialSettings("MovementAreaMat", "MovementAreaFx", DefaultRenderLayers.MovementArea);
+                    //    ormManager.SaveObject(mat);
+                    //}
 
                     transaction.Commit();
                 }
