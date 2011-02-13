@@ -661,7 +661,7 @@ namespace Conquera
                 !SceneManager.MouseManager.IsButtonDown(MouseButton.Middle))
             {
                 float scrollSpeed = mGameSettings.CameraCornerScrollSpeed;
-                if (curPos.X <= 1)
+                if (curPos.X <= 0)
                 {
                     Vector2 dirVec;
                     Vector2 perpDir;
@@ -673,7 +673,7 @@ namespace Conquera
                 }
                 else
                 {
-                    if (curPos.X >= Viewport.Width - 1)
+                    if (curPos.X >= Viewport.Width)
                     {
                         Vector2 dirVec;
                         Vector2 perpDir;
@@ -684,7 +684,7 @@ namespace Conquera
                         GameCamera.TargetWorldPosition -= new Vector3(perpDir.X + dirVec.X, 0, 0);
                     }
                 }
-                if (curPos.Y <= 1)
+                if (curPos.Y <= 0)
                 {
                     Vector2 dirVec;
                     Vector2 perpDir;
@@ -696,7 +696,7 @@ namespace Conquera
                 }
                 else
                 {
-                    if (curPos.Y >= Viewport.Height - 1)
+                    if (curPos.Y >= Viewport.Height)
                     {
                         Vector2 dirVec;
                         Vector2 perpDir;
