@@ -25,13 +25,14 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Conquera.Gui;
 
 namespace Conquera
 {
     public class LastSacrificeSpell : Spell
     {
-        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconLastSacrifice");
-        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconLastSacrifice");
+        private static GraphicElement mPictureGraphicElement = ConqueraPalette.SpellIconLastSacrifice;
+        private static GraphicElement mIconGraphicElement = ConqueraPalette.SpellIconLastSacrifice;
         private static float DivCoef = 2;
 
         private AnimationDelay mAttackDelay = new AnimationDelay();

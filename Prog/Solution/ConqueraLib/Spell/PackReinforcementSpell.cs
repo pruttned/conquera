@@ -25,13 +25,14 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Conquera.Gui;
 
 namespace Conquera
 {
     public class PackReinforcementSpell : Spell
     {
-        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPackReinforcement");
-        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPackReinforcement");
+        private static GraphicElement mPictureGraphicElement = ConqueraPalette.SpellIconPackReinforcement;
+        private static GraphicElement mIconGraphicElement = ConqueraPalette.SpellIconPackReinforcement;
         private static float DivCoef = 10;
 
         public override GraphicElement Picture

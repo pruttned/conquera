@@ -26,6 +26,7 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Conquera.Gui;
 
 namespace Conquera
 {
@@ -36,8 +37,8 @@ namespace Conquera
         private static Vector3 FireBallPos = new Vector3(0.2f, 0.4f, 4);
         private static readonly string FireBallPsys = "FireBallPsys";
         private static readonly string ExplosionPsys = "FireExplosionPsys";
-        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconFireStorm");
-        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconFireStorm");
+        private static GraphicElement mPictureGraphicElement = ConqueraPalette.SpellIconFireStorm;
+        private static GraphicElement mIconGraphicElement = ConqueraPalette.SpellIconFireStorm;
 
         List<ParticleSystemMissile> mMissiles = new List<ParticleSystemMissile>();
 

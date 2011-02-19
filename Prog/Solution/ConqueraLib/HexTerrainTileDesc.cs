@@ -172,7 +172,7 @@ namespace Conquera
                 }
             }
 
-            Icon = GuiManager.Instance.Palette.CreateGraphicElement(settings.Icon);
+            Icon = Conquera.Gui.ConqueraPalette.GetTileIcon(settings.Icon);
         }
 
         /// <summary>

@@ -25,13 +25,14 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Conquera.Gui;
 
 namespace Conquera
 {
     public class SpikesSpell : Spell
     {
-        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSpikes");
-        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSpikes");
+        private static GraphicElement mPictureGraphicElement = ConqueraPalette.SpellIconSpikes;
+        private static GraphicElement mIconGraphicElement = ConqueraPalette.SpellIconSpikes;
         private static int Damage = 50;
 
         private AnimationDelay mAttackDelay = new AnimationDelay();
