@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="material">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="params" />
+
+        <xs:element name="techniques">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="technique">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="params" />
+                    
+                    <xs:element name="passes">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="pass">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="1" ref="params" />
+                              </xs:sequence>
+                              <xs:attribute name="name" type="xs:string" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                      <xs:key name="passId">
+                        <xs:selector xpath="./pass"/>
+                        <xs:field xpath="@name"/>
+                      </xs:key>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="name" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+              
+            </xs:sequence>
+          </xs:complexType>
+          <xs:key name="techniqueId">
+            <xs:selector xpath="./technique"/>
+            <xs:field xpath="@name"/>
+          </xs:key>
+        </xs:element>
+        
+      </xs:sequence>
+      <xs:attribute name="effect" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="params">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="param">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="matrix" type="xs:string" />
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="vector4" type="xs:string" />
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="vector3" type="xs:string" />
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="vector2" type="xs:string" />
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="texture2D" type="xs:string" />
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="texture3D" type="xs:string" />
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="textureCube" type="xs:string" />
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="texture" type="xs:string" />
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="int" type="xs:int" />
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="bool" type="xs:boolean" />
+              <xs:element minOccurs="0" maxOccurs ="unbounded" name="float" type="xs:decimal" />
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+    <xs:key name="paramId">
+      <xs:selector xpath="./param"/>
+      <xs:field xpath="@name"/>
+    </xs:key>
+  </xs:element>
+</xs:schema>
