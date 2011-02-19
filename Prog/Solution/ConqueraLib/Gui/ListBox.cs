@@ -17,43 +17,43 @@
 ////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Ale.Gui;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 
-namespace Ale.Gui
+namespace Conquera.Gui
 {
-    public class AleMessageBox : Dialog
+    public class ListBox : Control
     {
-        private GraphicElement mBackground;
+    }
+
+    public class ListBoxItem : Control
+    {
         private TextElement mTextElement;
+
+        public string Text
+        {
+            get { return mTextElement.Text; }
+            set { mTextElement.Text = value; }
+        }
 
         public override System.Drawing.SizeF Size
         {
-            get { return mBackground.Size; }
+            get { return new System.Drawing.Size(30, 100); }
         }
 
-        public AleMessageBox(string text, GuiFont font, GraphicElement background, GraphicElement closeButtonDefault, GraphicElement closeButtonOver)
+        public ListBoxItem()
         {
-            mBackground = background;
-
-            mTextElement = new TextElement(300, 100, font, true, Color.White);
-            mTextElement.Text = text;
-
-            TextButton closeButton = new TextButton(closeButtonDefault, closeButtonOver, font, Color.White, "OK");
-            closeButton.Location = new Point(150, 150);
-            closeButton.Click += new EventHandler<ControlEventArgs>(closeButton_Click);
-            ChildControls.Add(closeButton);
+            mTextElement = new TextElement(ConqueraFonts.SpriteFontSmall, Color.Black);
         }
 
-        protected override void OnDrawBackground()
+        protected override void OnDrawForeground()
         {
-            mBackground.Draw(ScreenLocation);
             mTextElement.Draw(ScreenLocation);
-        }
-
-        private void closeButton_Click(object sender, ControlEventArgs e)
-        {
-            Hide();
         }
     }
 }

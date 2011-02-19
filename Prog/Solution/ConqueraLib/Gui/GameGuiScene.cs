@@ -32,9 +32,9 @@ namespace Conquera.Gui
         private MegaDebugLabel mDebugLabel = new MegaDebugLabel();
         private PlayerGoldView mPlayerGoldView = new PlayerGoldView();
         private PlayerUnitCountView mPlayerUnitCountView = new PlayerUnitCountView();
-        private TextButton mMainMenuButton;
+        private ConqueraTextButton mMainMenuButton;
         private SpellPanel mSpellPanel;
-        private TextButton mEndTurnButton;
+        private ConqueraTextButton mEndTurnButton;
         private CurrentPlayerDisplay mCurrentPlayerDisplay;
 
         public bool SidePanelsVisible
@@ -79,9 +79,7 @@ namespace Conquera.Gui
             RootControls.Add(mPlayerUnitCountView);
 
             //Main menu button.
-            mMainMenuButton = new TextButton(GuiManager.Instance.Palette.CreateGraphicElement("ShowMainMenuButtonDefault"),
-                GuiManager.Instance.Palette.CreateGraphicElement("ShowMainMenuButtonMouseOver"), GuiManager.Instance.GetGuiFont("SpriteFont1"),
-                Color.White, "Menu");
+            mMainMenuButton = new ConqueraTextButton("Menu");
             mMainMenuButton.Click += new EventHandler<ControlEventArgs>(mMainMenuButton_Click);
             RootControls.Add(mMainMenuButton);
 
@@ -91,9 +89,7 @@ namespace Conquera.Gui
             UpdateSpellPanel();
 
             //End turn button.
-            mEndTurnButton = new TextButton(GuiManager.Instance.Palette.CreateGraphicElement("EndTurnButtonDefault"),
-                GuiManager.Instance.Palette.CreateGraphicElement("EndTurnButtonMouseOver"), GuiManager.Instance.GetGuiFont("SpriteFont1"),
-                Color.White, "EndTurn");
+            mEndTurnButton = new ConqueraTextButton("EndTurn");
             mEndTurnButton.Click += new EventHandler<ControlEventArgs>(mEndTurnButton_Click);            
             RootControls.Add(mEndTurnButton);
 
@@ -239,7 +235,7 @@ namespace Conquera.Gui
 
     public class PlayerGoldView : Control
     {
-        TextElement mGoldTextElement = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFontSmall"), Color.Gold);
+        TextElement mGoldTextElement = new TextElement(ConqueraFonts.SpriteFontSmall, Color.Gold);
 
         public override System.Drawing.SizeF Size
         {
@@ -259,7 +255,7 @@ namespace Conquera.Gui
 
     public class PlayerUnitCountView : Control
     {
-        TextElement mCountTextElement = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFontSmall"), Color.Black);
+        TextElement mCountTextElement = new TextElement(ConqueraFonts.SpriteFontSmall, Color.Black);
 
         public override System.Drawing.SizeF Size
         {
@@ -281,11 +277,8 @@ namespace Conquera.Gui
     {
         private SceneManager mSceneManager;
         private GraphicElement mBackground;
-        private GraphicElement mButtonBackgroundDefault = GuiManager.Instance.Palette.CreateGraphicElement("MainMenuButtonDefault");
-        private GraphicElement mButtonBackgroundMouseOver = GuiManager.Instance.Palette.CreateGraphicElement("MainMenuButtonMouseOver");
-        private GuiFont mButtonFont = GuiManager.Instance.GetGuiFont("SpriteFont1");
-        private TextButton mQuitButton;
-        private TextButton mContinueButton;
+        private ConqueraTextButton mQuitButton;
+        private ConqueraTextButton mContinueButton;
 
         public override System.Drawing.SizeF Size
         {
@@ -295,16 +288,16 @@ namespace Conquera.Gui
         public MainMenuDialog(SceneManager sceneManager)
         {
             mSceneManager = sceneManager;
-            mBackground = GuiManager.Instance.Palette.CreateGraphicElement("MainMenuDialogBackground");
+            mBackground = ConqueraPalette.MainMenuBackground;
 
             //Quit button.
-            mQuitButton = new TextButton(mButtonBackgroundDefault, mButtonBackgroundMouseOver, mButtonFont, Color.White, "Quit");
+            mQuitButton = new ConqueraTextButton("Quit");
             mQuitButton.Location = new Point(200, 100);
             mQuitButton.Click += new EventHandler<ControlEventArgs>(mQuitButton_Click);
             ChildControls.Add(mQuitButton);
 
             //Continue button.
-            mContinueButton = new TextButton(mButtonBackgroundDefault, mButtonBackgroundMouseOver, mButtonFont, Color.White, "Continue");
+            mContinueButton = new ConqueraTextButton("Continue");
             mContinueButton.Location = new Point(200, 200);
             mContinueButton.Click += new EventHandler<ControlEventArgs>(mContinueButton_Click);
             ChildControls.Add(mContinueButton);
@@ -317,7 +310,7 @@ namespace Conquera.Gui
 
         private void mQuitButton_Click(object sender, ControlEventArgs e)
         {
-            mSceneManager.ExitApplication();
+            //mSceneManager.ExitApplication(); namiesto tohoto scene.goToMainMenu alebo take daco
         }
 
         private void mContinueButton_Click(object sender, ControlEventArgs e)
@@ -337,7 +330,7 @@ namespace Conquera.Gui
 
         public CurrentPlayerDisplay()
         {
-            mPlayerColorLabel = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFont1"), Color.Black);
+            mPlayerColorLabel = new TextElement(ConqueraFonts.SpriteFont1, Color.Black);
         }
 
         public void SetPlayer(GamePlayer player)
