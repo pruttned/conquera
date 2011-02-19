@@ -208,6 +208,11 @@ namespace Conquera
             return scene;
         }
 
+        public void ExitToMainMenu()
+        {
+            SceneManager.ActivateScene(new MainMenuScene(SceneManager, Content));
+        }
+
         public IGameSceneState GetGameSceneState(string name)
         {
             return CurrentPlayer.GetGameSceneState(name);
@@ -283,6 +288,13 @@ namespace Conquera
             cell.GameUnit = unit;
             gamePlayer.AddGameUnit(unit);
             AddSceneObject(unit);
+
+            RefreshSelectedCell();
+
+            if (SelectedUnit == unit && SelectedUnit.OwningPlayer == CurrentPlayer)
+            {
+                State = GetGameSceneState(GameSceneStates.ReadyGameUnitSelected);
+            }
 
             return unit;
         }
@@ -779,7 +791,7 @@ namespace Conquera
             }
             if (key == Microsoft.Xna.Framework.Input.Keys.Escape)
             {
-                SceneManager.ExitApplication();
+                ExitToMainMenu();
             }
             if (key == Microsoft.Xna.Framework.Input.Keys.G)
             {
