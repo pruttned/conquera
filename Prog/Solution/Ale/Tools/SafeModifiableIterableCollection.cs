@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2010 by Conquera Team
 //  Part of the Conquera Project
 //
@@ -25,11 +25,11 @@ using System.Runtime.InteropServices;
 namespace Ale.Tools
 {
     /// <summary>
-    /// Collections where each item has assigned auto-generated Id. 
-    /// Item order depends on its Id. Unused Ids are reused.
+    /// Collection that can be modified during iteration.
+    /// Removeing item sets slot to null. Its neceseary to call Tidy to remove empty slots.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class IdValueCollection<T> : IEnumerable<T> where T : class
+    internal class SafeModifiableIterableCollection<T> : IEnumerable<T> where T : class
     {
         #region Nested Types
         
@@ -44,7 +44,7 @@ namespace Ale.Tools
             /// <summary>
             /// 
             /// </summary>
-            private IdValueCollection<T> mCollection;
+            private SafeModifiableIterableCollection<T> mCollection;
             
             /// <summary>
             /// 
@@ -97,7 +97,7 @@ namespace Ale.Tools
             /// Ctor
             /// </summary>
             /// <param name="collection"></param>
-            internal Enumerator(IdValueCollection<T> collection)
+            internal Enumerator(SafeModifiableIterableCollection<T> collection)
             {
                 mCollection = collection;
                 mTraversedItemCnt = 0;
@@ -160,6 +160,8 @@ namespace Ale.Tools
         /// </summary>
         private int mItemCnt;
 
+        private bool mUntidy = false;
+
         #endregion Fields
 
         #region Properties
@@ -172,33 +174,13 @@ namespace Ale.Tools
             get { return mItemCnt; }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException">- Item doesn't exists</exception>
-        public T this[int id]
-        {
-            get
-            {
-                T item = GetItem(id);
-                if (null == item)
-                {
-                    throw new ArgumentException(string.Format("Item with id '{0}' doesn't exists", id));
-                }
-                return item;
-            }
-        }
-
         #endregion Properties
 
-        #region Methods
 
         /// <summary>
         /// 
         /// </summary>
-        public IdValueCollection()
+        public SafeModifiableIterableCollection()
         {
             mItems = new List<T>();
             mItemCnt = 0;
@@ -208,7 +190,7 @@ namespace Ale.Tools
         /// 
         /// </summary>
         /// <param name="capacity"></param>
-        public IdValueCollection(int capacity)
+        public SafeModifiableIterableCollection(int capacity)
         {
             mItems = new List<T>(capacity);
             mItemCnt = 0;
@@ -219,83 +201,48 @@ namespace Ale.Tools
         /// </summary>
         /// <param name="item"></param>
         /// <returns>Id of the item</returns>
-        public int Add(T item)
+        public void Add(T item)
         {
             if(null == item)
             {
                 throw new ArgumentNullException("item");
             }
 
-            if (mItems.Count != Count) //has free space
-            {
-                for (int i = 0; i < mItems.Count; ++i)
-                {
-                    if (null == mItems[i]) //found empty space
-                    {
-                        mItems[i] = item;
-                        mItemCnt++;
-                        return i;
-                    }
-                }
-            }
-
-            //add to end
             mItems.Add(item);
             mItemCnt++;
-
-            return mItems.Count - 1; 
         }
 
-        /// <summary>
-        /// Removes item with a given Id from the collection
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns>Removed item or null</returns>
-        public T Remove(int id)
-        {
-            if (0 > id || mItems.Count <= id)
-            {
-                return null;
-            }
-
-            T item = mItems[id];
-            mItems[id] = null;
-
-            if (null != item)
-            {
-                mItemCnt--;
-            }
-
-            return item;
-        }
-
-        /// <summary>
-        /// Gets the item with a given Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns>Item or null</returns>
-        public T GetItem(int id)
-        {
-            if (0 > id || mItems.Count <= id)
-            {
-                return null;
-            }
-
-            return mItems[id];
-        }
-
-        /// <summary>
-        /// Gets the id of a given item
-        /// </summary>
-        /// <param name="item">Can't be null</param>
-        /// <returns>Id or -1</returns>
-        public int GetItemId(T item)
+        public bool Remove(T item)
         {
             if (null == item)
             {
                 throw new ArgumentNullException("item");
-            } 
-            return mItems.IndexOf(item);
+            }
+
+            int index = mItems.IndexOf(item);
+            if (-1 < index)
+            {
+                mItems[index] = null;
+                mItemCnt--;
+                mUntidy = true;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the item 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Item or null</returns>
+        public T GetItem(int index)
+        {
+            if (0 > index || mItems.Count <= index)
+            {
+                return null;
+            }
+
+            return mItems[index];
         }
 
         /// <summary>
@@ -307,9 +254,22 @@ namespace Ale.Tools
             mItemCnt = 0;
         }
 
-        #endregion Methods
+        public void Tidy()
+        {
+            if (mUntidy)
+            {
+                //clear removed listeners
+                for (int i = mItems.Count - 1; i >= 0; --i)
+                {
+                    if (null == mItems[i])
+                    {
+                        mItems.RemoveAt(i);
+                    }
+                }
 
-        #region IEnumerable
+                mUntidy = false;
+            }
+        }
         
         /// <summary>
         /// 
@@ -329,6 +289,6 @@ namespace Ale.Tools
             return new Enumerator(this);
         }
 
-        #endregion IEnumerable
     }
 }
+

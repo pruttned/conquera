@@ -29,6 +29,7 @@ using Ale.Scene;
 using Ale.Graphics;
 using Ale.Settings;
 using Ale.Sound;
+using Ale.Tools;
 
 namespace Ale
 {
@@ -76,7 +77,7 @@ namespace Ale
         /// <summary>
         /// Frame listeners
         /// </summary>
-        private List<IFrameListener> mFrameListeners;
+        private SafeModifiableIterableCollection<IFrameListener> mFrameListeners;
 
         /// <summary>
         /// Whether was object already disposed
@@ -216,7 +217,7 @@ namespace Ale
 
             if (null == mFrameListeners)
             {
-                mFrameListeners = new List<IFrameListener>();
+                mFrameListeners = new SafeModifiableIterableCollection<IFrameListener>();
             }
             mFrameListeners.Add(frameListener);
         }
@@ -334,9 +335,9 @@ namespace Ale
             //call frame listeners
             if (null != mFrameListeners)
             {
-                for (int i = 0; i < mFrameListeners.Count; ++i)
+                foreach(var listener in  mFrameListeners)
                 {
-                    mFrameListeners[i].BeforeUpdate(mGameTime);
+                    listener.BeforeUpdate(mGameTime);
                 }
             }
 
@@ -345,12 +346,14 @@ namespace Ale
             //call frame listeners
             if (null != mFrameListeners)
             {
-                for (int i = 0; i < mFrameListeners.Count; ++i)
+                foreach (var listener in mFrameListeners)
                 {
-                    mFrameListeners[i].AfterUpdate(mGameTime);
+                    listener.AfterUpdate(mGameTime);
                 }
-            }
 
+                //clear removed listeners
+                mFrameListeners.Tidy();
+            }
         }
 
         /// <summary>
@@ -362,9 +365,9 @@ namespace Ale
             //call frame listeners
             if (null != mFrameListeners)
             {
-                for (int i = 0; i < mFrameListeners.Count; ++i)
+                foreach (var listener in mFrameListeners)
                 {
-                    mFrameListeners[i].BeforeRender(mGameTime);
+                    listener.BeforeRender(mGameTime);
                 }
             }
 
@@ -373,15 +376,18 @@ namespace Ale
             //call frame listeners
             if (null != mFrameListeners)
             {
-                for (int i = 0; i < mFrameListeners.Count; ++i)
+                foreach (var listener in mFrameListeners)
                 {
-                    mFrameListeners[i].AfterRender(mGameTime);
+                    listener.AfterRender(mGameTime);
                 }
+
+                //clear removed listeners
+                mFrameListeners.Tidy();
             }
         }
 
         #region IDisposable
-        
+
         /// <summary>
         /// Dispose
         /// </summary>

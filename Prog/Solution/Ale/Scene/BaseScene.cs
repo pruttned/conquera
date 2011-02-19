@@ -42,12 +42,18 @@ namespace Ale.Scene
         private RenderableProvider mRenderableProvider = new RenderableProvider();
         private ContentGroup mContent;
         private PostProcessEffectManager mPostProcessEffectManager;
+        private RenderTargetManager mRenderTargetManager;
 
         private List<ISceneDrawableComponent> mSceneDrawableComponents = new List<ISceneDrawableComponent>();
 
         public SceneManager SceneManager
         {
             get { return mSceneManager; }
+        }
+
+        public RenderTargetManager RenderTargetManager
+        {
+            get { return mRenderTargetManager; }
         }
 
         public ParticleSystemManager ParticleSystemManager
@@ -92,7 +98,9 @@ namespace Ale.Scene
             mSceneManager = sceneManager;
             mContent = content;
 
-            mScenePasses = CreateScenePasses(sceneManager.GraphicsDeviceManager, sceneManager.RenderTargetManager, content);
+            mRenderTargetManager = new RenderTargetManager(sceneManager.GraphicsDeviceManager);
+
+            mScenePasses = CreateScenePasses(sceneManager.GraphicsDeviceManager, mRenderTargetManager, content);
             if(null == mScenePasses ||  0 == mScenePasses.Count)
             {
                 throw new ArgumentException("No scene passes were created");
@@ -122,7 +130,7 @@ namespace Ale.Scene
             {
                 if (scenePass.IsEnabled)
                 {
-                    scenePass.Draw(mSceneManager.GraphicsDeviceManager.GraphicsDevice, mSceneManager.Renderer, gameTime, mSceneManager.RenderTargetManager);
+                    scenePass.Draw(mSceneManager.GraphicsDeviceManager.GraphicsDevice, mSceneManager.Renderer, gameTime, RenderTargetManager);
                 }
             }
             mPostProcessEffectManager.Apply(gameTime);
@@ -210,6 +218,8 @@ namespace Ale.Scene
                         scenePass.Dispose();
                     }
                     mPostProcessEffectManager.Dispose();
+
+                    mRenderTargetManager.Dispose();
                 }
                 mIsDisposed = true;
             }

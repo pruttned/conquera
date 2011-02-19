@@ -297,7 +297,6 @@ namespace Conquera
                     mShakeMagnitude = -1.0f;
                 }
             }
-
         }
 
         void IFrameListener.AfterUpdate(AleGameTime gameTime)

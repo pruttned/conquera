@@ -95,7 +95,7 @@ namespace Conquera
 
             if(null != targetCell.GameUnit)
             {
-                var missile2 = new ParticleSystemMissile(Target, Target.Position + FireBallPos, Target.Position, FireBallPsys, FireBallPsysSpeed);
+                var missile2 = new SpellParticleSystemMissile(Target, Target.Position + FireBallPos, Target.Position, FireBallPsys, FireBallPsysSpeed);
                 missile2.OnHit += new ParticleSystemMissile.OnHitHandler(missile_OnHit);
                 mMissiles.Add(missile2);
             }
@@ -104,7 +104,7 @@ namespace Conquera
             {
                 if (null != cell.GameUnit && cell.GameUnit.OwningPlayer != Caster.OwningPlayer)
                 {
-                    var missile2 = new ParticleSystemMissile(cell.GameUnit, cell.GameUnit.Position + FireBallPos, cell.GameUnit.Position, FireBallPsys, FireBallPsysSpeed);
+                    var missile2 = new SpellParticleSystemMissile(cell.GameUnit, cell.GameUnit.Position + FireBallPos, cell.GameUnit.Position, FireBallPsys, FireBallPsysSpeed);
                     missile2.OnHit += new ParticleSystemMissile.OnHitHandler(missile_OnHit);
                     mMissiles.Add(missile2);
                 }
@@ -130,8 +130,10 @@ namespace Conquera
             return true;
         }
 
-        private void missile_OnHit(ParticleSystemMissile missile, GameUnit target)
+        private void missile_OnHit(ParticleSystemMissile missile)
         {
+            var target = ((SpellParticleSystemMissile)missile).Target;
+
             target.ReceiveDamage(Damage, false);
             target.GameScene.ParticleSystemManager.CreateFireAndForgetParticleSystem(
                 target.GameScene.Content.Load<ParticleSystemDesc>(ExplosionPsys), target.Position);

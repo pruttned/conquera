@@ -19,12 +19,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Ale.Tools;
 
 namespace Ale
 {
     public class CompositeFrameListener : IFrameListener
     {
-        private List<IFrameListener> mFrameListeners;
+        private SafeModifiableIterableCollection<IFrameListener> mFrameListeners;
 
         /// <summary>
         /// Adds a new frame listener
@@ -36,7 +37,7 @@ namespace Ale
 
             if (null == mFrameListeners)
             {
-                mFrameListeners = new List<IFrameListener>();
+                mFrameListeners = new SafeModifiableIterableCollection<IFrameListener>();
             }
             mFrameListeners.Add(frameListener);
         }
@@ -65,6 +66,9 @@ namespace Ale
                 {
                     listener.BeforeUpdate(gameTime);
                 }
+
+                //clear removed listeners
+                mFrameListeners.Tidy();
             }
         }
 
@@ -76,6 +80,9 @@ namespace Ale
                 {
                     listener.AfterUpdate(gameTime);
                 }
+
+                //clear removed listeners
+                mFrameListeners.Tidy();
             }
         }
 
@@ -87,6 +94,9 @@ namespace Ale
                 {
                     listener.BeforeRender(gameTime);
                 }
+
+                //clear removed listeners
+                mFrameListeners.Tidy();
             }
         }
 
@@ -98,6 +108,9 @@ namespace Ale
                 {
                     listener.AfterRender(gameTime);
                 }
+
+                //clear removed listeners
+                mFrameListeners.Tidy();
             }
         }
 

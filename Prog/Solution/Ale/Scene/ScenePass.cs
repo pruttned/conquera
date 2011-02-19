@@ -35,7 +35,6 @@ namespace Ale.Scene
         private bool mIsDisposed = false;
         private BaseScene mScene;
         private bool mEnabled = true;
-        //private bool mC
         
         public NameId NameId
         {
@@ -77,27 +76,8 @@ namespace Ale.Scene
             if (null == camera) { throw new NullReferenceException("camera"); }
             if (null == scene) { throw new NullReferenceException("scene"); }
 
-            mNameId = nameId;
-            mCamera = camera;
-            mRenderTarget = renderTarget;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="camera"></param>
-        /// <param name="scene"></param>
-        /// <param name="renderTarget">- if null, then the content is rendered to the backbuffer</param>
-        /// <param name="backColor"></param>
-        public ScenePass(string name, BaseScene scene,  ICamera camera, AleRenderTarget renderTarget)
-        {
-            if (string.IsNullOrEmpty(name)) { throw new NullReferenceException("name"); }
-            if (null == camera) { throw new NullReferenceException("camera"); }
-            if (null == scene) { throw new NullReferenceException("scene"); }
-            
-            mNameId = name;
             mScene = scene;
+            mNameId = nameId;
             mCamera = camera;
             mRenderTarget = renderTarget;
         }
@@ -111,6 +91,13 @@ namespace Ale.Scene
             GC.SuppressFinalize(this);
         }
 
+        public virtual void Draw(GraphicsDevice graphicsDevice, Renderer renderer, AleGameTime gameTime, RenderTargetManager renderTargetManager)
+        {
+            Begin(graphicsDevice, renderer, renderTargetManager);
+            EnqueRenderableUnits(graphicsDevice, gameTime, renderer);
+            End(graphicsDevice, gameTime, renderer);
+        }
+
         protected virtual void Dispose(bool isDisposing)
         {
             if (!mIsDisposed)
@@ -119,18 +106,16 @@ namespace Ale.Scene
                 {
                     if (null != mRenderTarget)
                     {
-                        mRenderTarget.Dispose();
+                        DestroyRenderTarget(mRenderTarget);
                     }
                 }
                 mIsDisposed = true;
             }
         }
 
-        public virtual void Draw(GraphicsDevice graphicsDevice, Renderer renderer, AleGameTime gameTime, RenderTargetManager renderTargetManager)
+        protected virtual void DestroyRenderTarget(AleRenderTarget renderTarget)
         {
-            Begin(graphicsDevice, renderer, renderTargetManager);
-            EnqueRenderableUnits(graphicsDevice, gameTime, renderer);
-            End(graphicsDevice, gameTime, renderer);
+            renderTarget.Dispose();
         }
 
         protected virtual void Begin(GraphicsDevice graphicsDevice, Renderer renderer, RenderTargetManager renderTargetManager)

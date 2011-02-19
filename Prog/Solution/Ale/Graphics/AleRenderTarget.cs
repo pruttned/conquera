@@ -55,9 +55,9 @@ namespace Ale.Graphics
             get { return mGraphicsDeviceManager.GraphicsDevice; }
         }
 
-        public NameId NameId
+        public NameId Name
         {
-            get { return NameId; }
+            get { return mName; }
         }
 
         public int Width

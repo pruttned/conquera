@@ -30,11 +30,13 @@ namespace Conquera
     class ShadowScenePass : ScenePass
     {
         public static readonly string Name = "ShadowPass";
+        private RenderTargetManager mRenderTargetManager;
 
         public ShadowScenePass(ICamera mainCamera, BaseScene scene, Vector3 lightDir, Plane groundPlane, RenderTargetManager renderTargetManager, ContentGroup content)
             : base(Name, scene, new ShadowOrthoCamera(mainCamera, lightDir, groundPlane),
                 CreateRenderTarget(renderTargetManager))
         {
+            mRenderTargetManager = renderTargetManager;
         }
 
         static private AleRenderTarget CreateRenderTarget(RenderTargetManager renderTargetManager)
@@ -47,6 +49,11 @@ namespace Conquera
         {
             graphicsDevice.Clear(Color.White);
         }
+
+        protected override void DestroyRenderTarget(AleRenderTarget renderTarget)
+        {
+            mRenderTargetManager.DestroyRenderTarget(renderTarget.Name);
+        } 
     }
 
 }

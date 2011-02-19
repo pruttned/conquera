@@ -34,6 +34,16 @@ namespace Ale.Tools
 
         private T mCurrentValue;
 
+        public T StartValue
+        {
+            get { return mStartValue; }
+        }
+
+        public T EndValue
+        {
+            get { return mEndValue; }
+        }
+
         public T CurrentValue
         {
             get { return mCurrentValue; }

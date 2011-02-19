@@ -327,6 +327,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Tools\LinearAnimator.cs" />
+    <Compile Include="Tools\SafeModifiableIterableCollection.cs" />
     <Compile Include="Tools\Tracer.cs" />
     <Compile Include="Tools\NameId.cs" />
     <Compile Include="Tools\Point3D.cs" />

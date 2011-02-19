@@ -25,12 +25,13 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Ale.Scene;
 
 namespace Conquera
 {
     public class ParticleSystemMissile : IDisposable
     {
-        public delegate void OnHitHandler(ParticleSystemMissile missile, GameUnit target);
+        public delegate void OnHitHandler(ParticleSystemMissile missile);
 
         public event OnHitHandler OnHit;
 
@@ -38,17 +39,24 @@ namespace Conquera
         private ParticleSystem mParticleSystem;
         private Vector3LinearAnimator mPosAnimator = new Vector3LinearAnimator();
 
-        public GameUnit Target { get; private set; }
-        public GameScene GameScene { get { return Target.GameScene; } }
+        public OctreeScene Scene {get; private set;}
+        public Vector3 DestPos 
+        { 
+            get {return mPosAnimator.EndValue;}
+        }
+        public Vector3 SrcPos
+        { 
+            get {return mPosAnimator.StartValue;}
+        }
 
-        public ParticleSystemMissile(GameUnit target, Vector3 srcPos, Vector3 destPos, string pSysName, float speed)
+        public ParticleSystemMissile(OctreeScene scene, Vector3 srcPos, Vector3 destPos, string pSysName, float speed)
         {
-            Target = target;
-            mParticleSystem = GameScene.ParticleSystemManager.CreateParticleSystem(GameScene.Content, pSysName);
+            Scene = scene;
+            mParticleSystem = scene.ParticleSystemManager.CreateParticleSystem(Scene.Content, pSysName);
             mPosAnimator.Animate(speed, srcPos, destPos);
             mParticleSystem.Position = mPosAnimator.CurrentValue;
 
-            GameScene.Octree.AddObject(mParticleSystem);
+            Scene.Octree.AddObject(mParticleSystem);
         }
 
         /// <summary>
@@ -85,14 +93,14 @@ namespace Conquera
                     mParticleSystem.IsEnabled = false;
                     if (null != OnHit)
                     {
-                        OnHit.Invoke(this, Target);
+                        OnHit.Invoke(this);
                     }
                 }
                 else
                 {
                     if (!mParticleSystem.IsLoaded)
                     {
-                        GameScene.Octree.RemoveObject(mParticleSystem);
+                        Scene.Octree.RemoveObject(mParticleSystem);
                         return false;
                     }
                 }
@@ -101,4 +109,15 @@ namespace Conquera
         }
     }
 
+    public class SpellParticleSystemMissile : ParticleSystemMissile
+    {
+        public GameUnit Target { get; private set; }
+        public GameScene GameScene { get { return Target.GameScene; } }
+
+        public SpellParticleSystemMissile(GameUnit target, Vector3 srcPos, Vector3 destPos, string pSysName, float speed)
+            : base(target.GameScene, srcPos, destPos, pSysName, speed)
+        {
+            Target = target;
+        }
+    }
 }

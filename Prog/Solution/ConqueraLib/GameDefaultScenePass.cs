@@ -27,7 +27,7 @@ namespace Conquera
 {
     public class GameDefaultScenePass : ScenePass
     {
-        public GameDefaultScenePass(GameScene scene, ICamera mainCamera)
+        public GameDefaultScenePass(BaseScene scene, ICamera mainCamera)
             : base("Default", scene, mainCamera, null)
         {
         }
