@@ -25,6 +25,7 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Conquera.Gui;
 
 namespace Conquera
 {
@@ -32,8 +33,8 @@ namespace Conquera
     {
         private static int Damage = 50;
         private static readonly string SlayerPsys = "SlayerPsys";
-        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSlayer");
-        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconSlayer");
+        private static GraphicElement mPictureGraphicElement = ConqueraPalette.SpellIconSlayer;
+        private static GraphicElement mIconGraphicElement = ConqueraPalette.SpellIconSlayer;
 
         private AnimationDelay mAttackDelay = new AnimationDelay();
 

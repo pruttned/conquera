@@ -33,9 +33,8 @@ namespace Conquera.Gui
 
         public GameUnitInfoPanel()
         {
-            mBackground = GuiManager.Instance.Palette.CreateGraphicElement("UnitInfoPanelBackground");
-
-            mStatText = new TextElement((int)Size.Width, (int)Size.Height, GuiManager.Instance.GetGuiFont("SpriteFontSmall"), true, Color.Black);
+            mBackground = ConqueraPalette.UnitInfoPanelBackground;
+            mStatText = new TextElement((int)Size.Width, (int)Size.Height, ConqueraFonts.SpriteFontSmall, true, Color.Black);
         }
 
         public void Update(GameUnit gameUnit)

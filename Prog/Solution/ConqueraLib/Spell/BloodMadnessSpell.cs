@@ -25,6 +25,7 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Conquera.Gui;
 
 namespace Conquera
 {
@@ -46,8 +47,8 @@ namespace Conquera
             }
         }
 
-        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconBloodMadness");
-        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconBloodMadness");
+        private static GraphicElement mPictureGraphicElement = ConqueraPalette.SpellIconBloodMadness;
+        private static GraphicElement mIconGraphicElement = ConqueraPalette.SpellIconBloodMadness;
 
         private AnimationDelay mAttackDelay = new AnimationDelay();
 

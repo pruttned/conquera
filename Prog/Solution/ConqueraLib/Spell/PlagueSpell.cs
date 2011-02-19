@@ -25,13 +25,14 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Conquera.Gui;
 
 namespace Conquera
 {
     public class PlagueSpell : Spell
     {
-        private static GraphicElement mPictureGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPlague");
-        private static GraphicElement mIconGraphicElement = GuiManager.Instance.Palette.CreateGraphicElement("SpellIconPlague");
+        private static GraphicElement mPictureGraphicElement = ConqueraPalette.SpellIconPlague;
+        private static GraphicElement mIconGraphicElement = ConqueraPalette.SpellIconPlague;
         private static int FirstZoneDamage = 60;
         private static int[] RestZoneDamages = new int[] { 20, 10 };
 

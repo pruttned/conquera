@@ -31,9 +31,7 @@ namespace Ale.Gui
     public class GuiManager
     {
         public event EventHandler ScreenSizeChanged;
-
-        private Dictionary<string, GuiFont> mGuiFontCache = new Dictionary<string, GuiFont>();
-        private ContentGroup mContent;
+        
         private System.Drawing.SizeF mScreenSize;
         private MouseManager mMouseManager;
         private Control mControlUnderMouseOnLastUpdate = null;        
@@ -44,9 +42,9 @@ namespace Ale.Gui
         public static GuiManager Instance { get; private set; }
         public SpriteBatch SpriteBatch { get; private set; }
         public AleGameTime GameTime { get; private set; }
-        public Palette Palette { get; private set; }        
         public GuiScene ActiveScene { get; set; }
         public CursorInfo Cursor { get; set; }
+        public AleContentManager Content { get; private set; }
         internal DragDropInfo DragDropInfo { get; private set; }
 
         public System.Drawing.SizeF ScreenSize
@@ -77,14 +75,13 @@ namespace Ale.Gui
             }
         }
 
-        private GuiManager(GraphicsDeviceManager graphicsDeviceManager, Palette palette, ContentGroup content, MouseManager mouseManager)
+        private GuiManager(GraphicsDeviceManager graphicsDeviceManager, AleContentManager content, MouseManager mouseManager)
         {
             GraphicsDevice device = graphicsDeviceManager.GraphicsDevice;
             mGraphicsDeviceManager = graphicsDeviceManager;
+            Content = content;
             ActiveScene = new DefaultGuiScene();
             SpriteBatch = new SpriteBatch(device);
-            Palette = palette;
-            mContent= content;
             DragDropInfo = new DragDropInfo();
             ScreenSize = new System.Drawing.SizeF(device.Viewport.Width, device.Viewport.Height);
 
@@ -93,14 +90,14 @@ namespace Ale.Gui
             AppSettingsManager.Default.AppSettingsCommitted += new AppSettingsManager.CommittedHandler(Default_AppSettingsCommitted);
         }
 
-        public static void Initialize(GraphicsDeviceManager graphicsDeviceManager, Palette palette, ContentGroup content, MouseManager mouseManager)
+        public static void Initialize(GraphicsDeviceManager graphicsDeviceManager, AleContentManager content, MouseManager mouseManager)
         {
             if (Instance != null)
             {
                 throw new InvalidOperationException("Already initialized.");
             }
 
-            Instance = new GuiManager(graphicsDeviceManager, palette, content, mouseManager);
+            Instance = new GuiManager(graphicsDeviceManager, content, mouseManager);
         }
 
         public void Draw(AleGameTime gameTime)
@@ -123,17 +120,6 @@ namespace Ale.Gui
             }
 
             SpriteBatch.End();
-        }
-
-        public GuiFont GetGuiFont(string name)
-        {
-            GuiFont guiFont;
-            if (!mGuiFontCache.TryGetValue(name, out guiFont))
-            {
-                guiFont = new GuiFont(mContent.Load<SpriteFont>(name));
-                mGuiFontCache.Add(name, guiFont);
-            }
-            return guiFont;
         }
 
         public void Update(AleGameTime gameTime)

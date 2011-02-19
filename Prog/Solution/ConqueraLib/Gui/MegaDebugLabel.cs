@@ -38,7 +38,7 @@ namespace Conquera.Gui
 
         public MegaDebugLabel()
         {
-            mTextElement = new TextElement(800, 600, GuiManager.Instance.GetGuiFont("SpriteFont1"), true, Color.White);
+            mTextElement = new TextElement(800, 600, ConqueraFonts.SpriteFont1, true, Color.White);
             Text = "Praise the Emperor! I am visible!";
         }
 

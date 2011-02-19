@@ -23,14 +23,13 @@ namespace Conquera.Gui
 {
     public class CastleInfoView : TileInfoView
     {
-        private GraphicButton mBuyUnitButton;
+        private ConqueraTextButton mBuyUnitButton;
         private HexCell mCell = null;
 
         public CastleInfoView()
         {
-            mBuyUnitButton = new GraphicButton(GuiManager.Instance.Palette.CreateGraphicElement("CastleBuyUnitDefault"),
-                                                             GuiManager.Instance.Palette.CreateGraphicElement("CastleBuyUnitMouseOver"));
-            mBuyUnitButton.Location = GuiManager.Instance.Palette.CreateRectangle("CastleBuyUnitButton").Location;
+            mBuyUnitButton = new ConqueraTextButton("Buy1");
+            mBuyUnitButton.Location = ConqueraPalette.CastleBuyUnit1ButtonLocation;
             mBuyUnitButton.Click += new EventHandler<ControlEventArgs>(mBuyUnitButton_Click);
             ChildControls.Add(mBuyUnitButton);
         }
