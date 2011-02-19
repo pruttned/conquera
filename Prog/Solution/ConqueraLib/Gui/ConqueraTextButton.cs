@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2010 by Conquera Team
 //  Part of the Conquera Project
 //
@@ -16,15 +16,16 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////
 
-
 using Ale.Gui;
+using Microsoft.Xna.Framework.Graphics;
+
 namespace Conquera.Gui
 {
-    public static class AlCursors
+    public class ConqueraTextButton : TextButton
     {
-        public static readonly CursorInfo Default = new CursorInfo(ConqueraPalette.CursorDefault, ConqueraPalette.CursorDefaultHotSpot);
-        public static readonly CursorInfo Attack = new CursorInfo(ConqueraPalette.CursorAttack, ConqueraPalette.CursorAttackHotSpot);
-        public static readonly CursorInfo Move = new CursorInfo(ConqueraPalette.CursorMove, ConqueraPalette.CursorMoveHotSpot);
-        public static readonly CursorInfo MoveDisabled = new CursorInfo(ConqueraPalette.CursorMoveDisabled, ConqueraPalette.CursorMoveDisabledHotSpot);
+        public ConqueraTextButton(string text)
+            :base(ConqueraPalette.TextButtonDefault, ConqueraPalette.TextButtonOver, ConqueraFonts.SpriteFont1, Color.White, text)
+        {
+        }
     }
 }

@@ -75,10 +75,10 @@ namespace Conquera.Gui
             mSpellView.Click += new EventHandler<ControlEventArgs>(mSpellView_Click);
             ChildControls.Add(mSpellView);
 
-            mCountLabel = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFontSmall"), Color.White);
+            mCountLabel = new TextElement(ConqueraFonts.SpriteFontSmall, Color.White);
             mCountLabelContainer = new GraphicElementContainer(mCountLabel, Point.Zero);
 
-            TextElement isActiveLabel = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFontSmall"), Color.White);
+            TextElement isActiveLabel = new TextElement(ConqueraFonts.SpriteFontSmall, Color.White);
             isActiveLabel.Text = "[A]";
             mIsActiveLabelContainer = new GraphicElementContainer(isActiveLabel, new Point(30, 30));
 

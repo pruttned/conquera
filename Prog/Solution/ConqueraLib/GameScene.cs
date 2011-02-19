@@ -465,7 +465,7 @@ namespace Conquera
 
         public virtual void OnVictory(GamePlayer player)
         {
-            mVictoryMessageBox = new AleMessageBox(string.Format("Player {0} has won", player.Color.ToString()));
+            mVictoryMessageBox = new ConqueraMessageBox(string.Format("Player {0} has won", player.Color.ToString()));
             mVictoryMessageBox.Closed += new EventHandler(msg_Closed);
             mVictoryMessageBox.Show(true);
         }

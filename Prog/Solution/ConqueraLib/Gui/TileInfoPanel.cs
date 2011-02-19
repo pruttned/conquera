@@ -28,8 +28,7 @@ namespace Conquera.Gui
     {
         private TileInfoView mDefaultTileInfoView = new TileInfoView();
         private Dictionary<Type, TileInfoView> mDerivedTileInfoViews = new Dictionary<Type, TileInfoView>();
-        private GraphicElement mBackground;
-        private Rectangle mTileInfoViewRectangle;
+        private GraphicElement mBackground;        
 
         public override System.Drawing.SizeF Size
         {
@@ -38,8 +37,7 @@ namespace Conquera.Gui
 
         public TileInfoPanel()
         {
-            mBackground = GuiManager.Instance.Palette.CreateGraphicElement("TileInfoPanelBackground");
-            mTileInfoViewRectangle = GuiManager.Instance.Palette.CreateRectangle("TileInfoViewBounds");
+            mBackground = ConqueraPalette.TileInfoPanelBackground;            
 
             InitializeView(mDefaultTileInfoView);
             RegisterDerivedView(typeof(SpellTowerTileDesc), new SpellTowerInfoView());
@@ -71,8 +69,8 @@ namespace Conquera.Gui
 
         private void InitializeView(TileInfoView view)
         {
-            view.Location = mTileInfoViewRectangle.Location;
-            view.SetSize(new System.Drawing.SizeF(mTileInfoViewRectangle.Width, mTileInfoViewRectangle.Height));
+            view.Location = ConqueraPalette.TileInfoViewLocation;
+            view.SetSize(ConqueraPalette.TileInfoViewSize);
         }
     }
 }

@@ -295,8 +295,8 @@ namespace Ale
                 BoundingBoxRenderable.Init(GraphicsDevice, Content.DefaultContentGroup);
 
                 mSceneManager = CreateSceneManager(GraphicsDeviceManager, null != mRenderControl ? mRenderControl : Control.FromHandle(mGame.Window.Handle));
-                Ale.Gui.GuiManager.Initialize(GraphicsDeviceManager, Content.Load<Ale.Gui.Palette>(GuiPaletteName), Content.DefaultContentGroup, SceneManager.MouseManager);
-
+                Ale.Gui.GuiManager.Initialize(GraphicsDeviceManager, Content, SceneManager.MouseManager);
+                
                 if (mRenderControl == null)
                 {
                     Ale.Gui.GuiManager.Instance.Cursor = DefaultCursor;

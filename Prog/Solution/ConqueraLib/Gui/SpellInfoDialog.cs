@@ -39,15 +39,15 @@ namespace Conquera.Gui
 
         public SpellInfoDialog()
         {
-            mBackground = GuiManager.Instance.Palette.CreateGraphicElement("SpellInfoDialogBackground");
+            mBackground = ConqueraPalette.SpellInfoDialogBackground;
 
-            TextElement displayNameLabel = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFont1"), Color.White);
+            TextElement displayNameLabel = new TextElement(ConqueraFonts.SpriteFont1, Color.White);
             mDisplayNameContainer = new GraphicElementContainer(displayNameLabel, Point.Zero);            
 
             mIconContainer = new GraphicElementContainer(null, new Point(0, 40));
             mPictureContainer = new GraphicElementContainer(null, new Point(0, 110));
 
-            TextElement descriptionLabel = new TextElement(GuiManager.Instance.GetGuiFont("SpriteFont1"), Color.Yellow);
+            TextElement descriptionLabel = new TextElement(ConqueraFonts.SpriteFont1, Color.Yellow);
             descriptionLabel.Warp = true;
             descriptionLabel.AutoSize = false;
             descriptionLabel.Width = 200;
