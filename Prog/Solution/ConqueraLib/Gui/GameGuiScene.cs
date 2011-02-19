@@ -211,7 +211,7 @@ namespace Conquera.Gui
 
         private void mMainMenuButton_Click(object sender, ControlEventArgs e)
         {
-            MainMenuDialog dialog = new MainMenuDialog(mGameScene.SceneManager);
+            MainMenuDialog dialog = new MainMenuDialog(mGameScene);
             dialog.Show(true);
         }
 
@@ -279,19 +279,20 @@ namespace Conquera.Gui
         private GraphicElement mBackground;
         private ConqueraTextButton mQuitButton;
         private ConqueraTextButton mContinueButton;
+        private GameScene mGameScene;
 
         public override System.Drawing.SizeF Size
         {
             get { return mBackground.Size; }
         }
 
-        public MainMenuDialog(SceneManager sceneManager)
+        public MainMenuDialog(GameScene gameScene)
         {
-            mSceneManager = sceneManager;
+            mGameScene = gameScene;
             mBackground = ConqueraPalette.MainMenuBackground;
 
             //Quit button.
-            mQuitButton = new ConqueraTextButton("Quit");
+            mQuitButton = new ConqueraTextButton("ToMainMenu");
             mQuitButton.Location = new Point(200, 100);
             mQuitButton.Click += new EventHandler<ControlEventArgs>(mQuitButton_Click);
             ChildControls.Add(mQuitButton);
@@ -310,12 +311,12 @@ namespace Conquera.Gui
 
         private void mQuitButton_Click(object sender, ControlEventArgs e)
         {
-            //mSceneManager.ExitApplication(); namiesto tohoto scene.goToMainMenu alebo take daco
+            mGameScene.ExitToMainMenu();
         }
 
         private void mContinueButton_Click(object sender, ControlEventArgs e)
         {
-            Hide(); //todo if not in game, load last save
+            Hide();
         }
     }    
 
