@@ -18,42 +18,179 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Ale.Gui;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Conquera.Gui
 {
     public class ListBox : Control
     {
-    }
-
-    public class ListBoxItem : Control
-    {
-        private TextElement mTextElement;
-
-        public string Text
+        public class SelectedItemChangedEventArgs : EventArgs
         {
-            get { return mTextElement.Text; }
-            set { mTextElement.Text = value; }
+            public string Item { get; private set; }
+
+            public SelectedItemChangedEventArgs(string item)
+            {
+                Item = item;
+            }
         }
+
+        public event EventHandler<SelectedItemChangedEventArgs> SelectedItemChanged;
+
+        private TextElement mItemsTextElement;
+        private GraphicElementContainer mItemsContainer;
+        private IList<string> mItems;
+        private GraphicButton mNextPageButton;
+        private GraphicButton mPreviousPageButton;
+        private int mMaxItemLength;
+        private int mCurrentPageNumber = 0;
+        private int mMaxItemsPerPage;
+        private int mPageCount;
+        private string mSelectedItem = null;
+        private int mSelectedItemIndex = -1;
 
         public override System.Drawing.SizeF Size
         {
-            get { return new System.Drawing.Size(30, 100); }
+            get { return ConqueraPalette.ListBoxBackground.Size; }
         }
 
-        public ListBoxItem()
+        public string SelectedItem
         {
-            mTextElement = new TextElement(ConqueraFonts.SpriteFontSmall, Color.Black);
+            get { return mSelectedItem; }
+            private set
+            {
+                if (mSelectedItem != value)
+                {
+                    mSelectedItem = value;
+
+                    if (SelectedItemChanged != null)
+                    {
+                        SelectedItemChanged(this, new SelectedItemChangedEventArgs(mSelectedItem));
+                    }
+                }
+            }
+        }
+
+        public ListBox(IList<string> items)
+        {
+            Rectangle itemsRectangle = ConqueraPalette.ListBoxItemsRectangle;
+            mItemsTextElement = new TextElement(itemsRectangle.Width, itemsRectangle.Height, ConqueraFonts.SpriteFont1, true, Color.White);
+            mItemsContainer = new GraphicElementContainer(mItemsTextElement, itemsRectangle.Location);            
+            
+            mItems = items;
+            mMaxItemLength = ConqueraPalette.ListBoxItemsRectangle.Width / mItemsTextElement.Font.AverageCharWidth;
+            mMaxItemsPerPage = (ConqueraPalette.ListBoxItemsRectangle.Height - mItemsTextElement.Font.FirstLineMargin) / mItemsTextElement.Font.InnerFont.LineSpacing;
+            LoadItemsToTextElement();
+            mPageCount = (int)Math.Ceiling((double)mItemsTextElement.LineCount / (double)mMaxItemsPerPage);
+
+            mNextPageButton = new GraphicButton(ConqueraPalette.ListBoxNextPageButtonDefault, ConqueraPalette.ListBoxNextPageButtonOver, ConqueraPalette.ListBoxNextPageButtonDisabled);
+            mPreviousPageButton = new GraphicButton(ConqueraPalette.ListBoxPreviousPageButtonDefault, ConqueraPalette.ListBoxPreviousPageButtonOver, ConqueraPalette.ListBoxPreviousPageButtonDisabled);
+            mNextPageButton.Location = ConqueraPalette.ListBoxNextPageButtonLocation;
+            mPreviousPageButton.Location = ConqueraPalette.ListBoxPreviousPageButtonLocation;
+            mNextPageButton.Click += new EventHandler<ControlEventArgs>(mNextPageButton_Click);
+            mPreviousPageButton.Click += new EventHandler<ControlEventArgs>(mPreviousPageButton_Click);
+            UpdatePageButtonsHitTest();
+            ChildControls.Add(mNextPageButton);
+            ChildControls.Add(mPreviousPageButton);
+
+            MouseDown += new EventHandler<MouseEventArgs>(ListBox_MouseDown);
+        }
+
+        protected override void OnDrawBackground()
+        {
+            ConqueraPalette.ListBoxBackground.Draw(ScreenLocation);
         }
 
         protected override void OnDrawForeground()
         {
-            mTextElement.Draw(ScreenLocation);
+            //Selected item.
+            if (mSelectedItemIndex != -1 && mSelectedItemIndex >= mItemsTextElement.StartLine && mSelectedItemIndex <= mItemsTextElement.LastVisibleLine)
+            {
+                ConqueraPalette.ListBoxSelectedItem.Draw(GetItemScreenLocation(mSelectedItemIndex));
+            }
+
+            //Item under mouse.
+            int itemUnderMouseIndex = GetItemIndexAtPoint(PointToClient(GuiManager.Instance.MouseManager.CursorPosition));
+            if (itemUnderMouseIndex != -1 && itemUnderMouseIndex != mSelectedItemIndex)
+            {
+                ConqueraPalette.ListBoxOverItem.Draw(GetItemScreenLocation(itemUnderMouseIndex));
+            }
+
+            //Items.
+            mItemsContainer.Draw(this);
+        }
+
+        private void LoadItemsToTextElement()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (string item in mItems)
+            {
+                if (item.Length > mMaxItemLength)
+                {
+                    builder.AppendLine(string.Format("{0}...", item.Substring(0, mMaxItemLength - 3)));
+                }
+                else
+                {
+                    builder.AppendLine(item);
+                }
+            }
+            mItemsTextElement.Text = builder.ToString();
+        }
+
+        private void mNextPageButton_Click(object sender, ControlEventArgs e)
+        {
+            mItemsTextElement.StartLine = mItemsTextElement.LastVisibleLine + 1;
+            mCurrentPageNumber++;
+            UpdatePageButtonsHitTest();
+        }
+
+        private void mPreviousPageButton_Click(object sender, ControlEventArgs e)
+        {
+            mItemsTextElement.StartLine = mItemsTextElement.StartLine - mMaxItemsPerPage;
+            mCurrentPageNumber--;
+            UpdatePageButtonsHitTest();
+        }
+
+        private void UpdatePageButtonsHitTest()
+        {
+            mNextPageButton.IsHitTestEnabled = mItemsTextElement.LastVisibleLine + 1 < mItemsTextElement.LineCount;
+            mPreviousPageButton.IsHitTestEnabled = mItemsTextElement.StartLine > 0;
+        }
+
+        private void ListBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            int itemIndex = GetItemIndexAtPoint(e.Location);
+            if (itemIndex != -1)
+            {
+                mSelectedItemIndex = itemIndex;
+                SelectedItem = mItems[mSelectedItemIndex];
+            }
+        }
+
+        private int GetItemIndexAtPoint(Point point) //point relative to this control
+        {
+            if (point.X >= ConqueraPalette.ListBoxItemsRectangle.Left && point.X <= ConqueraPalette.ListBoxItemsRectangle.Right &&
+                point.Y >= ConqueraPalette.ListBoxItemsRectangle.Top && point.Y <= ConqueraPalette.ListBoxItemsRectangle.Bottom)
+            {
+                int yInTextElement = point.Y - ConqueraPalette.ListBoxItemsRectangle.Top;
+                int itemIndex = mItemsTextElement.StartLine + (yInTextElement - mItemsTextElement.Font.FirstLineMargin) / mItemsTextElement.Font.InnerFont.LineSpacing;
+
+                if (itemIndex < mItemsTextElement.LineCount)
+                {
+                    return itemIndex;
+                }
+            }
+            return -1;
+        }
+
+        private Point GetItemScreenLocation(int itemIndex) //itemIndex must be a valid index of an item - there is no check
+        {
+            return new Point(ScreenLocation.X + ConqueraPalette.ListBoxItemsRectangle.X,
+                             ScreenLocation.Y + ConqueraPalette.ListBoxItemsRectangle.Y + mItemsTextElement.Font.FirstLineMargin +
+                                (itemIndex - mItemsTextElement.StartLine) * mItemsTextElement.Font.InnerFont.LineSpacing);
         }
     }
 }

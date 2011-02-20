@@ -24,7 +24,8 @@ namespace Conquera.Gui
     public class ConqueraTextButton : TextButton
     {
         public ConqueraTextButton(string text)
-            :base(ConqueraPalette.TextButtonDefault, ConqueraPalette.TextButtonOver, ConqueraFonts.SpriteFont1, Color.White, text)
+            :base(ConqueraPalette.TextButtonDefault, ConqueraPalette.TextButtonOver, ConqueraPalette.TextButtonDisabled, ConqueraFonts.SpriteFont1, 
+            Color.White, text)
         {
         }
     }

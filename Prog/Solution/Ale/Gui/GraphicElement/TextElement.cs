@@ -163,7 +163,7 @@ namespace Ale.Gui
 
                     if (AutoSize)
                     {
-                        SetHeight(Font.LineHeight);
+                        SetHeight(Font.FirstLineHeight);
                     }
                 }
             }
@@ -193,7 +193,7 @@ namespace Ale.Gui
                     if (AutoSize)
                     {
                         RefreshDrawSourceText(); //also sets 'Width'
-                        SetHeight(Font.LineHeight);
+                        SetHeight(Font.FirstLineHeight);
                     }
                 }
             }
@@ -257,7 +257,7 @@ namespace Ale.Gui
         {
             get
             {
-                return Math.Min(LineCount - 1, Height / Font.LineHeight + StartLine - 1);
+                return Math.Min(LineCount - 1, (Height - Font.FirstLineMargin) / Font.InnerFont.LineSpacing + StartLine - 1);
             }
         }
 

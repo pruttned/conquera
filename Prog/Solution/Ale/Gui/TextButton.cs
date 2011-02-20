@@ -32,7 +32,13 @@ namespace Ale.Gui
         }
 
         public TextButton(GraphicElement defaultGraphicElement, GraphicElement mouseOverGraphicElement, GuiFont font, Color textColor, string text)
-            : base(defaultGraphicElement, mouseOverGraphicElement)
+            : this(defaultGraphicElement, mouseOverGraphicElement, null, font, textColor, text)
+        {
+        }
+
+        public TextButton(GraphicElement defaultGraphicElement, GraphicElement mouseOverGraphicElement, GraphicElement disabledGraphicElement,
+            GuiFont font, Color textColor, string text)
+            : base(defaultGraphicElement, mouseOverGraphicElement, disabledGraphicElement)
         {
             mTextElement = new TextElement(font, textColor);
             mTextElement.Text = text;
