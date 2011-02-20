@@ -28,7 +28,7 @@ namespace Ale.Gui
         private int mMaxCharWidth;
         private int mAverageCharWidth;
         private int mSpaceWidth;
-        private int mLineHeight;
+        private int mFirstLineHeight;
 
         public SpriteFont InnerFont
         {
@@ -50,10 +50,12 @@ namespace Ale.Gui
             get { return mSpaceWidth; }
         }
 
-        public int LineHeight
+        public int FirstLineHeight
         {
-            get { return mLineHeight; }
+            get { return mFirstLineHeight; }
         }
+
+        public int FirstLineMargin { get; private set; } //first line has larger height than others - this is that delta
 
         public GuiFont(SpriteFont innerFont)
         {
@@ -61,7 +63,8 @@ namespace Ale.Gui
 
             Vector2 spaceSize = InnerFont.MeasureString(" ");
             mSpaceWidth = (int)spaceSize.X;
-            mLineHeight = (int)spaceSize.Y;
+            mFirstLineHeight = (int)spaceSize.Y;
+            FirstLineMargin = mFirstLineHeight - InnerFont.LineSpacing;
 
             int charWidth;
             mAverageCharWidth = 0;
