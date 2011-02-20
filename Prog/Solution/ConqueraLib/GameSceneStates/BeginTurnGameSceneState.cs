@@ -35,6 +35,7 @@ namespace Conquera
 
         public void OnStart()
         {
+            mScene.Show3dCursor = false;
         }
 
         public void OnEnd()

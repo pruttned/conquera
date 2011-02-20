@@ -50,6 +50,7 @@ namespace Conquera
 
         public void OnStart()
         {
+            mScene.Show3dCursor = true;
             if (null == SelectedUnit) //hotfix
             {
                 mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
