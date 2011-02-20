@@ -58,6 +58,8 @@ namespace Conquera
         private GraphicModel mCursor3dCellSel;
         private MovementArrow mMovementArrow;
 
+        private bool mShow3dCursor = true;
+
         private HexCell mSelectedCell = null;
 
         SoundEmitter mSoundEmitter = new SoundEmitter();
@@ -75,6 +77,16 @@ namespace Conquera
         public string Name 
         {
             get { return mSettings.Name; }
+        }
+
+        public bool Show3dCursor
+        {
+            get { return mShow3dCursor; }
+            set 
+            {
+                mShow3dCursor = value;
+                mCursor3d.IsVisible = mShow3dCursor; 
+            }
         }
 
         public GameSceneContextState GameSceneContextState { get; private set; }
@@ -390,7 +402,10 @@ namespace Conquera
             {
                 Point index = cellUnderCur.Index;
                 mCursor3d.Position = cellUnderCur.CenterPos;
-                mCursor3d.IsVisible = true;
+                if (Show3dCursor)
+                {
+                    mCursor3d.IsVisible = true;
+                }
             }
             else
             {

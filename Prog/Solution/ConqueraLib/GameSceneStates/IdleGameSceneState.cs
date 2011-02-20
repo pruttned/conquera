@@ -39,6 +39,7 @@ namespace Conquera
 
         public void OnStart()
         {
+            mScene.Show3dCursor = true;
             if (IsSelectedUnitReady())
             {
                 mScene.State = mScene.GetGameSceneState(GameSceneStates.ReadyGameUnitSelected);

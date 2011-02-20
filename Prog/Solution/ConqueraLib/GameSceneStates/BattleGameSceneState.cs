@@ -35,6 +35,7 @@ namespace Conquera
 
         public void OnStart()
         {
+            mScene.Show3dCursor = false;
             if (null == mScene.SelectedUnit)
             {
                 mScene.State = mScene.GetGameSceneState(GameSceneStates.VictoryEvaluation);
