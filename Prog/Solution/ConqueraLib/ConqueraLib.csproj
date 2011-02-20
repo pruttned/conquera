@@ -136,6 +136,7 @@
     <Compile Include="HexTerrainTileDesc.cs" />
     <Compile Include="HexTerrainTileDescLoader.cs" />
     <Compile Include="HexTerrainTileSettings.cs" />
+    <Compile Include="HotseatGameScene.cs" />
     <Compile Include="MainMenuScene.cs" />
     <Compile Include="MovementAreaRenderable.cs" />
     <Compile Include="MovementArrow.cs" />

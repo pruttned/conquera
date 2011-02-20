@@ -35,7 +35,7 @@ using Ale;
 
 namespace Conquera
 {
-    public class GameScene : OctreeScene
+    public abstract class GameScene : OctreeScene
     {
         //TODO !!! Doplnit co treba do Dispose
         
@@ -72,7 +72,10 @@ namespace Conquera
 
         private MovementAreaRenderable mMovementAreaRenderable;
 
-        public string Name { get; private set; }
+        public string Name 
+        {
+            get { return mSettings.Name; }
+        }
 
         public GameSceneContextState GameSceneContextState { get; private set; }
 
@@ -162,27 +165,50 @@ namespace Conquera
 
         public Viewport Viewport { get; private set; }
 
+        /// <summary>
+        /// For map folder name and saves folder name
+        /// </summary>
+        public abstract string GameType { get; }
+
+
+
         public GameScene(string name, SceneManager sceneManager, int width, int height, string defaultTile, ContentGroup content)
             : base(sceneManager, content, GetBoundsFromSize(width, height))
         {
-            Name = name;
 
             Terrain = new HexTerrain(width, height, defaultTile, this);
-            mSettings = new GameSceneSettings();
+            mSettings = CreateGameSettings();
+            mSettings.Name = name;
             GameSceneContextState = new GameSceneContextState();
             GameSceneContextState.GameMap = name;
 
-            GameSceneContextState.Players.Add(new HumanPlayer(Color.Blue.ToVector3()));
-            GameSceneContextState.Players.Add(new HumanPlayer(Color.Red.ToVector3()));
-            GameSceneContextState.Players[0].Gold = 1000;
-            GameSceneContextState.Players[1].Gold = 1000;
+            CreatePlayers();
 
             Init();
         }
 
-        public static GameScene Load(string mapName, SceneManager sceneManager, ContentGroup content)
+        public static IList<string> QueryMapFiles(string gameType, ContentGroup content)
         {
-            string mapFile = GetMapFileName(content, mapName);
+            string mapDir = GetMapDirName(content, gameType);
+            if(!Directory.Exists(mapDir))
+            {
+                return new string[0];
+            }
+            List<string> maps = new List<string>();
+            foreach (string file in Directory.GetFiles(mapDir, "*.map"))
+            {
+                // Directory.GetFiles will return all files whose ext starts with "map"
+                if (string.Equals(Path.GetExtension(file), ".map", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    maps.Add(Path.GetFileNameWithoutExtension(file));
+                }
+            }
+            return maps;
+        }
+
+        public static GameScene Load(string mapName, string gameType, SceneManager sceneManager, ContentGroup content)
+        {
+            string mapFile = GetMapFileName(content, mapName, gameType);
 
             if (!File.Exists(mapFile))
             {
@@ -202,7 +228,7 @@ namespace Conquera
                 var terrain = ormManager.LoadObject<HexTerrain>(settings.TerrainId);
                 var gameSceneState = ormManager.LoadObject<GameSceneContextState>("Key=1");
 
-                scene = new GameScene(sceneManager, content, ormManager, settings, terrain, gameSceneState);
+                scene = settings.CreateScene(sceneManager, content, ormManager, settings, terrain, gameSceneState);
             }
 
             return scene;
@@ -218,7 +244,7 @@ namespace Conquera
             return CurrentPlayer.GetGameSceneState(name);
         }
 
-        public void Save()
+        public void SaveMap()
         {
             string mapDir = GetMapDirName();
             string mapFile = GetMapFileName();
@@ -239,32 +265,34 @@ namespace Conquera
                 {
                     mSettings.TerrainId = ormManager.SaveObject(Terrain);
                     ormManager.SaveObject(mSettings);
-                    ormManager.SaveObject(GameSceneContextState);
 
-
-                    // cells ownership
-                    Dictionary<GamePlayer, byte> playerNums = new Dictionary<GamePlayer, byte>();
-                    for (byte i = 0; i < GameSceneContextState.Players.Count; ++i)
-                    {
-                        playerNums.Add(GameSceneContextState.Players[i], i);
-                    }
-
-                    byte[] data = new byte[Terrain.Width * Terrain.Height];
-                    int k = 0;
-                    for (int i = 0; i < Terrain.Width; ++i)
-                    {
-                        for (int j = 0; j < Terrain.Height; ++j)
-                        {
-                            var player = mCells[i, j].OwningPlayer;
-                            data[k++] = (null != player ? playerNums[player] : (byte)255);
-                        }
-                    }
-
-                    ormManager.SetBlobData("CellsOwnership", data);
+                    SaveState(ormManager);
 
                     transaction.Commit();
                 }
             }
+        }
+
+        public string SaveGame()
+        {
+            string dateTime = DateTime.Now.ToString("MM-dd-yy_HH-mm-ss");
+            string dir = Path.Combine(MainSettings.Instance.UserDir, string.Format("Saves\\{0}", GameType));
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            string saveFile = Path.Combine(dir, string.Format("{0}_{1}.sav", Name, dateTime));
+            using (OrmManager ormManager = new OrmManager(OrmManager.CreateDefaultConnectionString(saveFile)))
+            {
+                using (SofTransaction transaction = ormManager.BeginTransaction())
+                {
+                    SaveState(ormManager);
+
+                    transaction.Commit();
+                }
+            }
+            return saveFile;
         }
 
         public GameUnit AddGameUnit(GamePlayer gamePlayer, string desc, Point index)
@@ -508,6 +536,9 @@ namespace Conquera
             SceneManager.ExitApplication();
         }
 
+        protected abstract void CreatePlayers();
+        protected abstract GameSceneSettings CreateGameSettings();
+
         protected internal virtual void HexCellTileChanged(HexCell tile, HexTerrainTileDesc oldDesc)
         {
         }
@@ -575,14 +606,12 @@ namespace Conquera
             GuiManager.Instance.ActiveScene = mGuiScene;
         }
 
-        private GameScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState)
+        protected GameScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState)
             : base(sceneManager, content, GetBoundsFromSize(terrain.Width, terrain.Height))
         {
             mSettings = settings;
             Terrain = terrain;
             GameSceneContextState = gameSceneState;
-
-            Name = gameSceneState.GameMap;
 
             terrain.InitAfterLoad(this, ormManager);
 
@@ -807,7 +836,7 @@ namespace Conquera
             }
             if (key == Microsoft.Xna.Framework.Input.Keys.F6)
             {
-                Save();
+                SaveMap();
             }
             if (key == Microsoft.Xna.Framework.Input.Keys.F1)
             {
@@ -880,23 +909,23 @@ namespace Conquera
 
         private string GetMapDirName()
         {
-            return GetMapDirName(Content);
+            return GetMapDirName(Content, GameType);
         }
 
         private string GetMapFileName()
         {
-            return GetMapFileName(Content, Name);
+            return GetMapFileName(Content, Name, GameType);
         }
 
-        private static string GetMapFileName(ContentGroup content, string mapName)
+        private static string GetMapFileName(ContentGroup content, string mapName, string gameType)
         {
-            return Path.Combine(GetMapDirName(content), mapName + ".map");
+            return Path.Combine(GetMapDirName(content, gameType), mapName + ".map");
         }
 
-        private static string GetMapDirName(ContentGroup content)
+        private static string GetMapDirName(ContentGroup content, string gameType)
         {
             string modFile = content.ParentContentManager.ModFile;
-            return Path.Combine(Path.Combine(Path.GetDirectoryName(modFile), Path.GetFileNameWithoutExtension(modFile)), "Maps");
+            return Path.Combine(Path.Combine(Path.GetDirectoryName(modFile), Path.GetFileNameWithoutExtension(modFile)), string.Format("Maps\\{0}", gameType));
         }
 
         private void Init()
@@ -981,6 +1010,31 @@ namespace Conquera
                     mGameSettings = ((GameSettings)settings);
                 }
             }
+        }
+
+        private void SaveState(OrmManager ormManager)
+        {
+            ormManager.SaveObject(GameSceneContextState);
+
+            // cells ownership
+            Dictionary<GamePlayer, byte> playerNums = new Dictionary<GamePlayer, byte>();
+            for (byte i = 0; i < GameSceneContextState.Players.Count; ++i)
+            {
+                playerNums.Add(GameSceneContextState.Players[i], i);
+            }
+
+            byte[] data = new byte[Terrain.Width * Terrain.Height];
+            int k = 0;
+            for (int i = 0; i < Terrain.Width; ++i)
+            {
+                for (int j = 0; j < Terrain.Height; ++j)
+                {
+                    var player = mCells[i, j].OwningPlayer;
+                    data[k++] = (null != player ? playerNums[player] : (byte)255);
+                }
+            }
+
+            ormManager.SetBlobData("CellsOwnership", data);
         }
     }
 

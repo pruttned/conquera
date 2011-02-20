@@ -21,12 +21,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SimpleOrmFramework;
+using Ale.Content;
+using Ale.Scene;
 
 namespace Conquera
 {
     [DataObject(MaxCachedCnt = 0)]
-    internal class GameSceneSettings : BaseDataObject
+    public abstract class GameSceneSettings : BaseDataObject
     {
+        [DataProperty(NotNull = true)]
+        public string Name { get; set; }
+
         [DataProperty(NotNull = true)]
         public long TerrainId { get; set; }
 
@@ -39,6 +44,17 @@ namespace Conquera
         public GameSceneSettings()
         {
             Key = 1;
+        }
+
+        public abstract GameScene CreateScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState);
+    }
+
+    [DataObject(MaxCachedCnt = 0)]
+    public class HotseatGameSceneSettings : GameSceneSettings
+    {
+        public override GameScene CreateScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState)
+        {
+            return new HotseatGameScene(sceneManager, content, ormManager, settings, terrain, gameSceneState);
         }
     }
 }
