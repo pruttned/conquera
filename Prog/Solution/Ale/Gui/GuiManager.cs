@@ -32,8 +32,7 @@ namespace Ale.Gui
     {
         public event EventHandler ScreenSizeChanged;
         
-        private System.Drawing.SizeF mScreenSize;
-        private MouseManager mMouseManager;
+        private System.Drawing.SizeF mScreenSize;        
         private Control mControlUnderMouseOnLastUpdate = null;        
         private Control mMouseDownControl = null;
         private GraphicsDeviceManager mGraphicsDeviceManager;
@@ -64,6 +63,8 @@ namespace Ale.Gui
             }
         }
 
+        public MouseManager MouseManager { get; private set; }
+
         public bool HandlesMouse
         {
             get
@@ -85,7 +86,7 @@ namespace Ale.Gui
             DragDropInfo = new DragDropInfo();
             ScreenSize = new System.Drawing.SizeF(device.Viewport.Width, device.Viewport.Height);
 
-            mMouseManager = mouseManager;
+            MouseManager = mouseManager;
 
             AppSettingsManager.Default.AppSettingsCommitted += new AppSettingsManager.CommittedHandler(Default_AppSettingsCommitted);
         }
@@ -114,7 +115,7 @@ namespace Ale.Gui
             //Cursor.
             if (Cursor != null)
             {
-                Point mouseLocation = new Point((int)mMouseManager.CursorPosition.X, (int)mMouseManager.CursorPosition.Y);
+                Point mouseLocation = new Point((int)MouseManager.CursorPosition.X, (int)MouseManager.CursorPosition.Y);
                 Point cursorLocation = new Point(mouseLocation.X - Cursor.HotSpot.X, mouseLocation.Y - Cursor.HotSpot.Y);
                 Cursor.GraphicElement.Draw(cursorLocation);
             }
@@ -165,7 +166,7 @@ namespace Ale.Gui
 
             if (null != mMouseDownControl)
             {
-                mMouseDownControl.OnMouseDown(button, mMouseManager);
+                mMouseDownControl.OnMouseDown(button, MouseManager);
             }
         }
 
@@ -197,7 +198,7 @@ namespace Ale.Gui
             
             if (null != mMouseDownControl)
             {
-                mMouseDownControl.OnMouseUp(button, mMouseManager);
+                mMouseDownControl.OnMouseUp(button, MouseManager);
 
                 if (mMouseDownControl == mControlUnderMouse)
                 {
@@ -243,7 +244,7 @@ namespace Ale.Gui
 
         public Control GetControlUnderMouse()
         {
-            Point mouseLocation = new Point((int)mMouseManager.CursorPosition.X, (int)mMouseManager.CursorPosition.Y);
+            Point mouseLocation = new Point((int)MouseManager.CursorPosition.X, (int)MouseManager.CursorPosition.Y);
 
             for (int i = ActiveScene.RootControls.Count - 1; i >= 0; i--)            
             {
@@ -258,8 +259,8 @@ namespace Ale.Gui
 
         private bool IsAnyMouseButtonPressed()
         {
-            return mMouseManager.IsButtonDown(MouseButton.Left) || mMouseManager.IsButtonDown(MouseButton.Right) ||
-                mMouseManager.IsButtonDown(MouseButton.Middle);
+            return MouseManager.IsButtonDown(MouseButton.Left) || MouseManager.IsButtonDown(MouseButton.Right) ||
+                   MouseManager.IsButtonDown(MouseButton.Middle);
         }
 
         private bool CheckModal(Control control)

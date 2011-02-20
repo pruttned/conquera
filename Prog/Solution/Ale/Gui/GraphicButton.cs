@@ -25,6 +25,7 @@ namespace Ale.Gui
         private GraphicElement mDefaultGraphicElement;
         private GraphicElement mMouseOverGraphicElement;
         private GraphicElement mActiveGraphicElement;
+        private GraphicElement mDisabledGraphicElement;
 
         public override System.Drawing.SizeF Size
         {
@@ -32,10 +33,16 @@ namespace Ale.Gui
         }
 
         public GraphicButton(GraphicElement defaultGraphicElement, GraphicElement mouseOverGraphicElement)
+            : this(defaultGraphicElement, mouseOverGraphicElement, null)
+        {
+        }
+
+        public GraphicButton(GraphicElement defaultGraphicElement, GraphicElement mouseOverGraphicElement, GraphicElement disabledGraphicElement)
         {
             mDefaultGraphicElement = defaultGraphicElement;
             mMouseOverGraphicElement = mouseOverGraphicElement;
             mActiveGraphicElement = mDefaultGraphicElement;
+            mDisabledGraphicElement = disabledGraphicElement;
 
             MouseEnter += new EventHandler<ControlEventArgs>(GraphicButton_MouseEnter);
             MouseLeave += new EventHandler<ControlEventArgs>(GraphicButton_MouseLeave);
@@ -43,7 +50,14 @@ namespace Ale.Gui
 
         protected override void OnDrawBackground()
         {
-            mActiveGraphicElement.Draw(ScreenLocation);
+            if (IsHitTestEnabled || mDisabledGraphicElement == null)
+            {
+                mActiveGraphicElement.Draw(ScreenLocation);
+            }
+            else
+            {
+                mDisabledGraphicElement.Draw(ScreenLocation);
+            }
         }
 
         private void GraphicButton_MouseEnter(object sender, ControlEventArgs e)
