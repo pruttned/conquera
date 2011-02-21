@@ -25,28 +25,54 @@ namespace Ale.Gui
     {
         public GraphicElement GraphicElement { get; set; }
         public Point Location { get; set; }
+        public System.Drawing.SizeF Size { get; set; } //if not empty, graphic element is center-aligned; otherwise it is topLeft-aligned
+
+        public GraphicElementContainer(GraphicElement graphicElement, Rectangle rectangle)
+            :this(graphicElement, rectangle.Location, new System.Drawing.SizeF(rectangle.Width, rectangle.Height))
+        {
+        }
 
         public GraphicElementContainer(GraphicElement graphicElement, Point location)
+            :this(graphicElement, location, System.Drawing.SizeF.Empty)
+        {
+        }
+
+        public GraphicElementContainer(GraphicElement graphicElement, Point location, System.Drawing.SizeF size)
         {
             GraphicElement = graphicElement;
             Location = location;
+            Size = size;
         }
 
         public void Draw(Control ownerControl)
         {
             if (GraphicElement != null)
             {
-                Point screenLocation = new Point(ownerControl.ScreenLocation.X + Location.X, ownerControl.ScreenLocation.Y + Location.Y);
-                GraphicElement.Draw(screenLocation);
+                GraphicElement.Draw(GetGraphicElementScreenLocation(ownerControl));
             }
         }
 
         public void Draw(SpriteBatch spriteBatch, Control ownerControl, AleGameTime gameTime)
         {
             if (GraphicElement != null)
+            {                
+                GraphicElement.Draw(spriteBatch, GetGraphicElementScreenLocation(ownerControl), gameTime);
+            }
+        }
+
+        public Point GetGraphicElementScreenLocation(Control ownerControl)
+        {
+            int containerLeft = ownerControl.ScreenLocation.X + Location.X;
+            int containerTop = ownerControl.ScreenLocation.Y + Location.Y;
+
+            if (!Size.IsEmpty) //center-aligned
             {
-                Point screenLocation = new Point(ownerControl.ScreenLocation.X + Location.X, ownerControl.ScreenLocation.Y + Location.Y);
-                GraphicElement.Draw(spriteBatch, screenLocation, gameTime);
+                return new Point(containerLeft + (int)(Size.Width / 2 - GraphicElement.Size.Width / 2),
+                                 containerTop + (int)(Size.Height / 2 - GraphicElement.Size.Height / 2));
+            }
+            else //topLeft-aligned
+            {
+                return new Point(containerLeft, containerTop);
             }
         }
     }

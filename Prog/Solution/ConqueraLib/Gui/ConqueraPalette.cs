@@ -61,18 +61,19 @@ namespace Conquera.Gui
         public static readonly Image SpellIconBloodMadness = new Image(new Rectangle(0, 128, 64, 64), mCellNotificationTexture);
         public static readonly Image SpellIconLastSacrifice = new Image(new Rectangle(128, 128, 64, 64), mCellNotificationTexture);
 
-        public static readonly Image ListBoxBackground = new Image(new Rectangle(257, 1, 150, 200), mPaletteTexture);
-        public static readonly Rectangle ListBoxItemsRectangle = new Rectangle(10, 50, 130, 130);
+        public static readonly Image ListBoxBackground = new Image(new Rectangle(257, 1, 200, 300), mPaletteTexture);
+        public static readonly Rectangle ListBoxItemsRectangle = new Rectangle(10, 50, 180, 230);
         public static readonly Image ListBoxNextPageButtonDefault = new Image(new Rectangle(0, 0, 42, 42), mPaletteTexture);
         public static readonly Image ListBoxNextPageButtonOver = new Image(new Rectangle(43, 0, 42, 42), mPaletteTexture);
         public static readonly Image ListBoxNextPageButtonDisabled = new Image(new Rectangle(86, 0, 42, 42), mPaletteTexture);
         public static readonly Image ListBoxPreviousPageButtonDefault = new Image(new Rectangle(0, 0, 42, 42), mPaletteTexture);
         public static readonly Image ListBoxPreviousPageButtonOver = new Image(new Rectangle(43, 0, 42, 42), mPaletteTexture);
         public static readonly Image ListBoxPreviousPageButtonDisabled = new Image(new Rectangle(86, 0, 42, 42), mPaletteTexture);
-        public static readonly Point ListBoxNextPageButtonLocation = new Point(80, 5);
+        public static readonly Point ListBoxNextPageButtonLocation = new Point(130, 5);
         public static readonly Point ListBoxPreviousPageButtonLocation = new Point(5, 5);
         public static readonly Image ListBoxOverItem = new Image(new Rectangle(1, 525, 130, 24), mPaletteTexture);
         public static readonly Image ListBoxSelectedItem = new Image(new Rectangle(1, 550, 130, 24), mPaletteTexture);
+        public static readonly Rectangle ListBoxPageTextElementRectangle = new Rectangle(48, 5, 82, 50);
 
         public static Image GetTileIcon(string name)
         {
