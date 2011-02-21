@@ -274,8 +274,7 @@ namespace Conquera.Gui
     }
 
     public class MainMenuDialog : Dialog
-    {
-        private SceneManager mSceneManager;
+    {        
         private GraphicElement mBackground;
         private ConqueraTextButton mQuitButton;
         private ConqueraTextButton mContinueButton;

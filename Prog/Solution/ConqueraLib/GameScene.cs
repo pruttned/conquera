@@ -621,6 +621,11 @@ namespace Conquera
             GuiManager.Instance.ActiveScene = mGuiScene;
         }
 
+        protected override void OnDeactivateImpl()
+        {
+            GuiManager.Instance.ActiveScene = DefaultGuiScene.Instance;
+        }
+
         protected GameScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState)
             : base(sceneManager, content, GetBoundsFromSize(terrain.Width, terrain.Height))
         {

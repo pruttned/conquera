@@ -37,14 +37,30 @@ namespace Ale.Gui
         private Control mMouseDownControl = null;
         private GraphicsDeviceManager mGraphicsDeviceManager;
         private Control mControlUnderMouse = null;
+        private GuiScene mActiveScene;
 
         public static GuiManager Instance { get; private set; }
         public SpriteBatch SpriteBatch { get; private set; }
-        public AleGameTime GameTime { get; private set; }
-        public GuiScene ActiveScene { get; set; }
+        public AleGameTime GameTime { get; private set; }        
         public CursorInfo Cursor { get; set; }
         public AleContentManager Content { get; private set; }
         internal DragDropInfo DragDropInfo { get; private set; }
+
+        public GuiScene ActiveScene
+        {
+            get { return mActiveScene; }
+            set
+            {
+                if (mActiveScene != value)
+                {
+                    if (value == null)
+                    {
+                        throw new ArgumentNullException("Cannot be null. You can set DefaultGuiScene.Instance instead.");
+                    }
+                    mActiveScene = value;
+                }
+            }
+        }
 
         public System.Drawing.SizeF ScreenSize
         {
@@ -81,7 +97,7 @@ namespace Ale.Gui
             GraphicsDevice device = graphicsDeviceManager.GraphicsDevice;
             mGraphicsDeviceManager = graphicsDeviceManager;
             Content = content;
-            ActiveScene = new DefaultGuiScene();
+            ActiveScene = DefaultGuiScene.Instance;
             SpriteBatch = new SpriteBatch(device);
             DragDropInfo = new DragDropInfo();
             ScreenSize = new System.Drawing.SizeF(device.Viewport.Width, device.Viewport.Height);

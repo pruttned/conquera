@@ -36,5 +36,22 @@ namespace Ale.Gui
 
     public class DefaultGuiScene : GuiScene
     {
+        private static DefaultGuiScene mInstance = null;
+
+        public static DefaultGuiScene Instance
+        {
+            get
+            {
+                if (mInstance == null)
+                {
+                    mInstance = new DefaultGuiScene();
+                }
+                return mInstance;
+            }
+        }
+
+        private DefaultGuiScene()
+        {
+        }
     }
 }

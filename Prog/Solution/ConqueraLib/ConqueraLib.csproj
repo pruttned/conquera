@@ -117,6 +117,7 @@
     <Compile Include="Gui\GameUnitInfoPanel.cs" />
     <Compile Include="Gui\HeaderPanel.cs" />
     <Compile Include="Gui\ListBox.cs" />
+    <Compile Include="Gui\MainMenuGuiScene.cs" />
     <Compile Include="Gui\MegaDebugLabel.cs" />
     <Compile Include="Gui\SpellInfoDialog.cs" />
     <Compile Include="Gui\SpellPanel.cs" />
