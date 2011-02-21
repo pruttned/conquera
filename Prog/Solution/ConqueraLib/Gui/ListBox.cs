@@ -40,16 +40,18 @@ namespace Conquera.Gui
         public event EventHandler<SelectedItemChangedEventArgs> SelectedItemChanged;
 
         private TextElement mItemsTextElement;
-        private GraphicElementContainer mItemsContainer;
+        private GraphicElementContainer mItemsTextElementContainer;
         private IList<string> mItems;
         private GraphicButton mNextPageButton;
         private GraphicButton mPreviousPageButton;
         private int mMaxItemLength;
-        private int mCurrentPageNumber = 0;
+        private int mCurrentPageNumber;
         private int mMaxItemsPerPage;
         private int mPageCount;
         private string mSelectedItem = null;
         private int mSelectedItemIndex = -1;
+        private TextElement mPageTextElement;
+        private GraphicElementContainer mPageTextElementContainer;
 
         public override System.Drawing.SizeF Size
         {
@@ -77,13 +79,14 @@ namespace Conquera.Gui
         {
             Rectangle itemsRectangle = ConqueraPalette.ListBoxItemsRectangle;
             mItemsTextElement = new TextElement(itemsRectangle.Width, itemsRectangle.Height, ConqueraFonts.SpriteFont1, true, Color.White);
-            mItemsContainer = new GraphicElementContainer(mItemsTextElement, itemsRectangle.Location);            
+            mItemsTextElementContainer = new GraphicElementContainer(mItemsTextElement, itemsRectangle.Location);            
             
             mItems = items;
-            mMaxItemLength = ConqueraPalette.ListBoxItemsRectangle.Width / mItemsTextElement.Font.AverageCharWidth;
+            mMaxItemLength = ConqueraPalette.ListBoxItemsRectangle.Width / mItemsTextElement.Font.AverageCharWidth - 1;
             mMaxItemsPerPage = (ConqueraPalette.ListBoxItemsRectangle.Height - mItemsTextElement.Font.FirstLineMargin) / mItemsTextElement.Font.InnerFont.LineSpacing;
             LoadItemsToTextElement();
             mPageCount = (int)Math.Ceiling((double)mItemsTextElement.LineCount / (double)mMaxItemsPerPage);
+            mCurrentPageNumber = mItems.Count > 0 ? 1 : 0;
 
             mNextPageButton = new GraphicButton(ConqueraPalette.ListBoxNextPageButtonDefault, ConqueraPalette.ListBoxNextPageButtonOver, ConqueraPalette.ListBoxNextPageButtonDisabled);
             mPreviousPageButton = new GraphicButton(ConqueraPalette.ListBoxPreviousPageButtonDefault, ConqueraPalette.ListBoxPreviousPageButtonOver, ConqueraPalette.ListBoxPreviousPageButtonDisabled);
@@ -94,6 +97,10 @@ namespace Conquera.Gui
             UpdatePageButtonsHitTest();
             ChildControls.Add(mNextPageButton);
             ChildControls.Add(mPreviousPageButton);
+
+            mPageTextElement = new TextElement(ConqueraFonts.SpriteFont1, Color.White);
+            mPageTextElementContainer = new GraphicElementContainer(mPageTextElement, ConqueraPalette.ListBoxPageTextElementRectangle);
+            UpdatePageTextElement();
 
             MouseDown += new EventHandler<MouseEventArgs>(ListBox_MouseDown);
         }
@@ -119,7 +126,10 @@ namespace Conquera.Gui
             }
 
             //Items.
-            mItemsContainer.Draw(this);
+            mItemsTextElementContainer.Draw(this);
+
+            //Page text element.
+            mPageTextElementContainer.Draw(this);
         }
 
         private void LoadItemsToTextElement()
@@ -145,6 +155,7 @@ namespace Conquera.Gui
             mItemsTextElement.StartLine = mItemsTextElement.LastVisibleLine + 1;
             mCurrentPageNumber++;
             UpdatePageButtonsHitTest();
+            UpdatePageTextElement();
         }
 
         private void mPreviousPageButton_Click(object sender, ControlEventArgs e)
@@ -152,12 +163,18 @@ namespace Conquera.Gui
             mItemsTextElement.StartLine = mItemsTextElement.StartLine - mMaxItemsPerPage;
             mCurrentPageNumber--;
             UpdatePageButtonsHitTest();
+            UpdatePageTextElement();
         }
 
         private void UpdatePageButtonsHitTest()
         {
             mNextPageButton.IsHitTestEnabled = mItemsTextElement.LastVisibleLine + 1 < mItemsTextElement.LineCount;
             mPreviousPageButton.IsHitTestEnabled = mItemsTextElement.StartLine > 0;
+        }
+
+        private void UpdatePageTextElement()
+        {
+            mPageTextElement.Text = string.Format("{0}/{1}", mCurrentPageNumber, mPageCount);
         }
 
         private void ListBox_MouseDown(object sender, MouseEventArgs e)
@@ -178,7 +195,7 @@ namespace Conquera.Gui
                 int yInTextElement = point.Y - ConqueraPalette.ListBoxItemsRectangle.Top;
                 int itemIndex = mItemsTextElement.StartLine + (yInTextElement - mItemsTextElement.Font.FirstLineMargin) / mItemsTextElement.Font.InnerFont.LineSpacing;
 
-                if (itemIndex < mItemsTextElement.LineCount)
+                if (itemIndex <= mItemsTextElement.LastVisibleLine)
                 {
                     return itemIndex;
                 }

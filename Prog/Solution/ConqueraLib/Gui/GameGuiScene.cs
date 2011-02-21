@@ -101,21 +101,7 @@ namespace Conquera.Gui
             //Other.
             UpdateLocations();
             GuiManager.Instance.ScreenSizeChanged += new EventHandler(ScreenSizeChanged);
-
-            //TEST LIST BOX
-            System.Collections.Generic.List<string> items = new System.Collections.Generic.List<string>() { "a1111111111111111111111111111111", "d", "c", "d", "e", "f", "g", "h", "i" };            
-            ListBox listBox = new ListBox(items);
-            listBox.Location = new Point(100, 100);
-            RootControls.Add(listBox);
-            listBox.SelectedItemChanged += new EventHandler<ListBox.SelectedItemChangedEventArgs>(listBox_SelectedItemChanged);
-            
         }        
-        void listBox_SelectedItemChanged(object sender, ListBox.SelectedItemChangedEventArgs e)
-        {
-            Console.WriteLine(e.Item == null ? "null" : e.Item);
-            ConqueraFonts.SpriteFont1.InnerFont.MeasureString("d/nd");
-        }
-        //TEST LIST BOX
 
         public void UpdateHexCell(HexCell cell)
         {
