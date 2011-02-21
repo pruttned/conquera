@@ -43,21 +43,27 @@ namespace Conquera
 
         private Vector3 mLightDir = new Vector3(-0.3333333f, -0.5f, 1f);
         private List<ParticleSystemMissile> mMissiles = new List<ParticleSystemMissile>();
+        private MainMenuGuiScene mGuiScene;
 
         public MainMenuScene(SceneManager sceneManager, ContentGroup content)
             : base(sceneManager, content, new BoundingBox(new Vector3(-100,-100,-100), new Vector3(100,100,100)))
         {
             SceneManager.KeyboardManager.KeyDown += new KeyboardManager.KeyEventHandler(KeyboardManager_KeyDown);
+            SceneManager.MouseManager.MouseButtonUp += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonUp);
+            SceneManager.MouseManager.MouseButtonDown += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonDown);
 
             for (int i = 0; i < 20; ++i)
             {
                 mMissiles.Add(CreateMissile());
             }
+
+            mGuiScene = new MainMenuGuiScene(this);
         }
 
         public override void Update(AleGameTime gameTime)
         {
             base.Update(gameTime);
+            GuiManager.Instance.Update(gameTime);
 
             for (int i = 0; i < mMissiles.Count; ++i)
             {
@@ -68,7 +74,13 @@ namespace Conquera
                 }
             }
         }
-        
+
+        public override void Draw(AleGameTime gameTime)
+        {
+            base.Draw(gameTime);            
+            GuiManager.Instance.Draw(gameTime);
+        }
+
         protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentGroup content)
         {
             Camera mainCamera = new Camera(Vector3.Zero,10, new Vector2(-1.1f, 0), 20, 3, 1.55f, -1.57f);
@@ -117,6 +129,16 @@ namespace Conquera
             base.Dispose(isDisposing);
         }
 
+        protected override void OnActivatedImpl()
+        {            
+            GuiManager.Instance.ActiveScene = mGuiScene;
+        }
+
+        protected override void OnDeactivateImpl()
+        {
+            GuiManager.Instance.ActiveScene = DefaultGuiScene.Instance;
+        }
+
         private ParticleSystemMissile CreateMissile()
         {
             Vector3 src = new Vector3(0.2f, 0.4f, 8);
@@ -141,6 +163,16 @@ namespace Conquera
             {
                 SceneManager.ExitApplication();
             }
+        }
+
+        private void MouseManager_MouseButtonUp(MouseButton button, MouseManager mouseManager)
+        {
+            GuiManager.Instance.HandleMouseUp(button);
+        }
+
+        private void MouseManager_MouseButtonDown(MouseButton button, MouseManager mouseManager)
+        {
+            GuiManager.Instance.HandleMouseDown(button);
         }
     }
 }
