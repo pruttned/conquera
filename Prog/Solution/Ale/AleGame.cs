@@ -120,7 +120,7 @@ namespace Ale
             VideoSettings videoSettings;
             if (AppSettingsManager.Default.TryGetSettings<VideoSettings>(out videoSettings))
             {
-                ReloadSettings(videoSettings, false);
+                ReloadVideoSettings(videoSettings, false);
                 mVideoInitialized = true;
             }
         }
@@ -129,7 +129,7 @@ namespace Ale
         {
             base.Dispose(isDisposing);
 
-            //Xna doesn't dispose Content ... great!! - So, for instance, AleSound's finalizer will blow because SoundManager was already disposed
+            //Xna doesn't dispose Content ... great!! - So, for instance, AleSound's finalizer will blow because SoundManager will be already disposed
             if (!mIsDisposed)
             {
                 if (isDisposing)
@@ -233,10 +233,10 @@ namespace Ale
                 VideoSettings videoSettings;
                 if (!AppSettingsManager.Default.TryGetSettings<VideoSettings>(out videoSettings))
                 {
-                    videoSettings = new VideoSettings(GraphicsDevice);
+                    videoSettings = new VideoSettings();
                     AppSettingsManager.Default.CommitSettings(videoSettings);
                 }
-                ReloadSettings(videoSettings, false);
+                ReloadVideoSettings(videoSettings, false);
                 mVideoInitialized = true;
             }
             mBaseApplication.OnLoadContent();
@@ -255,7 +255,7 @@ namespace Ale
         {
             if (settings is VideoSettings)
             {
-                ReloadSettings((VideoSettings)settings, true);
+                ReloadVideoSettings((VideoSettings)settings, true);
             }
         }
 
@@ -285,7 +285,7 @@ namespace Ale
             }
         }
 
-        private void ReloadSettings(VideoSettings videoSettings, bool applyChanges)
+        private void ReloadVideoSettings(VideoSettings videoSettings, bool applyChanges)
         {
             Tracer.WriteInfo("AleGame.ReloadSettings");
 
@@ -298,7 +298,6 @@ namespace Ale
             {
                 mGraphicsDeviceManager.ApplyChanges();
             }
-
         }
 
         #endregion Methods

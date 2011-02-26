@@ -88,9 +88,14 @@ namespace Ale
 
         private bool mInitialized = false;
 
+        
+        Control mRenderWindow;
+        public bool mRenderWindowHasFocus = true;
+
         #endregion Fields
 
         #region Properties
+
 
         /// <summary>
         /// Gets the acutall game time
@@ -117,9 +122,9 @@ namespace Ale
         }
 
         /// <summary>
-        /// temp
+        /// Render window handle
         /// </summary>
-        public IntPtr AuxWinHwnd
+        public IntPtr RenderWindowHwnd
         {
             get { return mGame.Window.Handle; }
         }
@@ -165,6 +170,8 @@ namespace Ale
         /// <param name="modFile"></param>
         public BaseApplication(AleRenderControl renderControl, string modFile)
         {
+            mRenderWindowHasFocus = true;
+
             string dataDirectory = MainSettings.Instance.DataDirectory;
             if (!Path.IsPathRooted(modFile))
             {
@@ -265,7 +272,7 @@ namespace Ale
         }
 
         /// <summary>
-        /// Runed only once at first LoadContent
+        /// Runs only once at a first LoadContent
         /// </summary>
         protected virtual void OnInit()
         {
@@ -305,6 +312,10 @@ namespace Ale
                     mGame.IsMouseVisible = false;
                 }
 
+                mRenderWindow = Control.FromHandle(RenderWindowHwnd);
+                mRenderWindow.GotFocus += new EventHandler(mRenderWindow_GotFocus);
+                mRenderWindow.LostFocus += new EventHandler(mRenderWindow_LostFocus);
+
                 RegisterFrameListener(mSceneManager);
                 SceneManager.ActivateScene(CreateDefaultScene(SceneManager));                
 
@@ -330,29 +341,32 @@ namespace Ale
         /// <param name="gameTime"></param>
         internal void OnUpdate(GameTime gameTime)
         {
-            GameTime.UpdateOnFrameStart(gameTime);
-
-            //call frame listeners
-            if (null != mFrameListeners)
+            if (mRenderWindowHasFocus)
             {
-                foreach(var listener in  mFrameListeners)
-                {
-                    listener.BeforeUpdate(mGameTime);
-                }
-            }
+                GameTime.UpdateOnFrameStart(gameTime);
 
-            Update(GameTime);
-
-            //call frame listeners
-            if (null != mFrameListeners)
-            {
-                foreach (var listener in mFrameListeners)
+                //call frame listeners
+                if (null != mFrameListeners)
                 {
-                    listener.AfterUpdate(mGameTime);
+                    foreach (var listener in mFrameListeners)
+                    {
+                        listener.BeforeUpdate(mGameTime);
+                    }
                 }
 
-                //clear removed listeners
-                mFrameListeners.Tidy();
+                Update(GameTime);
+
+                //call frame listeners
+                if (null != mFrameListeners)
+                {
+                    foreach (var listener in mFrameListeners)
+                    {
+                        listener.AfterUpdate(mGameTime);
+                    }
+
+                    //clear removed listeners
+                    mFrameListeners.Tidy();
+                }
             }
         }
 
@@ -362,27 +376,30 @@ namespace Ale
         /// <param name="gameTime"></param>
         internal void OnDraw(GameTime gameTime)
         {
-            //call frame listeners
-            if (null != mFrameListeners)
+            if (mRenderWindowHasFocus)
             {
-                foreach (var listener in mFrameListeners)
+                //call frame listeners
+                if (null != mFrameListeners)
                 {
-                    listener.BeforeRender(mGameTime);
-                }
-            }
-
-            Draw(GameTime);
-
-            //call frame listeners
-            if (null != mFrameListeners)
-            {
-                foreach (var listener in mFrameListeners)
-                {
-                    listener.AfterRender(mGameTime);
+                    foreach (var listener in mFrameListeners)
+                    {
+                        listener.BeforeRender(mGameTime);
+                    }
                 }
 
-                //clear removed listeners
-                mFrameListeners.Tidy();
+                Draw(GameTime);
+
+                //call frame listeners
+                if (null != mFrameListeners)
+                {
+                    foreach (var listener in mFrameListeners)
+                    {
+                        listener.AfterRender(mGameTime);
+                    }
+
+                    //clear removed listeners
+                    mFrameListeners.Tidy();
+                }
             }
         }
 
@@ -455,6 +472,14 @@ namespace Ale
             }
         }
 
+        void mRenderWindow_LostFocus(object sender, EventArgs e)
+        {
+            mRenderWindowHasFocus = false;
+        }
 
+        void mRenderWindow_GotFocus(object sender, EventArgs e)
+        {
+            mRenderWindowHasFocus = true;
+        }
     }
 }
