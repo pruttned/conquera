@@ -34,10 +34,12 @@ using Ale.Content;
 using Ale.Gui;
 using Conquera.Gui;
 
-namespace Conquera
+namespace Conquera.Editor
 {
     class Application : BaseApplication
     {
+        ToolBarForm mToolBarForm = new ToolBarForm();
+
         protected override string GuiPaletteName
         {
             get { return "PaletteDef"; }
@@ -53,6 +55,16 @@ namespace Conquera
         {
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            if (isDisposing)
+            {
+                mToolBarForm.Dispose();
+            }
+
+            base.Dispose(isDisposing);
+        }
+
         public Application(AleRenderControl renderControl)
             : base(renderControl, "Conquera.mod")
         {
@@ -60,13 +72,16 @@ namespace Conquera
 
         protected override BaseScene CreateDefaultScene(SceneManager sceneManager)
         {
-         //   return GameScene.Load("TestMap", sceneManager, Content.DefaultContentGroup);
             return new MainMenuScene(sceneManager, Content.DefaultContentGroup);
-            //return new GameScene("TestMap", sceneManager, 20,20, "Grass1Tile", Content.DefaultContentGroup);
         }
 
         protected override void OnInit()
         {
+            //todo default settings -> turn off music.. etc
+
+            mToolBarForm = new ToolBarForm();
+            mToolBarForm.Show();
+
             base.OnInit();
         }
     }

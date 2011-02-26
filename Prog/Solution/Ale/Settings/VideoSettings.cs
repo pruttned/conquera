@@ -37,19 +37,19 @@ namespace Ale.Settings
 
         public VideoSettings()
         {
-            ScreenWidth = 800;
-            ScreenHeight = 600;
+            ScreenWidth = 1024;
+            ScreenHeight = 768;
             Fullscreen = false;
         }
 
-        public VideoSettings(GraphicsDevice graphicsDevice)
-        {
-            if (null == graphicsDevice) throw new ArgumentNullException("graphicsDevice");
+        //public VideoSettings(GraphicsDevice graphicsDevice)
+        //{
+        //    if (null == graphicsDevice) throw new ArgumentNullException("graphicsDevice");
 
-            ScreenWidth = graphicsDevice.DisplayMode.Width;
-            ScreenHeight = graphicsDevice.DisplayMode.Height;
-            Fullscreen = true;
-        }
+        //    ScreenWidth = graphicsDevice.DisplayMode.Width;
+        //    ScreenHeight = graphicsDevice.DisplayMode.Height;
+        //    Fullscreen = true;
+        //}
 
         public object Clone()
         {

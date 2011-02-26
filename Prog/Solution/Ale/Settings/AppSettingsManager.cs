@@ -251,7 +251,8 @@ namespace Ale.Settings
             }
             AppSettingsAttribute appSettingsAttribute = (AppSettingsAttribute)appSettingsAttributes[0];
 
-            iniFile = Path.Combine(mSettingsDirectory, appSettingsAttribute.FileName);
+            var fileName = !string.IsNullOrEmpty(appSettingsAttribute.FileName) ? appSettingsAttribute.FileName : string.Format("{0}.ini",(Assembly.GetEntryAssembly().GetName().Name));
+            iniFile = Path.Combine(mSettingsDirectory, fileName);
             sectionName = appSettingsAttribute.SectionName ?? type.Name;
             readonlySettings = appSettingsAttribute.Readonly;
         }

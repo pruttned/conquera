@@ -27,7 +27,7 @@ namespace Ale.Settings
     /// <summary>
     /// Use MainSettings.Instance to get settings.
     /// </summary>
-    [AppSettings("MainCfg.ini", SectionName = "Main", Readonly=true)]
+    [AppSettings(null, SectionName = "Main", Readonly=true)]
     public class MainSettings : IAppSettings
     {
         private static MainSettings mInstance;

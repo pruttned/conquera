@@ -757,7 +757,7 @@ namespace Conquera
                 }
                 else
                 {
-                    if (curPos.X >= Viewport.Width)
+                    if (curPos.X >= Viewport.Width - 1)
                     {
                         Vector2 dirVec;
                         Vector2 perpDir;
@@ -780,7 +780,7 @@ namespace Conquera
                 }
                 else
                 {
-                    if (curPos.Y >= Viewport.Height)
+                    if (curPos.Y >= Viewport.Height - 1)
                     {
                         Vector2 dirVec;
                         Vector2 perpDir;
