@@ -35,7 +35,7 @@ namespace Ale
     {
         #region Fields
 
-       private static bool EnablePerfHud = false ;
+       private static bool EnablePerfHud = false;
 
         /// <summary>
         /// Base application that owns this game instance
