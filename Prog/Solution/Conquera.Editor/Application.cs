@@ -33,12 +33,29 @@ using Microsoft.Xna.Framework.Content;
 using Ale.Content;
 using Ale.Gui;
 using Conquera.Gui;
+using System.IO;
+using Ale.Settings;
 
 namespace Conquera.Editor
 {
-    class Application : BaseApplication
+    public class EditorApplication : BaseApplication
     {
-        ToolBarForm mToolBarForm = new ToolBarForm();
+        private ToolBarForm mToolBarForm = new ToolBarForm();
+        private EditorScene mEditorScene;
+
+        public CommandQueue CommandQueue { get; private set; }
+        
+        public GameScene GameScene
+        {
+            get
+            {
+                return mEditorScene.GameScene;
+            }
+            set
+            {
+                mEditorScene.GameScene = value;
+            }
+        }
 
         protected override string GuiPaletteName
         {
@@ -47,12 +64,13 @@ namespace Conquera.Editor
 
         protected override CursorInfo DefaultCursor
         {
-            get { return AlCursors.Default; }
+            get { return null; }
         }
 
-        public Application()
-            : this(null)
+        public EditorApplication()
+            : base(null, "Conquera.mod")
         {
+            CommandQueue = new CommandQueue();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -65,24 +83,34 @@ namespace Conquera.Editor
             base.Dispose(isDisposing);
         }
 
-        public Application(AleRenderControl renderControl)
-            : base(renderControl, "Conquera.mod")
-        {
-        }
-
         protected override BaseScene CreateDefaultScene(SceneManager sceneManager)
         {
-            return new MainMenuScene(sceneManager, Content.DefaultContentGroup);
+            mEditorScene = new EditorScene(new HotseatGameScene("TestMap", sceneManager, 20,20, "Grass1Tile", Content.DefaultContentGroup));
+            return mEditorScene;
         }
 
         protected override void OnInit()
         {
-            //todo default settings -> turn off music.. etc
-
             mToolBarForm = new ToolBarForm();
+            mToolBarForm.EditorApplication = this;
+            mToolBarForm.RenderWindow = RenderWindow;
             mToolBarForm.Show();
+            ShowSysCursor = true;
 
             base.OnInit();
+
+            GuiManager.Instance.Cursor = null;
+        }
+
+        protected override void Update(AleGameTime gameTime)
+        {
+            ICommand command = null;
+            while(null != (command = CommandQueue.Dequeue()))
+            {
+                command.Execute(this);
+            }
+
+            base.Update(gameTime);
         }
     }
 }
