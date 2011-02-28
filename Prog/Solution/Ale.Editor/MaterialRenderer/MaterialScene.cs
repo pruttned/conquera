@@ -35,13 +35,14 @@ namespace Ale.Editor
 {
     public class MaterialScene : OctreeScene
     {
+        string mMeshName = "VillageMesh";
         GraphicModel mGraphicModel;
 
         public MaterialScene(SceneManager sceneManager, ContentGroup content)
             : base(sceneManager, content, new BoundingBox(new Vector3(-100, -100, -100), new Vector3(100, 100, 100)))
         {
             //GraphicModel dom = new GraphicModel(Content.Load<GraphicModelDesc>("domGm"), Content);
-            mGraphicModel = new GraphicModel(Content.Load<Mesh>("Sphere"), Content.Load<Material>("DomMat"));
+            mGraphicModel = new GraphicModel(Content.Load<Mesh>(mMeshName), Content.Load<Material>("DomMat"));
             //            GraphicModel gm = new GraphicModel(Content.Load<Mesh>("Sphere"), new Material(null, Content));
             //gm.SetMaterials(
             Octree.AddObject(mGraphicModel);
@@ -51,7 +52,7 @@ namespace Ale.Editor
         protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentGroup content)
         {
             Camera mainCamera = new Camera(Vector3.Zero, 100, new Vector2(-0.8f, 0), 20000, 3, 1.55f, -1.57f);
-            mainCamera.DistanceToTarget = 10;
+            mainCamera.DistanceToTarget = 3;
 
             //return null;
             List<ScenePass> scenePasses = new List<ScenePass>();

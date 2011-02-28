@@ -120,9 +120,10 @@ technique WaterReflectionPass
 
 technique ShadowPass
 {
-	pass trt 
+	pass p0 
 	<
 		bool IsTransparent=false;
+		string MainTexture = "gDiffuseMap";  
 	>
 	{
 		AlphaTestEnable = true;
