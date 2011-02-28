@@ -89,8 +89,8 @@ namespace Ale
         private bool mInitialized = false;
 
         
-        Control mRenderWindow;
-        public bool mRenderWindowHasFocus = true;
+        private Control mRenderWindow;
+        private bool mRenderWindowHasFocus = true;
 
         #endregion Fields
 
@@ -128,6 +128,11 @@ namespace Ale
         {
             get { return mGame.Window.Handle; }
         }
+        public Control RenderWindow
+        {
+            get { return mRenderWindow; }
+        }
+
 
         public GraphicsDevice GraphicsDevice
         {
@@ -151,6 +156,17 @@ namespace Ale
 
         protected abstract string GuiPaletteName { get; }
         protected abstract Ale.Gui.CursorInfo DefaultCursor { get; }
+        protected bool ShowSysCursor
+        {
+            get
+            {
+                return mGame.IsMouseVisible;
+            }
+            set
+            {
+                mGame.IsMouseVisible = value;
+            }
+        }
 
         #endregion Properties
 
