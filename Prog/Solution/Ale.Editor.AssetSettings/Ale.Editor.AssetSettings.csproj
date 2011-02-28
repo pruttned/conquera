@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Material\VillageMaterial.cs" />
     <Compile Include="Material\Test2Material.cs" />
     <Compile Include="Material\TestMaterial.cs" />
     <Compile Include="ParticleSystem\SlayerPsys.cs" />

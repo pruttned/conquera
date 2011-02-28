@@ -555,21 +555,7 @@ namespace Conquera
                 //        obj.Icon = "TileIconSpellTower";
                 //        ormManager.SaveObject(obj);
                 //    }
-                //    {
-                //        VillageTileSettings obj = new VillageTileSettings();
-                //        obj.Name = "VillageLv1Tile";
-                //        obj.DisplayName = "Small Village";
-                //        obj.Description = ormManager.LoadObject<StringResource>("Name = 'VillageLv1TileDescription'");
-                //        obj.MaxUnitCntIncrement = 3;
-                //        obj.HpIncrement = 20;
-                //        obj.UnitPosition = new Vector3(0.2f, 0.2f, 0);
-                //        obj.TileIndex = new Point(5, 0);
-                //        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
-                //        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
-                //        obj.IsPassable = true;
-                //        obj.Icon = "TileIconSpellTower";
-                //        ormManager.SaveObject(obj);
-                //    }
+
                     
                 //    {
                 //        foreach (var spell in new KeyValuePair<string, Point>[] { 
@@ -772,6 +758,41 @@ namespace Conquera
                     //    MaterialSettings mat = new MaterialSettings("MovementAreaMat", "MovementAreaFx", DefaultRenderLayers.MovementArea);
                     //    ormManager.SaveObject(mat);
                     //}
+
+
+                    //{
+                    //    GraphicModelSettings settings = new GraphicModelSettings();
+                    //    settings.Name = "VillageMeshGm";
+                    //    settings.Mesh = "VillageMesh";
+                    //    settings.MaterialAssignments.Add(new MaterialAssignmentsettings("Material", ormManager.FindObject(typeof(MaterialSettings), "Name='VillageMat'")));
+                    //    ormManager.SaveObject(settings);
+                    //}
+
+                    {
+                        //VillageTileSettings obj = ormManager.LoadObject<VillageTileSettings>("Name='VillageLv1Tile'");
+                        //obj.InactiveGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name='VillageMeshGm'");
+                        ////obj.UnitPosition = new Vector3();
+                        //obj.ActiveGraphicModel = obj.InactiveGraphicModel;
+                        //ormManager.SaveObject(obj);
+
+
+
+                        //VillageTileSettings obj = new VillageTileSettings();
+                        //obj.Name = "VillageLv1Tile";
+                        //obj.DisplayName = "Small Village";
+                        //obj.Description = ormManager.LoadObject<StringResource>("Name = 'VillageLv1TileDescription'");
+                        //obj.MaxUnitCntIncrement = 3;
+                        //obj.HpIncrement = 20;
+                        //obj.UnitPosition = new Vector3(0.2f, 0.2f, 0);
+                        //obj.TileIndex = new Point(5, 0);
+                        //obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
+                        //obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
+                        //obj.IsPassable = true;
+                        //obj.Icon = "TileIconSpellTower";
+                        //ormManager.SaveObject(obj);
+                    }
+
+
 
                     transaction.Commit();
                 }
