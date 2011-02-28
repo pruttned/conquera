@@ -46,6 +46,11 @@ namespace Ale.Scene
             get { return mRenderer; }
         }
 
+        public BaseScene ActiveScene
+        {
+            get { return mActiveScene; }
+        }
+
         public GraphicsDeviceManager GraphicsDeviceManager
         {
             get { return mGraphicsDeviceManager; }

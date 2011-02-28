@@ -203,27 +203,53 @@ namespace Conquera
 
         public void IncZoomLevel()
         {
-            if (mZoomLevel < ZoomLevels.Length-1)
-            {
-                SetCameraAnimationGameSceneState();
-
-                mZoomLevel++;
-
-                Vector3 curZommLevel = new Vector3(mCamera.DistanceToTarget, mBaseRotationArroundTarget.X, mBaseRotationArroundTarget.Y);
-                mZoomLevelAnimator.Animate(15, curZommLevel, ZoomLevels[mZoomLevel]);
-            }
+            IncZoomLevel(true);
         }
 
         public void DecZoomLevel()
         {
+            DecZoomLevel(true);
+        }
+
+        public void IncZoomLevel(bool anim)
+        {
+            if (mZoomLevel < ZoomLevels.Length - 1)
+            {
+                if (anim)
+                {
+                    SetCameraAnimationGameSceneState();
+
+                    mZoomLevel++;
+
+                    Vector3 curZommLevel = new Vector3(mCamera.DistanceToTarget, mBaseRotationArroundTarget.X, mBaseRotationArroundTarget.Y);
+                    mZoomLevelAnimator.Animate(15, curZommLevel, ZoomLevels[mZoomLevel]);
+                }
+                else
+                {
+                    mZoomLevel++;
+                    UpdateDistanceToTarget(ZoomLevels[mZoomLevel]);
+                }
+            }
+        }
+
+        public void DecZoomLevel(bool anim)
+        {
             if (mZoomLevel > 0)
             {
-                SetCameraAnimationGameSceneState();
-            
-                mZoomLevel--;
+                if (anim)
+                {
+                    SetCameraAnimationGameSceneState();
 
-                Vector3 curZommLevel = new Vector3(mCamera.DistanceToTarget, mBaseRotationArroundTarget.X, mBaseRotationArroundTarget.Y);
-                mZoomLevelAnimator.Animate(15, curZommLevel, ZoomLevels[mZoomLevel]);
+                    mZoomLevel--;
+
+                    Vector3 curZommLevel = new Vector3(mCamera.DistanceToTarget, mBaseRotationArroundTarget.X, mBaseRotationArroundTarget.Y);
+                    mZoomLevelAnimator.Animate(15, curZommLevel, ZoomLevels[mZoomLevel]);
+                }
+                else
+                {
+                    mZoomLevel--;
+                    UpdateDistanceToTarget(ZoomLevels[mZoomLevel]);
+                }
             }
         }
 

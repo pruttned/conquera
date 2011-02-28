@@ -396,6 +396,13 @@ namespace Conquera
                 HandleCameraControl();
             }
 
+            Update3dCursor();
+
+            mGuiScene.DebugText = State.GetType().ToString();
+        }
+
+        public void Update3dCursor()
+        {
             var cellUnderCur = GetCellUnderCur();
             //3d cursor
             if (null != cellUnderCur && !GuiManager.Instance.HandlesMouse)
@@ -411,8 +418,6 @@ namespace Conquera
             {
                 mCursor3d.IsVisible = false;
             }
-
-            mGuiScene.DebugText = State.GetType().ToString();
         }
 
         public override void Draw(AleGameTime gameTime)
@@ -546,6 +551,15 @@ namespace Conquera
             }
         }
 
+        public void PanCamera(Vector2 pan)
+        {
+            Vector2 dirVec;
+            Vector2 perpDir;
+            GetCameraPerpDirVec(out dirVec, out perpDir);
+
+            GameCamera.TargetWorldPosition += new Vector3((perpDir.X + dirVec.X) * pan.X, (perpDir.Y + dirVec.Y) * pan.Y, 0);
+        }
+
         void msg_Closed(object sender, EventArgs e)
         {
             SceneManager.ExitApplication();
@@ -618,11 +632,19 @@ namespace Conquera
 
         protected override void OnActivatedImpl()
         {
+            SceneManager.KeyboardManager.KeyDown += new KeyboardManager.KeyEventHandler(KeyboardManager_KeyDown);
+            SceneManager.MouseManager.MouseButtonUp += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonUp);
+            SceneManager.MouseManager.MouseButtonDown += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonDown);
+
             GuiManager.Instance.ActiveScene = mGuiScene;
         }
 
         protected override void OnDeactivateImpl()
         {
+            SceneManager.KeyboardManager.KeyDown -= KeyboardManager_KeyDown;
+            SceneManager.MouseManager.MouseButtonUp -= MouseManager_MouseButtonUp;
+            SceneManager.MouseManager.MouseButtonDown -= MouseManager_MouseButtonDown;
+
             GuiManager.Instance.ActiveScene = DefaultGuiScene.Instance;
         }
 
@@ -726,17 +748,8 @@ namespace Conquera
                 {
                     if (SceneManager.MouseManager.IsButtonDown(MouseButton.Middle))
                     {//movement
-                        Vector2 dirVec;
-                        Vector2 perpDir;
-
-                        GetCameraPerpDirVec(out dirVec, out perpDir);
-
                         float scrollSpeed = mGameSettings.CameraScrollSpeed;
-
-                        perpDir *= mouseMovement.X * scrollSpeed;
-                        dirVec *= mouseMovement.Y * scrollSpeed;
-
-                        GameCamera.TargetWorldPosition += new Vector3(perpDir.X + dirVec.X, perpDir.Y + dirVec.Y, 0);
+                        PanCamera(new Vector2(mouseMovement.X * scrollSpeed, mouseMovement.Y * scrollSpeed));
                     }
                 }
             }
@@ -747,53 +760,31 @@ namespace Conquera
                 float scrollSpeed = mGameSettings.CameraCornerScrollSpeed;
                 if (curPos.X <= 0)
                 {
-                    Vector2 dirVec;
-                    Vector2 perpDir;
-                    GetCameraPerpDirVec(out dirVec, out perpDir);
-                    perpDir *= scrollSpeed;
-                    dirVec *= scrollSpeed;
-
-                    GameCamera.TargetWorldPosition += new Vector3(perpDir.X + dirVec.X, 0, 0);
+                    PanCamera(new Vector2(scrollSpeed, 0));
                 }
                 else
                 {
                     if (curPos.X >= Viewport.Width - 1)
                     {
-                        Vector2 dirVec;
-                        Vector2 perpDir;
-                        GetCameraPerpDirVec(out dirVec, out perpDir);
-                        perpDir *= scrollSpeed;
-                        dirVec *= scrollSpeed;
-
-                        GameCamera.TargetWorldPosition -= new Vector3(perpDir.X + dirVec.X, 0, 0);
+                        PanCamera(new Vector2(-scrollSpeed, 0));
                     }
                 }
                 if (curPos.Y <= 0)
                 {
-                    Vector2 dirVec;
-                    Vector2 perpDir;
-                    GetCameraPerpDirVec(out dirVec, out perpDir);
-                    perpDir *= scrollSpeed;
-                    dirVec *= scrollSpeed;
-
-                    GameCamera.TargetWorldPosition += new Vector3(0, perpDir.Y + dirVec.Y, 0);
+                    PanCamera(new Vector2(0, scrollSpeed));
                 }
                 else
                 {
                     if (curPos.Y >= Viewport.Height - 1)
                     {
-                        Vector2 dirVec;
-                        Vector2 perpDir;
-                        GetCameraPerpDirVec(out dirVec, out perpDir);
-                        perpDir *= scrollSpeed;
-                        dirVec *= scrollSpeed;
-
-                        GameCamera.TargetWorldPosition -= new Vector3(0, perpDir.Y + dirVec.Y, 0);
+                        PanCamera(new Vector2(0, -scrollSpeed));
                     }
                 }
             }
 
         }
+
+ 
 
         private void GetCameraPerpDirVec(out Vector2 dirVec, out Vector2 perpDir)
         {
@@ -950,10 +941,6 @@ namespace Conquera
 
         private void Init()
         {
-            SceneManager.KeyboardManager.KeyDown += new KeyboardManager.KeyEventHandler(KeyboardManager_KeyDown);
-            SceneManager.MouseManager.MouseButtonUp += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonUp);
-            SceneManager.MouseManager.MouseButtonDown += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonDown);
-
             AppSettingsManager.Default.AppSettingsCommitted += new AppSettingsManager.CommittedHandler(Default_AppSettingsCommitted);
 
             Viewport = GraphicsDeviceManager.GraphicsDevice.Viewport;
