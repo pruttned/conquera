@@ -212,7 +212,7 @@ namespace Conquera
                 // Directory.GetFiles will return all files whose ext starts with "map"
                 if (string.Equals(Path.GetExtension(file), ".map", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    maps.Add(Path.GetFileNameWithoutExtension(file));
+                    maps.Add(file);
                 }
             }
             return maps;
@@ -222,6 +222,11 @@ namespace Conquera
         {
             string mapFile = GetMapFileName(content, mapName, gameType);
 
+            return Load(mapFile, sceneManager, content);
+        }
+
+        public static GameScene Load(string mapFile, SceneManager sceneManager, ContentGroup content)
+        {
             if (!File.Exists(mapFile))
             {
                 throw new ArgumentException(string.Format("Map '{0}' doesn't exists", mapFile));
@@ -231,14 +236,9 @@ namespace Conquera
 
             using (OrmManager ormManager = new OrmManager(OrmManager.CreateDefaultConnectionString(mapFile)))
             {
-                long settingsId = ormManager.FindObject(typeof(GameSceneSettings), "Key=1");
-                if (0 >= settingsId)
-                {
-                    throw new ArgumentException(string.Format("Map file '{0}' is corrupted", mapFile));
-                }
-                var settings = ormManager.LoadObject<GameSceneSettings>(settingsId);
+                var settings = ormManager.LoadObjects<GameSceneSettings>()[0];
                 var terrain = ormManager.LoadObject<HexTerrain>(settings.TerrainId);
-                var gameSceneState = ormManager.LoadObject<GameSceneContextState>("Key=1");
+                var gameSceneState = ormManager.LoadObjects<GameSceneContextState>()[0];
 
                 scene = settings.CreateScene(sceneManager, content, ormManager, settings, terrain, gameSceneState);
             }
@@ -525,7 +525,7 @@ namespace Conquera
 
         public virtual void OnVictory(GamePlayer player)
         {
-            mVictoryMessageBox = new ConqueraMessageBox(string.Format("Player {0} has won", player.Color.ToString()));
+            mVictoryMessageBox = new ConqueraMessageBox(string.Format("Player {0} has won", player.Name));
             mVictoryMessageBox.Closed += new EventHandler(msg_Closed);
             mVictoryMessageBox.Show(true);
         }

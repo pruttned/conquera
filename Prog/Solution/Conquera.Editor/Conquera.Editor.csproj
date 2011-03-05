@@ -92,6 +92,12 @@
     <Compile Include="Command.cs" />
     <Compile Include="CommandQueue.cs" />
     <Compile Include="EditorScene.cs" />
+    <Compile Include="LoadMapDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoadMapDlg.Designer.cs">
+      <DependentUpon>LoadMapDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="NewMapDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -170,6 +176,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="LoadMapDlg.resx">
+      <DependentUpon>LoadMapDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NewMapDlg.resx">
       <DependentUpon>NewMapDlg.cs</DependentUpon>
     </EmbeddedResource>

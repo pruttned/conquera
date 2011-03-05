@@ -42,9 +42,12 @@ namespace Conquera.Editor
     {
         private ToolBarForm mToolBarForm = new ToolBarForm();
         private EditorScene mEditorScene;
+        private NewMapInfo mDefaultNewMapInfo;
+        Dictionary<string, TileBrush> mTileBrushes = new Dictionary<string, TileBrush>(StringComparer.InvariantCultureIgnoreCase);
 
         public CommandQueue CommandQueue { get; private set; }
-        
+        public ICollection<string> TileBrushes { get { return mTileBrushes.Keys; } }
+
         public GameScene GameScene
         {
             get
@@ -54,6 +57,63 @@ namespace Conquera.Editor
             set
             {
                 mEditorScene.GameScene = value;
+                GuiManager.Instance.Cursor = null;
+
+            }
+        }
+
+        public string TileBrush
+        {
+            get
+            {
+                if (null == mEditorScene.TileBrush)
+                {
+                    return null;
+                }
+                return mEditorScene.TileBrush.Name;
+            }
+            set
+            {
+                mEditorScene.TileBrush = null == value ? null : mTileBrushes[value];
+            }
+        }
+
+        public IList<GamePlayer> Players { get { return mEditorScene.Players; } }
+        public List<string> UnitTypes { get; private set; }
+
+        public EditMode EditMode
+        {
+            get
+            {
+                return mEditorScene.EditMode;
+            }
+            set
+            {
+                mEditorScene.EditMode = value;
+            }
+        }
+
+        public string UnitType
+        {
+            get
+            {
+                return mEditorScene.UnitType;
+            }
+            set
+            {
+                mEditorScene.UnitType = value;
+            }
+        }
+
+        public GamePlayer Player
+        {
+            get
+            {
+                return mEditorScene.Player;
+            }
+            set
+            {
+                mEditorScene.Player = value;
             }
         }
 
@@ -67,10 +127,14 @@ namespace Conquera.Editor
             get { return null; }
         }
 
-        public EditorApplication()
+        public EditorApplication(NewMapInfo newMapInfo)
             : base(null, "Conquera.mod")
         {
             CommandQueue = new CommandQueue();
+            mDefaultNewMapInfo = newMapInfo;
+
+            InitTileBrushes();
+            InitUnitTypes();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -85,7 +149,8 @@ namespace Conquera.Editor
 
         protected override BaseScene CreateDefaultScene(SceneManager sceneManager)
         {
-            mEditorScene = new EditorScene(new HotseatGameScene("TestMap", sceneManager, 20,20, "Grass1Tile", Content.DefaultContentGroup));
+            mEditorScene = new EditorScene(new HotseatGameScene(mDefaultNewMapInfo.Name, SceneManager, mDefaultNewMapInfo.Width, mDefaultNewMapInfo.Height,
+                "Grass1Tile", Content.DefaultContentGroup));
             return mEditorScene;
         }
 
@@ -112,5 +177,60 @@ namespace Conquera.Editor
 
             base.Update(gameTime);
         }
+
+        private void InitTileBrushes()
+        {
+            var ormManager = Content.OrmManager;
+            foreach (var tile in ormManager.LoadObjects<HexTerrainTileSettings>())
+            {
+                string displName = tile.DisplayName;
+                TileBrush brush;
+                if (!mTileBrushes.TryGetValue(displName, out brush))
+                {
+                    brush = new TileBrush(displName);
+                    mTileBrushes.Add(displName, brush);
+                }
+                brush.AddTile(tile.Name);
+            }
+        }
+
+        private void InitUnitTypes()
+        {
+            UnitTypes = new List<string>();
+            var ormManager = Content.OrmManager;
+            foreach (var unit in ormManager.LoadObjects<GameUnitSettings>())
+            {
+                UnitTypes.Add(unit.Name);
+            }
+        }
+    }
+
+    public class TileBrush
+    {
+        private List<string> mTiles = new List<string>();
+
+        public string Name {get; private set;}
+
+        public TileBrush(string name)
+        {
+            Name = name;
+        }
+
+        public void AddTile(string tile)
+        {
+            mTiles.Add(tile);
+        }
+
+        public string GetTile()
+        {
+            if (0 == mTiles.Count)
+            {
+                throw new InvalidOperationException("Brush is empty");
+            }
+            return mTiles[AleMathUtils.Random.Next(mTiles.Count)];
+        }
+
+
+
     }
 }
