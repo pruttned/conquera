@@ -495,6 +495,21 @@ namespace Conquera
                 //        ormManager.SaveObject(obj);
                 //    }
 
+                    //{
+                    //    LandTileSettings obj = new LandTileSettings();
+                    //    obj.Name = "Grass2Tile";
+                    //    obj.DisplayName = "Grass Land";
+                    //    obj.Description = ormManager.LoadObject<StringResource>("Name = 'GrassTileDescription'");
+                    //    obj.HpIncrement = 10;
+                    //    obj.UnitPosition = Vector3.Zero;
+                    //    obj.TileIndex = new Point(0, 3);
+                    //    obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
+                    //    obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
+                    //    obj.IsPassable = true;
+                    //    obj.Icon = "TileIconLand";
+                    //    ormManager.SaveObject(obj);
+                    //}
+
                 //    {
                 //        LandTileSettings obj = new LandTileSettings();
                 //        obj.Name = "Dirt1Tile";
@@ -556,7 +571,6 @@ namespace Conquera
                 //        ormManager.SaveObject(obj);
                 //    }
 
-                    
                 //    {
                 //        foreach (var spell in new KeyValuePair<string, Point>[] { 
                 //            new KeyValuePair<string, Point>("Slayer", new Point(0,1)),

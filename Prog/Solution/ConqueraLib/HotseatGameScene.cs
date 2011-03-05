@@ -66,8 +66,8 @@ namespace Conquera
 
         protected override void CreatePlayers()
         {
-            GameSceneContextState.Players.Add(new HumanPlayer(Color.Blue.ToVector3()));
-            GameSceneContextState.Players.Add(new HumanPlayer(Color.Red.ToVector3()));
+            GameSceneContextState.Players.Add(new HumanPlayer("Blue", Color.Blue.ToVector3()));
+            GameSceneContextState.Players.Add(new HumanPlayer("Red", Color.Red.ToVector3()));
             GameSceneContextState.Players[0].Gold = 1000;
             GameSceneContextState.Players[1].Gold = 1000;
         }

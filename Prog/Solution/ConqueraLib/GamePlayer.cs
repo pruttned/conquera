@@ -103,6 +103,9 @@ namespace Conquera
             }
         }
 
+        [DataProperty(NotNull = true, Unique=true)]
+        public string Name { get; set; }
+
         [DataProperty(NotNull = true)]
         public Vector3 Color { get; private set; }
         [DataListProperty(NotNull = true)]
@@ -132,9 +135,10 @@ namespace Conquera
         [DataProperty] //Not a DataListProperty
         public SpellSlotCollection Spells { get; private set; }
 
-        public GamePlayer(Vector3 color)
+        public GamePlayer(string name, Vector3 color)
             : this()
         {
+            Name = name;
             Color = color;
         }
 
@@ -155,10 +159,10 @@ namespace Conquera
 
         internal void AddGameUnit(GameUnit unit)
         {
-            if (mUnits.Count >= MaxUnitCnt)
-            {
-                throw new InvalidOperationException("MaxUnitCnt already reached.");
-            }
+            //if (mUnits.Count >= MaxUnitCnt)
+            //{
+            //    throw new InvalidOperationException("MaxUnitCnt already reached.");
+            //}
 
             mUnits.Add(unit);
             RaiseUnitsChanged();
@@ -222,6 +226,11 @@ namespace Conquera
             return Scene.AddGameUnit(this, descName, cell);
         }
 
+        public override string ToString()
+        {
+            return Name;
+        }
+
         protected GamePlayer()
         {
             Cells = new ReadOnlyCollection<HexCell>(mCells);
@@ -256,8 +265,8 @@ namespace Conquera
             get { return true; }
         }
 
-        public HumanPlayer(Vector3 color)
-            : base(color)
+        public HumanPlayer(string name, Vector3 color)
+            : base(name, color)
         {
             CameraTargetPos = new Vector3();
         }

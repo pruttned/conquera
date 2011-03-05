@@ -390,6 +390,24 @@ namespace SimpleOrmFramework
         }
 
         /// <summary>
+        /// Loads all data objects of a given type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sofQuery"></param>
+        /// <returns></returns>
+        public T[] LoadObjects<T>() where T : class, IDataObject
+        {
+            long[] ids = GetIds(typeof(T));
+            T[] objs = new T[ids.Length];
+            for (int i = 0; i < ids.Length; ++i)
+            {
+                objs[i] = LoadObject<T>(ids[i]);
+            }
+
+            return objs;
+        }
+
+        /// <summary>
         /// Loads data objects that matches a given query
         /// </summary>
         /// <param name="type"></param>
@@ -460,6 +478,40 @@ namespace SimpleOrmFramework
                 throw ex;
             }
         }
+
+        /// <summary>
+        /// Gets all objects(theirs ids) of a given type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public long[] GetIds(Type type)
+        {
+            if (null == type) throw new ArgumentNullException("type");
+            try
+            {
+                DataObjectTypeMetaInfo dataObjectMetaInfo = DataObjectTypeMetaInfoManager.GetDataObjectMetaInfoFromType(type);
+                string query = string.Format("SELECT [Id] FROM [{0}]", dataObjectMetaInfo.TableName);
+
+                List<long> ids = new List<long>();
+                using (DbDataReader reader = DataLayerManager.ExecuteReaderCommand(query))
+                {
+                    while (reader.Read())
+                    {
+                        ids.Add((long)reader[0]);
+                    }
+                }
+
+                return ids.ToArray();
+            }
+            catch (Exception ex)
+            {
+                ex = new SofException(string.Format("Exception occured during searching for objects of type '{0}'. See inner exception for details.", type.FullName), ex);
+                ex.Data["Type"] = type;
+                throw ex;
+            }
+        }
+
+
 
         /// <summary>
         /// Gets the id of the first objects that matches a given query
