@@ -35,17 +35,6 @@ namespace Conquera
         [DataProperty(NotNull = true)]
         public long TerrainId { get; set; }
 
-        /// <summary>
-        /// Only fo ormManager.FindObject
-        /// </summary>
-        [DataProperty(NotNull = true)]
-        private int Key { get; set; }
-
-        public GameSceneSettings()
-        {
-            Key = 1;
-        }
-
         public abstract GameScene CreateScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState);
     }
 

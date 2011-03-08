@@ -1,4 +1,22 @@
-﻿using System;
+﻿//////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2010 by Conquera Team
+//  Part of the Conquera Project
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+////////////////////////////////////////////////////////////////////////
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Ale.Scene;
@@ -11,11 +29,28 @@ using Ale.Settings;
 
 namespace Conquera.Editor
 {
+    public enum EditMode
+    {
+        TileEdit,
+        RegionEdit,
+        UnitEdit
+    }
+
     class EditorScene : BaseScene
     {
         GameSettings mGameSettings;
-
         private GameScene mGameScene;
+        private TileBrush mTileBrush;
+        private HexCell mLastSetTileCell = null;
+
+        public EditMode EditMode { get; set; }
+        public string UnitType { get; set; }
+        public GamePlayer Player { get; set; }
+
+
+        public IList<GamePlayer> Players { get { return mGameScene.GameSceneContextState.Players; } }
+
+
         public GameScene GameScene 
         { 
             get {return mGameScene;}
@@ -33,6 +68,16 @@ namespace Conquera.Editor
                 }
             }
         }
+
+        public TileBrush TileBrush
+        {
+            get { return mTileBrush; }
+            set
+            {
+                mTileBrush = value;
+            }
+        }
+
         protected GameCamera GameCamera
         {
             get { return GameScene.GameCamera; }
@@ -43,17 +88,108 @@ namespace Conquera.Editor
         {
             GameScene = gameScene;
             mGameSettings = AppSettingsManager.Default.GetSettings<GameSettings>();
+            EditMode = EditMode.TileEdit;
+
+            Player = GameScene.CurrentPlayer;
         }
 
         public override void Draw(AleGameTime gameTime)
         {
             GameScene.Draw(gameTime);
         }
+
         public override void Update(AleGameTime gameTime)
         {
             GameScene.Update3dCursor();
-
             HandleCamera();
+
+            var cellUnderCur = mGameScene.GetCellUnderCur();
+
+            if (null != cellUnderCur)
+            {
+                var cellUnderCurIndex = cellUnderCur.Index;
+                switch (EditMode)
+                {
+                    case EditMode.TileEdit:
+                        if (SceneManager.MouseManager.IsButtonDown(MouseButton.Left))
+                        {
+                            if (null == TileBrush)
+                            {
+                                ClearCell(cellUnderCur); 
+                                cellUnderCur.SetTile(null);
+                            }
+                            else
+                            {
+                                if (!cellUnderCur.IsPassable)
+                                {
+                                    ClearCell(cellUnderCur);
+                                }
+
+                                if (mLastSetTileCell != cellUnderCur || !string.Equals(cellUnderCur.HexTerrainTile.DisplayName, TileBrush.Name))
+                                {
+                                    cellUnderCur.SetTile(TileBrush.GetTile());
+                                    mLastSetTileCell = cellUnderCur;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (SceneManager.MouseManager.IsButtonDown(MouseButton.Right))
+                            {
+                                ClearCell(cellUnderCur); 
+                                cellUnderCur.SetTile(null);
+                            }
+                        }
+
+                        break;
+                    case EditMode.RegionEdit:
+                        if (SceneManager.MouseManager.IsButtonDown(MouseButton.Left))
+                        {
+                            if (!cellUnderCur.IsGap && cellUnderCur.IsPassable)
+                            {
+                                GameScene.SetCellOwner(cellUnderCurIndex, Player);
+                            }
+                        }
+                        else
+                        {
+                            if (SceneManager.MouseManager.IsButtonDown(MouseButton.Right))
+                            {
+                                GameScene.SetCellOwner(cellUnderCurIndex, null);
+                            }
+                        }
+                        break;
+                    case EditMode.UnitEdit:
+                        if (SceneManager.MouseManager.IsButtonDown(MouseButton.Left))
+                        {
+                            if (null == cellUnderCur.GameUnit && !cellUnderCur.IsGap && cellUnderCur.IsPassable)
+                            {
+                                GameScene.AddGameUnit(Player, UnitType, cellUnderCurIndex);
+                            }
+                        }
+                        else
+                        {
+                            if (SceneManager.MouseManager.IsButtonDown(MouseButton.Right))
+                            {
+                                if (null != cellUnderCur.GameUnit)
+                                {
+                                    GameScene.RemoveUnit(cellUnderCur.GameUnit);
+                                }
+                            }
+                        }
+                        break;
+                }
+
+            }
+        }
+
+        private void ClearCell(HexCell cellUnderCur)
+        {
+            var cellUnderCurIndex = cellUnderCur.Index;
+            GameScene.SetCellOwner(cellUnderCurIndex, null);
+            if (null != cellUnderCur.GameUnit)
+            {
+                GameScene.RemoveUnit(cellUnderCur.GameUnit);
+            }
         }
 
         protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentGroup content)

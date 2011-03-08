@@ -336,7 +336,7 @@ namespace Conquera.Gui
         public void SetPlayer(GamePlayer player)
         {            
             mPlayerColorLabel.Color = new Color(player.Color);
-            mPlayerColorLabel.Text = mPlayerColorLabel.Color.ToString();
+            mPlayerColorLabel.Text = player.Name;
         }
 
         protected override void OnDrawForeground()
