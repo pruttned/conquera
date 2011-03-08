@@ -62,7 +62,7 @@ namespace Conquera
         {
             return HotseatGameScene.Load("TestMap", sceneManager, Content.DefaultContentGroup);
          //   return new MainMenuScene(sceneManager, Content.DefaultContentGroup);
-            //return new GameScene("TestMap", sceneManager, 20,20, "Grass1Tile", Content.DefaultContentGroup);
+            //return new HotseatGameScene("TestMap", sceneManager, 20, 20, "Grass1Tile", Content.DefaultContentGroup);
         }
 
         protected override void OnInit()

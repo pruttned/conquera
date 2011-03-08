@@ -104,13 +104,17 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(262, 115);
+            this.ControlBox = false;
             this.Controls.Add(this.button1);
             this.Controls.Add(this.mCreateButton);
             this.Controls.Add(this.mHeightNumericUpDown);
             this.Controls.Add(this.mWidthNumericUpDown);
             this.Controls.Add(this.mMapNameTextBox);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "NewMapDlg";
-            this.Text = "NewMapDlg";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
+            this.Text = "NewMap";
             ((System.ComponentModel.ISupportInitialize)(this.mWidthNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.mHeightNumericUpDown)).EndInit();
             this.ResumeLayout(false);
