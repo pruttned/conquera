@@ -85,6 +85,11 @@ namespace Conquera.Gui
             Click += new EventHandler<ControlEventArgs>(SpellSlotButton_Click);
         }
 
+        public void Toggle()
+        {
+            mGameScene.ActiveSpellSlot = mGameScene.ActiveSpellSlot != SpellSlot ? SpellSlot : null;
+        }
+
         protected override void OnDrawForeground()
         {
             mCountLabelContainer.Draw(this);
@@ -124,7 +129,7 @@ namespace Conquera.Gui
 
         private void SpellSlotButton_Click(object sender, ControlEventArgs e)
         {
-            mGameScene.ActiveSpellSlot = mGameScene.ActiveSpellSlot != SpellSlot ? SpellSlot : null;
+            Toggle();
         }
     }
 }

@@ -633,15 +633,17 @@ namespace Conquera
         protected override void OnActivatedImpl()
         {
             SceneManager.KeyboardManager.KeyDown += new KeyboardManager.KeyEventHandler(KeyboardManager_KeyDown);
+            SceneManager.KeyboardManager.KeyUp += new KeyboardManager.KeyEventHandler(KeyboardManager_KeyUp);
             SceneManager.MouseManager.MouseButtonUp += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonUp);
             SceneManager.MouseManager.MouseButtonDown += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonDown);
-
+            
             GuiManager.Instance.ActiveScene = mGuiScene;
         }
 
         protected override void OnDeactivateImpl()
         {
             SceneManager.KeyboardManager.KeyDown -= KeyboardManager_KeyDown;
+            SceneManager.KeyboardManager.KeyUp -= KeyboardManager_KeyUp;
             SceneManager.MouseManager.MouseButtonUp -= MouseManager_MouseButtonUp;
             SceneManager.MouseManager.MouseButtonDown -= MouseManager_MouseButtonDown;
 
@@ -797,6 +799,8 @@ namespace Conquera
         
         private void KeyboardManager_KeyDown(Microsoft.Xna.Framework.Input.Keys key, KeyboardManager keyboardManager)
         {
+            GuiManager.Instance.HandleKeyDown(key);
+
             if (key == Microsoft.Xna.Framework.Input.Keys.S)
             {
                 ScenePass shadowPass = GetScenePass(ShadowScenePass.Name);
@@ -875,6 +879,11 @@ namespace Conquera
                     Console.WriteLine(CurrentPlayer.Gold);
                 }
             }
+        }
+
+        private void KeyboardManager_KeyUp(Microsoft.Xna.Framework.Input.Keys key, KeyboardManager keyboardManager)
+        {
+            GuiManager.Instance.HandleKeyUp(key);
         }
 
         public void KillUnit(GameUnit unit)

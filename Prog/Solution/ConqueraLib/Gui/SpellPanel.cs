@@ -72,5 +72,10 @@ namespace Conquera.Gui
                 ChildControls.Add(mButtons[i]);
             }
         }
+
+        public void ToggleSpellSlotButton(int index)
+        {
+            mButtons[index].Toggle();
+        }
     }
 }

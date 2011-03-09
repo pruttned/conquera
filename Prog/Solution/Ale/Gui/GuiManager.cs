@@ -25,6 +25,7 @@ using Ale.Content;
 using Ale.Input;
 using Microsoft.Xna.Framework;
 using Ale.Settings;
+using Microsoft.Xna.Framework.Input;
 
 namespace Ale.Gui
 {
@@ -238,7 +239,23 @@ namespace Ale.Gui
             mMouseDownControl = null;
             return false;
         }
-        
+
+        public void HandleKeyDown(Keys key)
+        {
+            if (ActiveScene != null)
+            {
+                ActiveScene.OnKeyDown(key);
+            }
+        }
+
+        public void HandleKeyUp(Keys key)
+        {
+            if (ActiveScene != null)
+            {
+                ActiveScene.OnKeyUp(key);
+            }
+        }
+
         private void UpdateControlUnderMouse()
         {
             mControlUnderMouse = GetControlUnderMouse();
