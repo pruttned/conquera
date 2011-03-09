@@ -21,6 +21,7 @@ using Ale.Scene;
 using Microsoft.Xna.Framework;
 using Ale.Gui;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Conquera.Gui
 {
@@ -146,6 +147,14 @@ namespace Conquera.Gui
             UpdateSpellPanel();
 
             mCurrentPlayerDisplay.SetPlayer(mGameScene.CurrentPlayer);
+        }
+
+        protected override void OnKeyDown(Keys key)
+        {
+            if (key >= Keys.D1 && key <= Keys.D9)
+            {
+                mSpellPanel.ToggleSpellSlotButton((int)key - (int)Keys.D1);
+            }
         }
 
         private void BindToCurrentPlayer()
