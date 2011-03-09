@@ -18,6 +18,8 @@
 
 using System;
 using Ale.Gui;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Conquera.Gui
 {
@@ -31,7 +33,13 @@ namespace Conquera.Gui
         {
             mMainMenuScene = mainMenuScene;
 
-            mMapListBox = new ListBox(HotseatGameScene.QueryMapFiles(mMainMenuScene.Content));
+            IList<string> maps = HotseatGameScene.QueryMapFiles(mMainMenuScene.Content);
+            for (int i = 0; i < maps.Count; ++i)
+            {
+                maps[i] = Path.GetFileNameWithoutExtension(maps[i]);
+            }
+
+            mMapListBox = new ListBox(maps);
             mMapListBox.Location = new Microsoft.Xna.Framework.Point(200, 200);
             mMapListBox.SelectedItemChanged += new EventHandler<ListBox.SelectedItemChangedEventArgs>(mMapListBox_SelectedItemChanged);
             RootControls.Add(mMapListBox);
