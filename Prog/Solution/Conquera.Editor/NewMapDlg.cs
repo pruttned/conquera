@@ -24,6 +24,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Conquera.Editor
 {
@@ -44,6 +45,19 @@ namespace Conquera.Editor
         public NewMapDlg()
         {
             InitializeComponent();
+        }
+
+        private void mCreateButton_Click(object sender, EventArgs e)
+        {
+            string fileName = Path.Combine(GameScene.GetMapDirName("HotSeat"), mMapNameTextBox.Text + ".map");
+            if (File.Exists(fileName))
+            {
+                MessageBox.Show("Map with a same name already exists", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                DialogResult = DialogResult.OK;
+            }
         }
     }
 }

@@ -153,7 +153,7 @@ namespace Conquera
         {
             if (key == Microsoft.Xna.Framework.Input.Keys.Enter)
             {
-                var maps = HotseatGameScene.QueryMapFiles(Content);
+                var maps = HotseatGameScene.QueryMapFiles();
 
                 //var map = new HotseatGameScene("TestMap", SceneManager, 10,10, "Grass1Tile", Content);
                 var map = HotseatGameScene.Load(maps[0], SceneManager, Content);

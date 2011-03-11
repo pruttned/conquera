@@ -50,12 +50,12 @@ namespace Ale.Editor
         }
 
         public AleApplication(AleRenderControl renderControl)
-            : base(renderControl, "Conquera.mod")
+            : base(renderControl)
         {
         }
 
         public AleApplication()
-            : base("Conquera.mod")
+            : base()
         {
             base.GraphicsDeviceManager.IsFullScreen = false;
 

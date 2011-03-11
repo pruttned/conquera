@@ -81,13 +81,13 @@
             // 
             // mCreateButton
             // 
-            this.mCreateButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.mCreateButton.Location = new System.Drawing.Point(12, 78);
             this.mCreateButton.Name = "mCreateButton";
             this.mCreateButton.Size = new System.Drawing.Size(99, 25);
             this.mCreateButton.TabIndex = 3;
             this.mCreateButton.Text = "Create";
             this.mCreateButton.UseVisualStyleBackColor = true;
+            this.mCreateButton.Click += new System.EventHandler(this.mCreateButton_Click);
             // 
             // button1
             // 
@@ -103,7 +103,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(262, 115);
+            this.ClientSize = new System.Drawing.Size(258, 111);
             this.ControlBox = false;
             this.Controls.Add(this.button1);
             this.Controls.Add(this.mCreateButton);

@@ -139,7 +139,7 @@ namespace Conquera.Editor
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (LoadMapDlg loadMapDlg = new LoadMapDlg(EditorApplication.Content.DefaultContentGroup))
+            using (LoadMapDlg loadMapDlg = new LoadMapDlg())
             {
                 if (DialogResult.OK == loadMapDlg.ShowDialog(this))
                 {

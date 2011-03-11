@@ -199,9 +199,9 @@ namespace Conquera
             Init();
         }
 
-        public static IList<string> QueryMapFiles(string gameType, ContentGroup content)
+        public static IList<string> QueryMapFiles(string gameType)
         {
-            string mapDir = GetMapDirName(content, gameType);
+            string mapDir = GetMapDirName(gameType);
             if(!Directory.Exists(mapDir))
             {
                 return new string[0];
@@ -220,7 +220,7 @@ namespace Conquera
 
         public static GameScene Load(string mapName, string gameType, SceneManager sceneManager, ContentGroup content)
         {
-            string mapFile = GetMapFileName(content, mapName, gameType);
+            string mapFile = GetMapFileName(mapName, gameType);
 
             return Load(mapFile, sceneManager, content);
         }
@@ -902,6 +902,32 @@ namespace Conquera
             RefreshSelectedCell();
         }
 
+        public string GetMapDirName()
+        {
+            return GetMapDirName(GameType);
+        }
+
+        public string GetMapFileName()
+        {
+            return GetMapFileName(Name, GameType);
+        }
+
+        public static string GetMapFileName(string mapName, string gameType)
+        {
+            return Path.Combine(GetMapDirName(gameType), mapName + ".map");
+        }
+
+        public static string GetMapDirName(string gameType)
+        {
+            string modFile = MainSettings.Instance.Mod;
+            if (!Path.IsPathRooted(modFile))
+            {
+                modFile = Path.Combine(MainSettings.Instance.DataDirectory, modFile);
+            }
+
+            return Path.Combine(Path.Combine(Path.GetDirectoryName(modFile), Path.GetFileNameWithoutExtension(modFile)), string.Format("Maps\\{0}", gameType));
+        }
+
         private void MouseManager_MouseButtonUp(MouseButton button, MouseManager mouseManager)
         {
             if (!GuiManager.Instance.HandleMouseUp(button) && !GuiManager.Instance.HandlesMouse)
@@ -925,27 +951,6 @@ namespace Conquera
             }
             GetCell(oldValue).GameUnit = null;
             cell.GameUnit = obj;
-        }
-
-        private string GetMapDirName()
-        {
-            return GetMapDirName(Content, GameType);
-        }
-
-        private string GetMapFileName()
-        {
-            return GetMapFileName(Content, Name, GameType);
-        }
-
-        private static string GetMapFileName(ContentGroup content, string mapName, string gameType)
-        {
-            return Path.Combine(GetMapDirName(content, gameType), mapName + ".map");
-        }
-
-        private static string GetMapDirName(ContentGroup content, string gameType)
-        {
-            string modFile = content.ParentContentManager.ModFile;
-            return Path.Combine(Path.Combine(Path.GetDirectoryName(modFile), Path.GetFileNameWithoutExtension(modFile)), string.Format("Maps\\{0}", gameType));
         }
 
         private void Init()

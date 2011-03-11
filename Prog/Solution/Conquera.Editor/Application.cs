@@ -128,7 +128,7 @@ namespace Conquera.Editor
         }
 
         public EditorApplication(NewMapInfo newMapInfo)
-            : base(null, "Conquera.mod")
+            : base()
         {
             CommandQueue = new CommandQueue();
             mDefaultNewMapInfo = newMapInfo;

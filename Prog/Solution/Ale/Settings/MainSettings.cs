@@ -76,7 +76,7 @@ namespace Ale.Settings
             }
         }
         [AppSettingsParam]
-        public string DefaultMod { get; set; }
+        public string Mod { get; set; }
 
         [AppSettingsParam]
         public bool Logging { get; set; }
@@ -90,7 +90,7 @@ namespace Ale.Settings
         {
             UserDir = @"My Games\AL\";
             DataDirectory = "Data";
-            DefaultMod = "AL.mod";
+            Mod = "AL.mod";
             Logging = true;
         }
     }

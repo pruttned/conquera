@@ -33,7 +33,7 @@ namespace Conquera.Gui
         {
             mMainMenuScene = mainMenuScene;
 
-            IList<string> maps = HotseatGameScene.QueryMapFiles(mMainMenuScene.Content);
+            IList<string> maps = HotseatGameScene.QueryMapFiles();
             for (int i = 0; i < maps.Count; ++i)
             {
                 maps[i] = Path.GetFileNameWithoutExtension(maps[i]);

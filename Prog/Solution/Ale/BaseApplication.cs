@@ -173,9 +173,8 @@ namespace Ale
         /// <summary>
         /// Ctor
         /// </summary>
-        /// <param name="modFile"></param>
-        public BaseApplication(string modFile)
-            : this(null, modFile)
+        public BaseApplication()
+            : this(null)
         {
         }
 
@@ -184,11 +183,12 @@ namespace Ale
         /// </summary>
         /// <param name="renderControl">- Control that should be used as a target for rendering (null - window will be created)</param>
         /// <param name="modFile"></param>
-        public BaseApplication(AleRenderControl renderControl, string modFile)
+        public BaseApplication(AleRenderControl renderControl)
         {
             mRenderWindowHasFocus = true;
 
             string dataDirectory = MainSettings.Instance.DataDirectory;
+            string modFile = MainSettings.Instance.Mod;
             if (!Path.IsPathRooted(modFile))
             {
                 modFile = Path.Combine(dataDirectory, modFile);
