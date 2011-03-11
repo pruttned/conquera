@@ -96,6 +96,11 @@ namespace Conquera
                 //        wallMat.Params.Add(new Texture2DMaterialParamSettings("gWallLightMap", "WallLightMap"));
                 //        ormManager.SaveObject(wallMat);
                 //    }
+                //{
+                //    MaterialSettings s = new MaterialSettings("WallLavaGlowMat", "WallLavaGlowFx", DefaultRenderLayers.GroundWall);
+                //    s.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "WallLavalGlowTex"));
+                //    ormManager.SaveObject(s);
+                //}
 
                 //    {
                 //        MaterialSettings waterPlaneMat = new MaterialSettings("waterPlaneMat", "WaterPlaneFx", DefaultRenderLayers.Water);
@@ -279,16 +284,18 @@ namespace Conquera
                 //        ormManager.SaveObject(settings);
                 //    }
 
-                //    {
-                //        GraphicModelSettings settings = new GraphicModelSettings();
-                //        settings.Mesh = "HexCellWall";
-                //        settings.Name = "Wall1Gm";
-                //        settings.BoundsMultiplicator = 1.0f;
-                //        settings.MaterialAssignments.Add(new MaterialAssignmentsettings("Wall", ormManager.FindObjects(typeof(MaterialSettings), "Name='WallMat'")[0]));
-                //        settings.MaterialAssignments.Add(new MaterialAssignmentsettings("Grass", ormManager.FindObjects(typeof(MaterialSettings), "Name='WallGrassMat'")[0]));
+                    //{
+                    //    GraphicModelSettings settings = new GraphicModelSettings();
+                    //    //GraphicModelSettings settings = ormManager.LoadObject<GraphicModelSettings>("Name='Wall1Gm'");
+                    //    settings.Mesh = "HexCellWall";
+                    //    settings.Name = "Wall1Gm";
+                    //    settings.BoundsMultiplicator = 1.0f;
+                    //    settings.MaterialAssignments.Clear();
+                    //    settings.MaterialAssignments.Add(new MaterialAssignmentsettings("Wall", ormManager.FindObjects(typeof(MaterialSettings), "Name='WallMat'")[0]));
+                    //    settings.MaterialAssignments.Add(new MaterialAssignmentsettings("Glow", ormManager.FindObjects(typeof(MaterialSettings), "Name='WallLavaGlowMat'")[0]));
 
-                //        ormManager.SaveObject(settings);
-                //    }
+                    //    ormManager.SaveObject(settings);
+                    //}
 
                 //    {
                 //        MaterialSettings mat = new MaterialSettings("CastleMat", "Simple", DefaultRenderLayers.GroundStandingObjects);

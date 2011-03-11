@@ -40,7 +40,7 @@ namespace Ale.Scene
         /// Temporal storage for objects that are outside of the bounds of the octree.
         /// Whenever size of this list exceeds its maximum, then the octree is resized and objects are inserted to octree tree.
         /// </summary>
-     //   private List<IOctreeObject> mOutsideOctreeObjects = new List<IOctreeObject>();
+        private List<IOctreeObject> mOutsideOctreeObjects = new List<IOctreeObject>();
 
         /// <summary>
         /// Objects queried in foreach. (Promoted to member)
@@ -100,8 +100,8 @@ namespace Ale.Scene
             
             if (!TryAddObject(octreeObject))
             {
-                throw new ArgumentException("Object was outside of octree's bounds");
-               // AddOutsideOctreeObject(octreeObject);
+               // throw new ArgumentException("Object was outside of octree's bounds");
+                AddOutsideOctreeObject(octreeObject);
             }
         }
 
@@ -129,15 +129,15 @@ namespace Ale.Scene
             QueryObjects(mQueriedObjects, octreeObjectNodeFilter, ref octreeFilterStatistics);
             
             //objects outside of octree
-            //for (int i = 0; i < mOutsideOctreeObjects.Count; ++i)
-            //{
-            //    octreeFilterStatistics.IncCheckedObjectCnt();
-            //    if (octreeObjectNodeFilter.CheckObject(mOutsideOctreeObjects[i]))
-            //    {
-            //        octreeFilterStatistics.IncIncludedObjectCnt();
-            //        mQueriedObjects.Add(mOutsideOctreeObjects[i]);
-            //    }
-            //}
+            for (int i = 0; i < mOutsideOctreeObjects.Count; ++i)
+            {
+                octreeFilterStatistics.IncCheckedObjectCnt();
+                if (octreeObjectNodeFilter.CheckObject(mOutsideOctreeObjects[i]))
+                {
+                    octreeFilterStatistics.IncIncludedObjectCnt();
+                    mQueriedObjects.Add(mOutsideOctreeObjects[i]);
+                }
+            }
 
             //what if action changes the octree (particle system bounds are changed in OnEnqueRenderableUnits)
             for (int i = 0; i < mQueriedObjects.Count; ++i)
@@ -185,6 +185,16 @@ namespace Ale.Scene
             return ForEachObject(action, mRayOctreeObjectNodeFilter);
         }
 
+        public override bool RemoveObject(IOctreeObject octreeObject)
+        {
+            if (base.RemoveObject(octreeObject))
+            {
+                return true;
+            }
+            //outside objects
+            return mOutsideOctreeObjects.Remove(octreeObject);
+        }
+
         /// <summary>
         /// Called by a child node when it isn't cappable to hold some object any longer (e.g. it has been resized)
         /// </summary>
@@ -202,9 +212,9 @@ namespace Ale.Scene
         {
             if (!CanContain(octreeObject))
             {
-                throw new ArgumentException("Object was outside of octree's bounds");
-//                RemoveObjectFromThisNode(octreeObject);
-  //              AddOutsideOctreeObject(octreeObject);
+               // throw new ArgumentException("Object was outside of octree's bounds");
+                RemoveObjectFromThisNode(octreeObject);
+                AddOutsideOctreeObject(octreeObject);
             }
         }
 
@@ -212,50 +222,51 @@ namespace Ale.Scene
         /// Adds object that can't be stored in octree because it is outside of its bounds
         /// </summary>
         /// <param name="octreeObject"></param>
-        //private void AddOutsideOctreeObject(IOctreeObject octreeObject)
-        //{
-        //    //doesn't subscribes for a WorldBoundsChanged event
-        //    mOutsideOctreeObjects.Add(octreeObject);
+        private void AddOutsideOctreeObject(IOctreeObject octreeObject)
+        {
+            //doesn't subscribes for a WorldBoundsChanged event
+            octreeObject.WorldBoundsChanged += new WorldBoundsChangedHandler(OnOctreeObjectWorldBoundsChanged);
+            mOutsideOctreeObjects.Add(octreeObject);
 
-        //    if (MaxOutsideOctreeObjectCnt < mOutsideOctreeObjects.Count)
-        //    {//resize the octree
-        //        //compute new bounds
-        //        BoundingBox oldBounds = Bounds;
-        //        BoundingBox newBounds = oldBounds;
-        //        foreach (Renderable outRenderable in mOutsideOctreeObjects)
-        //        {
-        //            BoundingBox renderableBounds = BoundingBox.CreateFromSphere(outRenderable.WorldBounds);
-        //            BoundingBox.CreateMerged(ref newBounds, ref renderableBounds, out newBounds);
-        //        }
+            //if (MaxOutsideOctreeObjectCnt < mOutsideOctreeObjects.Count)
+            //{//resize the octree
+            //    //compute new bounds
+            //    BoundingBox oldBounds = Bounds;
+            //    BoundingBox newBounds = oldBounds;
+            //    foreach (Renderable outRenderable in mOutsideOctreeObjects)
+            //    {
+            //        BoundingBox renderableBounds = BoundingBox.CreateFromSphere(outRenderable.WorldBounds);
+            //        BoundingBox.CreateMerged(ref newBounds, ref renderableBounds, out newBounds);
+            //    }
 
-        //        //keep the same center position
-        //        Vector3 oldMax = oldBounds.Max;
-        //        Vector3 oldMin = oldBounds.Min;
-        //        Vector3 newMax = newBounds.Max;
-        //        Vector3 newMin = newBounds.Min;
-        //        Vector3 bInc = new Vector3(
-        //            Math.Max(newMax.X - oldMax.X, Math.Abs(newMin.X - oldMin.X)),
-        //            Math.Max(newMax.Y - oldMax.Y, Math.Abs(newMin.Y - oldMin.Y)),
-        //            Math.Max(newMax.Z - oldMax.Z, Math.Abs(newMin.Z - oldMin.Z)));
+            //    //keep the same center position
+            //    Vector3 oldMax = oldBounds.Max;
+            //    Vector3 oldMin = oldBounds.Min;
+            //    Vector3 newMax = newBounds.Max;
+            //    Vector3 newMin = newBounds.Min;
+            //    Vector3 bInc = new Vector3(
+            //        Math.Max(newMax.X - oldMax.X, Math.Abs(newMin.X - oldMin.X)),
+            //        Math.Max(newMax.Y - oldMax.Y, Math.Abs(newMin.Y - oldMin.Y)),
+            //        Math.Max(newMax.Z - oldMax.Z, Math.Abs(newMin.Z - oldMin.Z)));
 
-        //        bInc = new Vector3(Math.Max(bInc.X, Math.Max(bInc.Y, bInc.Z))*2);
+            //    bInc = new Vector3(Math.Max(bInc.X, Math.Max(bInc.Y, bInc.Z)) * 2);
 
-        //        newBounds = new BoundingBox(oldMin - bInc, oldMax + bInc);
+            //    newBounds = new BoundingBox(oldMin - bInc, oldMax + bInc);
 
-        //        //resize
-        //        Resize(newBounds);
+            //    //resize
+            //    Resize(newBounds);
 
-        //        foreach (IOctreeObject outObject in mOutsideOctreeObjects)
-        //        {
-        //            if (!TryAddObject(outObject))
-        //            {//this shouldn't happen
-        //                throw new Exception("Failed to add renderable in AddOutsideOctreeObject");
-        //            }
-        //        }
+            //    foreach (IOctreeObject outObject in mOutsideOctreeObjects)
+            //    {
+            //        if (!TryAddObject(outObject))
+            //        {//this shouldn't happen
+            //            throw new Exception("Failed to add renderable in AddOutsideOctreeObject");
+            //        }
+            //    }
 
-        //        mOutsideOctreeObjects.Clear();
-        //    }
-        //}
+            //    mOutsideOctreeObjects.Clear();
+            //}
+        }
 
         #endregion Methods
     }

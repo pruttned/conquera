@@ -177,7 +177,7 @@ namespace Ale.Scene
         /// </summary>
         /// <param name="octreeObject"></param>
         /// <returns></returns>
-        public bool RemoveObject(IOctreeObject octreeObject)
+        public virtual bool RemoveObject(IOctreeObject octreeObject)
         {
             if (null == octreeObject) { throw new NullReferenceException("octreeObject"); }
 
