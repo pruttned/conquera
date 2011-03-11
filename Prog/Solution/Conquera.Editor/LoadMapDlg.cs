@@ -48,14 +48,7 @@ namespace Conquera.Editor
             }
         }
 
-        private ContentGroup mContent = null;
         public string MapFile { get; private set; }
-
-        public LoadMapDlg(ContentGroup content)
-            :this()
-        {
-            mContent = content;
-        }
 
         public LoadMapDlg()
         {
@@ -64,12 +57,9 @@ namespace Conquera.Editor
 
         private void LoadMapDlg_Load(object sender, EventArgs e)
         {
-            if(null != mContent)
+            foreach (string file in HotseatGameScene.QueryMapFiles())
             {
-                foreach (string file in HotseatGameScene.QueryMapFiles(mContent))
-                {
-                    listBox1.Items.Add(new ListBoxItem(file));
-                }
+                listBox1.Items.Add(new ListBoxItem(file));
             }
         }
 

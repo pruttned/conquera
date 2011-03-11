@@ -53,16 +53,15 @@ namespace Conquera
         {
         }
 
-        public static HotseatGameScene Load(string mapName, SceneManager sceneManager, ContentGroup content)
+        public new static HotseatGameScene Load(string mapName, SceneManager sceneManager, ContentGroup content)
         {
             return (HotseatGameScene)GameScene.Load(mapName, "Hotseat", sceneManager, content);
         }
 
-        public static IList<string> QueryMapFiles(ContentGroup content)
+        public static IList<string> QueryMapFiles()
         {
-            return GameScene.QueryMapFiles("Hotseat", content);
+            return GameScene.QueryMapFiles("Hotseat");
         }
-
 
         protected override void CreatePlayers()
         {
