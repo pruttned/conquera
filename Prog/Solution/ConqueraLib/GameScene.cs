@@ -74,6 +74,8 @@ namespace Conquera
 
         private MovementAreaRenderable mMovementAreaRenderable;
 
+        private LavaRenderable mLavaRenderable;
+
         public string Name 
         {
             get { return mSettings.Name; }
@@ -584,6 +586,7 @@ namespace Conquera
                 Terrain.Dispose();
                 mMovementArrow.Dispose();
                 mCellLabelManager.Dispose();
+                Octree.DestroyObject(mLavaRenderable);
 
                 GameCamera.Dispose();
             }
@@ -603,10 +606,10 @@ namespace Conquera
             //scenePasses.Add(new WaterReflectionPass(mainCamera, this, renderTargetManager, content));
 
             //todo - nacitavaj material z content podla mena
-            Material skyPlaneMaterial = new Material(content.Load<MaterialEffect>("SkyPlaneFx"), 0);
-            skyPlaneMaterial.DefaultTechnique.Passes[0].SetParam("gDiffuseMap", content.Load<Texture2D>("Sky"));
-            skyPlaneMaterial.Techniques["SkyPlaneScenePass"].Passes[0].SetParam("gDiffuseMap", content.Load<Texture2D>("Sky"));
-            scenePasses.Add(new SkyPlaneScenePass(mainCamera.RealCamera, this, content, skyPlaneMaterial));
+            //Material skyPlaneMaterial = new Material(content.Load<MaterialEffect>("SkyPlaneFx"), 0);
+            //skyPlaneMaterial.DefaultTechnique.Passes[0].SetParam("gDiffuseMap", content.Load<Texture2D>("Sky"));
+            //skyPlaneMaterial.Techniques["SkyPlaneScenePass"].Passes[0].SetParam("gDiffuseMap", content.Load<Texture2D>("Sky"));
+            //scenePasses.Add(new SkyPlaneScenePass(mainCamera.RealCamera, this, content, skyPlaneMaterial));
 
             scenePasses.Add(new GameDefaultScenePass(this, mainCamera));
 
@@ -999,9 +1002,11 @@ namespace Conquera
             mGuiScene = new GameGuiScene(this);
             State = GetGameSceneState(GameSceneStates.Idle);
 
-            //temp
             mCursor3dCellSel.IsVisible = false;
             mMovementArrow.IsVisible = false;
+
+            mLavaRenderable = new LavaRenderable(GraphicsDeviceManager.GraphicsDevice, Content, Octree.Bounds);
+            Octree.AddObject(mLavaRenderable);
         }
 
 
@@ -1069,4 +1074,61 @@ namespace Conquera
         public static readonly string ReadyGameUnitSelected = "ReadyGameUnitSelected";
         public static readonly string Battle = "Battle";
     }
+
+
+
+
+
+    internal class LavaRenderable : GraphicModel
+    {
+        const float ZPos = -3.00f;
+        private bool mIsDisposed = false;
+
+        public LavaRenderable(GraphicsDevice graphicsDevice, ContentGroup content, BoundingBox sceneBounds)
+            : base(BuildMesh(graphicsDevice, sceneBounds), GetMaterial(content))
+        {
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (!mIsDisposed)
+            {
+                if (isDisposing)
+                {
+                    Mesh.Dispose();
+                }
+                mIsDisposed = true;
+            }
+
+            base.Dispose(isDisposing);
+        }
+
+        private static Mesh BuildMesh(GraphicsDevice graphicsDevice, BoundingBox sceneBounds)
+        {
+            MeshBuilder mb = new MeshBuilder(graphicsDevice);
+            mb.SetCurrentSubMesh("m");
+
+            Vector3 min = sceneBounds.Min;
+            Vector3 max = sceneBounds.Max;
+            int v1 = mb.AddVertex(new SimpleVertex(new Vector3(min.X, max.Y, ZPos), new Vector3(0, 0, 1), new Vector2(0.0f, 0.0f)));
+            int v2 = mb.AddVertex(new SimpleVertex(new Vector3(max.X, max.Y, ZPos), new Vector3(0, 0, 1), new Vector2(1.0f, 0.0f)));
+            int v3 = mb.AddVertex(new SimpleVertex(new Vector3(max.X, min.Y, ZPos), new Vector3(0, 0, 1), new Vector2(1.0f, 1.0f)));
+            int v4 = mb.AddVertex(new SimpleVertex(new Vector3(min.X, min.Y, ZPos), new Vector3(0, 0, 1), new Vector2(0.0f, 1.0f)));
+
+            mb.AddFace(v1, v2, v4);
+            mb.AddFace(v3, v4, v2);
+
+            return mb.BuildMesh(true);
+        }
+
+        private static Material GetMaterial(ContentGroup content)
+        {
+           // return content.Load<Material>("SurfaceMat");
+            MaterialSettings settings= new MaterialSettings("LavaMat", "LavaFx", DefaultRenderLayers.Water);
+            settings.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "bwNoise"));
+            return new Material(settings, content);
+            
+        }
+    }
+
 }

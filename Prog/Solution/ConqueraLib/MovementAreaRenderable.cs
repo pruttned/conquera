@@ -51,7 +51,7 @@ namespace Conquera
 
         internal static MovementAreaRenderable TryCreate(GraphicsDevice graphicsDevice, ContentGroup content, GameUnit unit)
         {
-            Mesh mesh = BuildGm(graphicsDevice, unit);
+            Mesh mesh = BuildMesh(graphicsDevice, unit);
             if (null == mesh)
             {
                 return null;
@@ -73,7 +73,7 @@ namespace Conquera
             base.Dispose(isDisposing);
         }
 
-        private static Mesh BuildGm(GraphicsDevice graphicsDevice, GameUnit unit)
+        private static Mesh BuildMesh(GraphicsDevice graphicsDevice, GameUnit unit)
         {
             //!!! vertex Normal is color
 
