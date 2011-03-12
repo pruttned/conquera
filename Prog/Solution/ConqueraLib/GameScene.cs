@@ -1081,7 +1081,7 @@ namespace Conquera
 
     internal class LavaRenderable : GraphicModel
     {
-        const float ZPos = -3.00f;
+        const float ZPos = -5.00f;
         private bool mIsDisposed = false;
 
         public LavaRenderable(GraphicsDevice graphicsDevice, ContentGroup content, BoundingBox sceneBounds)
@@ -1125,7 +1125,9 @@ namespace Conquera
         {
            // return content.Load<Material>("SurfaceMat");
             MaterialSettings settings= new MaterialSettings("LavaMat", "LavaFx", DefaultRenderLayers.Water);
-            settings.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "bwNoise"));
+            settings.Params.Add(new Texture2DMaterialParamSettings("gLavaNoiseMap", "LavaNoiseTex"));
+            settings.Params.Add(new Texture2DMaterialParamSettings("gLavaColdMap", "LavaColdTex"));
+            settings.Params.Add(new Texture2DMaterialParamSettings("gNoiseMap", "bwNoise"));
             return new Material(settings, content);
             
         }
