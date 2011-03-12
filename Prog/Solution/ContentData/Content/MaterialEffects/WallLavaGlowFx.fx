@@ -26,8 +26,8 @@ sampler2D gDiffuseMapSampler = sampler_state
 	  MinFilter = Linear;
 	  MagFilter = Linear;
 	  MipFilter = Linear;
-	  AddressU = Wrap;
-	  AddressV = Wrap;
+	  AddressU = Clamp;
+	  AddressV = Clamp;
 	};
 	
 	
@@ -71,8 +71,8 @@ technique Default
 		AlphaRef = 0x000001;
 
 	    BlendOp = add;
-		DestBlend = ONE;
-		SrcBlend = SRCCOLOR;
+		DestBlend = INVSRCALPHA;
+		SrcBlend = SRCALPHA;
 		
 		ZEnable = true;
 		ZWriteEnable = false;
