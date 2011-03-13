@@ -51,8 +51,10 @@ VsOutput mainVS(float4 pos: POSITION, float4 normal: NORMAL, float2 uv: TEXCOORD
 
 float4 mainPS(float2 uv: TEXCOORD0, float4 posWorld : TEXCOORD1) : COLOR 
 {
-		return  
+		float4 color =   
 			tex2D(gDiffuseMapSampler, uv) * float4(1, 1, 0, 1);
+			color.a*= 0.8;
+			return color;
 }
 
 technique Default
