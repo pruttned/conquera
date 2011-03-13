@@ -979,7 +979,7 @@ namespace Conquera
             }
 
             PostProcessEffectManager.PostProcessEffects.Add(new BloomProcessEffect(GraphicsDeviceManager, Content));
-            PostProcessEffectManager.PostProcessEffects[0].Enabled = true;
+            PostProcessEffectManager.PostProcessEffects[0].Enabled = false;
 
             mCaptureParticleSystemDesc = Content.Load<ParticleSystemDesc>("CellCaptureParticleSystem");
             mUnitDeathParticleSystemDesc = Content.Load<ParticleSystemDesc>("UnitDeathParticleSystem");
