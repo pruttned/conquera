@@ -77,7 +77,7 @@ VsOutput mainVS(VsInput input)
 	output.Uv = input.Position/8;
 	output.Uv2 = input.Position/2 + float2(gTime * 0.032 , gTime * 0.02);
 	output.Uv3 = input.Uv*15 + float2(gTime * 0.032 , gTime * 0.02);
-	output.Uv4 = input.Uv * 20 + float2(-gTime * 0.02, -gTime * 0.032);
+	output.Uv4 = input.Uv * 13 + float2(-gTime * 0.02, -gTime * 0.032);
     
     return output;
 }
@@ -86,12 +86,16 @@ float4 mainPS(float2 uv: TEXCOORD0, float2 uv2 : TEXCOORD01, float2 uv3 : TEXCOO
 {
 	float4 color  = 
 		float4(0.8, 0.1, 0.1 ,1) + 
-		(tex2D(gLavaNoiseMapSampler, uv3)- tex2D(gLavaNoiseMapSampler, uv4)) * float4(1.5, 1.2, 0, 1);
+		(tex2D(gLavaNoiseMapSampler, uv3)) * float4(1.5, 1.2, 0, 1);
 		
 	//	return tex2D(gNoiseMapSampler, uv);
 	
-	color = color + clamp(float4(0,0,0,1), float4(0.8, 0.1, 0 ,1), (tex2D(gLavaColdMapSampler, uv2) + tex2D(gNoiseMapSampler, uv)));
+	//color = color + clamp(float4(0,0,0,1), float4(0.8, 0.1, 0 ,1), (tex2D(gLavaColdMapSampler, uv2) + tex2D(gNoiseMapSampler, uv)));
+	//color = lerp(color, color*tex2D(gLavaColdMapSampler, uv2), tex2D(gNoiseMapSampler, uv));
 		
+		
+		color = color * tex2D(gLavaColdMapSampler, uv2);
+		color += float4(tex2D(gNoiseMapSampler, uv3).rg, 0,0) * float4(tex2D(gNoiseMapSampler, uv4).rg, 0,0);
 	color.a = 1;
 	return color;   
 }
