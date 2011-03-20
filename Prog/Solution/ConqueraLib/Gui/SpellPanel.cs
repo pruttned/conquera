@@ -64,7 +64,7 @@ namespace Conquera.Gui
 
         public SpellPanel(GameScene gameScene)
         {
-            mButtons = new SpellSlotButton[SpellSlotCollection.Spells.Length];
+            mButtons = new SpellSlotButton[gameScene.Spells.Count];
             for (int i = 0; i < mButtons.Length; i++)
             {
                 mButtons[i] = new SpellSlotButton(gameScene);

@@ -35,6 +35,9 @@ namespace Conquera
         [DataProperty(NotNull = true)]
         public long TerrainId { get; set; }
 
+        [DataProperty(NotNull = true)]
+        public SpellSlotCollection Spells { get; set; }
+
         public abstract GameScene CreateScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState);
     }
 

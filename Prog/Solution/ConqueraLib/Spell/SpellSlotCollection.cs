@@ -32,9 +32,7 @@ namespace Conquera
     [DataObject(MaxCachedCnt=0)]
     public class SpellSlotCollection : BaseDataObject, IEnumerable<SpellSlot>
     {
-        public static Spell[] Spells;
-
-        private SpellSlot[] mSpellSlots;
+        private List<SpellSlot> mSpellSlots = null;
 
         public SpellSlot this[string name]
         {
@@ -56,99 +54,46 @@ namespace Conquera
         {
             get
             {
-                return mSpellSlots[i];
+                return SpellSlots[i];
             }
         }
 
-        /// <summary>
-        /// Only for load/save purposes
-        /// </summary>
+        public int Count
+        {
+            get { return SpellSlots.Count; }
+        }
+
         [DataListProperty]
-        private List<int> SpellUsageCnts { get; set; }
-
-        static SpellSlotCollection()
+        private List<SpellSlot> SpellSlots 
         {
-            Spells = new Spell[] 
-            { 
-                new SlayerSpell(),
-                new SpikesSpell(),
-                new FireStormSpell(),
-                new VampiricTouchSpell(),
-                new PackReinforcementSpell(),
-                new MindControlSpell(),
-                new PlagueSpell(),
-                new BloodMadnessSpell(),
-                new LastSacrificeSpell()
-            };
-        }
-
-        public SpellSlotCollection()
-        {
-            mSpellSlots = CreateSpellSlotList();
-        }
-
-        public void ResetSpellAvailabilities()
-        {
-            foreach (var spell in mSpellSlots)
+            get
             {
-                spell.ResetAvailableCount();
+                if (null == mSpellSlots)
+                {
+                    mSpellSlots = new List<SpellSlot>();
+                    foreach (var spellName in SpellSlot.SpellNames)
+                    {
+                        mSpellSlots.Add(new SpellSlot(spellName));
+                    }
+                }
+                return mSpellSlots;
+            }
+            set
+            {
+                mSpellSlots = value;
             }
         }
 
         public IEnumerator<SpellSlot> GetEnumerator()
         {
-            return ((IEnumerable<SpellSlot>)mSpellSlots).GetEnumerator();
-        }
-
-        public static Spell GetSpell(string name)
-        {
-            foreach (Spell spell in Spells)
-            {
-                if(string.Equals(spell.Name, name, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return spell;
-                }
-            }
-            throw new KeyNotFoundException(string.Format("Spell with name '{0}' doesn't exists", name));
+            return ((IEnumerable<SpellSlot>)SpellSlots).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return mSpellSlots.GetEnumerator();
+            return SpellSlots.GetEnumerator();
         }
 
-        private static SpellSlot[] CreateSpellSlotList()
-        {
-            SpellSlot[] slots = new SpellSlot[Spells.Length];
-            for (int i = 0; i < slots.Length; ++i)
-            {
-                slots[i] = new SpellSlot(Spells[i]);
-            }
 
-            return slots;
-        }
-
-        protected override void BeforeSaveImpl(OrmManager ormManager)
-        {
-            if (null == SpellUsageCnts)
-            {
-                SpellUsageCnts = new List<int>(new int[mSpellSlots.Length]);
-            }
-            for(int i =0; i< mSpellSlots.Length; ++i)
-            {
-                SpellUsageCnts[i] = mSpellSlots[i].UsedCount;
-            }
-            base.BeforeSaveImpl(ormManager);
-        }
-
-        protected override void AfterLoadImpl(OrmManager ormManager)
-        {
-            for (int i = 0; i < mSpellSlots.Length; ++i)
-            {
-                mSpellSlots[i].UsedCount = SpellUsageCnts[i];
-            }
-            
-            base.AfterLoadImpl(ormManager);
-        }
     }
 }

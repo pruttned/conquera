@@ -578,38 +578,6 @@ namespace Conquera
                 //        ormManager.SaveObject(obj);
                 //    }
 
-                //    {
-                //        foreach (var spell in new KeyValuePair<string, Point>[] { 
-                //            new KeyValuePair<string, Point>("Slayer", new Point(0,1)),
-                //            new KeyValuePair<string, Point>("Spikes", new Point(1,1)),
-                //            new KeyValuePair<string, Point>("FireStorm", new Point(2,1)),
-                //            new KeyValuePair<string, Point>("VampiricTouch", new Point(3,1)),
-                //            new KeyValuePair<string, Point>("PackReinforcement", new Point(4,1)),
-                //            new KeyValuePair<string, Point>("MindControl", new Point(5,1)),
-                //            new KeyValuePair<string, Point>("Plague", new Point(0,2)),
-                //            new KeyValuePair<string, Point>("BloodMadness", new Point(1,2)),
-                //            new KeyValuePair<string, Point>("LastSacrifice", new Point(3, 2))})
-                //        {
-                //            SpellTowerTileSettings obj = new SpellTowerTileSettings();
-                //            obj.Spell = spell.Key;
-                //            obj.Name = obj.Spell + "SpellTowerTile";
-                //            obj.DisplayName = obj.Spell + "SpellTower";
-                //            obj.SpellCnt = 2;
-                //            obj.Description = ormManager.LoadObject<StringResource>("Name = 'SpellTowerTileDescription'");
-                //            obj.HpIncrement = 0;
-                //            obj.UnitPosition = new Vector3(0.0f, 0.0f, 0);
-                //            obj.TileIndex = spell.Value;
-                //            obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
-                //            obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
-                //            obj.IsPassable = true;
-                //            obj.Icon = "TileIconSpellTower";
-                //            ormManager.SaveObject(obj);
-                //        }
-                //    }
-
-
-
-
 
                 //    {
                 //        MaterialSettings mat = new MaterialSettings("BeamParticleMat", "BeamParticleFx", DefaultRenderLayers.GroundStandingObjects);

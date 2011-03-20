@@ -226,7 +226,7 @@ namespace Conquera.Gui
 
         private void UpdateSpellPanel()
         {
-            mSpellPanel.SpellSlotCollection = mGameScene.CurrentPlayer.Spells;
+            mSpellPanel.SpellSlotCollection = mGameScene.Spells;
         }
 
         private void mEndTurnButton_Click(object sender, ControlEventArgs e)
