@@ -246,6 +246,31 @@ namespace Conquera
             return siblings;
         }
 
+        public static int GetDistance(Point a, Point b)
+        {
+            //based on  http://www-cs-students.stanford.edu/~amitp/Articles/HexLOS.html
+            if (a.Y == b.Y)
+            {
+                return Math.Abs(Math.Abs(a.X) - Math.Abs(b.X));
+            }
+            else
+            {
+                Point aa = new Point(a.X - Floor2(a.Y), a.X + Ceil2(a.Y));
+                Point bb = new Point(b.X - Floor2(b.Y), b.Y = b.X + Ceil2(b.Y));
+
+                int dx = bb.X - aa.X;
+                int dy = bb.Y - aa.Y;
+                if ((dx >= 0 && dy >= 0) || (dx < 0 && dy < 0))
+                {
+                    return Math.Max(Math.Abs(dx), Math.Abs(dy));
+                }
+                else
+                {
+                    return Math.Abs(dx) + Math.Abs(dy);
+                }
+            }
+        }
+
         public static Vector3 GetPosFromIndex(Point index)
         {
             Vector3 pos;
@@ -550,6 +575,18 @@ namespace Conquera
         {
             return string.Format("HexTerrain_{0}", Id);
         }
+
+        private static int Floor2(int X)
+        {
+            //from http://www-cs-students.stanford.edu/~amitp/Articles/HexLOS.html            
+            return ((X >= 0) ? (X >> 1) : (X - 1) / 2);
+        }
+        private static int Ceil2(int X)
+        {
+            //from http://www-cs-students.stanford.edu/~amitp/Articles/HexLOS.html
+            return ((X >= 0) ? ((X + 1) >> 1) : (X / 2));
+        }
+
     }
 
     public enum HexDirection

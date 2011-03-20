@@ -35,6 +35,9 @@ namespace Conquera
     [CustomBasicTypeProvider(typeof(Point), typeof(FieldCustomBasicTypeProvider<Point>))]
     public class GameUnit : OctreeSceneObject, IDataObject
     {
+        //promoted collections
+        private static List<HexCell> Siblings = new List<HexCell>(6);
+
         public delegate void CellIndexChangedHandler(GameUnit obj, Point oldValue);
         public event CellIndexChangedHandler CellIndexChanged;
 
@@ -161,11 +164,39 @@ namespace Conquera
             {
                 return false;
             }
-
             HexCell srcCell = Cell;
             HexCell targetCell = GameScene.GetCell(cell);
 
-            return targetCell.IsPassable && (srcCell.Region == targetCell.Region || srcCell.IsSiblingTo(targetCell));
+
+            if (targetCell.IsPassable && (srcCell.Region == targetCell.Region || srcCell.IsSiblingTo(targetCell)))
+            {
+                int distance = HexTerrain.GetDistance(srcCell.Index, targetCell.Index);
+
+                if (1 == distance)
+                {
+                    return true;
+                }
+                else
+                {
+                    if (distance == 2)
+                    {
+                        Siblings.Clear();
+                        srcCell.GetSiblings(Siblings);
+                        foreach (var sibling in Siblings)
+                        {
+                            if (sibling.HexTerrainTile.IsPassable && sibling.Region == targetCell.Region)
+                            {
+                                if (targetCell.IsSiblingTo(sibling))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            return false;
         }
 
         public bool CanAttackTo(Point cell)
@@ -213,6 +244,8 @@ namespace Conquera
             if (!HasAttackedThisTurn && CanAttackTo(cell))
             {
                 LastAttackedTurn = GameScene.GameSceneContextState.TurnNum;
+                LastMovedTurn = GameScene.GameSceneContextState.TurnNum;
+
                 GameUnit target = GameScene.GetCell(cell).GameUnit;
                 RotateTo(target.CellIndex);
 

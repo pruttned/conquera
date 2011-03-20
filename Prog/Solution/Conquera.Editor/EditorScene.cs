@@ -120,14 +120,15 @@ namespace Conquera.Editor
                             }
                             else
                             {
-                                if (!cellUnderCur.IsPassable)
-                                {
-                                    ClearCell(cellUnderCur);
-                                }
-
                                 if (mLastSetTileCell != cellUnderCur || !string.Equals(cellUnderCur.HexTerrainTile.DisplayName, TileBrush.Name))
                                 {
-                                    cellUnderCur.SetTile(TileBrush.GetTile());
+                                    string tile = TileBrush.GetTile();
+                                    if (!Content.Load<HexTerrainTileDesc>(tile).IsPassable)
+                                    {
+                                        ClearCell(cellUnderCur);
+                                    }
+
+                                    cellUnderCur.SetTile(tile);
                                     mLastSetTileCell = cellUnderCur;
                                 }
                             }
