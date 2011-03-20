@@ -40,7 +40,6 @@ namespace Conquera.Gui
             mBackground = ConqueraPalette.TileInfoPanelBackground;            
 
             InitializeView(mDefaultTileInfoView);
-            RegisterDerivedView(typeof(SpellTowerTileDesc), new SpellTowerInfoView());
             RegisterDerivedView(typeof(CastleTileDesc), new CastleInfoView());
         }
 

@@ -132,9 +132,6 @@ namespace Conquera
             }
         }
 
-        [DataProperty] //Not a DataListProperty
-        public SpellSlotCollection Spells { get; private set; }
-
         public GamePlayer(string name, Vector3 color)
             : this()
         {
@@ -235,7 +232,6 @@ namespace Conquera
         {
             Cells = new ReadOnlyCollection<HexCell>(mCells);
             MaxUnitCnt = 3;
-            Spells = new SpellSlotCollection();
         }
 
         protected abstract void CreateGameSceneStates(GameScene scene, Dictionary<string, IGameSceneState> gameSceneStates);
@@ -296,7 +292,6 @@ namespace Conquera
                     //              Scene.GameCamera.MoveCameraTo(CameraTargetPos);
                     Scene.GameCamera.TargetWorldPosition = CameraTargetPos;
                 }
-            Spells.ResetSpellAvailabilities();
         }
 
         public override void OnEndTurn()

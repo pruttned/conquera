@@ -112,7 +112,8 @@ namespace Conquera
 
         public override HexTerrainTileDesc CreateDesc(ContentGroup content)
         {
-            return new SpellTowerTileDesc(this, content);
+            return null;
+            //return new SpellTowerTileDesc(this, content);
         }
     }
 

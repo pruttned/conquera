@@ -336,37 +336,7 @@ namespace Conquera
 
 
 
-
-    public class SpellTowerTileDesc : HexTerrainTileDesc
-    {
-        public Spell Spell { get; private set; }
-
-        public SpellTowerTileDesc(SpellTowerTileSettings settings, ContentGroup content)
-            : base(settings, content)
-        {
-            Spell = SpellSlotCollection.GetSpell(settings.Spell);
-        }
-
-        protected internal override void OnBeginTurn(HexCell cell)
-        {
-            base.OnBeginTurn(cell);
-        }
-
-        protected internal override void OnActivated(HexCell cell)
-        {
-            var slot = cell.OwningPlayer.Spells[Spell.Name];
-            slot.TotalCount++;
-        }
-
-        protected internal override void OnDeactivating(HexCell cell)
-        {
-            var slot = cell.OwningPlayer.Spells[Spell.Name];
-            slot.TotalCount--;
-        }
-    }
-
-
-    public class CastleTileDesc : HexTerrainTileDesc
+  public class CastleTileDesc : HexTerrainTileDesc
     {
         public CastleTileDesc(CastleTileSettings settings, ContentGroup content)
             : base(settings, content)

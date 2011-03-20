@@ -130,42 +130,6 @@ namespace Conquera
                         {
                             mScene.GetCell(index).SetTile("VillageLv1Tile");
                         }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D1))
-                        {
-                            mScene.GetCell(index).SetTile("SlayerSpellTowerTile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D2))
-                        {
-                            mScene.GetCell(index).SetTile("SpikesSpellTowerTile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D3))
-                        {
-                            mScene.GetCell(index).SetTile("FireStormSpellTowerTile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D4))
-                        {
-                            mScene.GetCell(index).SetTile("VampiricTouchSpellTowerTile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D5))
-                        {
-                            mScene.GetCell(index).SetTile("PackReinforcementSpellTowerTile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D6))
-                        {
-                            mScene.GetCell(index).SetTile("MindControlSpellTowerTile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D7))
-                        {
-                            mScene.GetCell(index).SetTile("PlagueSpellTowerTile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D8))
-                        {
-                            mScene.GetCell(index).SetTile("BloodMadnessSpellTowerTile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D9))
-                        {
-                            mScene.GetCell(index).SetTile("LastSacrificeSpellTowerTile");
-                        }
                     }
                 }
             }

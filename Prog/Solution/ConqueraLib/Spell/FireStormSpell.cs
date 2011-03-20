@@ -67,6 +67,11 @@ namespace Conquera
             get { return "Fireballs for everyone!"; }
         }
 
+        public override int Cost
+        {
+            get { return 100; }
+        }
+
         public override int ApplyAttackModifiers(int baseAttack)
         {
             return baseAttack;

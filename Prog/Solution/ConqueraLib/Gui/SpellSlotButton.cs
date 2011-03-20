@@ -48,22 +48,22 @@ namespace Conquera.Gui
             {
                 if (value != mSpellSlot)
                 {
-                    if (mSpellSlot != null) //old
-                    {
-                        mSpellSlot.TotalCountChanged -= mSpellSlot_TotalCountChanged;
-                        mSpellSlot.AvailableCountChanged -= mSpellSlot_AvailableCountChanged;
-                    }
+                    //if (mSpellSlot != null) //old
+                    //{
+                    //    mSpellSlot.TotalCountChanged -= mSpellSlot_TotalCountChanged;
+                    //    mSpellSlot.AvailableCountChanged -= mSpellSlot_AvailableCountChanged;
+                    //}
 
                     mSpellSlot = value;
                     mSpellView.Spell = mSpellSlot.Spell;
 
-                    if (mSpellSlot != null) //new
-                    {
-                        mSpellSlot.TotalCountChanged += new EventHandler(mSpellSlot_TotalCountChanged);
-                        mSpellSlot.AvailableCountChanged += new EventHandler(mSpellSlot_AvailableCountChanged);
-                    }
+                    //if (mSpellSlot != null) //new
+                    //{
+                    //    mSpellSlot.TotalCountChanged += new EventHandler(mSpellSlot_TotalCountChanged);
+                    //    mSpellSlot.AvailableCountChanged += new EventHandler(mSpellSlot_AvailableCountChanged);
+                    //}
 
-                    UpdateCount();
+                    //UpdateCount();
                 }
             }
         }
@@ -100,27 +100,27 @@ namespace Conquera.Gui
             }
         }
 
-        private void mSpellSlot_TotalCountChanged(object sender, EventArgs e)
-        {
-            UpdateCount();
-        }
+        //private void mSpellSlot_TotalCountChanged(object sender, EventArgs e)
+        //{
+        //    UpdateCount();
+        //}
 
-        private void mSpellSlot_AvailableCountChanged(object sender, EventArgs e)
-        {
-            UpdateCount();
-        }
+        //private void mSpellSlot_AvailableCountChanged(object sender, EventArgs e)
+        //{
+        //    UpdateCount();
+        //}
 
-        private void UpdateCount()
-        {
-            if (SpellSlot == null)
-            {
-                mCountLabel.Text = string.Empty;
-            }
-            else
-            {
-                mCountLabel.Text = string.Format("{0}/{1}", SpellSlot.AvailableCount, SpellSlot.TotalCount);
-            }
-        }
+        //private void UpdateCount()
+        //{
+        //    if (SpellSlot == null)
+        //    {
+        //        mCountLabel.Text = string.Empty;
+        //    }
+        //    else
+        //    {
+        //        mCountLabel.Text = string.Format("{0}/{1}", SpellSlot.AvailableCount, SpellSlot.TotalCount);
+        //    }
+        //}
 
         private void mSpellView_Click(object sender, ControlEventArgs e)
         {

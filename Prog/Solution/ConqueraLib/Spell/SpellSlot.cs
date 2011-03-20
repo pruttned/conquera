@@ -29,70 +29,53 @@ using SimpleOrmFramework;
 
 namespace Conquera
 {
+    [DataObject(MaxCachedCnt = 0)]
     public class SpellSlot :BaseDataObject
     {
-        public event EventHandler TotalCountChanged;
-        public event EventHandler AvailableCountChanged;
-
-        private int mTotalCount;
+        public static List<string> SpellNames = new List<string>();
+        private static Dictionary<string, Spell> Spells = new Dictionary<string, Spell>();
 
         public Spell Spell { get; private set; }
+        [DataProperty(NotNull = true)]
+        public bool Enabled { get; private set; }
+        
+        [DataProperty(Column="Spell", NotNull = true)]
+        private string SpellName { get; set; }
 
-        public int TotalCount
+        static SpellSlot()
         {
-            get { return mTotalCount; }
-            set
-            {
-                if (value != mTotalCount)
-                {
-                    if (value < 0)
-                    {
-                        throw new ArgumentException("Value must be greater or equal to zero.");
-                    }
-
-                    mTotalCount = value;
-                    EventHelper.RaiseEvent(TotalCountChanged, this);
-
-                    if (mTotalCount < UsedCount)
-                    {
-                        UsedCount = mTotalCount;
-                    }
-
-                    EventHelper.RaiseEvent(AvailableCountChanged, this);
-                }
-            }
+            RegisterSpell(new SlayerSpell());
+            RegisterSpell(new SpikesSpell());
+            RegisterSpell(new FireStormSpell());
+            RegisterSpell(new VampiricTouchSpell());
+            RegisterSpell(new PackReinforcementSpell());
+            RegisterSpell(new MindControlSpell());
+            RegisterSpell(new PlagueSpell());
+            RegisterSpell(new BloodMadnessSpell());
+            RegisterSpell(new LastSacrificeSpell());
         }
 
-        public int AvailableCount
+        public SpellSlot(string spellName)
         {
-            get { return mTotalCount - UsedCount; }
+            SpellName = spellName;
+            Spell = Spells[SpellName];
+            Enabled = true;
         }
 
-        /// <summary>
-        /// Only for save/load purposes - used in SpellSlotCollection
-        /// </summary>
-        internal int UsedCount { get; set; }
-
-        public void OnCast()
+        protected override void AfterLoadImpl(OrmManager ormManager)
         {
-            if (0 == AvailableCount)
-            {
-                throw new InvalidOperationException("AvailableCount < 0");
-            }
-            UsedCount++;
-            EventHelper.RaiseEvent(AvailableCountChanged, this);
+            base.AfterLoadImpl(ormManager);
+            Spell = Spells[SpellName];
         }
 
-        public SpellSlot(Spell spell)
+        private SpellSlot()
         {
-            Spell = spell;
         }
 
-        public void ResetAvailableCount()
+        private static void RegisterSpell(Spell spell)
         {
-            UsedCount = 0;
-            EventHelper.RaiseEvent(AvailableCountChanged, this);
+            SpellNames.Add(spell.Name);
+            Spells.Add(spell.Name, spell);
         }
-
     }
 }

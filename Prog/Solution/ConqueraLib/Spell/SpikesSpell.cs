@@ -62,6 +62,11 @@ namespace Conquera
             get { return "etc."; }
         }
 
+        public override int Cost
+        {
+            get { return 100; }
+        }
+
         public override int ApplyAttackModifiers(int baseAttack)
         {
             return baseAttack;

@@ -91,6 +91,11 @@ namespace Conquera
             }
         }
 
+        public SpellSlotCollection Spells
+        {
+            get { return mSettings.Spells; }
+        }
+
         public GameSceneContextState GameSceneContextState { get; private set; }
 
         public IGameSceneState State
@@ -193,6 +198,7 @@ namespace Conquera
             Terrain = new HexTerrain(width, height, defaultTile, this);
             mSettings = CreateGameSettings();
             mSettings.Name = name;
+            mSettings.Spells = new SpellSlotCollection();
             GameSceneContextState = new GameSceneContextState();
             GameSceneContextState.GameMap = name;
 
@@ -241,7 +247,7 @@ namespace Conquera
                 var settings = ormManager.LoadObjects<GameSceneSettings>()[0];
                 var terrain = ormManager.LoadObject<HexTerrain>(settings.TerrainId);
                 var gameSceneState = ormManager.LoadObjects<GameSceneContextState>()[0];
-
+                
                 scene = settings.CreateScene(sceneManager, content, ormManager, settings, terrain, gameSceneState);
             }
 

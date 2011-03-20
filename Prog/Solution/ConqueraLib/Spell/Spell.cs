@@ -37,6 +37,7 @@ namespace Conquera
         public abstract string Name { get; }
         public abstract string DisplayName { get; }
         public abstract string Description { get; }
+        public abstract int Cost { get; }
 
         protected GameUnit Caster { get; private set; }
         protected GameUnit Target { get; private set; }

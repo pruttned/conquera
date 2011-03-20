@@ -22,20 +22,5 @@ using Ale.Gui;
 
 namespace Conquera.Gui
 {
-    public class SpellTowerInfoView : TileInfoView
-    {
-        private SpellView mSpellView = new SpellView();
 
-        public SpellTowerInfoView()
-        {
-            mSpellView.Location = new Point(0, 100);
-            ChildControls.Add(mSpellView);
-        }
-
-        public override void Update(HexCell cell)
-        {
-            base.Update(cell);
-            mSpellView.Spell = ((SpellTowerTileDesc)cell.HexTerrainTile).Spell;
-        }
-    }
 }
