@@ -268,16 +268,34 @@ namespace Conquera
         public HumanPlayer(string name, Vector3 color)
             : base(name, color)
         {
-            CameraTargetPos = new Vector3();
+            CameraTargetPos = new Vector3(-10000, -10000, -10000);
         }
 
         public override void OnBegineTurn()
         {
-            if (!Scene.GameCamera.IsInSight(new BoundingSphere(CameraTargetPos, 0.5f)))
+            if (CameraTargetPos.X < -1000)
             {
-                //              Scene.GameCamera.MoveCameraTo(CameraTargetPos);
-                Scene.GameCamera.TargetWorldPosition = CameraTargetPos;
+                if (0 < Units.Count)
+                {
+                    CameraTargetPos = Units[0].Cell.CenterPos;
+                }
+                else
+                {
+                    if (0 < Cells.Count)
+                    {
+                        CameraTargetPos = Cells[0].CenterPos;
+                    }
+                    else
+                    {
+                        CameraTargetPos = new Vector3();
+                    }
+                }
             }
+                if (!Scene.GameCamera.IsInSight(new BoundingSphere(CameraTargetPos, 0.5f)))
+                {
+                    //              Scene.GameCamera.MoveCameraTo(CameraTargetPos);
+                    Scene.GameCamera.TargetWorldPosition = CameraTargetPos;
+                }
             Spells.ResetSpellAvailabilities();
         }
 
