@@ -27,12 +27,13 @@ namespace Ale.Graphics
 {
     public sealed class AleRenderTarget : IDisposable
     {
-        private static bool mInBeginEnd = false;
         private static DepthStencilBuffer mDefaultDepthStencilBuffer = null;
 
         private GraphicsDeviceManager mGraphicsDeviceManager;
         private RenderTarget2D mRenderTarget2D;
         private DepthStencilBuffer mDepthStencilBuffer;
+
+        private bool mInBeginEnd = false;
 
         private NameId mName;
         private int mWidth;
@@ -170,6 +171,12 @@ namespace Ale.Graphics
 
         public void Begin()
         {
+            Begin(0);
+        }
+        int mIndex;
+
+        public void Begin(int index)
+        {
             if (mInBeginEnd)
             {
                 throw new InvalidOperationException("Multiple calls of Begin method detected withou calling End");
@@ -187,8 +194,9 @@ namespace Ale.Graphics
                 mDefaultDepthStencilBuffer = GraphicsDevice.DepthStencilBuffer;
                 mDefaultDepthStencilBuffer.Disposing += new EventHandler(mDefaultDepthStencilBuffer_Disposing);
             }
+            mIndex = index;
 
-            GraphicsDevice.SetRenderTarget(0, mRenderTarget2D);
+            GraphicsDevice.SetRenderTarget(mIndex, mRenderTarget2D);
             GraphicsDevice.DepthStencilBuffer = mDepthStencilBuffer;
         }
 
@@ -208,7 +216,7 @@ namespace Ale.Graphics
 
             if (setDefaultRenderTarget)
             {
-                GraphicsDevice.SetRenderTarget(0, null);
+                GraphicsDevice.SetRenderTarget(mIndex, null);
                 GraphicsDevice.DepthStencilBuffer = mDefaultDepthStencilBuffer;
             }
         }

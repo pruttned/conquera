@@ -192,10 +192,10 @@ namespace Ale.Graphics
                 }
             }
 
-            if (null == mDefaultTechnique) //Default technique is required
-            {
-                throw new ArgumentException("Unable to find effect's technique with name 'Default', which is required");
-            }
+            //if (null == mDefaultTechnique) //Default technique is required
+            //{
+            //    throw new ArgumentException("Unable to find effect's technique with name 'Default', which is required");
+            //}
 
             ActiveTechnique = mDefaultTechnique;
         }

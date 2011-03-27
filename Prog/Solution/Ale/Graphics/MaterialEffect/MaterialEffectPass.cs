@@ -93,6 +93,12 @@ namespace Ale.Graphics
         }
 
         /// <summary>
+        /// Whether to use deferred rendering or forward.
+        /// Transparent pas must use forward
+        /// </summary>
+        public bool ReceivesLight { get; private set; }
+
+        /// <summary>
         /// Gets the texture parameter that should be used for batching
         /// </summary>
         public MaterialEffectParam MainTextureParameter
@@ -126,6 +132,9 @@ namespace Ale.Graphics
 
             //IsTransparent
             LoadIsTransparentAnnotation();
+
+            //Receives light
+            LoadReceivesLightAnnotation();
 
             //MainTexture
             LoadMainTextureAnnotation();
@@ -197,6 +206,30 @@ namespace Ale.Graphics
             else //use default value
             {
                 mIsTransparent = false;
+            }
+        }
+
+        private void LoadReceivesLightAnnotation()
+        {
+            EffectAnnotation annotation = Annotations["ReceivesLight"];
+            if (null != annotation)
+            {
+                //check type
+                if (EffectParameterType.Bool != annotation.ParameterType)
+                {
+                    throw new ArgumentException(string.Format("Annotation ReceivesLight of the pass '{0}' has incorect type. Its type must be bool", Name));
+                }
+
+                ReceivesLight = annotation.GetValueBoolean();
+
+                if (IsTransparent && ReceivesLight)
+                {
+                    throw new ArgumentException("Transparent pass can't receive light");
+                }
+            }
+            else //use default value
+            {
+                ReceivesLight = false;
             }
         }
 

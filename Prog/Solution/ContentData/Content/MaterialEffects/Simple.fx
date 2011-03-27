@@ -79,7 +79,8 @@ technique Default
 {
 	pass p0 
 	<
-		bool IsTransparent=false;
+		bool IsTransparent = false;
+		bool ReceivesLight = false;
 		string MainTexture = "gDiffuseMap";  
 	>
 	{

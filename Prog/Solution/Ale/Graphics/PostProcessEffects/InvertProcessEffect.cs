@@ -69,8 +69,9 @@ namespace Ale.Graphics
         {
             GraphicsDevice.SetRenderTarget(0, resultRenderTarget);
             mScreenMapMaterialEffectParam.Value = screen;
+            
             //mInvertEffect.Apply(gameTime, mInvertEffect.DefaultTechnique.Passes[0]);
-            DrawFullscreenQuad(mInvertEffect, gameTime, screen);
+            DrawFullscreenQuad(mInvertEffect, gameTime);
         }
 
         /// <summary>

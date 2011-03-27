@@ -27,6 +27,19 @@ sampler2D gScreenMapSampler = sampler_state
 	  AddressV = Clamp;
 	};
 	
+struct VsOutput
+{
+    float4 pos : POSITION;
+    float2 uv : TEXCOORD0;
+};	
+
+VsOutput mainVS(float3 position : POSITION0, float2 uv : TEXCOORD0)
+{
+	VsOutput output;
+    output.pos = float4(position,1);
+    output.uv = uv;
+    return output;
+}	
 
 float4 mainPS(float2 pos : POSITION, float2 uv : TEXCOORD0) : COLOR 
 {
@@ -109,6 +122,7 @@ technique Default
 		ZEnable = false;
 		ZWriteEnable = false;
 	
+		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
 	}
 }

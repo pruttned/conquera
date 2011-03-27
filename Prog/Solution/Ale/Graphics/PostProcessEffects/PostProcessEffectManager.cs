@@ -94,7 +94,6 @@ namespace Ale.Graphics
         /// <summary>
         /// Ctor
         /// </summary>
-        /// <param name="graphicsDevice"></param>
         public PostProcessEffectManager(GraphicsDeviceManager graphicsDeviceManager)
         {
             mGraphicsDeviceManager = graphicsDeviceManager;
@@ -151,6 +150,11 @@ namespace Ale.Graphics
             if (!mIsDisposed)
             {
                 mGraphicsDeviceManager.DeviceReset -= mGraphicsDeviceManager_DeviceReset;
+
+                foreach (var p in mPostProcessEffects)
+                {
+                    p.Dispose();
+                }
 
                 UnloadContent();
                 

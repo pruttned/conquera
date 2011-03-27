@@ -35,8 +35,6 @@ namespace Ale.Editor
 {
     public class DefaultScene : OctreeScene
     {
-        Renderer mRenderer = new Renderer();
-
         AleContentManager mContentManager;
 
         public DefaultScene(SceneManager sceneManager, ContentGroup content)

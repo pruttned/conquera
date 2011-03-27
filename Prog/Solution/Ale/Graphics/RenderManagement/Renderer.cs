@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Ale.Tools;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Ale.Graphics
 {
@@ -43,9 +44,15 @@ namespace Ale.Graphics
     /// renderer.End(gameTime); 
     /// </code>
     /// </example>        
-    public class Renderer
+    public sealed class Renderer : IDisposable 
     {
         #region Fields
+
+        private bool mIsDisposed = false;
+
+        AleRenderTarget mColorRenderTarget;
+        AleRenderTarget mNormalRenderTarget;
+        AleRenderTarget mDepthRenderTarget;
 
         /// <summary>
         /// Currently active camera
@@ -74,6 +81,8 @@ namespace Ale.Graphics
 
         private int mEnquedRenderableUnitCnt = 0;
 
+        public bool mContentIsLoaded = false;
+
         #endregion Fields
 
         #region Properties
@@ -86,9 +95,23 @@ namespace Ale.Graphics
             get { return mActiveCamera; }
         }
 
+        public GraphicsDeviceManager GraphicsDeviceManager
+        {
+            get { return RenderTargetManager.GraphicsDeviceManager; }
+        }
+        public RenderTargetManager RenderTargetManager { get; private set; }
+
         #endregion Properties
 
         #region Methods
+
+        public Renderer(RenderTargetManager renderTargetManager)
+        {
+            if (null == renderTargetManager) throw new ArgumentNullException("renderTargetManager");
+
+            RenderTargetManager = renderTargetManager;
+            GraphicsDeviceManager.DeviceReset += new EventHandler(GraphicsDeviceManager_DeviceReset);
+        }
 
         /// <summary>
         /// Begins the render process. 
@@ -154,9 +177,12 @@ namespace Ale.Graphics
 
             if (null == mActiveScenePass)
             {
-                mEnquedRenderableUnitCnt++;
-                renderQueue.Enqueue(renderableUnit, renderableUnit.Material.DefaultTechnique, ActiveCamera);
-                return true;
+                if (null != renderableUnit.Material.DefaultTechnique)
+                {
+                    mEnquedRenderableUnitCnt++;
+                    renderQueue.Enqueue(renderableUnit, renderableUnit.Material.DefaultTechnique, ActiveCamera);
+                    return true;
+                }
             }
             else
             {
@@ -185,40 +211,84 @@ namespace Ale.Graphics
             {
                 MaterialPass lastUsedMaterialPass = null;
 
+
+                //Deffered pass
+                //if (!mContentIsLoaded)
+                //{
+                //    LoadContent();
+                //}
+                //mColorRenderTarget.Begin(0);
+                //mNormalRenderTarget.Begin(1);
+                //mDepthRenderTarget.Begin(2);
+
+                //for (int i = mRenderLayers.Count - 1; i >= 0; --i)
+                //{
+                //    if (0 < mRenderLayers.Values[i].LightReceivingOpaqueRenderableUnitsCnt)
+                //    {
+                //        mRenderLayers.Values[i].ForEachLightReceivingOpaqueRenderable(
+                //            delegate(IRenderableUnit renderableUnit, MaterialPass materialPass)
+                //            {
+                //                if (lastUsedMaterialPass != materialPass)
+                //                {
+                //                    materialPass.Apply();
+                //                    lastUsedMaterialPass = materialPass;
+                //                }
+
+                //                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
+
+                //                renderableUnit.Render(gameTime);
+                //            });
+                //    }
+                //}
+
+                //mColorRenderTarget.End();
+                //mNormalRenderTarget.End();
+                //mDepthRenderTarget.End();
+
+
+
+                //Forward pass
+
                 //Opaque
                 for (int i = mRenderLayers.Count - 1; i >= 0; --i)
                 {
-                    mRenderLayers.Values[i].ForEachOpaqueObject(
-                        delegate(IRenderableUnit renderableUnit, MaterialPass materialPass)
-                        {
-                            if (lastUsedMaterialPass != materialPass)
+                    if (0 < mRenderLayers.Values[i].OpaqueRenderableUnitsCnt)
+                    {
+                        mRenderLayers.Values[i].ForEachOpaqueRenderable(
+                            delegate(IRenderableUnit renderableUnit, MaterialPass materialPass)
                             {
-                                materialPass.Apply();
-                                lastUsedMaterialPass = materialPass;
-                            }
+                                if (lastUsedMaterialPass != materialPass)
+                                {
+                                    materialPass.Apply();
+                                    lastUsedMaterialPass = materialPass;
+                                }
 
-                            materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
+                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
 
-                            renderableUnit.Render(gameTime);
-                        });
+                                renderableUnit.Render(gameTime);
+                            });
+                    }
                 }
 
                 //Transparent
                 for (int i = 0, count = mRenderLayers.Count; i < count; ++i)
                 {
-                    mRenderLayers.Values[i].ForEachTransparentObject(
-                        delegate(IRenderableUnit renderableUnit, MaterialPass materialPass)
-                        {
-                            if (lastUsedMaterialPass != materialPass)
+                    if (0 < mRenderLayers.Values[i].TransparentRenderableUnitsCnt)
+                    {
+                        mRenderLayers.Values[i].ForEachTransparentRenderable(
+                            delegate(IRenderableUnit renderableUnit, MaterialPass materialPass)
                             {
-                                materialPass.Apply();
-                                lastUsedMaterialPass = materialPass;
-                            }
+                                if (lastUsedMaterialPass != materialPass)
+                                {
+                                    materialPass.Apply();
+                                    lastUsedMaterialPass = materialPass;
+                                }
 
-                            materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
+                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
 
-                            renderableUnit.Render(gameTime);
-                        });
+                                renderableUnit.Render(gameTime);
+                            });
+                    }
                 }
 
                 MaterialEffect.Finish();
@@ -234,6 +304,18 @@ namespace Ale.Graphics
             }
 
             mActiveCamera = null;
+        }
+
+        public void Dispose()
+        {
+            if (!mIsDisposed)
+            {
+                UnloadContent();
+                GraphicsDeviceManager.DeviceReset -= GraphicsDeviceManager_DeviceReset;
+
+                GC.SuppressFinalize(this);
+                mIsDisposed = true;
+            }
         }
 
         /// <summary>
@@ -257,6 +339,41 @@ namespace Ale.Graphics
             mLastRenderQueue = renderQueue;
             mLastRenderQueueLayer = layer;
             return renderQueue;
+        }
+
+        private void GraphicsDeviceManager_DeviceReset(object sender, EventArgs e)
+        {
+            UnloadContent();
+            mContentIsLoaded = false;
+        }
+
+        private void LoadContent()
+        {
+            PresentationParameters pp = GraphicsDeviceManager.GraphicsDevice.PresentationParameters;
+            mColorRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenColorMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth16);
+            mDepthRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenDepthMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth16);
+            mNormalRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenNormalMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth16);
+
+            mContentIsLoaded = true;
+        }
+
+        private void UnloadContent()
+        {
+            if (mContentIsLoaded)
+            {
+                if (null != mColorRenderTarget)
+                {
+                    RenderTargetManager.DestroyRenderTarget(mColorRenderTarget.Name);
+                }
+                if (null != mDepthRenderTarget)
+                {
+                    RenderTargetManager.DestroyRenderTarget(mDepthRenderTarget.Name);
+                }
+                if (null != mNormalRenderTarget)
+                {
+                    RenderTargetManager.DestroyRenderTarget(mNormalRenderTarget.Name);
+                }
+            }
         }
 
         #endregion Methods
