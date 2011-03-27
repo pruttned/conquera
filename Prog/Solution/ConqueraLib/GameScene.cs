@@ -1009,6 +1009,7 @@ namespace Conquera
             State = GetGameSceneState(GameSceneStates.Idle);
 
             mCursor3dCellSel.IsVisible = false;
+
             mMovementArrow.IsVisible = false;
 
             mLavaRenderable = new LavaRenderable(GraphicsDeviceManager.GraphicsDevice, Content, Octree.Bounds);

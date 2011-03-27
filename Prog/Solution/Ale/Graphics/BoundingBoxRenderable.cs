@@ -182,7 +182,7 @@ namespace Ale.Graphics
                 3, 7
             };
 
-            mIndexBuffer = new IndexBuffer(graphicsDevice, 16 * 24, BufferUsage.WriteOnly, IndexElementSize.SixteenBits);
+            mIndexBuffer = new IndexBuffer(graphicsDevice, 2 * 24, BufferUsage.WriteOnly, IndexElementSize.SixteenBits);
             mIndexBuffer.SetData<short>(indices);
         }
 

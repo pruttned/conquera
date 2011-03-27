@@ -147,7 +147,9 @@ namespace Ale.Graphics
             mTechniques = new MaterialTechniqueCollection(techniques);
 
             //default technique
-            mDefaultTechnique = mTechniques["Default"]; //now it will throw if it isn't found
+            mTechniques.TryGetValue("Default", out mDefaultTechnique);
+
+//            mDefaultTechnique = mTechniques["Default"]; //now it will throw if it isn't found
             //if (null == mDefaultTechnique) //Default technique is required
             //{
             //    throw new ArgumentException(string.Format("Unable to find material's requered technique with name 'Default'in effect '{1}'", settings.EffectName));
@@ -173,7 +175,10 @@ namespace Ale.Graphics
             }
 
             //default technique
-            mDefaultTechnique = mTechniques["Default"]; //now it will throw if it isn't found
+            mTechniques.TryGetValue("Default", out mDefaultTechnique);
+
+
+            //    mDefaultTechnique = mTechniques["Default"]; //now it will throw if it isn't found
             //if (null == mDefaultTechnique) //Default technique is required
             //{
             //    throw new ArgumentException("Unable to find material's requered technique with name 'Default'");

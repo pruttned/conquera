@@ -150,6 +150,5 @@ namespace Ale.Scene
         {
             mScene.EnqueRenderableUnits(gameTime, this);
         }
-
     }
 }

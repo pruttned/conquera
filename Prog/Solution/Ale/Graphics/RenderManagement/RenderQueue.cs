@@ -35,12 +35,18 @@ namespace Ale.Graphics
         /// </summary>
         List<RenderQueueEntry> mOpaqueRenderableUnits = new List<RenderQueueEntry>(30);
 
+        List<RenderQueueEntry> mLightReceivingOpaqueRenderableUnits = new List<RenderQueueEntry>(30);
+
         /// <summary>
         /// Queued transparent renderable units
         /// </summary>
         List<RenderQueueEntry> mTransparentRenderableUnits = new List<RenderQueueEntry>(30);
  
         #endregion Fields
+
+        public int OpaqueRenderableUnitsCnt { get { return mOpaqueRenderableUnits.Count; } }
+        public int LightReceivingOpaqueRenderableUnitsCnt { get { return mLightReceivingOpaqueRenderableUnits.Count; } }
+        public int TransparentRenderableUnitsCnt { get { return mTransparentRenderableUnits.Count; } }
 
         #region Methods
 
@@ -55,13 +61,21 @@ namespace Ale.Graphics
             MaterialPassCollection passes = technique.Passes;
             for (int i = 0; i < passes.Count; ++i)
             {
-                if (passes[i].MaterialEffectPass.IsTransparent) //transparent
+                var materialEffectPass = passes[i].MaterialEffectPass;
+                if (materialEffectPass.IsTransparent) //transparent
                 {
                     mTransparentRenderableUnits.Add(new RenderQueueEntry(renderableUnit, passes[i], camera, true));
                 }
                 else //opaque
                 {
-                    mOpaqueRenderableUnits.Add(new RenderQueueEntry(renderableUnit, passes[i], camera, false));
+                    if (materialEffectPass.ReceivesLight)
+                    {
+                        mLightReceivingOpaqueRenderableUnits.Add(new RenderQueueEntry(renderableUnit, passes[i], camera, false));
+                    }
+                    else
+                    {
+                        mOpaqueRenderableUnits.Add(new RenderQueueEntry(renderableUnit, passes[i], camera, false));
+                    }
                 }
             }
         }
@@ -81,14 +95,31 @@ namespace Ale.Graphics
         /// and sorted front to back before executing foreach loop. Grouping is preferred over the sorting.
         /// </summary>
         /// <param name="action">- Action that should be executed</param>
-        public void ForEachOpaqueObject(Action<IRenderableUnit, MaterialPass> action)
+        public void ForEachOpaqueRenderable(Action<IRenderableUnit, MaterialPass> action)
         {
-            mOpaqueRenderableUnits.Sort();
-
-            //front to back
-            for (int i = 0; i < mOpaqueRenderableUnits.Count; ++i)
+            if (0 < OpaqueRenderableUnitsCnt)
             {
-                action(mOpaqueRenderableUnits[i].RenderableUnit, mOpaqueRenderableUnits[i].MaterialPass);
+                mOpaqueRenderableUnits.Sort();
+
+                //front to back
+                for (int i = 0; i < mOpaqueRenderableUnits.Count; ++i)
+                {
+                    action(mOpaqueRenderableUnits[i].RenderableUnit, mOpaqueRenderableUnits[i].MaterialPass);
+                }
+            }
+        }
+
+        public void ForEachLightReceivingOpaqueRenderable(Action<IRenderableUnit, MaterialPass> action)
+        {
+            if (0 < LightReceivingOpaqueRenderableUnitsCnt)
+            {
+                mOpaqueRenderableUnits.Sort();
+
+                //front to back
+                for (int i = 0; i < mOpaqueRenderableUnits.Count; ++i)
+                {
+                    action(mOpaqueRenderableUnits[i].RenderableUnit, mOpaqueRenderableUnits[i].MaterialPass);
+                }
             }
         }
 
@@ -98,14 +129,17 @@ namespace Ale.Graphics
         /// sorted back to front before executing foreach loop. Sorting is preferred over the grouping.
         /// </summary>
         /// <param name="action">- Action that should be executed</param>
-        public void ForEachTransparentObject(Action<IRenderableUnit, MaterialPass> action)
+        public void ForEachTransparentRenderable(Action<IRenderableUnit, MaterialPass> action)
         {
-            mTransparentRenderableUnits.Sort();
-
-            //back to front
-            for (int i = mTransparentRenderableUnits.Count - 1; i >= 0; --i)
+            if (0 < TransparentRenderableUnitsCnt)
             {
-                action(mTransparentRenderableUnits[i].RenderableUnit, mTransparentRenderableUnits[i].MaterialPass);
+                mTransparentRenderableUnits.Sort();
+
+                //back to front
+                for (int i = mTransparentRenderableUnits.Count - 1; i >= 0; --i)
+                {
+                    action(mTransparentRenderableUnits[i].RenderableUnit, mTransparentRenderableUnits[i].MaterialPass);
+                }
             }
         }
 

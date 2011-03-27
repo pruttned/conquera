@@ -42,18 +42,22 @@ namespace Ale.Scene
         private RenderableProvider mRenderableProvider = new RenderableProvider();
         private ContentGroup mContent;
         private PostProcessEffectManager mPostProcessEffectManager;
+        private Renderer mRenderer;
         private RenderTargetManager mRenderTargetManager;
 
         private List<ISceneDrawableComponent> mSceneDrawableComponents = new List<ISceneDrawableComponent>();
 
-        public SceneManager SceneManager
+        public Renderer Renderer
         {
-            get { return mSceneManager; }
+            get { return mRenderer; }
         }
-
         public RenderTargetManager RenderTargetManager
         {
             get { return mRenderTargetManager; }
+        }
+        public SceneManager SceneManager
+        {
+            get { return mSceneManager; }
         }
 
         public ParticleSystemManager ParticleSystemManager
@@ -97,10 +101,11 @@ namespace Ale.Scene
 
             mSceneManager = sceneManager;
             mContent = content;
-
             mRenderTargetManager = new RenderTargetManager(sceneManager.GraphicsDeviceManager);
+            mRenderer = new Renderer(mRenderTargetManager);
+            mPostProcessEffectManager = new PostProcessEffectManager(sceneManager.GraphicsDeviceManager);
 
-            mScenePasses = CreateScenePasses(sceneManager.GraphicsDeviceManager, mRenderTargetManager, content);
+            mScenePasses = CreateScenePasses(sceneManager.GraphicsDeviceManager, RenderTargetManager, content);
             if(null == mScenePasses ||  0 == mScenePasses.Count)
             {
                 throw new ArgumentException("No scene passes were created");
@@ -110,10 +115,8 @@ namespace Ale.Scene
             {
                 throw new ArgumentException("Name of the main scene phase must be 'Default'");
             }
-
-            mPostProcessEffectManager = new PostProcessEffectManager(sceneManager.GraphicsDeviceManager);
-
             mParticleSystemManager = new ParticleSystemManager(sceneManager.ParticleDynamicGeometryManager, MainCamera);
+
             SceneDrawableComponents.Add(mParticleSystemManager);
             RegisterFrameListener(mParticleSystemManager);
 
@@ -130,7 +133,7 @@ namespace Ale.Scene
             {
                 if (scenePass.IsEnabled)
                 {
-                    scenePass.Draw(mSceneManager.GraphicsDeviceManager.GraphicsDevice, mSceneManager.Renderer, gameTime, RenderTargetManager);
+                    scenePass.Draw(mSceneManager.GraphicsDeviceManager.GraphicsDevice, Renderer, gameTime, RenderTargetManager);
                 }
             }
             mPostProcessEffectManager.Apply(gameTime);
@@ -144,7 +147,7 @@ namespace Ale.Scene
         {
             foreach (var sceneDrawableComponent in mSceneDrawableComponents)
             {
-                sceneDrawableComponent.EnqueRenderableUnits(gameTime, mSceneManager.Renderer, scenePass);
+                sceneDrawableComponent.EnqueRenderableUnits(gameTime, Renderer, scenePass);
             }
         }
 
@@ -211,6 +214,9 @@ namespace Ale.Scene
             {
                 if (isDisposing)
                 {
+                    mPostProcessEffectManager.Dispose();
+                    mRenderer.Dispose();
+                    mRenderTargetManager.Dispose();
                     MainCamera.ViewTransformationChanged -= MainCamera_ViewTransformationChanged;
 
                     foreach (ScenePass scenePass in mScenePasses)
@@ -218,8 +224,6 @@ namespace Ale.Scene
                         scenePass.Dispose();
                     }
                     mPostProcessEffectManager.Dispose();
-
-                    mRenderTargetManager.Dispose();
                 }
                 mIsDisposed = true;
             }

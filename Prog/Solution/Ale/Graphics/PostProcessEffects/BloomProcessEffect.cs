@@ -157,21 +157,21 @@ namespace Ale.Graphics
             //            mBlurHorizEffectScreenMap.Value = mExtractBrightnessEffectTarget.GetTexture();
             mBlurHorizEffectScreenMap.Value = screen;
             //mBlurHorizEffect.Apply(gameTime, mBlurHorizEffect.DefaultTechnique.Passes[0]);
-            DrawFullscreenQuad(mBlurHorizEffect, gameTime, screen, mBlurHorizEffectTarget.Width, mBlurHorizEffectTarget.Height);
+            DrawFullscreenQuad(mBlurHorizEffect, gameTime, mBlurHorizEffectTarget.Width, mBlurHorizEffectTarget.Height);
             mBlurHorizEffectTarget.End(false);
 
             //Vertical blur pass
             mBlurVertEffectTarget.Begin();
             mBlurVertEffectScreenMap.Value = mBlurHorizEffectTarget.Texture;
             //mBlurVertEffect.Apply(gameTime, mBlurVertEffect.DefaultTechnique.Passes[0]);
-            DrawFullscreenQuad(mBlurVertEffect, gameTime, mBlurVertEffectScreenMap.Value, mBlurVertEffectTarget.Width, mBlurVertEffectTarget.Height);
+            DrawFullscreenQuad(mBlurVertEffect, gameTime, mBlurVertEffectTarget.Width, mBlurVertEffectTarget.Height);
             mBlurVertEffectTarget.End();
 
             //Bloom pass
             mBloomEffectScreenMap.Value = screen;
             mBloomEffectBluredBrightnessMap.Value = mBlurVertEffectTarget.Texture;
             //mBloomEffect.Apply(gameTime, mBloomEffect.DefaultTechnique.Passes[0]);
-            DrawFullscreenQuad(mBloomEffect, gameTime, screen);
+            DrawFullscreenQuad(mBloomEffect, gameTime);
         }
 
         /// <summary>

@@ -68,7 +68,7 @@ namespace Ale.Graphics
 
         private bool mIsLoaded = false;
 
-        private static SpriteBatch mSpriteBatch;
+        private FullScreenQuad mFullScreenQuad;
 
         #endregion Fields
 
@@ -110,8 +110,6 @@ namespace Ale.Graphics
             }
         }
 
-        protected Viewport Viewport { get; private set; }
-
         #endregion Properties
         
         #region Methods
@@ -123,11 +121,7 @@ namespace Ale.Graphics
         public PostProcessEffect(GraphicsDeviceManager graphicsDeviceManager)
         {
             mGraphicsDeviceManager = graphicsDeviceManager;
-
-            if (null == mSpriteBatch)
-            {
-                mSpriteBatch = new SpriteBatch(GraphicsDevice);
-            }
+            mFullScreenQuad = new FullScreenQuad(graphicsDeviceManager);
         }
 
         #region IDisposable
@@ -147,6 +141,7 @@ namespace Ale.Graphics
             {
                 if (isDisposing)
                 {
+                    mFullScreenQuad.Dispose();
                     UnloadContent();
                 }
                 mIsDisposed = true;
@@ -180,7 +175,6 @@ namespace Ale.Graphics
         /// </summary>
         internal void LoadContent()
         {
-            Viewport = GraphicsDevice.Viewport;
             LoadContentImpl();
             mIsLoaded = true;
         }
@@ -208,22 +202,11 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="effect"></param>
         /// <param name="gameTime"></param>
-        /// <param name="texture">- First texture of the effect - it is set by spritebatch</param>
         /// <param name="rtWidth"></param>
         /// <param name="rtHeight"></param>
-        protected void DrawFullscreenQuad(MaterialEffect effect, AleGameTime gameTime, Texture2D texture, int rtWidth, int rtHeight)
+        protected void DrawFullscreenQuad(MaterialEffect effect, AleGameTime gameTime, int rtWidth, int rtHeight)
         {
-            mSpriteBatch.Begin(SpriteBlendMode.None,
-                              SpriteSortMode.Immediate,
-                              SaveStateMode.None);
-
-
-            effect.Apply(gameTime, effect.DefaultTechnique.Passes[0]);
-
-            mSpriteBatch.Draw(texture, new Rectangle(0, 0, rtWidth, rtHeight), Color.White);
-            mSpriteBatch.End();
-
-            MaterialEffect.Finish();
+            mFullScreenQuad.Draw(effect, gameTime, rtWidth, rtHeight);
         }
 
         /// <summary>
@@ -232,10 +215,9 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="effect"></param>
         /// <param name="gameTime"></param>
-        /// <param name="texture">- First texture of the effect - it is set by spritebatch</param>
-        protected void DrawFullscreenQuad(MaterialEffect effect, AleGameTime gameTime, Texture2D texture)
+        protected void DrawFullscreenQuad(MaterialEffect effect, AleGameTime gameTime)
         {
-            DrawFullscreenQuad(effect, gameTime, texture, Viewport.Width, Viewport.Height);
+            mFullScreenQuad.Draw(effect, gameTime);
         }
 
         /// <summary>

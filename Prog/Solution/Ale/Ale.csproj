@@ -102,6 +102,7 @@
     <Compile Include="CompositeFrameListener.cs" />
     <Compile Include="Content\AleAssetInfo.cs" />
     <Compile Include="Content\BaseAssetLoader.cs" />
+    <Compile Include="Graphics\FullScreenQuad.cs" />
     <Compile Include="Graphics\IRenderableListener.cs" />
     <Compile Include="Graphics\Model\ConnectionPointAssigmentDesc.cs" />
     <Compile Include="Graphics\Model\ConnectionPointAssigmentSettings.cs" />

@@ -31,7 +31,6 @@ namespace Ale.Scene
 {
     public class SceneManager : CompositeFrameListener, IDisposable
     {
-        private Renderer mRenderer;
         private GraphicsDeviceManager mGraphicsDeviceManager;
         private MouseManager mMouseManager;
         private KeyboardManager mKeyboardManager;
@@ -40,11 +39,6 @@ namespace Ale.Scene
         private bool mExitingApp = false;
 
         private bool mIsDisposed = false;
-
-        public Renderer Renderer
-        {
-            get { return mRenderer; }
-        }
 
         public BaseScene ActiveScene
         {
@@ -89,7 +83,6 @@ namespace Ale.Scene
             if (null == graphicsDeviceManager) { throw new NullReferenceException("graphicsDeviceManager"); }
             if (null == renderControl) { throw new NullReferenceException("renderControl"); }
 
-            mRenderer = new Renderer();
             mGraphicsDeviceManager = graphicsDeviceManager;
 
             SoundManager = mSoundManager;
@@ -191,7 +184,6 @@ namespace Ale.Scene
                     {
                         mActiveScene.Dispose();
                     }
-                    //todo: dispose inactive scenes ?
                 }
                 mIsDisposed = true;
             }
