@@ -32,11 +32,6 @@ namespace Conquera
         {
         }
 
-        protected override void Clear(GraphicsDevice graphicsDevice)
-        {
-            graphicsDevice.Clear(Color.White);
-        }
-
         //public override void Draw(GraphicsDevice graphicsDevice, Renderer renderer, Ale.AleGameTime gameTime, RenderTargetManager renderTargetManager)
         //{
         //    base.Draw(graphicsDevice, renderer, gameTime, renderTargetManager);

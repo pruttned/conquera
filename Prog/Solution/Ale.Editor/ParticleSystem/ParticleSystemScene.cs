@@ -41,11 +41,6 @@ namespace Ale.Editor
                 : base("Default", scene, camera, renderTarget)
             {
             }
-
-            protected override void Clear(GraphicsDevice graphicsDevice)
-            {
-                graphicsDevice.Clear(Color.Green);
-            }
         }
 
 

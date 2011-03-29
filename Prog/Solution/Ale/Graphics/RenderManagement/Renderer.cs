@@ -44,7 +44,7 @@ namespace Ale.Graphics
     /// renderer.End(gameTime); 
     /// </code>
     /// </example>        
-    public sealed class Renderer : IDisposable 
+    public sealed class Renderer : IDisposable
     {
         #region Fields
 
@@ -62,13 +62,11 @@ namespace Ale.Graphics
         /// <summary>
         /// Render layers
         /// </summary>
-        private SortedList<int, RenderQueue> mRenderLayers = new SortedList<int,RenderQueue>(10);
+        private SortedList<int, RenderQueue> mRenderLayers = new SortedList<int, RenderQueue>(10);
 
         private int mLastRenderQueueLayer = -1;
 
         private RenderQueue mLastRenderQueue = null;
-
-        private RenderTargetManager mRenderTargetManager;
 
         /// <summary>
         /// Active scene pass
@@ -83,10 +81,12 @@ namespace Ale.Graphics
 
         public bool mContentIsLoaded = false;
 
+        public AleRenderTarget mActiveRenderTarget = null;
+
         #endregion Fields
 
         #region Properties
-        
+
         /// <summary>
         /// Gets the currently active camera
         /// </summary>
@@ -126,30 +126,20 @@ namespace Ale.Graphics
         /// Begins the render process. 
         /// </summary>
         /// <param name="camera">- Currently active camera</param>
-        /// <param name="renderTargetManager">- (nullable)</param>
-        public void Begin(ICamera camera, RenderTargetManager renderTargetManager)
-        {
-            Begin(camera, renderTargetManager, null, null);
-        }
-
-        /// <summary>
-        /// Begins the render process. 
-        /// </summary>
-        /// <param name="camera">- Currently active camera</param>
-        /// <param name="renderTargetManager">- (nullable)</param>
         /// <param name="actviveScene">- (nullable)</param>
         /// <param name="scenePass">- Active scene pass (null = default)</param>
-        public void Begin(ICamera camera, RenderTargetManager renderTargetManager, Scene.BaseScene actviveScene, NameId scenePass)
+        /// <param name="renderTarget"></param>
+        public void Begin(ICamera camera, Scene.BaseScene actviveScene, NameId scenePass, AleRenderTarget renderTarget)
         {
             if (null != mActiveCamera)
             {
                 throw new InvalidOperationException("Cannot call two subsequent Begin methods without calling End method");
             }
 
-            mRenderTargetManager = renderTargetManager;
             mActiveCamera = camera;
             mActviveScene = actviveScene;
-            
+            mActiveRenderTarget = renderTarget;
+
             if (mDefaultScenePass == scenePass)
             {
                 mActiveScenePass = null;
@@ -159,7 +149,6 @@ namespace Ale.Graphics
                 mActiveScenePass = scenePass;
             }
         }
-
 
         /// <summary>
         /// Enqueue a renderable unit for rendering in actual frame
@@ -207,10 +196,10 @@ namespace Ale.Graphics
                 throw new InvalidOperationException("Cannot call End method without calling Begin method first");
             }
 
+            MaterialPass lastUsedMaterialPass = null;
+
             if (0 < mEnquedRenderableUnitCnt)
             {
-                MaterialPass lastUsedMaterialPass = null;
-
 
                 //Deffered pass
                 //if (!mContentIsLoaded)
@@ -244,10 +233,23 @@ namespace Ale.Graphics
                 //mColorRenderTarget.End();
                 //mNormalRenderTarget.End();
                 //mDepthRenderTarget.End();
+            }
 
 
+            //Forward pass
 
-                //Forward pass
+            if (null != mActiveRenderTarget)
+            {
+                mActiveRenderTarget.Begin();
+            }
+            else
+            {
+                GraphicsDeviceManager.GraphicsDevice.SetRenderTarget(0, null);
+                GraphicsDeviceManager.GraphicsDevice.Clear(Color.White);
+            }
+
+            if (0 < mEnquedRenderableUnitCnt)
+            {
 
                 //Opaque
                 for (int i = mRenderLayers.Count - 1; i >= 0; --i)
@@ -263,7 +265,7 @@ namespace Ale.Graphics
                                     lastUsedMaterialPass = materialPass;
                                 }
 
-                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
+                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, RenderTargetManager);
 
                                 renderableUnit.Render(gameTime);
                             });
@@ -284,7 +286,7 @@ namespace Ale.Graphics
                                     lastUsedMaterialPass = materialPass;
                                 }
 
-                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
+                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, RenderTargetManager);
 
                                 renderableUnit.Render(gameTime);
                             });
@@ -292,16 +294,21 @@ namespace Ale.Graphics
                 }
 
                 MaterialEffect.Finish();
-
-                //Clear render queues for next frame
-                IList<RenderQueue> queues = mRenderLayers.Values;
-                for (int i = 0; i < queues.Count; ++i)
-                {
-                    queues[i].Clear();
-                }
-
-                mEnquedRenderableUnitCnt = 0;
             }
+            if (null != mActiveRenderTarget)
+            {
+                mActiveRenderTarget.End();
+            }
+
+
+            //Clear render queues for next frame
+            IList<RenderQueue> queues = mRenderLayers.Values;
+            for (int i = 0; i < queues.Count; ++i)
+            {
+                queues[i].Clear();
+            }
+
+            mEnquedRenderableUnitCnt = 0;
 
             mActiveCamera = null;
         }

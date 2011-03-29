@@ -120,30 +120,12 @@ namespace Ale.Scene
 
         protected virtual void Begin(GraphicsDevice graphicsDevice, Renderer renderer, RenderTargetManager renderTargetManager)
         {
-            if (null != mRenderTarget)
-            {
-                mRenderTarget.Begin();
-            }
-            else
-            {
-                graphicsDevice.SetRenderTarget(0, null);
-            }
-            Clear(graphicsDevice);
-            renderer.Begin(mCamera, renderTargetManager, mScene, mNameId);
+            renderer.Begin(mCamera, mScene, mNameId, mRenderTarget);
         }
 
         protected virtual void End(GraphicsDevice graphicsDevice, AleGameTime gameTime, Renderer renderer)
         {
             renderer.End(gameTime);
-            if (null != mRenderTarget)
-            {
-                mRenderTarget.End();
-            }
-        }
-
-        protected virtual void Clear(GraphicsDevice graphicsDevice)
-        {
-            graphicsDevice.Clear(Color.Black);
         }
 
         protected virtual void EnqueRenderableUnits(GraphicsDevice graphicsDevice, AleGameTime gameTime, Renderer renderer)

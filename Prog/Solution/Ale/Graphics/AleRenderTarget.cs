@@ -43,13 +43,16 @@ namespace Ale.Graphics
         private MultiSampleType mMultiSampleType;
         private int mMultiSampleQuality;
         private RenderTargetUsage mUsage;
-        
+
         /// <summary>
         /// If == DepthFormat.Unknown then no DepthStencilBuffer is used
         /// </summary>
         private DepthFormat mDepthFormat;
 
         private bool mIsDisposed = false;
+
+        public Color Color { get; set; }
+        public bool ClearOnBegin { get; set; }
 
         public GraphicsDevice GraphicsDevice
         {
@@ -105,13 +108,9 @@ namespace Ale.Graphics
         {
             get 
             {
-                if (null == mRenderTarget2D)
+                if (null == mRenderTarget2D || mRenderTarget2D.IsContentLost)
                 {
-                    return null;
-                }
-                if (mRenderTarget2D.IsContentLost)
-                {
-                    Clear(Color.White);
+                    Clear();
                 }
                 return mRenderTarget2D.GetTexture(); 
             }
@@ -138,19 +137,25 @@ namespace Ale.Graphics
             mMultiSampleQuality = multiSampleQuality;
             mUsage = usage;
             mDepthFormat = depthFormat;
+
+            Color = Color.White;
+            ClearOnBegin = true;
         }
 
         /// <summary>
-        /// Clears the render target with a given color. This method calls Begin and End.
+        /// Clears the render target. This method calls Begin and End.
         /// </summary>
         /// <param name="color"></param>
-        public void Clear(Color color)
+        public void Clear()
         {
             Begin();
 
-            GraphicsDevice.Clear(color);
+            if (!ClearOnBegin)
+            {
+                ClearInter();
+            }
 
-            End();
+            End(true);
         }
 
         /// <summary>
@@ -198,6 +203,11 @@ namespace Ale.Graphics
 
             GraphicsDevice.SetRenderTarget(mIndex, mRenderTarget2D);
             GraphicsDevice.DepthStencilBuffer = mDepthStencilBuffer;
+
+            if (ClearOnBegin)
+            {
+                ClearInter();
+            }
         }
 
         public void End()
@@ -219,6 +229,11 @@ namespace Ale.Graphics
                 GraphicsDevice.SetRenderTarget(mIndex, null);
                 GraphicsDevice.DepthStencilBuffer = mDefaultDepthStencilBuffer;
             }
+        }
+
+        public override string ToString()
+        {
+            return mName.ToString();
         }
 
         #region IDisposable
@@ -265,10 +280,14 @@ namespace Ale.Graphics
                 mDepthStencilBuffer = new DepthStencilBuffer(GraphicsDevice, mWidth, mHeight, mDepthFormat, mMultiSampleType, mMultiSampleQuality);
             }
         }
-        
-        public override string ToString()
+
+        /// <summary>
+        /// Clears the render target. This method calls Begin and End.
+        /// </summary>
+        /// <param name="color"></param>
+        private void ClearInter()
         {
-            return mName.ToString();
+            GraphicsDevice.Clear(Color);
         }
     }
 }

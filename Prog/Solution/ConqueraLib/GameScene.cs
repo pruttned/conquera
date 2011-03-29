@@ -607,8 +607,7 @@ namespace Conquera
             List<ScenePass> scenePasses = new List<ScenePass>();
 
             scenePasses.Add(new ShadowScenePass(mainCamera, this, mLightDir, new Plane(Vector3.UnitZ, HexTerrain.GroundHeight), renderTargetManager, content));
-            scenePasses[0].RenderTarget.Clear(Color.White);
-
+            scenePasses[0].IsEnabled = false;
             //scenePasses.Add(new WaterReflectionPass(mainCamera, this, renderTargetManager, content));
 
             //todo - nacitavaj material z content podla mena
@@ -816,9 +815,8 @@ namespace Conquera
                 shadowPass.IsEnabled = !shadowPass.IsEnabled;
                 if (!shadowPass.IsEnabled)
                 {
-                    shadowPass.RenderTarget.Clear(Color.White);
+                    shadowPass.RenderTarget.Clear();
                 }
-
             }
             if (key == Microsoft.Xna.Framework.Input.Keys.P)
             {

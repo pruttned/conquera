@@ -47,10 +47,6 @@ namespace Ale.Scene
             mSkyPlane.EnqueRenderableUnits(gameTime, renderer, this);
         }
 
-        protected override void Clear(GraphicsDevice graphicsDevice)
-        {
-            graphicsDevice.Clear(ClearOptions.DepthBuffer, Color.AliceBlue, 1.0f, 0);
-        }
 
         #region IDisposable Members
 

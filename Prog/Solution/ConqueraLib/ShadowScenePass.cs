@@ -42,12 +42,9 @@ namespace Conquera
         static private AleRenderTarget CreateRenderTarget(RenderTargetManager renderTargetManager)
         {
             PresentationParameters pp = renderTargetManager.GraphicsDeviceManager.GraphicsDevice.PresentationParameters;
-            return renderTargetManager.CreateRenderTarget("ShadowMap", 1024, 1024, 1, pp.BackBufferFormat, DepthFormat.Depth16);
-        }
-
-        protected override void Clear(GraphicsDevice graphicsDevice)
-        {
-            graphicsDevice.Clear(Color.White);
+            var rt =  renderTargetManager.CreateRenderTarget("ShadowMap", 1024, 1024, 1, pp.BackBufferFormat, DepthFormat.Depth16);
+            rt.Color = Color.White;
+            return rt;
         }
 
         protected override void DestroyRenderTarget(AleRenderTarget renderTarget)
