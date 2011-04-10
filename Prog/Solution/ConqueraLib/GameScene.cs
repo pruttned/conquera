@@ -408,7 +408,6 @@ namespace Conquera
 
             mGuiScene.DebugText = State.GetType().ToString();
         }
-
         public void Update3dCursor()
         {
             var cellUnderCur = GetCellUnderCur();
@@ -417,10 +416,30 @@ namespace Conquera
             {
                 Point index = cellUnderCur.Index;
                 mCursor3d.Position = cellUnderCur.CenterPos;
+
+
                 if (Show3dCursor)
                 {
                     mCursor3d.IsVisible = true;
                 }
+
+
+
+                Plane plane = new Plane(Vector3.UnitZ, 0);
+
+                Ray ray;
+                MainCamera.CameraToViewport(SceneManager.MouseManager.CursorPosition, SceneManager.GraphicsDeviceManager.GraphicsDevice.Viewport, out ray);
+
+                float? intersection = ray.Intersects(plane);
+                if (null != intersection)
+                {
+                    Vector3 intPoint = ray.Position + intersection.Value * ray.Direction;
+
+                    cursorLight.Position = new Vector3(intPoint.X, intPoint.Y, 0.5f);
+                }
+
+
+
             }
             else
             {
@@ -433,6 +452,16 @@ namespace Conquera
             base.Draw(gameTime);
             mCellLabelManager.Draw(gameTime);
             GuiManager.Instance.Draw(gameTime);
+
+            //GuiManager.Instance.SpriteBatch.Begin();
+            //GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ShadowMap").Texture, new Rectangle(256, 0, 256, 192), Color.White);
+            // GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ScreenDepthMap").Texture, new Rectangle(256, 0, 256, 192), Color.White);
+            //GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ScreenNormalMap").Texture, new Rectangle(512, 0, 256, 192), Color.White);
+            //GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ScreenLightMap").Texture, new Rectangle(768, 0, 256, 192), Color.White);
+            //////            GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ScreenColorMap").Texture, new Rectangle(0, 0, 256, 192), Color.White);
+            //GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ScreenColorMap").Texture, new Rectangle(0, 0, 256, 192), Color.White);
+            //GuiManager.Instance.SpriteBatch.End();
+
         }
 
         public HexCell GetCellUnderCur()
@@ -606,8 +635,8 @@ namespace Conquera
             //return null;
             List<ScenePass> scenePasses = new List<ScenePass>();
 
-            scenePasses.Add(new ShadowScenePass(mainCamera, this, mLightDir, new Plane(Vector3.UnitZ, HexTerrain.GroundHeight), renderTargetManager, content));
-            scenePasses[0].IsEnabled = false;
+            scenePasses.Add(new ShadowScenePass(mainCamera, this, mLightDir, new Plane(Vector3.UnitZ, HexTerrain.GroundHeight)));
+            
             //scenePasses.Add(new WaterReflectionPass(mainCamera, this, renderTargetManager, content));
 
             //todo - nacitavaj material z content podla mena
@@ -982,7 +1011,8 @@ namespace Conquera
                 player.Init(this, Content);
             }
 
-            PostProcessEffectManager.PostProcessEffects.Add(new BloomProcessEffect(GraphicsDeviceManager, Content));
+            PostProcessEffectManager.PostProcessEffects.Add(new BloomProcessEffect(GraphicsDeviceManager, RenderTargetManager, Content));
+          //  PostProcessEffectManager.PostProcessEffects.Add(new InvertProcessEffect(GraphicsDeviceManager, RenderTargetManager,Content));
             PostProcessEffectManager.PostProcessEffects[0].Enabled = false;
 
             mCaptureParticleSystemDesc = Content.Load<ParticleSystemDesc>("CellCaptureParticleSystem");
@@ -1012,7 +1042,53 @@ namespace Conquera
 
             mLavaRenderable = new LavaRenderable(GraphicsDeviceManager.GraphicsDevice, Content, Octree.Bounds);
             Octree.AddObject(mLavaRenderable);
+
+            Material lightMat = Content.Load<Material>("PointLightMat");
+            int cnt = 15;
+            for (int i = 0; i < cnt; ++i)
+            {
+                Vector3 v = new Vector3(0.5f, 0.5f, 0.5f);
+                Vector3 c = AleMathUtils.GetRandomVector3(ref v, 0.5f);
+                //  c = new Vector3(1,0.1f,0.1f);
+                if (i < (float)cnt / 3.0f)
+                {
+                    c = new Vector3(2, 0, 0);
+                }
+                else
+                {
+                    if (i < 2.0f * (float)cnt / 3.0f)
+                    {
+                        c = new Vector3(0.0f, 2.0f, 0.0f);
+                    }
+                    else
+                    {
+                        c = new Vector3(0.0f, 0.0f, 2.0f);
+                    }
+                }
+
+                PointLight light = new PointLight(Content, GraphicsDeviceManager, lightMat);
+                light.Color = c;
+                light.Scale = 2.0f;
+                var sss = HexTerrain.GetPosFromIndex(new Point(Terrain.Height, Terrain.Width));
+                light.Position = new Vector3((float)AleMathUtils.Random.NextDouble() * sss.X
+                    , (float)AleMathUtils.Random.NextDouble() * sss.Y, 0.5f);
+
+                //light.Position = new Vector3(10, 10, 1);
+
+
+
+                Octree.AddObject(light);
+            }
+
+            cursorLight = new PointLight(Content, GraphicsDeviceManager,lightMat);
+            cursorLight.Color = new Vector3(2.0f, 2.0f, 2.0f);
+            cursorLight.Scale = 1.5f;
+            cursorLight.Position = new Vector3(0, 0, 0.1f);
+            Octree.AddObject(cursorLight);
+
+
         }
+        PointLight cursorLight;
 
 
         private static BoundingBox GetBoundsFromSize(int width, int height)

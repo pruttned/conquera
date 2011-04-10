@@ -42,7 +42,11 @@ namespace Ale.Graphics
             /// <summary>
             /// Time since the previous frame in seconds (Semantic 'ElapsedTime')
             /// </summary>
-            ElapsedTime
+            ElapsedTime,
+
+            ScreenWidth,
+            ScreenHeight,
+            ScreenHalfPixel
         }
 
         #endregion Enums
@@ -64,6 +68,8 @@ namespace Ale.Graphics
         /// </summary>
         private Semantic mSemantic;
 
+        private GraphicsDevice mGraphicsDevice;
+
         #endregion Fields
 
         #region Methods
@@ -73,7 +79,7 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="effectParameter">- Effect parameter to which should be this auto paramter binded</param>
         /// <returns>New auto parameter or null if its semantic is incompatible with per frame parameter semantics</returns>
-        static public PerFrameAutoParam TryCreateAutoParam(EffectParameter effectParameter)
+        static public PerFrameAutoParam TryCreateAutoParam(EffectParameter effectParameter, GraphicsDevice graphicsDevice)
         {
             for(int i = 0; i <  SemanticNames.Length; ++i)
             { //Scaning through semantic names is better then using Enum.parse because it is possible that 
@@ -82,7 +88,7 @@ namespace Ale.Graphics
                 //meens that is is not a PerFrameAutoParam but another parameter type.
                 if(string.Equals(SemanticNames[i], effectParameter.Semantic, StringComparison.OrdinalIgnoreCase))
                 {
-                    return new PerFrameAutoParam(effectParameter, (Semantic)i);
+                    return new PerFrameAutoParam(effectParameter, (Semantic)i, graphicsDevice);
                 }
             }
             return null;
@@ -107,6 +113,18 @@ namespace Ale.Graphics
                 case Semantic.ElapsedTime:
                       mEffectParameter.SetValue((null != gameTime) ? gameTime.TimeSinceLastFrame : 0);
                       break;
+                case Semantic.ScreenWidth:
+                      mEffectParameter.SetValue(mGraphicsDevice.PresentationParameters.BackBufferWidth);
+                      break;
+                case Semantic.ScreenHeight:
+                      mEffectParameter.SetValue(mGraphicsDevice.PresentationParameters.BackBufferHeight);
+                      break;
+                case Semantic.ScreenHalfPixel:
+                    var pp = mGraphicsDevice.PresentationParameters;
+                      mEffectParameter.SetValue(new Vector2(
+                          0.5f / (float)pp.BackBufferWidth,
+                          0.5f / (float)pp.BackBufferHeight));
+                      break;
             }
         }
 
@@ -117,10 +135,11 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="effectParameter">- Effect parameter to which should be this auto paramter binded</param>
         /// <param name="semantic">- Parameter's semantic</param>
-        private PerFrameAutoParam(EffectParameter effectParameter, Semantic semantic)
+        private PerFrameAutoParam(EffectParameter effectParameter, Semantic semantic, GraphicsDevice graphicsDevice)
         {
             mEffectParameter = effectParameter;
             mSemantic = semantic;
+            mGraphicsDevice = graphicsDevice;
         }
     }
 }

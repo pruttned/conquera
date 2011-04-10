@@ -116,6 +116,7 @@
     <Compile Include="Graphics\ParticleSystem\ParticleDynamicGeometryManager.cs" />
     <Compile Include="Graphics\ParticleSystem\ParticleSystemLoader.cs" />
     <Compile Include="Graphics\ParticleSystem\ZCylinderParticleEmitter.cs" />
+    <Compile Include="Graphics\Light.cs" />
     <Compile Include="Graphics\Renderable\GraphicModelRenderableFactory.cs" />
     <Compile Include="Graphics\Renderable\IRenderableFactory.cs" />
     <Compile Include="Graphics\Renderable\IRenderableUnit.cs" />
@@ -271,7 +272,6 @@
     <Compile Include="Graphics\ParticleSystem\PointParticleEmitter.cs" />
     <Compile Include="Graphics\ParticleSystem\SphereParticleEmitter.cs" />
     <Compile Include="Graphics\PostProcessEffects\BloomProcessEffect.cs" />
-    <Compile Include="Graphics\PostProcessEffects\FullscreenQuadVertex.cs" />
     <Compile Include="Graphics\PostProcessEffects\InvertProcessEffect.cs" />
     <Compile Include="Graphics\PostProcessEffects\PostProcessEffect.cs" />
     <Compile Include="Graphics\PostProcessEffects\PostProcessEffectCollection.cs" />

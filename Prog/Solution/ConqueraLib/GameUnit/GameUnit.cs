@@ -184,7 +184,7 @@ namespace Conquera
                         srcCell.GetSiblings(Siblings);
                         foreach (var sibling in Siblings)
                         {
-                            if (sibling.HexTerrainTile.IsPassable && sibling.Region == targetCell.Region)
+                            if (null != sibling.HexTerrainTile && sibling.HexTerrainTile.IsPassable && sibling.Region == targetCell.Region)
                             {
                                 if (targetCell.IsSiblingTo(sibling))
                                 {

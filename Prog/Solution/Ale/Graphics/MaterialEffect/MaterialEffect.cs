@@ -173,7 +173,7 @@ namespace Ale.Graphics
 
             //Effect's parameters
             InitEffectParameters(out manualParams, out perFrameAutoParams, out perCameraAutoParams,
-                out perRenderableAutoParams, out mRenderTargetAutoParams, out perSceneAutoParams);
+                out perRenderableAutoParams, out mRenderTargetAutoParams, out perSceneAutoParams, effect.GraphicsDevice);
             mManualParameters = new MaterialEffectParamCollection(manualParams);
 
             //Techniques
@@ -238,22 +238,6 @@ namespace Ale.Graphics
         internal void Apply(AleGameTime gameTime, MaterialEffectPass pass)
         {
             Apply(gameTime, null, null, null, null, pass);
-        }
-
-        /// <summary>
-        /// Applies the effect. 
-        /// Duplicate state changes are discarded and so multiple following calls of the Apply (with same parameters) method 
-        /// of a same MaterialEffect instance has no performance penalty
-        /// </summary>
-        /// <param name="gameTime"></param>
-        /// <param name="camera"></param>
-        /// <param name="renderableUnit"></param>
-        /// <param name="renderTargetManager"></param>
-        /// <param name="pass"></param>
-        internal void Apply(AleGameTime gameTime, ICamera camera, IRenderableUnit renderableUnit,
-            RenderTargetManager renderTargetManager, MaterialEffectPass pass)
-        {
-            Apply(gameTime, camera, renderableUnit, null, renderTargetManager, pass);
         }
 
         /// <summary>
@@ -375,8 +359,8 @@ namespace Ale.Graphics
         /// </summary>
         private void InitEffectParameters( out List<MaterialEffectParam> manualParams,
             out List<PerFrameAutoParam> perFrameAutoParams, out List<PerCameraAutoParam> perCameraAutoParams,
-            out List<PerRenderableAutoParam> perRenderableAutoParams, out List<RenderTargetAutoParam> renderTargetAutoParams, 
-            out List<PerSceneAutoParam> perSceneAutoParams)
+            out List<PerRenderableAutoParam> perRenderableAutoParams, out List<RenderTargetAutoParam> renderTargetAutoParams,
+            out List<PerSceneAutoParam> perSceneAutoParams, GraphicsDevice graphicsDevice)
         {
             manualParams = new List<MaterialEffectParam>();
             perFrameAutoParams = null;
@@ -388,7 +372,7 @@ namespace Ale.Graphics
             foreach (EffectParameter effectParameter in mEffect.Parameters)
             {
                 //whether it is PerFrameAutoParam
-                PerFrameAutoParam perFrameAutoParam = PerFrameAutoParam.TryCreateAutoParam(effectParameter);
+                PerFrameAutoParam perFrameAutoParam = PerFrameAutoParam.TryCreateAutoParam(effectParameter, graphicsDevice);
                 if (null != perFrameAutoParam)
                 {
                     if (null == perFrameAutoParams)

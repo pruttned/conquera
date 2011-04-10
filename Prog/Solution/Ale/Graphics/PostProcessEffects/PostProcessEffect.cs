@@ -70,6 +70,8 @@ namespace Ale.Graphics
 
         private FullScreenQuad mFullScreenQuad;
 
+        private RenderTargetManager mRenderTargetManager;
+
         #endregion Fields
 
         #region Properties
@@ -118,10 +120,11 @@ namespace Ale.Graphics
         /// Ctor
         /// </summary>
         /// <param name="graphicsDevice"></param>
-        public PostProcessEffect(GraphicsDeviceManager graphicsDeviceManager)
+        public PostProcessEffect(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager)
         {
             mGraphicsDeviceManager = graphicsDeviceManager;
             mFullScreenQuad = new FullScreenQuad(graphicsDeviceManager);
+            mRenderTargetManager = renderTargetManager;
         }
 
         #region IDisposable
@@ -156,7 +159,7 @@ namespace Ale.Graphics
         /// <param name="screen"></param>
         /// <param name="resultRenderTarget"></param>
         /// <param name="gameTime"></param>
-        internal void Apply(Texture2D screen, RenderTarget2D resultRenderTarget, AleGameTime gameTime)
+        public void Apply(Texture2D screen, RenderTarget2D resultRenderTarget, AleGameTime gameTime)
         {
             if (Enabled)
             {
@@ -206,7 +209,7 @@ namespace Ale.Graphics
         /// <param name="rtHeight"></param>
         protected void DrawFullscreenQuad(MaterialEffect effect, AleGameTime gameTime, int rtWidth, int rtHeight)
         {
-            mFullScreenQuad.Draw(effect, gameTime, rtWidth, rtHeight);
+            mFullScreenQuad.Draw(effect, gameTime, mRenderTargetManager, rtWidth, rtHeight);
         }
 
         /// <summary>
@@ -217,7 +220,7 @@ namespace Ale.Graphics
         /// <param name="gameTime"></param>
         protected void DrawFullscreenQuad(MaterialEffect effect, AleGameTime gameTime)
         {
-            mFullScreenQuad.Draw(effect, gameTime);
+            mFullScreenQuad.Draw(effect, gameTime, mRenderTargetManager);
         }
 
         /// <summary>

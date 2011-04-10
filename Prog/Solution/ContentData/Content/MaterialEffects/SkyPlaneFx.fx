@@ -67,25 +67,6 @@ float4 mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01) : COLOR
 	return color;   
 }
 
-
-//Must be present although it is not used
-technique Default
-{
-	pass p0 
-	<
-		bool IsTransparent=false;
-		string MainTexture = "gDiffuseMap";  
-	>
-	{
-		AlphaTestEnable = false;
-		AlphaBlendEnable = false;
-		ZEnable = false;
-		ZWriteEnable = false;
-		
-		VertexShader = compile vs_2_0 mainVS();
-		PixelShader = compile ps_2_0 mainPS();
-	}
-}
 technique SkyPlaneScenePass
 {
 	pass p0 
@@ -96,8 +77,10 @@ technique SkyPlaneScenePass
 	{
 		AlphaTestEnable = false;
 		AlphaBlendEnable = false;
+		
 		ZEnable = false;
 		ZWriteEnable = false;
+		CullMode = None;
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();

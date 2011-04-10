@@ -36,12 +36,9 @@ namespace Ale.Graphics
 
         private GraphicsDeviceManager mGraphicsDeviceManager;
 
-        private Point mScreenSize = new Point(-1, -1);
-
         public FullScreenQuad(GraphicsDeviceManager graphicsDeviceManager)
         {
             mGraphicsDeviceManager = graphicsDeviceManager;
-            graphicsDeviceManager.DeviceReset += new EventHandler(GraphicsDeviceManager_DeviceReset);
 
             var graphicsDevice = mGraphicsDeviceManager.GraphicsDevice;
 
@@ -60,17 +57,13 @@ namespace Ale.Graphics
             mVertexBuffer = new DynamicVertexBuffer(graphicsDevice, 4 * VertexPositionTexture.SizeInBytes, BufferUsage.WriteOnly);
         }
 
-        public void Draw(MaterialEffect effect, AleGameTime gameTime)
+        public void Draw(MaterialEffect effect, AleGameTime gameTime,RenderTargetManager renderTargetManager)
         {
-            if (0 > mScreenSize.X)
-            {
-                PresentationParameters pp = mGraphicsDeviceManager.GraphicsDevice.PresentationParameters;
-                mScreenSize = new Point(pp.BackBufferWidth, pp.BackBufferWidth);
-            }
-            Draw(effect, gameTime, mScreenSize.X, mScreenSize.Y);
+            PresentationParameters pp = mGraphicsDeviceManager.GraphicsDevice.PresentationParameters;
+            Draw(effect, gameTime, renderTargetManager, pp.BackBufferWidth, pp.BackBufferHeight);
         }
 
-        public void Draw(MaterialEffect effect, AleGameTime gameTime, int width, int height)
+        public void Draw(MaterialEffect effect, AleGameTime gameTime, RenderTargetManager renderTargetManager, int width, int height)
         {
             var graphicsDevice = mGraphicsDeviceManager.GraphicsDevice;
 
@@ -81,15 +74,20 @@ namespace Ale.Graphics
             graphicsDevice.Vertices[0].SetSource(mVertexBuffer, 0, 20);
             graphicsDevice.Indices = mIndexBuffer;
 
-            effect.Apply(gameTime, effect.DefaultTechnique.Passes[0]);
+            effect.Apply(gameTime,null, null, null, renderTargetManager, effect.DefaultTechnique.Passes[0]);
             graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4, 0, 2);
             MaterialEffect.Finish();
         }
 
-        private void GraphicsDeviceManager_DeviceReset(object sender, EventArgs e)
+        public void Draw(MaterialEffect effect, AleGameTime gameTime)
         {
-            mScreenSize = new Point(-1, -1);
+            Draw(effect, gameTime, null);
         }
+        public void Draw(MaterialEffect effect, AleGameTime gameTime, int width, int height)
+        {
+            Draw(effect, gameTime, null, width, height);
+        }
+
 
         public void Dispose()
         {
@@ -103,8 +101,6 @@ namespace Ale.Graphics
                 mVertexBuffer = null;
                 mVertexDeclaration = null;
 
-                mGraphicsDeviceManager.DeviceReset -= GraphicsDeviceManager_DeviceReset;
-
                 GC.SuppressFinalize(this);
                 mIsDisposed = true;
             }
@@ -113,8 +109,8 @@ namespace Ale.Graphics
         private void FillVertexBuffer(int width, int height)
         {
             var graphicsDevice = mGraphicsDeviceManager.GraphicsDevice;
-            float hpw = -(1.0f / (float)width) / 2.0f;
-            float hph = +(1.0f / (float)height) / 2.0f;
+            float hpw = -(0.5f / (float)width);
+            float hph = +(0.5f / (float)height);
 
             mVertices[0].Position.X = -1 + hpw;
             mVertices[0].Position.Y = 1 + hph;

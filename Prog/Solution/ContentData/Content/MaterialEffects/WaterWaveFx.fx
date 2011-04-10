@@ -105,9 +105,7 @@ technique Default
 	{
 		AlphaTestEnable = true;
 		AlphaBlendEnable = true;
-		ZEnable = true;
-		ZWriteEnable = false;
-			
+		
 		BlendOp = add;
 
 		DestBlend = INVSRCALPHA;
@@ -115,6 +113,11 @@ technique Default
 
 		AlphaFunc = Greater; 
 		AlphaRef = 0x000005;
+
+		ZEnable = true;
+		ZWriteEnable = false;
+		CullMode = None;
+		ZFUNC = lessequal;
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();

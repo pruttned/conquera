@@ -279,6 +279,10 @@ namespace Ale.Graphics
             {
                 mDepthStencilBuffer = new DepthStencilBuffer(GraphicsDevice, mWidth, mHeight, mDepthFormat, mMultiSampleType, mMultiSampleQuality);
             }
+            else
+            {
+                mDepthStencilBuffer = null;
+            }
         }
 
         /// <summary>

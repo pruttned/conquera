@@ -16,55 +16,49 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////
 
-float4x4 gWorldViewProj : WorldViewProjection;
-float4x4 gWorld : World;
-float3 gEyePosition : EyePosition;
-	
+// Based on http://www.catalinzima.com/tutorials/deferred-rendering-in-xna/
+
 struct VsOutput
 {
     float4 pos : POSITION;
-    float4 posWorld : TEXCOORD0;
-    float3 normal : TEXCOORD1;
 };	
-	
-VsOutput mainVS(float4 pos: POSITION, float4 normal: NORMAL)
-{
-	VsOutput output = (VsOutput)0;
-	output.posWorld = mul(pos, gWorld);
-	output.normal = normal;
-	output.pos = mul(pos, gWorldViewProj);
-	return output;
 
+VsOutput mainVS(float3 position : POSITION0)
+{
+	VsOutput output;
+    output.pos = float4(position,1);
+    return output;
 }
 
-float4 mainPS(float4 posWorld : TEXCOORD0, float3 normal : TEXCOORD1) : COLOR 
+struct PsOutput
 {
-	float3 eyeDir = normalize(gEyePosition - posWorld.xyz);   
-	float4 outColor = float4(0.8, 0.8, 1.0, 1) * saturate(1-dot(eyeDir,normalize(normal)) + 0.3);
-	//outColor.a = 0.5;
-	//outColor.a += 0.2;
-	return outColor;
+    float4 Color : COLOR0;
+    float4 Normal : COLOR1;
+    float4 Depth : COLOR2;
+};
+
+PsOutput mainPS()
+{
+    PsOutput output;
+
+    output.Color = 0;
+    output.Normal = float4(0.5f, 0.5f, 0.5f, 0.0f);
+    output.Depth = 1.0f;
+    
+    return output;
 }
 
 technique Default
 {
 	pass p0 
-	<
-		bool IsTransparent=true;  
-	>
 	{
-		AlphaBlendEnable = true;
-		AlphaTestEnable = true;
+		AlphaBlendEnable = false;
+		AlphaTestEnable = false;
 	
-		BlendOp = add;
-		DestBlend = INVSRCALPHA;
-		SrcBlend = SRCALPHA;
+		ZEnable = false;
+		ZWriteEnable = false;
+		CullMode = None;
 	
-		ZEnable = true;
-		ZWriteEnable = true;
-		CullMode = CCW;
-		ZFUNC = lessequal;
-		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
 	}

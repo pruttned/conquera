@@ -578,6 +578,27 @@
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\Deferred\DeferredClearFx.fx">
+      <Name>DeferredClearFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\Deferred\PointLightFx.fx">
+      <Name>PointLightFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\Deferred\CombineFx.fx">
+      <Name>CombineFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

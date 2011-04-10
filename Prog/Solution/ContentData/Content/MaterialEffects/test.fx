@@ -111,6 +111,8 @@ technique Default
 		AlphaTestEnable = false;
 		ZEnable = true;
 		ZWriteEnable = true;
+		CullMode = CCW;
+		ZFUNC = lessequal;
 		
 	
 		VertexShader = compile vs_2_0 mainVS();

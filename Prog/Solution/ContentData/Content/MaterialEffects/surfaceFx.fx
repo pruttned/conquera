@@ -47,45 +47,55 @@ sampler2D gShadowMapSampler = sampler_state
 	  AddressV = Clamp;
 	};	
 	
+
 struct VsOutput
 {
     float4 pos : POSITION;
     float2 uv : TEXCOORD0;
-    float4 worldPos : TEXCOORD1;
+    float4 posWorld : TEXCOORD1;
+    float2 Depth : TEXCOORD2;
 };	
-	
-VsOutput mainVS(float4 pos: POSITION, float4 normal: NORMAL, float2 uv: TEXCOORD0)
+
+
+VsOutput mainVS(float4 pos: POSITION, float2 uv: TEXCOORD0)
 {
 	VsOutput output = (VsOutput)0;
-//	pos.y -= 0.01;
+	
 	output.pos = mul(pos, gWorldViewProj);
-	//output.uv = mul(pos, gWorld).xy / 6;
 	output.uv = uv;
-	output.worldPos = mul(pos, gWorld);
+	output.posWorld = mul(pos, gWorld);
+	
+	output.Depth = float2(output.pos.z, output.pos.w);
 
 	return output;
 }
 
-float4 mainPS(float2 uv: TEXCOORD0, float4 posWorld : TEXCOORD1) : COLOR 
+struct PsOut
 {
-   float4 lightingPosition = mul(posWorld, gLightViewProj);
-    
-  
+    half4 Color : COLOR0;
+    half4 Normal : COLOR1;
+    half4 Depth : COLOR2;
+};
+
+PsOut mainPS(float2 uv: TEXCOORD0, float4 posWorld : TEXCOORD1, float2 depth : TEXCOORD02) 
+{
+	PsOut output;
+
+	float4 lightingPosition = mul(posWorld, gLightViewProj);
     // Find the position in the shadow map for this pixel
     float2 shadowTexCoord = 0.5 * lightingPosition.xy / 
                             lightingPosition.w + float2( 0.5, 0.5 );
     shadowTexCoord.y = 1.0f - shadowTexCoord.y;
     
     float4 shadowColor  = float4(tex2D(gShadowMapSampler, shadowTexCoord).rgb, 1);
-	return tex2D(gDiffuseMapSampler, uv) * shadowColor;
+
+	output.Color  = tex2D(gDiffuseMapSampler, uv) * shadowColor;
+    output.Normal = float4(0.5,0.5,1,0); // float4(0.5f * (normalize(normal) + 1.0f), 0);
+    output.Depth = depth.x / depth.y;
+	
+	return output;
 }
 
-
-
-float4 mainPS2(float2 uv: TEXCOORD0, float4 posWorld : TEXCOORD1) : COLOR 
-{
-	return float4(0,0,0,1);
-}
 
 technique Default
 {
@@ -93,33 +103,19 @@ technique Default
 	<
 		bool IsTransparent=false;
 		string MainTexture = "gDiffuseMap";  
+		bool ReceivesLight = true;
 	>
 	{
 		AlphaBlendEnable = false;
 		AlphaTestEnable = false;
+
 		ZEnable = true;
 		ZWriteEnable = true;
-		CullMode = CCW;
+		CullMode = None;
+		ZFUNC = lessequal;
 	
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
 	}
 }
 
-technique WaterReflectionPass
-{
-	pass p0 
-	<
-		bool IsTransparent=false;
-	>
-	{
-		AlphaBlendEnable = false;
-		AlphaTestEnable = false;
-		ZEnable = true;
-		ZWriteEnable = true;
-		CullMode = None;
-	
-		VertexShader = compile vs_2_0 mainVS();
-		PixelShader = compile ps_2_0 mainPS2();
-	}
-}

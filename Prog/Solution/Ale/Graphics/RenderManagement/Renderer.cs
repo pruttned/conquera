@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Ale.Tools;
 using Microsoft.Xna.Framework.Graphics;
+using Ale.Content;
 
 namespace Ale.Graphics
 {
@@ -46,13 +47,22 @@ namespace Ale.Graphics
     /// </example>        
     public sealed class Renderer : IDisposable
     {
+        //Deferred rendering  is based on http://www.catalinzima.com/tutorials/deferred-rendering-in-xna/
+
         #region Fields
 
         private bool mIsDisposed = false;
 
-        AleRenderTarget mColorRenderTarget;
-        AleRenderTarget mNormalRenderTarget;
-        AleRenderTarget mDepthRenderTarget;
+        //deferred
+        private AleRenderTarget mColorRenderTarget;
+        private AleRenderTarget mNormalRenderTarget;
+        private AleRenderTarget mDepthRenderTarget;
+        private AleRenderTarget mLightRenderTarget;
+        private MaterialEffect mDeferredClearEffect;
+        private MaterialEffect mCombineEffect;
+        private FullScreenQuad mFullScreenQuad;
+        private List<ILightRenderableUnit> mEnquedLights = new List<ILightRenderableUnit>();
+        private bool mIsDeferred;
 
         /// <summary>
         /// Currently active camera
@@ -83,6 +93,7 @@ namespace Ale.Graphics
 
         public AleRenderTarget mActiveRenderTarget = null;
 
+
         #endregion Fields
 
         #region Properties
@@ -105,21 +116,15 @@ namespace Ale.Graphics
 
         #region Methods
 
-        public Renderer(RenderTargetManager renderTargetManager)
+        public Renderer(RenderTargetManager renderTargetManager, ContentGroup content)
         {
             if (null == renderTargetManager) throw new ArgumentNullException("renderTargetManager");
 
             RenderTargetManager = renderTargetManager;
             GraphicsDeviceManager.DeviceReset += new EventHandler(GraphicsDeviceManager_DeviceReset);
-        }
 
-        /// <summary>
-        /// Begins the render process. 
-        /// </summary>
-        /// <param name="camera">- Currently active camera</param>
-        public void Begin(ICamera camera)
-        {
-            Begin(camera, null, null, null);
+            mFullScreenQuad = new FullScreenQuad(GraphicsDeviceManager);
+            LoadEffects(content);
         }
 
         /// <summary>
@@ -129,7 +134,7 @@ namespace Ale.Graphics
         /// <param name="actviveScene">- (nullable)</param>
         /// <param name="scenePass">- Active scene pass (null = default)</param>
         /// <param name="renderTarget"></param>
-        public void Begin(ICamera camera, Scene.BaseScene actviveScene, NameId scenePass, AleRenderTarget renderTarget)
+        public void BeginForward(ICamera camera, Scene.BaseScene actviveScene, NameId scenePass, AleRenderTarget renderTarget)
         {
             if (null != mActiveCamera)
             {
@@ -148,6 +153,20 @@ namespace Ale.Graphics
             {
                 mActiveScenePass = scenePass;
             }
+            mIsDeferred = false;
+        }
+
+        /// <summary>
+        /// Begins the render process. 
+        /// </summary>
+        /// <param name="camera">- Currently active camera</param>
+        /// <param name="actviveScene">- (nullable)</param>
+        /// <param name="scenePass">- Active scene pass (null = default)</param>
+        /// <param name="renderTarget"></param>
+        public void BeginDeferred(ICamera camera, Scene.BaseScene actviveScene, NameId scenePass)
+        {
+            BeginForward(camera, actviveScene, scenePass, null);
+            mIsDeferred = true;
         }
 
         /// <summary>
@@ -186,6 +205,16 @@ namespace Ale.Graphics
             return false;
         }
 
+        public bool EnqueLight(ILightRenderableUnit light)
+        {
+            if (mIsDeferred)
+            {
+                mEnquedLights.Add(light);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Renders all the enqueued renderables
         /// </summary>
@@ -196,47 +225,132 @@ namespace Ale.Graphics
                 throw new InvalidOperationException("Cannot call End method without calling Begin method first");
             }
 
-            MaterialPass lastUsedMaterialPass = null;
-
-            if (0 < mEnquedRenderableUnitCnt)
+            if (mIsDeferred)
             {
+                EndDeferred(gameTime);
+            }
+            else
+            {
+                EndForward(gameTime);
+            }
 
-                //Deffered pass
-                //if (!mContentIsLoaded)
-                //{
-                //    LoadContent();
-                //}
-                //mColorRenderTarget.Begin(0);
-                //mNormalRenderTarget.Begin(1);
-                //mDepthRenderTarget.Begin(2);
+            //Clear render queues for next frame
+            IList<RenderQueue> queues = mRenderLayers.Values;
+            for (int i = 0; i < queues.Count; ++i)
+            {
+                queues[i].Clear();
+            }
+            mEnquedLights.Clear();
+            mEnquedRenderableUnitCnt = 0;
 
-                //for (int i = mRenderLayers.Count - 1; i >= 0; --i)
-                //{
-                //    if (0 < mRenderLayers.Values[i].LightReceivingOpaqueRenderableUnitsCnt)
-                //    {
-                //        mRenderLayers.Values[i].ForEachLightReceivingOpaqueRenderable(
-                //            delegate(IRenderableUnit renderableUnit, MaterialPass materialPass)
-                //            {
-                //                if (lastUsedMaterialPass != materialPass)
-                //                {
-                //                    materialPass.Apply();
-                //                    lastUsedMaterialPass = materialPass;
-                //                }
+            mActiveCamera = null;
+        }
 
-                //                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
+        public void Dispose()
+        {
+            if (!mIsDisposed)
+            {
+                UnloadRenderTargets();
+                GraphicsDeviceManager.DeviceReset -= GraphicsDeviceManager_DeviceReset;
+                mFullScreenQuad.Dispose();
 
-                //                renderableUnit.Render(gameTime);
-                //            });
-                //    }
-                //}
+                GC.SuppressFinalize(this);
+                mIsDisposed = true;
+            }
+        }
 
-                //mColorRenderTarget.End();
-                //mNormalRenderTarget.End();
-                //mDepthRenderTarget.End();
+        private void EndDeferred(AleGameTime gameTime)
+        {
+            //???? todo: Optimize buffers ????
+            //http://www.gamedev.net/topic/562818-xna-deferred-rendering---performance-issues/
+            //http://aras-p.info/texts/CompactNormalStorage.html
+            //????
+
+
+            //////////////////////
+            //Deferred pass
+            //////////////////////
+            if (!mContentIsLoaded)
+            {
+                LoadRenderTargets();
+            }
+
+            if (0 < mEnquedRenderableUnitCnt && HasLightReceivingOpaqueRenderables())
+            {
+                MaterialPass lastUsedMaterialPass = null;
+
+                mColorRenderTarget.Begin(0);
+                mNormalRenderTarget.Begin(1);
+                mDepthRenderTarget.Begin(2);
+
+                //clear
+                GraphicsDeviceManager.GraphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
+                mFullScreenQuad.Draw(mDeferredClearEffect, gameTime);
+
+                //opaque
+                for (int i = mRenderLayers.Count - 1; i >= 0; --i)
+                {
+                    if (0 < mRenderLayers.Values[i].LightReceivingOpaqueRenderableUnitsCnt)
+                    {
+                        mRenderLayers.Values[i].ForEachLightReceivingOpaqueRenderable(
+                            delegate(IRenderableUnit renderableUnit, MaterialPass materialPass)
+                            {
+                                if (lastUsedMaterialPass != materialPass)
+                                {
+                                    materialPass.Apply();
+                                    lastUsedMaterialPass = materialPass;
+                                }
+
+                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, RenderTargetManager);
+
+                                renderableUnit.Render(gameTime);
+                            });
+                    }
+                }
+
+                mColorRenderTarget.End();
+                mNormalRenderTarget.End();
+                mDepthRenderTarget.End();
+
+                //Lights
+                if (0 < mEnquedLights.Count)   //- clear target
+                {
+                    mLightRenderTarget.Begin();
+
+                    foreach (var light in mEnquedLights)
+                    {
+                        var matPass = light.Material.DefaultTechnique.Passes[0];
+                        if (lastUsedMaterialPass != matPass)
+                        {
+                            matPass.Apply();
+                            lastUsedMaterialPass = matPass;
+                        }
+
+                        matPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, light, mActviveScene, RenderTargetManager);
+
+                        light.Render(gameTime);
+                    }
+
+                    mLightRenderTarget.End();
+                }
             }
 
 
+            //combine + restore depth
+            GraphicsDeviceManager.GraphicsDevice.SetRenderTarget(0, null);
+            GraphicsDeviceManager.GraphicsDevice.Clear(Color.White);
+            mFullScreenQuad.Draw(mCombineEffect, gameTime, RenderTargetManager);
+
+            //////////////////////
             //Forward pass
+            //////////////////////
+            DrawForward(gameTime);
+
+            MaterialEffect.Finish();
+        }
+
+        private void EndForward(AleGameTime gameTime)
+        {
 
             if (null != mActiveRenderTarget)
             {
@@ -248,8 +362,22 @@ namespace Ale.Graphics
                 GraphicsDeviceManager.GraphicsDevice.Clear(Color.White);
             }
 
+            DrawForward(gameTime);
+
+            MaterialEffect.Finish();
+
+
+            if (null != mActiveRenderTarget)
+            {
+                mActiveRenderTarget.End();
+            }
+        }
+
+        private void DrawForward(AleGameTime gameTime)
+        {
             if (0 < mEnquedRenderableUnitCnt)
             {
+                MaterialPass lastUsedMaterialPass = null;
 
                 //Opaque
                 for (int i = mRenderLayers.Count - 1; i >= 0; --i)
@@ -292,36 +420,6 @@ namespace Ale.Graphics
                             });
                     }
                 }
-
-                MaterialEffect.Finish();
-            }
-            if (null != mActiveRenderTarget)
-            {
-                mActiveRenderTarget.End();
-            }
-
-
-            //Clear render queues for next frame
-            IList<RenderQueue> queues = mRenderLayers.Values;
-            for (int i = 0; i < queues.Count; ++i)
-            {
-                queues[i].Clear();
-            }
-
-            mEnquedRenderableUnitCnt = 0;
-
-            mActiveCamera = null;
-        }
-
-        public void Dispose()
-        {
-            if (!mIsDisposed)
-            {
-                UnloadContent();
-                GraphicsDeviceManager.DeviceReset -= GraphicsDeviceManager_DeviceReset;
-
-                GC.SuppressFinalize(this);
-                mIsDisposed = true;
             }
         }
 
@@ -350,21 +448,33 @@ namespace Ale.Graphics
 
         private void GraphicsDeviceManager_DeviceReset(object sender, EventArgs e)
         {
-            UnloadContent();
+            UnloadRenderTargets();
             mContentIsLoaded = false;
         }
 
-        private void LoadContent()
+        private void LoadRenderTargets()
         {
             PresentationParameters pp = GraphicsDeviceManager.GraphicsDevice.PresentationParameters;
-            mColorRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenColorMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth16);
-            mDepthRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenDepthMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth16);
+            mColorRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenColorMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth24);
+            mDepthRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenDepthMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Single, DepthFormat.Depth24);
             mNormalRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenNormalMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth16);
+            mLightRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenLightMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color);
+            mColorRenderTarget.ClearOnBegin = false;
+            mDepthRenderTarget.ClearOnBegin = false;
+            mNormalRenderTarget.ClearOnBegin = false;
+            mLightRenderTarget.ClearOnBegin = true;
+            mLightRenderTarget.Color = Color.TransparentBlack;
 
             mContentIsLoaded = true;
         }
 
-        private void UnloadContent()
+        private void LoadEffects(ContentGroup content)
+        {
+            mDeferredClearEffect = content.Load<MaterialEffect>(@"Deferred/DeferredClearFx");
+            mCombineEffect = content.Load<MaterialEffect>(@"Deferred/CombineFx");
+        }
+
+        private void UnloadRenderTargets()
         {
             if (mContentIsLoaded)
             {
@@ -380,7 +490,23 @@ namespace Ale.Graphics
                 {
                     RenderTargetManager.DestroyRenderTarget(mNormalRenderTarget.Name);
                 }
+                if (null != mLightRenderTarget)
+                {
+                    RenderTargetManager.DestroyRenderTarget(mLightRenderTarget.Name);
+                }
             }
+        }
+
+        private bool HasLightReceivingOpaqueRenderables()
+        {
+            for (int i = mRenderLayers.Count - 1; i >= 0; --i)
+            {
+                if (0 < mRenderLayers.Values[i].LightReceivingOpaqueRenderableUnitsCnt)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         #endregion Methods

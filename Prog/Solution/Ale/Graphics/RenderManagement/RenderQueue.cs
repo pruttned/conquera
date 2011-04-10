@@ -87,6 +87,7 @@ namespace Ale.Graphics
         {
             mOpaqueRenderableUnits.Clear();
             mTransparentRenderableUnits.Clear();
+            mLightReceivingOpaqueRenderableUnits.Clear();
         }
 
         /// <summary>
@@ -113,12 +114,12 @@ namespace Ale.Graphics
         {
             if (0 < LightReceivingOpaqueRenderableUnitsCnt)
             {
-                mOpaqueRenderableUnits.Sort();
+                mLightReceivingOpaqueRenderableUnits.Sort();
 
                 //front to back
-                for (int i = 0; i < mOpaqueRenderableUnits.Count; ++i)
+                for (int i = 0; i < mLightReceivingOpaqueRenderableUnits.Count; ++i)
                 {
-                    action(mOpaqueRenderableUnits[i].RenderableUnit, mOpaqueRenderableUnits[i].MaterialPass);
+                    action(mLightReceivingOpaqueRenderableUnits[i].RenderableUnit, mLightReceivingOpaqueRenderableUnits[i].MaterialPass);
                 }
             }
         }

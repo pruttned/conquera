@@ -121,8 +121,8 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="graphicsDeviceManager"></param>
         /// <param name="content"></param>
-        public BloomProcessEffect(GraphicsDeviceManager graphicsDeviceManager, ContentManager content)
-            : base(graphicsDeviceManager)
+        public BloomProcessEffect(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentManager content)
+            : base(graphicsDeviceManager, renderTargetManager)
         {
             //mExtractBrightnessEffect = content.Load<MaterialEffect>(@"PostProcessEffects/ExtractBrightness");
             //mExtractBrightnessEffectScreenMap = (Texture2DMaterialEffectParam)mExtractBrightnessEffect.ManualParameters["gScreenMap"];
@@ -153,9 +153,9 @@ namespace Ale.Graphics
             //DrawFullscreenQuad();
 
             //Horizontal blur pass
+            mBlurHorizEffectScreenMap.Value = screen;
             mBlurHorizEffectTarget.Begin();
             //            mBlurHorizEffectScreenMap.Value = mExtractBrightnessEffectTarget.GetTexture();
-            mBlurHorizEffectScreenMap.Value = screen;
             //mBlurHorizEffect.Apply(gameTime, mBlurHorizEffect.DefaultTechnique.Passes[0]);
             DrawFullscreenQuad(mBlurHorizEffect, gameTime, mBlurHorizEffectTarget.Width, mBlurHorizEffectTarget.Height);
             mBlurHorizEffectTarget.End(false);

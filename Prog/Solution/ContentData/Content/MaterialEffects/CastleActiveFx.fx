@@ -98,38 +98,19 @@ technique Default
 	{
 		AlphaTestEnable = true;
 		AlphaBlendEnable = false;
-		ZEnable = true;
-		ZWriteEnable = true;
-		
 		AlphaFunc = Greater; 
 		AlphaRef = 0x000080;
+		
+		ZEnable = true;
+		ZWriteEnable = true;
+		CullMode = CCW;
+		ZFUNC = lessequal;
+		
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
 	}
 }
-
-/*
-technique WaterReflectionPass
-{
-	pass p0 
-	<
-		bool IsTransparent=false;
-	>
-	{
-		AlphaTestEnable = true;
-		AlphaBlendEnable = false;
-		ZEnable = true;
-		ZWriteEnable = true;
-		CullMode = None;
-		
-		AlphaFunc = Greater; 
-		AlphaRef = 0x000080;
-		
-		VertexShader = compile vs_2_0 mainVS();
-		PixelShader = compile ps_2_0 mainPS();
-	}
-}*/
 
 technique ShadowPass
 {
@@ -140,11 +121,14 @@ technique ShadowPass
 	{
 		AlphaTestEnable = true;
 		AlphaBlendEnable = false;
-		ZEnable = true;
-		ZWriteEnable = true;
-		
 		AlphaFunc = Greater; 
 		AlphaRef = 0x000080;
+
+		ZEnable = true;
+		ZWriteEnable = true;
+		CullMode = CCW;
+		ZFUNC = lessequal;
+		
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 ShadowCasterPs();

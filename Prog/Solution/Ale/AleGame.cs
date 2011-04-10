@@ -292,7 +292,10 @@ namespace Ale
             mGraphicsDeviceManager.PreferredBackBufferWidth = videoSettings.ScreenWidth;
             mGraphicsDeviceManager.PreferredBackBufferHeight = videoSettings.ScreenHeight;
             mGraphicsDeviceManager.IsFullScreen = (null == mAleRenderControl) && videoSettings.Fullscreen;
+            
+            
             //mGraphicsDeviceManager.SynchronizeWithVerticalRetrace = false;
+            //IsFixedTimeStep = false;
 
             if (applyChanges)
             {

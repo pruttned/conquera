@@ -67,8 +67,6 @@ float4 mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01) : COLOR
 	return color;   
 }
 
-
-
 float4 ShadowCasterPs(float2 uv: TEXCOORD0) : COLOR 
 {
 	//return tex2D(gDiffuseMapSampler, uv);   
@@ -85,11 +83,14 @@ technique Default
 	{
 		AlphaTestEnable = true;
 		AlphaBlendEnable = false;
-		ZEnable = true;
-		ZWriteEnable = true;
-		
 		AlphaFunc = Greater; 
 		AlphaRef = 0x000080;
+		
+		ZEnable = true;
+		ZWriteEnable = true;
+		CullMode = CCW;
+		ZFUNC = lessequal;
+		
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
