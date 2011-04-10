@@ -37,8 +37,8 @@ namespace Ale.Editor
     {
         class MainScenePass : ScenePass
         {
-            public MainScenePass(BaseScene scene, ICamera camera, AleRenderTarget renderTarget)
-                : base("Default", scene, camera, renderTarget)
+            public MainScenePass(BaseScene scene, ICamera camera)
+                : base("Default", scene, camera, false)
             {
             }
         }
@@ -77,7 +77,7 @@ namespace Ale.Editor
 
             //return null;
             List<ScenePass> scenePasses = new List<ScenePass>();
-            scenePasses.Add(new MainScenePass(this, mainCamera, null));
+            scenePasses.Add(new MainScenePass(this, mainCamera));
 
             //scenePasses[0].RenderTarget.Clear(Color.White);
 

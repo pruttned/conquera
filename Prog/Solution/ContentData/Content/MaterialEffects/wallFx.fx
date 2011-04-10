@@ -52,6 +52,7 @@ struct VsOutput
     float2 uv : TEXCOORD0;
     float3 posWorld : TEXCOORD1;
     float4 normal : TEXCOORD2;
+    float2 Depth : TEXCOORD3;
 };	
 	
 VsOutput mainVS(float4 pos: POSITION, float4 normal: NORMAL, float2 uv: TEXCOORD0)
@@ -70,34 +71,38 @@ VsOutput mainVS(float4 pos: POSITION, float4 normal: NORMAL, float2 uv: TEXCOORD
 	
 	output.normal = normalize(mul(normal, gWorld));
 	output.posWorld = mul(pos, gWorld);
+	output.Depth = float2(output.pos.z, output.pos.w);
 
 	return output;
 }
 
-float4 mainPS(float2 uv: TEXCOORD0, float4 posWorld : TEXCOORD1, float4 normal : TEXCOORD2) : COLOR 
+struct PsOut
 {
+    half4 Color : COLOR0;
+    half4 Normal : COLOR1;
+    half4 Depth : COLOR2;
+};
+
+PsOut mainPS(float2 uv: TEXCOORD0, float4 posWorld : TEXCOORD1, float3 normal : TEXCOORD2, float3 depth : TEXCOORD03) 
+{
+	PsOut output;
+	/*
 	float4 diffColor = tex2D(gDiffuseMapSampler, uv);
 	diffColor.rgb =  saturate(diffColor.rgb * dot(gSunLightDirection, normal)*2 + float3(0.02,0.01,0));
 	float3 light = tex2D(gWallLightMapSampler, float2(1-posWorld.z/5+1, 0)).xyz * (sin(gTime+posWorld.x*posWorld.y)*0.2+0.8);
 	diffColor.rgb += light*(light * float3(1, 1, 0)+float3(0.8, 0.1, 0.1) ) ;
-	
-	//diffColor.rgb = normal.xyz;
-
-//diffColor = lerp(float4(0,0,0,1), diffColor, saturate(posWorld.z/5));
-//diffColor.a = saturate(posWorld.z/2+1);
-//   return float4(0,0,0,0);
-
-
-	//float3 eyeDir = normalize(gEyePosition - posWorld.xyz);   
-	//float sinTime = (sin(gTime*0.7)*0.5+1) *0.2;
-	//float4 baseColor = float4(float4(0.7, 0.6, 1.0, 0.8) + sin(posWorld.xyz)*0.3, 0.8);
-	//float4 baseColor =  ;
-	//float4 outColor = baseColor * saturate(1-dot(eyeDir,normalize(normal)) + sinTime);
-	//outColor.a *= 1+posWorld.z*(sin(gTime*0.7))*0.5;
-	//outColor.a += 0.2;
-	//return diffColor  * lerp(outColor*2, 1, sin(gTime)*0.4+0.5);
-	
 	return diffColor;
+*/
+
+	float4 diffColor = tex2D(gDiffuseMapSampler, uv);
+	float3 light = tex2D(gWallLightMapSampler, float2(1-posWorld.z/5+1, 0)).xyz * (sin(gTime+posWorld.x*2)*0.2+0.8);
+	diffColor.rgb += light*(light * float3(1, 1, 0)+float3(0.8, 0.1, 0.1) ) ;
+
+	output.Color  = diffColor; //tex2D(gDiffuseMapSampler, uv);
+    output.Normal = float4(0.5f * (normalize(normal) + 1.0f), light.r);
+    output.Depth = depth.x / depth.y;
+	return output;
+	
 }
 
 technique Default
@@ -106,41 +111,17 @@ technique Default
 	<
 		bool IsTransparent=false;
 		string MainTexture = "gDiffuseMap";  
+		bool ReceivesLight = true;
 	>
 	{
 		AlphaBlendEnable = false;
 		AlphaTestEnable = false;
 		
-	//	BlendOp = add;
-
-		AlphaFunc = Greater; 
-		AlphaRef = 0x000001;
-
-		DestBlend = INVSRCALPHA;
-		SrcBlend = SRCALPHA;
-		
+	
 		ZEnable = true;
 		ZWriteEnable = true;
 		CullMode = CCW;
-		
-		VertexShader = compile vs_2_0 mainVS();
-		PixelShader = compile ps_2_0 mainPS();
-	}
-}
-
-technique WaterReflectionPass
-{
-	pass p0 
-	<
-		bool IsTransparent=false;
-	>
-	{
-		AlphaBlendEnable = false;
-		AlphaTestEnable = false;
-		
-		ZEnable = true;
-		ZWriteEnable = true;
-		CullMode = none;
+		ZFUNC = lessequal;
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();

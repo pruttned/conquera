@@ -67,7 +67,8 @@ struct VsOutput
     float2 Uv3 : TEXCOORD2;
     float2 Uv4 : TEXCOORD3;
 };	
-	
+
+
 VsOutput mainVS(VsInput input)
 {
     VsOutput output;
@@ -82,22 +83,17 @@ VsOutput mainVS(VsInput input)
     return output;
 }
 
-float4 mainPS(float2 uv: TEXCOORD0, float2 uv2 : TEXCOORD01, float2 uv3 : TEXCOORD02, float2 uv4 : TEXCOORD03) : COLOR 
+float4 mainPS(float2 uv: TEXCOORD0, float2 uv2 : TEXCOORD01, float2 uv3 : TEXCOORD02, float2 uv4 : TEXCOORD03) : COLOR0
 {
 	float4 color  = 
 		float4(0.8, 0.1, 0.1 ,1) + 
 		(tex2D(gLavaNoiseMapSampler, uv3)) * float4(1.5, 1.2, 0, 1);
 		
-	//	return tex2D(gNoiseMapSampler, uv);
-	
-	//color = color + clamp(float4(0,0,0,1), float4(0.8, 0.1, 0 ,1), (tex2D(gLavaColdMapSampler, uv2) + tex2D(gNoiseMapSampler, uv)));
-	//color = lerp(color, color*tex2D(gLavaColdMapSampler, uv2), tex2D(gNoiseMapSampler, uv));
-		
-		
-		color = color * tex2D(gLavaColdMapSampler, uv2);
-		color += float4(tex2D(gNoiseMapSampler, uv3).rg, 0,0) * float4(tex2D(gNoiseMapSampler, uv4).rg, 0,0);
+	color *= tex2D(gLavaColdMapSampler, uv2);
+	color.rg += tex2D(gNoiseMapSampler, uv3).rg * tex2D(gNoiseMapSampler, uv4).rg;
 	color.a = 1;
-	return color;   
+	
+	return color;
 }
 
 technique Default
@@ -110,8 +106,11 @@ technique Default
 	{
 		AlphaTestEnable = false;
 		AlphaBlendEnable = false;
+		
 		ZEnable = true;
 		ZWriteEnable = true;
+		CullMode = None;
+		ZFUNC = lessequal;
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();

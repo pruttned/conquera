@@ -87,12 +87,11 @@ namespace Conquera
 
             List<ScenePass> scenePasses = new List<ScenePass>();
 
-            scenePasses.Add(new ShadowScenePass(mainCamera, this, mLightDir, new Plane(Vector3.UnitZ, HexTerrain.GroundHeight), renderTargetManager, content));
+            scenePasses.Add(new ShadowScenePass(mainCamera, this, mLightDir, new Plane(Vector3.UnitZ, HexTerrain.GroundHeight)));
 
             Material skyPlaneMaterial = new Material(content.Load<MaterialEffect>("SkyPlaneFx"), 0);
-            skyPlaneMaterial.DefaultTechnique.Passes[0].SetParam("gDiffuseMap", content.Load<Texture2D>("Sky"));
             skyPlaneMaterial.Techniques["SkyPlaneScenePass"].Passes[0].SetParam("gDiffuseMap", content.Load<Texture2D>("Sky"));
-            scenePasses.Add(new SkyPlaneScenePass(mainCamera, this, content, skyPlaneMaterial));
+            //scenePasses.Add(new SkyPlaneScenePass(mainCamera, this, content, skyPlaneMaterial));
 
             scenePasses.Add(new GameDefaultScenePass(this, mainCamera));
 

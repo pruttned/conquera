@@ -43,6 +43,11 @@ namespace Ale.Graphics
             /// World*View*Projection transformation matrix
             /// </summary>
             WorldViewProjection,
+
+            /// <summary>
+            /// Bounding Center
+            /// </summary>
+            WorldBoundPos
         }
 
         #endregion Enums
@@ -125,6 +130,9 @@ namespace Ale.Graphics
                       {
                           mEffectParameter.SetValue(Matrix.Identity);
                       }
+                      break;
+                case Semantic.WorldBoundPos:
+                      mEffectParameter.SetValue(renderable.WorldBoundsCenter);
                       break;
             }
         }

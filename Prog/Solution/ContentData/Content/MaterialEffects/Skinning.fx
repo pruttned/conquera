@@ -124,28 +124,14 @@ technique Default
 	{
 		AlphaBlendEnable = false;
 		AlphaTestEnable = false;
+		
 		ZEnable = true;
 		ZWriteEnable = true;
+		CullMode = CCW;
+		ZFUNC = lessequal;
 	
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
-	}
-}
-
-
-technique Test
-{
-	pass trt 
-	<
-		bool IsTransparent=false;
-	>
-	{
-		AlphaTestEnable = false;
-		ZEnable = true;
-		ZWriteEnable = true;
-		
-		VertexShader = compile vs_2_0 mainVS();
-		PixelShader = compile ps_2_0 mainPS2();
 	}
 }
 
@@ -157,8 +143,11 @@ technique ShadowPass
 	>
 	{
 		AlphaTestEnable = false;
+		
 		ZEnable = true;
 		ZWriteEnable = true;
+		CullMode = CCW;
+		ZFUNC = lessequal;
 		
 		VertexShader = compile vs_2_0 ShadowCasterVs();
 		PixelShader = compile ps_2_0 ShadowCasterPs();

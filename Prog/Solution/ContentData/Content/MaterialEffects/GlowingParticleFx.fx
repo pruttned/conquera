@@ -147,15 +147,11 @@ technique Default
 		string MainTexture = "gDiffuseMap";  
 	>
 	{
-	
+		AlphaBlendEnable = true;
+		AlphaTestEnable = true;	
 		AlphaFunc = Greater; 
 		AlphaRef = 0x000001;
-	
-		AlphaBlendEnable = true;
-		AlphaTestEnable = true;
-		ZEnable = true;
-		ZWriteEnable = false;
-		
+
 		BlendOp = add;
 
 	//	DestBlend = one;
@@ -169,6 +165,13 @@ technique Default
 	//	DestBlend = one;
 	//	SrcBlend = SRCCOLOR;
 		SrcBlend = SRCALPHA;
+		
+		
+		ZEnable = true;
+		ZWriteEnable = false;
+		CullMode = None;
+		ZFUNC = lessequal;
+
 
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
@@ -185,8 +188,6 @@ technique Default
 	
 		AlphaBlendEnable = true;
 		AlphaTestEnable = true;
-		ZEnable = true;
-		ZWriteEnable = false;
 		
 		BlendOp = add;
 
@@ -201,6 +202,11 @@ technique Default
 		DestBlend = one;
 	//	SrcBlend = SRCCOLOR;
 		SrcBlend = SRCALPHA;
+
+		ZEnable = true;
+		ZWriteEnable = false;
+		CullMode = None;
+		ZFUNC = lessequal;
 
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS2();

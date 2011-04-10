@@ -49,6 +49,8 @@ namespace Ale.Graphics
             /// </summary>
             ViewProjection,
 
+            InvertViewProjection,
+
             /// <summary>
             /// Untransformed position of the camera's eye
             /// </summary>
@@ -119,6 +121,9 @@ namespace Ale.Graphics
                     break;
                 case Semantic.ViewProjection:
                     mEffectParameter.SetValue((null != camera) ? camera.ViewProjectionTransformation: Matrix.Identity);
+                    break;
+                case Semantic.InvertViewProjection:
+                    mEffectParameter.SetValue((null != camera) ? Matrix.Invert(camera.ViewProjectionTransformation) : Matrix.Identity);
                     break;
                 case Semantic.EyePosition:
                     mEffectParameter.SetValue((null != camera) ? camera.WorldPosition : Vector3.Zero);

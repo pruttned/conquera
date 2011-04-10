@@ -35,7 +35,9 @@ namespace Ale.Scene
         private bool mIsDisposed = false;
         private BaseScene mScene;
         private bool mEnabled = true;
-        
+        private bool mIsDeferred;
+        private bool mNeedReload = false;
+
         public NameId NameId
         {
             get { return mNameId; }
@@ -62,6 +64,14 @@ namespace Ale.Scene
 			set { mEnabled = value; }
 		}
 
+        public GraphicsDeviceManager GraphicsDeviceManager
+        {
+            get { return Scene.SceneManager.GraphicsDeviceManager; }
+        }
+        public RenderTargetManager RenderTargetManager 
+        {
+            get { return Scene.RenderTargetManager; }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -70,16 +80,25 @@ namespace Ale.Scene
         /// <param name="scene"></param>
         /// <param name="renderTarget">- if null, then the content is rendered to the backbuffer</param>
         /// <param name="backColor"></param>
-        public ScenePass(NameId nameId, BaseScene scene, ICamera camera, AleRenderTarget renderTarget)
+        public ScenePass(NameId nameId, BaseScene scene, ICamera camera, bool isDeferred)
         {
             if (null == nameId) { throw new NullReferenceException("nameId"); }
             if (null == camera) { throw new NullReferenceException("camera"); }
             if (null == scene) { throw new NullReferenceException("scene"); }
 
+            mIsDeferred = isDeferred;
             mScene = scene;
             mNameId = nameId;
             mCamera = camera;
-            mRenderTarget = renderTarget;
+            mRenderTarget = CreateRenderTarget(RenderTargetManager);
+
+            if (isDeferred && null != mRenderTarget)
+            {
+                throw new ArgumentException("Deferred doesn't supports render target");
+            }
+
+
+            GraphicsDeviceManager.DeviceReset += new EventHandler(mGraphicsDeviceManager_DeviceReset);
         }
 
         /// <summary>
@@ -91,11 +110,21 @@ namespace Ale.Scene
             GC.SuppressFinalize(this);
         }
 
-        public virtual void Draw(GraphicsDevice graphicsDevice, Renderer renderer, AleGameTime gameTime, RenderTargetManager renderTargetManager)
+        public virtual void Draw(GraphicsDevice graphicsDevice, Renderer renderer, AleGameTime gameTime)
         {
-            Begin(graphicsDevice, renderer, renderTargetManager);
+            Begin(graphicsDevice, renderer);
             EnqueRenderableUnits(graphicsDevice, gameTime, renderer);
             End(graphicsDevice, gameTime, renderer);
+        }
+
+        /// <summary>
+        /// Creates render target or null
+        /// </summary>
+        /// <param name="renderTargetManager"></param>
+        /// <returns></returns>
+        protected virtual AleRenderTarget CreateRenderTarget(RenderTargetManager renderTargetManager)
+        {
+            return null;
         }
 
         protected virtual void Dispose(bool isDisposing)
@@ -104,6 +133,7 @@ namespace Ale.Scene
             {
                 if (isDisposing)
                 {
+                    GraphicsDeviceManager.DeviceReset -= mGraphicsDeviceManager_DeviceReset;
                     if (null != mRenderTarget)
                     {
                         DestroyRenderTarget(mRenderTarget);
@@ -115,12 +145,26 @@ namespace Ale.Scene
 
         protected virtual void DestroyRenderTarget(AleRenderTarget renderTarget)
         {
-            renderTarget.Dispose();
+            RenderTargetManager.DestroyRenderTarget(renderTarget.Name);
+            mRenderTarget = null;
         }
 
-        protected virtual void Begin(GraphicsDevice graphicsDevice, Renderer renderer, RenderTargetManager renderTargetManager)
+        protected virtual void Begin(GraphicsDevice graphicsDevice, Renderer renderer)
         {
-            renderer.Begin(mCamera, mScene, mNameId, mRenderTarget);
+            if (mNeedReload)
+            {
+                mRenderTarget = CreateRenderTarget(RenderTargetManager);
+                mNeedReload = false;
+            }
+
+            if (mIsDeferred)
+            {
+                renderer.BeginDeferred(mCamera, mScene, mNameId);
+            }
+            else
+            {
+                renderer.BeginForward(mCamera, mScene, mNameId, mRenderTarget);
+            }
         }
 
         protected virtual void End(GraphicsDevice graphicsDevice, AleGameTime gameTime, Renderer renderer)
@@ -131,6 +175,15 @@ namespace Ale.Scene
         protected virtual void EnqueRenderableUnits(GraphicsDevice graphicsDevice, AleGameTime gameTime, Renderer renderer)
         {
             mScene.EnqueRenderableUnits(gameTime, this);
+        }
+
+        void mGraphicsDeviceManager_DeviceReset(object sender, EventArgs e)
+        {
+            if (null != RenderTarget)
+            {
+                DestroyRenderTarget(RenderTarget);
+                mNeedReload = true;
+            }
         }
     }
 }

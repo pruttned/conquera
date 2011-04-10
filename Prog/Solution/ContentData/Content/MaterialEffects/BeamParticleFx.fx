@@ -122,9 +122,12 @@ technique Default
 	
 		AlphaBlendEnable = true;
 		AlphaTestEnable = true;
+		
 		ZEnable = true;
 		ZWriteEnable = false;
-		
+		CullMode = None;
+		ZFUNC = lessequal;
+
 		BlendOp = add;
 
 		DestBlend = INVSRCALPHA;
@@ -146,9 +149,12 @@ technique Default
 	
 		AlphaBlendEnable = true;
 		AlphaTestEnable = true;
+		
 		ZEnable = true;
 		ZWriteEnable = false;
-		
+		CullMode = None;
+		ZFUNC = lessequal;
+
 		BlendOp = add;
 
 	

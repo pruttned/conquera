@@ -52,8 +52,8 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="graphicsDeviceManager"></param>
         /// <param name="content"></param>
-        public InvertProcessEffect(GraphicsDeviceManager graphicsDeviceManager, ContentManager content)
-            : base(graphicsDeviceManager)
+        public InvertProcessEffect(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentManager content)
+            : base(graphicsDeviceManager, renderTargetManager)
         {
             mInvertEffect = content.Load<MaterialEffect>(@"PostProcessEffects/Invert");
             mScreenMapMaterialEffectParam = (Texture2DMaterialEffectParam)mInvertEffect.ManualParameters["gScreenMap"];

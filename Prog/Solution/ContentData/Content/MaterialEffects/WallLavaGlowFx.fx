@@ -79,6 +79,7 @@ technique Default
 		ZEnable = true;
 		ZWriteEnable = false;
 		CullMode = None;
+		ZFUNC = lessequal;
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();

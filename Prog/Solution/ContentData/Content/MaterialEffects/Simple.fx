@@ -45,6 +45,7 @@ struct VsOutput
     float4 Position : POSITION;
     float2 Uv : TEXCOORD0;
     float3 Normal : TEXCOORD1;
+    float2 Depth : TEXCOORD2;
 };	
 	
 VsOutput mainVS(VsInput input)
@@ -52,21 +53,30 @@ VsOutput mainVS(VsInput input)
     VsOutput output;
     
     output.Position = mul(input.Position, gWorldViewProj);
-
     output.Normal = normalize(mul(input.Normal, gWorld));
-    
+	output.Depth = float2(output.Position.z, output.Position.w);
     output.Uv = input.Uv;
     
     return output;
 }
 
-float4 mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01) : COLOR 
+struct PsOut
 {
-	float4 color  = tex2D(gDiffuseMapSampler, uv);
-	color.rgb =  saturate(color.rgb * dot(gSunLightDirection, normal) + color.rgb * 0.5);
-	return color;   
-}
+    half4 Color : COLOR0;
+    half4 Normal : COLOR1;
+    half4 Depth : COLOR2;
+};
 
+PsOut mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01, float2 depth : TEXCOORD02) : COLOR 
+{
+	PsOut output;
+
+	output.Color  = tex2D(gDiffuseMapSampler, uv);
+    output.Normal = float4(0.5f * (normalize(normal) + 1.0f), 0); //a = diff color power
+    output.Depth = depth.x / depth.y;
+	
+	return output;
+}
 
 
 float4 ShadowCasterPs(float2 uv: TEXCOORD0) : COLOR 
@@ -80,44 +90,24 @@ technique Default
 	pass p0 
 	<
 		bool IsTransparent = false;
-		bool ReceivesLight = false;
+		bool ReceivesLight = true;
 		string MainTexture = "gDiffuseMap";  
 	>
 	{
 		AlphaTestEnable = true;
 		AlphaBlendEnable = false;
+		AlphaFunc = Greater; 
+		AlphaRef = 0x000001;
+		
 		ZEnable = true;
 		ZWriteEnable = true;
-		
-		AlphaFunc = Greater; 
-		AlphaRef = 0x000080;
+		CullMode = CCW;
+		ZFUNC = lessequal;
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
 	}
 }
-
-/*
-technique WaterReflectionPass
-{
-	pass p0 
-	<
-		bool IsTransparent=false;
-	>
-	{
-		AlphaTestEnable = true;
-		AlphaBlendEnable = false;
-		ZEnable = true;
-		ZWriteEnable = true;
-		CullMode = None;
-		
-		AlphaFunc = Greater; 
-		AlphaRef = 0x000080;
-		
-		VertexShader = compile vs_2_0 mainVS();
-		PixelShader = compile ps_2_0 mainPS();
-	}
-}*/
 
 technique ShadowPass
 {
@@ -129,11 +119,14 @@ technique ShadowPass
 	{
 		AlphaTestEnable = true;
 		AlphaBlendEnable = false;
-		ZEnable = true;
-		ZWriteEnable = true;
-		
 		AlphaFunc = Greater; 
 		AlphaRef = 0x000080;
+
+		ZEnable = true;
+		ZWriteEnable = true;
+		CullMode = CCW;
+		ZFUNC = lessequal;
+		
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 ShadowCasterPs();

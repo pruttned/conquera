@@ -55,9 +55,11 @@ technique Default
 	{
 		AlphaBlendEnable = false;
 		AlphaTestEnable = false;
+		
 		ZEnable = false;
 		ZWriteEnable = false;
-	
+		CullMode = None;
+
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
 	}

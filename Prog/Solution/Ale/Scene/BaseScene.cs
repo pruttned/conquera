@@ -102,7 +102,7 @@ namespace Ale.Scene
             mSceneManager = sceneManager;
             mContent = content;
             mRenderTargetManager = new RenderTargetManager(sceneManager.GraphicsDeviceManager);
-            mRenderer = new Renderer(mRenderTargetManager);
+            mRenderer = new Renderer(mRenderTargetManager, content);
             mPostProcessEffectManager = new PostProcessEffectManager(sceneManager.GraphicsDeviceManager);
 
             mScenePasses = CreateScenePasses(sceneManager.GraphicsDeviceManager, RenderTargetManager, content);
@@ -133,7 +133,7 @@ namespace Ale.Scene
             {
                 if (scenePass.IsEnabled)
                 {
-                    scenePass.Draw(mSceneManager.GraphicsDeviceManager.GraphicsDevice, Renderer, gameTime, RenderTargetManager);
+                    scenePass.Draw(mSceneManager.GraphicsDeviceManager.GraphicsDevice, Renderer, gameTime);
                 }
             }
             mPostProcessEffectManager.Apply(gameTime);

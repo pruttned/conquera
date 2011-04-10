@@ -40,14 +40,14 @@ namespace Conquera
         /// y = x rot
         /// z = y rot
         /// </summary>
-        private static Vector3[] ZoomLevels = new Vector3[] { new Vector3(15, -1.5f, 0.0f), new Vector3(10, -1.1f, 0.0f), new Vector3(5, -0.9f, 0.0f) };
+        private static Vector3[] ZoomLevels = new Vector3[] { new Vector3(20, -1.5f, 0.0f), new Vector3(15, -1.5f, 0.0f), new Vector3(10, -1.1f, 0.0f), new Vector3(5, -0.9f, 0.0f) };
 
         private Camera mCamera;
         private GameScene mGameScene;
         private bool mIsDisposed = false;
 
 
-        private int mZoomLevel = 1;
+        private int mZoomLevel = 2;
 
         private Vector3LinearAnimator mPositionAnimator = new Vector3LinearAnimator();
         private Vector3LinearAnimator mZoomLevelAnimator = new Vector3LinearAnimator();

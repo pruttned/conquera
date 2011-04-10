@@ -60,7 +60,7 @@ namespace Ale.Editor
 
             //return null;
             List<ScenePass> scenePasses = new List<ScenePass>();
-            scenePasses.Add(new ScenePass("Default", this, mainCamera, null));
+            scenePasses.Add(new ScenePass("Default", this, mainCamera, true));
 
             //scenePasses[0].RenderTarget.Clear(Color.White);
 
