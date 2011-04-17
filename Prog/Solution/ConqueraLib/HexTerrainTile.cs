@@ -143,14 +143,14 @@ namespace Conquera
 
             if (null != Desc.ActiveGraphicModel)
             {
-                mActiveGraphicModel = new GraphicModel(Desc.ActiveGraphicModel, scene.Content);
+                mActiveGraphicModel = new GraphicModel(Desc.ActiveGraphicModel, hexScene.RenderableProvider, scene.Content);
                 mActiveGraphicModel.IsVisible = false;
                 mActiveGraphicModel.Position = CenterPos;
                 hexScene.Octree.AddObject(mActiveGraphicModel);
             }
             if (null != Desc.InactiveGraphicModel)
             {
-                mInactiveGraphicModel = new GraphicModel(Desc.InactiveGraphicModel, scene.Content);
+                mInactiveGraphicModel = new GraphicModel(Desc.InactiveGraphicModel, hexScene.RenderableProvider, scene.Content);
                 mInactiveGraphicModel.Position = CenterPos;
                 hexScene.Octree.AddObject(mInactiveGraphicModel);
             }

@@ -310,21 +310,51 @@ namespace Conquera
                     //        ormManager.SaveObject(mat);
                     //    }
 
-                    //    {
-                    //        GraphicModelSettings settings = new GraphicModelSettings();
-                    //        settings.Mesh = "Castle";
-                    //        settings.Name = "CastleGm";
-                    //        settings.MaterialAssignments.Add(new MaterialAssignmentsettings("m1", ormManager.FindObjects(typeof(MaterialSettings), "Name='CastleMat'")[0]));
-                    //        ormManager.SaveObject(settings);
-                    //    }
+                    //{
+                    //    MaterialSettings mat = new MaterialSettings("PointLightMat", @"Deferred\PointLightFx", 0);
+                    //    ormManager.SaveObject(mat);
+                    //}
 
-                    //    {
-                    //        GraphicModelSettings settings = new GraphicModelSettings();
-                    //        settings.Mesh = "Castle";
-                    //        settings.Name = "CastleActiveGm";
-                    //        settings.MaterialAssignments.Add(new MaterialAssignmentsettings("m1", ormManager.FindObjects(typeof(MaterialSettings), "Name='CastleActiveMat'")[0]));
-                    //        ormManager.SaveObject(settings);
-                    //    }
+                    //{
+                    //    PointLightSettings s = new PointLightSettings();
+                    //    s.Name = "CastlePointLight";
+                    //    s.Material = ormManager.FindObject(typeof(MaterialSettings), "Name='PointLightMat'");
+                    //    s.Color = new Vector3(0.8f, 0.4f, 0.4f);
+                    //    s.Radius = 2.0f;
+                    //    ormManager.SaveObject(s);
+                    //}
+                    //{
+                    //    PointLightSettings s = new PointLightSettings();
+                    //    s.Name = "ActiveCastlePointLight";
+                    //    s.Material = ormManager.FindObject(typeof(MaterialSettings), "Name='PointLightMat'");
+                    //    s.Color = new Vector3(1.5f, 0.8f, 0.8f);
+                    //    s.Radius = 2.0f;
+                    //    ormManager.SaveObject(s);
+                    //}
+
+
+                    //{
+                    //    GraphicModelSettings settings = new GraphicModelSettings();
+                    //    //GraphicModelSettings settings = ormManager.LoadObject<GraphicModelSettings>("Name='CastleGm'");
+                    //    settings.Mesh = "Castle";
+                    //    settings.Name = "CastleGm";
+                    //    settings.MaterialAssignments.Add(new MaterialAssignmentsettings("m1", ormManager.FindObjects(typeof(MaterialSettings), "Name='CastleMat'")[0]));
+                    //    settings.ConnectionPointAssigments.Add(new ConnectionPointAssigmentSettings("Light",
+                    //        ormManager.FindObject(typeof(PointLightSettings), "Name='CastlePointLight'"), 3));
+                    //    ormManager.SaveObject(settings);
+                    //}
+
+                    //{
+                    //    GraphicModelSettings settings = new GraphicModelSettings();
+                    //    //GraphicModelSettings settings = ormManager.LoadObject<GraphicModelSettings>("Name='CastleActiveGm'");
+                    //    settings.Mesh = "Castle";
+                    //    settings.Name = "CastleActiveGm";
+                    //    settings.MaterialAssignments.Add(new MaterialAssignmentsettings("m1", ormManager.FindObjects(typeof(MaterialSettings), "Name='CastleActiveMat'")[0]));
+                    //    settings.ConnectionPointAssigments.Add(new ConnectionPointAssigmentSettings("Light",
+                    //        ormManager.FindObject(typeof(PointLightSettings), "Name='ActiveCastlePointLight'"), 3));
+                    //    ormManager.SaveObject(settings);
+                    //}
+
 
                     //    //{
                     //    //    HexTerrainTileSettings obj = new HexTerrainTileSettings();
@@ -747,12 +777,6 @@ namespace Conquera
                     //    MaterialSettings mat = new MaterialSettings("MovementAreaMat", "MovementAreaFx", DefaultRenderLayers.MovementArea);
                     //    ormManager.SaveObject(mat);
                     //}
-
-                    //{
-                    //    MaterialSettings mat = new MaterialSettings("PointLightMat", @"Deferred\PointLightFx", 0);
-                    //    ormManager.SaveObject(mat);
-                    //}
-
 
 
                     //{

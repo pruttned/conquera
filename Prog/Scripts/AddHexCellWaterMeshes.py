@@ -1,3 +1,10 @@
+#!BPY
+"""
+Name: 'WaterHexCells'
+Blender: 243
+Group: 'AddMesh'
+"""
+
 ##################################################################
 #  Copyright (C) 2010 by Conquera Team
 #  Part of the Conquera Project
@@ -14,13 +21,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 ##################################################################
-
-#!BPY
-"""
-Name: 'WaterHexCells'
-Blender: 243
-Group: 'AddMesh'
-"""
 
 import BPyAddMesh
 import Blender

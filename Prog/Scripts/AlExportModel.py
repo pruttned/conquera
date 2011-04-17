@@ -1,3 +1,11 @@
+#!BPY
+"""
+Name: 'ALE model (.alm)'
+Blender: 244
+Group: 'Export'
+Tooltip: 'Exports the model for using it with ALE'
+"""
+
 ##################################################################
 #  Copyright (C) 2010 by Conquera Team
 #  Part of the Conquera Project
@@ -14,14 +22,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 ##################################################################
-
-#!BPY
-"""
-Name: 'ALE model (.alm)'
-Blender: 244
-Group: 'Export'
-Tooltip: 'Exports the model for using it with ALE'
-"""
 
 import Blender
 import bpy
@@ -144,7 +144,7 @@ def WriteSelectedMesh(xmlDoc, modelElement):
                 relTransf = obj.matrixLocal
                 connectionPointElement = xmlDoc.createElement("connectionPoint")
                 connectionPointsElement.appendChild(connectionPointElement)
-                connectionPointElement.setAttribute("name", obj.name)
+                connectionPointElement.setAttribute("name", obj.name[3:])
                 connectionPointElement.setAttribute("parentBone", bone.GetName())
                 WriteTransformation(xmlDoc, connectionPointElement, relTransf.translationPart(), relTransf.toQuat())
 
@@ -154,7 +154,7 @@ def WriteSelectedMesh(xmlDoc, modelElement):
         connectionPointElement = xmlDoc.createElement("connectionPoint")
         connectionPointsElement.appendChild(connectionPointElement)
         WriteTransformation(xmlDoc, connectionPointElement, relTransf.translationPart(), relTransf.toQuat())
-        connectionPointElement.setAttribute("name", obj.name)
+        connectionPointElement.setAttribute("name", obj.name[3:])
     
     if 0 != len(connectionPointsElement.childNodes):
         modelElement.appendChild(connectionPointsElement)
@@ -246,7 +246,7 @@ def GetObjChildrens(obj):
     return filter(lambda o : o.getParent() == obj, bpy.data.scenes.active.objects)
          
 def IsConnectionPointObject(obj):
-    return 0 != len(filter(lambda p: p.getName() == "IsConnectionPoint", obj.getAllProperties()))
+    return "cp_" == obj.name[0:3]
 
 def GetChildConnectionPoints(obj):
     return filter(lambda o : IsConnectionPointObject(o), GetObjChildrens(obj))

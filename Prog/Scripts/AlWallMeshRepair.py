@@ -1,3 +1,10 @@
+#!BPY
+"""
+Name: 'Al Wall Mesh Repair'
+Blender: 244
+Group: 'Mesh'
+Tooltip: 'Ensures that the vertices of the wall's borders will have correct positions'
+"""
 ##################################################################
 #  Copyright (C) 2010 by Conquera Team
 #  Part of the Conquera Project
@@ -14,14 +21,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 ##################################################################
-
-#!BPY
-"""
-Name: 'Al Wall Mesh Repair'
-Blender: 244
-Group: 'Mesh'
-Tooltip: 'Ensures that the vertices of the wall's borders will have correct positions'
-"""
 
 import Blender
 import bpy

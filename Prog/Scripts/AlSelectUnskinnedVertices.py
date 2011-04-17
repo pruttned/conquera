@@ -1,3 +1,11 @@
+#!BPY
+"""
+Name: 'Select unskinned vertices'
+Blender: 244
+Group: 'Mesh'
+Tooltip: 'Selects all vertices with no weight assigned'
+"""
+
 ##################################################################
 #  Copyright (C) 2010 by Conquera Team
 #  Part of the Conquera Project
@@ -14,14 +22,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 ##################################################################
-
-#!BPY
-"""
-Name: 'Select unskinned vertices'
-Blender: 244
-Group: 'Mesh'
-Tooltip: 'Selects all vertices with no weight assigned'
-"""
 
 import Blender
 import bpy

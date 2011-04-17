@@ -1,3 +1,10 @@
+#!BPY
+"""
+Name: 'ConnectionPoint'
+Blender: 243
+Group: 'AddMesh'
+"""
+
 ##################################################################
 #  Copyright (C) 2010 by Conquera Team
 #  Part of the Conquera Project
@@ -14,13 +21,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 ##################################################################
-
-#!BPY
-"""
-Name: 'ConnectionPoint'
-Blender: 243
-Group: 'AddMesh'
-"""
 
 import BPyAddMesh
 import Blender
@@ -85,7 +85,7 @@ selObj = bpy.data.scenes.active.objects.active
 objs = []
 for axis in ['x', 'y', 'z']:
     mesh = CreateCircleMesh(size, axis)
-    obj = Object.New("Mesh", "ConnectionPoint")
+    obj = Object.New("Mesh", "cp_ConnectionPoint")
     obj.link(mesh)
     bpy.data.scenes.active.link(obj)
     objs.append(obj)
@@ -96,8 +96,6 @@ obj = objs[0]
 obj.join([objs[1], objs[2]])
 bpy.data.scenes.active.objects.unlink(objs[1])
 bpy.data.scenes.active.objects.unlink(objs[2])
-
-obj.addProperty("IsConnectionPoint", True, "BOOL")
 
 obj.select(True)
 

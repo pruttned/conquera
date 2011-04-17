@@ -57,6 +57,7 @@ struct VsOutput
     float4 Position : POSITION;
     float2 Uv : TEXCOORD0;
     float3 Normal : TEXCOORD1;
+    float2 Depth : TEXCOORD2;
 };	
 	
 VsOutput mainVS(VsInput input)
@@ -64,21 +65,32 @@ VsOutput mainVS(VsInput input)
     VsOutput output;
     
     output.Position = mul(input.Position, gWorldViewProj);
-
     output.Normal = normalize(mul(input.Normal, gWorld));
-    
+	output.Depth = float2(output.Position.z, output.Position.w);
     output.Uv = input.Uv;
     
     return output;
 }
 
-float4 mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01) : COLOR 
+struct PsOut
 {
-	float4 color  = tex2D(gDiffuseMapSampler, uv);
+    half4 Color : COLOR0;
+    half4 Normal : COLOR1;
+    half4 Depth : COLOR2;
+};
+
+PsOut mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01, float2 depth : TEXCOORD02) : COLOR 
+{
+	PsOut output;
+
+	output.Color  = tex2D(gDiffuseMapSampler, uv);
 	float4 light  = tex2D(gLightMapSampler, uv);
-	color.rgb =  saturate(color.rgb * dot(gSunLightDirection, normal) + color.rgb * 0.5);
-	color.rgb+= (light*(sin(gTime)*0.2+0.6));   
-	return color;
+	output.Color.rgb+= (light*(sin(gTime)*0.2+0.6));   
+
+    output.Normal = float4(0.5f * (normalize(normal) + 1.0f), light.a); //a = diff color power
+    output.Depth = depth.x / depth.y;
+	
+	return output;
 }
 
 
@@ -92,20 +104,20 @@ technique Default
 {
 	pass p0 
 	<
-		bool IsTransparent=false;
+		bool IsTransparent = false;
+		bool ReceivesLight = true;
 		string MainTexture = "gDiffuseMap";  
 	>
 	{
 		AlphaTestEnable = true;
 		AlphaBlendEnable = false;
 		AlphaFunc = Greater; 
-		AlphaRef = 0x000080;
+		AlphaRef = 0x000001;
 		
 		ZEnable = true;
 		ZWriteEnable = true;
 		CullMode = CCW;
 		ZFUNC = lessequal;
-		
 		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
@@ -114,9 +126,10 @@ technique Default
 
 technique ShadowPass
 {
-	pass trt 
+	pass p0 
 	<
 		bool IsTransparent=false;
+		string MainTexture = "gDiffuseMap";  
 	>
 	{
 		AlphaTestEnable = true;

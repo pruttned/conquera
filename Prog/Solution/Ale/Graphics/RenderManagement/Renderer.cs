@@ -313,7 +313,7 @@ namespace Ale.Graphics
                 mDepthRenderTarget.End();
 
                 //Lights
-                if (0 < mEnquedLights.Count)   //- clear target
+                // if (0 < mEnquedLights.Count)   //- clear target
                 {
                     mLightRenderTarget.Begin();
 

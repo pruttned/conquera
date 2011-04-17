@@ -1066,7 +1066,7 @@ namespace Conquera
                     }
                 }
 
-                PointLight light = new PointLight(Content, GraphicsDeviceManager, lightMat);
+                PointLight light = new PointLight(Content, lightMat);
                 light.Color = c;
                 light.Scale = 2.0f;
                 var sss = HexTerrain.GetPosFromIndex(new Point(Terrain.Height, Terrain.Width));
@@ -1080,13 +1080,12 @@ namespace Conquera
                 Octree.AddObject(light);
             }
 
-            cursorLight = new PointLight(Content, GraphicsDeviceManager,lightMat);
+            cursorLight = new PointLight(Content, lightMat);
             cursorLight.Color = new Vector3(2.0f, 2.0f, 2.0f);
             cursorLight.Scale = 1.5f;
             cursorLight.Position = new Vector3(0, 0, 0.1f);
+            //cursorLight.IsVisible = false;
             Octree.AddObject(cursorLight);
-
-
         }
         PointLight cursorLight;
 

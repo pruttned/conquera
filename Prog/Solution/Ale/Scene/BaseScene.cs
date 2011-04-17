@@ -155,6 +155,7 @@ namespace Ale.Scene
         {
             renderableProvider.RegisterFactory(new GraphicModelRenderableFactory(renderableProvider));
             renderableProvider.RegisterFactory(new ParticleSystemRenderableFactory(mParticleSystemManager));
+            renderableProvider.RegisterFactory(new PointLightRenderableFactory());
         }
 
         /// <summary>

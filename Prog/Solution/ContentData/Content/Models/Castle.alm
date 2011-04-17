@@ -1,5 +1,10 @@
 <?xml version="1.0" ?>
 <model>
+    <connectionPoints>
+        <connectionPoint name="Light">
+            <translation x="-0.110470" y="0.000000" z="0.458304"/>
+        </connectionPoint>
+    </connectionPoints>
     <mesh name="Cylinder.001">
         <submesh material="m1">
             <face v0="2" v1="1" v2="0"/>
