@@ -78,7 +78,7 @@ namespace Conquera
         public void OnStart()
         {
             mGameUnit.RotateTo(TargetCell);
-            mMovementAnimator.Animate(5, mGameUnit.Position, mGameUnit.GetPositionFromIndex(TargetCell));
+            mMovementAnimator.Animate(15, mGameUnit.Position, mGameUnit.GetPositionFromIndex(TargetCell));
             
             mGameUnit.AnimationPlayer.Animation = mGameUnit.GameUnitDesc.MoveAnimation;
             mGameUnit.AnimationPlayer.Play(true);
