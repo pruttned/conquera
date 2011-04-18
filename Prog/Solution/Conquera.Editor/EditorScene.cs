@@ -120,7 +120,7 @@ namespace Conquera.Editor
                             }
                             else
                             {
-                                if (mLastSetTileCell != cellUnderCur || !string.Equals(cellUnderCur.HexTerrainTile.DisplayName, TileBrush.Name))
+                                if (cellUnderCur.IsGap || mLastSetTileCell != cellUnderCur || !string.Equals(cellUnderCur.HexTerrainTile.DisplayName, TileBrush.Name))
                                 {
                                     string tile = TileBrush.GetTile();
                                     if (!Content.Load<HexTerrainTileDesc>(tile).IsPassable)
