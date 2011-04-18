@@ -70,6 +70,11 @@ namespace Conquera.Editor
             string srcDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EditorDefaultCfg");
             string destDir = MainSettings.Instance.UserDir;
 
+            if (!Directory.Exists(destDir))
+            {
+                Directory.CreateDirectory(destDir);
+            }
+
             foreach (string srcFile in Directory.GetFiles(srcDir, "*.ini"))
             {
                 string destFile = Path.Combine(destDir, Path.GetFileName(srcFile));
