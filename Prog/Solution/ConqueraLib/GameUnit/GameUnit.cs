@@ -134,23 +134,30 @@ namespace Conquera
 
         long IDataObject.Id { get; set; }
 
-        [DataListProperty(NotNull = true)] //todo
-        private List<long> CardsDb { get; set; }
-
-        [DataProperty(NotNull = true)]
-        private long DescId { get; set; }
-
         [DataProperty(NotNull = true)]
         private int LastMovedTurn { get; set; }
 
         [DataProperty(NotNull = true)]
         private int LastAttackedTurn { get; set; }
 
-        public GameUnit(long descId, GamePlayer owningPlayer)
+        [DataProperty(NotNull = true)]
+        private long DescId { get; set; }
+
+        public GameUnit(long descId, GamePlayer owningPlayer, bool isReady)
             :this()
         {
             DescId = descId;
             OwningPlayer = owningPlayer;
+
+            if (isReady)
+            {
+                LastMovedTurn = -1;
+                LastAttackedTurn = -1;
+            }
+            else
+            {
+                LastAttackedTurn = LastMovedTurn = owningPlayer.Scene.GameSceneContextState.TurnNum;
+            }
         }
 
         public override void Update(AleGameTime gameTime)
@@ -348,8 +355,6 @@ namespace Conquera
         protected GameUnit()
         {
             IsIdle = true;
-            LastMovedTurn = -1;
-            LastAttackedTurn = -1;
 
             States.Add("Idle", new IdleGameUnitState(this));
             States.Add("Move", new MovingGameUnitState(this));

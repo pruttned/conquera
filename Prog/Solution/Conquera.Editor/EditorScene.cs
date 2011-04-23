@@ -164,7 +164,7 @@ namespace Conquera.Editor
                         {
                             if (null == cellUnderCur.GameUnit && !cellUnderCur.IsGap && cellUnderCur.IsPassable)
                             {
-                                GameScene.AddGameUnit(Player, UnitType, cellUnderCurIndex);
+                                GameScene.AddGameUnit(Player, UnitType, cellUnderCurIndex, true);
                             }
                         }
                         else

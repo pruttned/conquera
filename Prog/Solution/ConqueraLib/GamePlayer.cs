@@ -220,7 +220,9 @@ namespace Conquera
 
             Gold -= desc.Cost;
 
-            return Scene.AddGameUnit(this, descName, cell);
+            var unit =  Scene.AddGameUnit(this, descName, cell, false);
+                                    
+            return unit;
         }
 
         public override string ToString()
