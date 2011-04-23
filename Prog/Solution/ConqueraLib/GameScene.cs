@@ -315,7 +315,7 @@ namespace Conquera
             return saveFile;
         }
 
-        public GameUnit AddGameUnit(GamePlayer gamePlayer, string desc, Point index)
+        public GameUnit AddGameUnit(GamePlayer gamePlayer, string desc, Point index, bool isReady)
         {
             var cell = GetCell(index);
             if (null != cell.GameUnit)
@@ -329,7 +329,7 @@ namespace Conquera
             {
                 throw new ArgumentException(string.Format("Unit desc '{0}' doesn't exists", desc));
             }
-            GameUnit unit = new GameUnit(descId, gamePlayer);
+            GameUnit unit = new GameUnit(descId, gamePlayer, isReady);
             unit.CellIndex = index;
             unit.CellIndexChanged += new GameUnit.CellIndexChangedHandler(unit_CellIndexChanged);
 
@@ -901,7 +901,7 @@ namespace Conquera
             {
                 if (null != SelectedCell && null == SelectedCell.GameUnit)
                 {
-                    AddGameUnit(CurrentPlayer, "GameUnit1", SelectedCell.Index);
+                    AddGameUnit(CurrentPlayer, "GameUnit1", SelectedCell.Index, true);
                 }
             }
             if (key == Microsoft.Xna.Framework.Input.Keys.B)
