@@ -67,15 +67,16 @@ namespace Conquera
 
         public override int ApplyAttackModifiers(int baseAttack)
         {
-            foreach (var cell in Caster.Cell.GetSiblings())
-            {
-                if (null != cell.GameUnit && cell.GameUnit.OwningPlayer == Caster.OwningPlayer)
-                {
-                    baseAttack += (int)Math.Ceiling((float)(cell.GameUnit.GameUnitDesc.Attack) / DivCoef);
-                }
-            }
+            throw new NotImplementedException();
+            //foreach (var cell in Caster.Cell.GetSiblings())
+            //{
+            //    if (null != cell.GameUnit && cell.GameUnit.OwningPlayer == Caster.OwningPlayer)
+            //    {
+            //        baseAttack += (int)Math.Ceiling((float)(cell.GameUnit.GameUnitDesc.Attack) / DivCoef);
+            //    }
+            //}
 
-            return baseAttack;
+            //return baseAttack;
         }
 
         protected override void BeforeAttackCastImpl()

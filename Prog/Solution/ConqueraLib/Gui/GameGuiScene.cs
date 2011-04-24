@@ -31,7 +31,7 @@ namespace Conquera.Gui
         private GameUnitInfoPanel mGameUnitInfoPanel = new GameUnitInfoPanel();
         private TileInfoPanel mTilePanel = new TileInfoPanel();
         private MegaDebugLabel mDebugLabel = new MegaDebugLabel();
-        private PlayerGoldView mPlayerGoldView = new PlayerGoldView();
+        private PlayerManaView mPlayerManaView = new PlayerManaView();
         private PlayerUnitCountView mPlayerUnitCountView = new PlayerUnitCountView();
         private ConqueraTextButton mMainMenuButton;
         private SpellPanel mSpellPanel;
@@ -74,9 +74,9 @@ namespace Conquera.Gui
             RootControls.Add(mTilePanel);
 
             //Player stats.
-            mPlayerGoldView.Update(mGameScene.CurrentPlayer.Gold);
+            mPlayerManaView.Update(mGameScene.CurrentPlayer.Mana);
             mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);
-            RootControls.Add(mPlayerGoldView);
+            RootControls.Add(mPlayerManaView);
             RootControls.Add(mPlayerUnitCountView);
 
             //Main menu button.
@@ -141,7 +141,7 @@ namespace Conquera.Gui
             UnBindFromPlayer(oldPlayer);
             BindToCurrentPlayer();
 
-            mPlayerGoldView.Update(mGameScene.CurrentPlayer.Gold);
+            mPlayerManaView.Update(mGameScene.CurrentPlayer.Mana);
             mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);            
 
             UpdateSpellPanel();
@@ -159,21 +159,21 @@ namespace Conquera.Gui
 
         private void BindToCurrentPlayer()
         {
-            mGameScene.CurrentPlayer.GoldChanged += new EventHandler(Player_GoldChanged);
+            mGameScene.CurrentPlayer.ManaChanged += new EventHandler(Player_ManaChanged);
             mGameScene.CurrentPlayer.MaxUnitCntChanged += new EventHandler(Player_MaxUnitCntChanged);
             mGameScene.CurrentPlayer.UnitsChanged += new EventHandler(Player_UnitsChanged);
         }
 
         private void UnBindFromPlayer(GamePlayer player)
         {
-            player.GoldChanged -= Player_GoldChanged;
+            player.ManaChanged -= Player_ManaChanged;
             player.MaxUnitCntChanged -= Player_MaxUnitCntChanged;
             player.UnitsChanged -= Player_UnitsChanged;
         }
 
-        private void Player_GoldChanged(object sender, EventArgs e)
+        private void Player_ManaChanged(object sender, EventArgs e)
         {
-            mPlayerGoldView.Update(mGameScene.CurrentPlayer.Gold);
+            mPlayerManaView.Update(mGameScene.CurrentPlayer.Mana);
         }
 
         private void Player_MaxUnitCntChanged(object sender, EventArgs e)
@@ -201,7 +201,7 @@ namespace Conquera.Gui
             mTilePanel.Location = new Point(screenWidth - (int)mTilePanel.Size.Width, screenHeight - (int)mTilePanel.Size.Height);
 
             //Player stat views.
-            mPlayerGoldView.Location = Point.Zero;
+            mPlayerManaView.Location = Point.Zero;
             mPlayerUnitCountView.Location = new Point(100, 0);
 
             //MainMenuButton.
@@ -242,29 +242,29 @@ namespace Conquera.Gui
 
 
 
-    public class PlayerGoldView : Control
+    public class PlayerManaView : Control
     {
-        TextElement mGoldTextElement = new TextElement(ConqueraFonts.SpriteFontSmall, Color.Gold);
+        TextElement mManaTextElement = new TextElement(ConqueraFonts.SpriteFont1, Color.White);
 
         public override System.Drawing.SizeF Size
         {
-            get { return mGoldTextElement.Size; }
+            get { return mManaTextElement.Size; }
         }
 
-        public void Update(int gold)
+        public void Update(int mana)
         {
-            mGoldTextElement.Text = string.Format("Gold: {0}", gold);
+            mManaTextElement.Text = string.Format("Mana: {0}", mana);
         }
 
         protected override void OnDrawForeground()
         {
-            mGoldTextElement.Draw(ScreenLocation);
+            mManaTextElement.Draw(ScreenLocation);
         }
     }
 
     public class PlayerUnitCountView : Control
     {
-        TextElement mCountTextElement = new TextElement(ConqueraFonts.SpriteFontSmall, Color.Black);
+        TextElement mCountTextElement = new TextElement(ConqueraFonts.SpriteFont1, Color.White);
 
         public override System.Drawing.SizeF Size
         {

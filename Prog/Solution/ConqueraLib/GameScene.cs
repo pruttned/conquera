@@ -42,7 +42,6 @@ namespace Conquera
         public event EventHandler ActiveSpellChanged;
 
         //promoted collections
-        private static HashSet<HexRegion> NewRegions = new HashSet<HexRegion>();
         private static List<HexCell> Siblings = new List<HexCell>(6);
 
         private GameSceneSettings mSettings;
@@ -323,7 +322,7 @@ namespace Conquera
                 throw new ArgumentException(string.Format("Cell {0} already contains a game unit", index));
             }
 
-            SetCellOwner(index, gamePlayer);
+            cell.OwningPlayer = gamePlayer;
             long descId = Content.ParentContentManager.OrmManager.FindObject(typeof(GameUnitSettings), string.Format("Name='{0}'", desc));
             if (0 >= descId)
             {
@@ -376,8 +375,9 @@ namespace Conquera
 
             GameSceneContextState.EndTurn();
 
-            CurrentPlayer.OnBegineTurn();
+            CurrentPlayer.OnBeginTurn();
 
+            //todo: store capured cells in player?
             for (int i = 0; i < Terrain.Width; ++i)
             {
                 for (int j = 0; j < Terrain.Height; ++j)
@@ -477,7 +477,7 @@ namespace Conquera
                 Vector3 intPoint = ray.Position + intersection.Value * ray.Direction;
 
                 Point index;
-                if (Terrain.GetIndexFromPos(intPoint.X, intPoint.Y, out index))
+                if (HexHelper.GetIndexFromPos(new Vector2(intPoint.X, intPoint.Y), Terrain.Width, Terrain.Height, out index))
                 {
                     return GetCell(index);
                 }
@@ -489,58 +489,6 @@ namespace Conquera
         public HexCell GetCell(Point index)
         {
             return mCells[index.X, index.Y];
-        }
-
-        public void SetCellOwner(Point cellIndex, GamePlayer newOwner)
-        {
-            HexCell cell = GetCell(cellIndex);
-            GamePlayer oldOwner = cell.OwningPlayer;
-
-            if (oldOwner != newOwner)
-            {
-                HexRegion oldRegion = cell.Region;
-
-                NewRegions.Clear();
-                Siblings.Clear();
-
-                cell.GetSiblings(Siblings);
-                foreach (HexCell sibling in Siblings)
-                {
-                    if (null != sibling.Region && (sibling.OwningPlayer == oldOwner || sibling.OwningPlayer == newOwner))
-                    {
-                        sibling.Region.Dispose();
-                    }
-                }
-                if (null != oldRegion)
-                {
-                    oldRegion.Dispose();
-                }
-
-                HexRegion newRegion;
-                if (null != newOwner)
-                {
-                    newRegion = new HexRegion(newOwner, Octree);
-                    NewRegions.Add(newRegion);
-
-                    newRegion.PropagateRegion(cell, mCells, null, GraphicsDeviceManager.GraphicsDevice);
-                }
-                else
-                {
-                    cell.NewRegion = null;
-                    cell.UpdateRegion();
-                    newRegion = null;
-                }
-
-                foreach (HexCell sibling in Siblings)
-                {
-                    if (!NewRegions.Contains(sibling.Region) && null != sibling.OwningPlayer && (sibling.OwningPlayer == oldOwner || sibling.OwningPlayer == newOwner))
-                    {
-                        HexRegion region = new HexRegion(sibling.OwningPlayer, Octree);
-                        region.PropagateRegion(sibling, mCells, null, GraphicsDeviceManager.GraphicsDevice);
-                        NewRegions.Add(region);
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -704,27 +652,13 @@ namespace Conquera
             {
                 throw new ArgumentOutOfRangeException("CellsOwnership blob data has a wrong size");
             }
-            GamePlayer[,] cellsOwnerships = new GamePlayer[Terrain.Width, Terrain.Height];
             int k = 0;
             for (int i = 0; i < Terrain.Width; ++i)
             {
                 for (int j = 0; j < Terrain.Height; ++j)
                 {
                     byte owner = data[k++];
-                    cellsOwnerships[i, j] = 255 > owner ? GameSceneContextState.Players[owner] : null;
-                }
-            }
-            for (int i = 0; i < Terrain.Width; ++i)
-            {
-                for (int j = 0; j < Terrain.Height; ++j)
-                {
-                    HexCell cell = mCells[i, j];
-                    GamePlayer owner = cellsOwnerships[i, j];
-                    if (null != owner && null == cell.Region)
-                    {
-                        var newRegion = new HexRegion(owner, Octree);
-                        newRegion.PropagateRegion(cell, mCells, cellsOwnerships, GraphicsDeviceManager.GraphicsDevice);
-                    }
+                    mCells[i, j].SetOwningPlayerDuringLoad(255 > owner ? GameSceneContextState.Players[owner] : null);
                 }
             }
         }
@@ -745,23 +679,6 @@ namespace Conquera
             mGuiScene.UpdateHexCell(mSelectedCell);
         }
 
-        private int DebugGetRegionCnt()
-        {
-            HashSet<HexRegion> regions = new HashSet<HexRegion>();
-            for (int i = 0; i < Terrain.Width; ++i)
-            {
-                for (int j = 0; j < Terrain.Height; ++j)
-                {
-                    HexRegion region = mCells[i, j].Region;
-                    if (null != region && !regions.Contains(region))
-                    {
-                        regions.Add(region);
-                    }
-                }
-            }
-
-            return regions.Count;
-        }
 
         private void HandleCameraControl()
         {
@@ -908,11 +825,11 @@ namespace Conquera
             {
                 if (null != SelectedCell && null == SelectedCell.GameUnit)
                 {
-                    if (CurrentPlayer.HasEnoughGoldForUnit("GameUnit1"))
+                    if (CurrentPlayer.HasEnoughManaForUnit("GameUnit1"))
                     {
                         CurrentPlayer.BuyUnit("GameUnit1", SelectedCell.Index);
                     }
-                    Console.WriteLine(CurrentPlayer.Gold);
+                    Console.WriteLine(CurrentPlayer.Mana);
                 }
             }
         }
@@ -983,7 +900,7 @@ namespace Conquera
             if (cell.OwningPlayer != obj.OwningPlayer) //has captured
             {
                 ParticleSystemManager.CreateFireAndForgetParticleSystem(mCaptureParticleSystemDesc, cell.CenterPos);
-                SetCellOwner(obj.CellIndex, obj.OwningPlayer);
+                cell.OwningPlayer = obj.OwningPlayer;
             }
             GetCell(oldValue).GameUnit = null;
             cell.GameUnit = obj;
@@ -1069,7 +986,7 @@ namespace Conquera
                 PointLight light = new PointLight(Content, lightMat);
                 light.Color = c;
                 light.Scale = 2.0f;
-                var sss = HexTerrain.GetPosFromIndex(new Point(Terrain.Height, Terrain.Width));
+                var sss = HexHelper.Get3DPosFromIndex(new Point(Terrain.Height, Terrain.Width), HexTerrain.GroundHeight);
                 light.Position = new Vector3((float)AleMathUtils.Random.NextDouble() * sss.X
                     , (float)AleMathUtils.Random.NextDouble() * sss.Y, 0.5f);
 
@@ -1092,11 +1009,11 @@ namespace Conquera
 
         private static BoundingBox GetBoundsFromSize(int width, int height)
         {
-            var v1 = HexTerrain.GetPosFromIndex(new Point(0, 0));
+            var v1 = HexHelper.Get3DPosFromIndex(new Point(0, 0), HexTerrain.GroundHeight);
             v1.X -= 50;
             v1.Y -= 50;
             v1.Z = -100;
-            var v2 = HexTerrain.GetPosFromIndex(new Point(width, height));
+            var v2 = HexHelper.Get3DPosFromIndex(new Point(width, height), HexTerrain.GroundHeight);
             v2.X += 50;
             v2.Y += 50;
             v2.Z = 100;

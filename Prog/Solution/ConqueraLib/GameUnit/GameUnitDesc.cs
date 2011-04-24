@@ -58,13 +58,21 @@ namespace Conquera
         {
             get { return mSettings.MaxHp; }
         }
-        public int Attack
+        public int MinAttack
         {
-            get { return mSettings.Attack; }
+            get { return mSettings.MinAttack; }
+        }
+        public int MaxAttack
+        {
+            get { return mSettings.MaxAttack; }
         }
         public float DamageAnimationTime
         {
             get { return mSettings.DamageAnimationTime; }
+        }
+        public int MovementDistance
+        {
+            get { return mSettings.MovementDistance; }
         }
 
         public ParticleSystemDesc BloodParticleSystem { get; private set; }

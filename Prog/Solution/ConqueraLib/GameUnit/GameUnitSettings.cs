@@ -43,8 +43,14 @@ namespace Conquera
         public int MaxHp { get; set; }
 
         [DataProperty(NotNull = true)]
-        public int Attack { get; set; }
+        public int MinAttack { get; set; }
+        
+        [DataProperty(NotNull = true)]
+        public int MaxAttack { get; set; }
 
+        [DataProperty(NotNull = true)]
+        public int MovementDistance { get; set; }
+        
         [DataProperty(NotNull = true)]
         public float DamageAnimationTime{ get; set; }
 

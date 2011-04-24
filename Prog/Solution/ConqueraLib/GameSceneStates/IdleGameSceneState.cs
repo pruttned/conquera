@@ -83,7 +83,7 @@ namespace Conquera
                     if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.E))
                     {
                         //Terrain.SetTile(index, null);
-                        mScene.SetCellOwner(index, null);
+                        cellUnderCur.OwningPlayer = null;
                     }
                     else
                     {
@@ -101,7 +101,7 @@ namespace Conquera
                         }
                         if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.M))
                         {
-                            mScene.GetCell(index).SetTile("GoldMineLv1Tile");
+                            mScene.GetCell(index).SetTile("MineLv1Tile");
                         }
                         if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D))
                         {
@@ -122,7 +122,7 @@ namespace Conquera
                         {
                             if (cellUnderCur.IsPassable)
                             {
-                                mScene.SetCellOwner(index, mScene.CurrentPlayer);
+                                cellUnderCur.OwningPlayer = mScene.CurrentPlayer;
                             }
                         }
 

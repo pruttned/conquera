@@ -70,12 +70,6 @@ namespace Conquera
         [DataProperty(NotNull = true)]
         public Vector3 UnitPosition { get; set; }
 
-        /// <summary>
-        /// Per turn healt points increment for a unit that occupies the tile
-        /// </summary>
-        [DataProperty(NotNull = true)]
-        public int HpIncrement  { get; set; }
-
         [DataProperty(NotNull = true)]
         public string Icon { get; set; }
 
@@ -118,14 +112,14 @@ namespace Conquera
     }
 
     [DataObject(MaxCachedCnt = 5)]
-    public class GoldMineTileSettings : HexTerrainTileSettings
+    public class ManaMineTileSettings : HexTerrainTileSettings
     {
         [DataProperty(NotNull = true)]
-        public int GoldIncrement { get; set; }
+        public int ManaIncrement { get; set; }
 
         public override HexTerrainTileDesc CreateDesc(ContentGroup content)
         {
-            return new GoldMineTileDesc(this, content);
+            return new ManaMineTileDesc(this, content);
         }
     }
 
@@ -152,20 +146,4 @@ namespace Conquera
             return new VillageTileDesc(this, content);
         }
     }
-
-    [DataObject(MaxCachedCnt = 5)]
-    public class LandTempleTileSettings : HexTerrainTileSettings
-    {
-        public override HexTerrainTileDesc CreateDesc(ContentGroup content)
-        {
-            return new LandTempleTileDesc(this, content);
-        }
-    }
-
-    //[DataObject(MaxCachedCnt = 5)]
-    //public class ShrineTileSettings : HexTerrainTileSettings
-    //{
-
-    //}
-
 }

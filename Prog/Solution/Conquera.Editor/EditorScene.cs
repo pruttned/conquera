@@ -143,22 +143,22 @@ namespace Conquera.Editor
                         }
 
                         break;
-                    case EditMode.RegionEdit:
-                        if (SceneManager.MouseManager.IsButtonDown(MouseButton.Left))
-                        {
-                            if (!cellUnderCur.IsGap && cellUnderCur.IsPassable)
-                            {
-                                GameScene.SetCellOwner(cellUnderCurIndex, Player);
-                            }
-                        }
-                        else
-                        {
-                            if (SceneManager.MouseManager.IsButtonDown(MouseButton.Right))
-                            {
-                                GameScene.SetCellOwner(cellUnderCurIndex, null);
-                            }
-                        }
-                        break;
+                    //case EditMode.RegionEdit:
+                    //    if (SceneManager.MouseManager.IsButtonDown(MouseButton.Left))
+                    //    {
+                    //        if (!cellUnderCur.IsGap && cellUnderCur.IsPassable)
+                    //        {
+                    //            GameScene.SetCellOwner(cellUnderCurIndex, Player);
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        if (SceneManager.MouseManager.IsButtonDown(MouseButton.Right))
+                    //        {
+                    //            GameScene.SetCellOwner(cellUnderCurIndex, null);
+                    //        }
+                    //    }
+                    //    break;
                     case EditMode.UnitEdit:
                         if (SceneManager.MouseManager.IsButtonDown(MouseButton.Left))
                         {
@@ -186,7 +186,7 @@ namespace Conquera.Editor
         private void ClearCell(HexCell cellUnderCur)
         {
             var cellUnderCurIndex = cellUnderCur.Index;
-            GameScene.SetCellOwner(cellUnderCurIndex, null);
+            cellUnderCur.OwningPlayer = null;
             if (null != cellUnderCur.GameUnit)
             {
                 GameScene.RemoveUnit(cellUnderCur.GameUnit);

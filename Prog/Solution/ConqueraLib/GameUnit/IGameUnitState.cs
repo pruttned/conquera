@@ -129,12 +129,12 @@ namespace Conquera
             }
             else
             {
-                if (mGameUnit.OwningPlayer.Gold < mGameUnit.GameScene.ActiveSpellSlot.Spell.Cost)
+                if (mGameUnit.OwningPlayer.Mana < mGameUnit.GameScene.ActiveSpellSlot.Spell.Cost)
                 {
-                    throw new InvalidOperationException("Not enough gold");
+                    throw new InvalidOperationException("Not enough mana");
                 }
 
-                mGameUnit.OwningPlayer.Gold -= mGameUnit.GameScene.ActiveSpellSlot.Spell.Cost;
+                mGameUnit.OwningPlayer.Mana -= mGameUnit.GameScene.ActiveSpellSlot.Spell.Cost;
                 mGameUnit.GameScene.ActiveSpellSlot.Spell.BeforeAttackCast(mGameUnit, TargetUnit);
             }
         }

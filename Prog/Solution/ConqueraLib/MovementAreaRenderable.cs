@@ -34,13 +34,14 @@ namespace Conquera
         /// </summary>
         private static Vector3[] Corners;
         private static List<HexCell> Siblings = new List<HexCell>();
+        private static List<Point> PosibleMoves = new List<Point>();
 
         const float ZPos = 0.01f;
         private bool mIsDisposed = false;
 
         static MovementAreaRenderable()
         {
-            Corners = HexTerrainTileDesc.GetCorners();
+            Corners = HexHelper.GetHexCellCorners();
             for (int i = 0; i < Corners.Length; ++i)
             {
                 Vector3 vec = Corners[i];
@@ -85,55 +86,79 @@ namespace Conquera
             MeshBuilder meshBuilder = new MeshBuilder(graphicsDevice);
             meshBuilder.SetCurrentSubMesh("m");
 
-            Vector2 pos;
             if (!unit.HasMovedThisTurn)
             {
-                int width = unit.GameScene.Terrain.Width;
-                int height = unit.GameScene.Terrain.Height;
-                Point index = new Point();
-                for (; index.X < width; ++index.X)
+                PosibleMoves.Clear();
+                unit.GetPossibleMoves(PosibleMoves);
+                isEmpty = 0 == PosibleMoves.Count;
+                foreach (var index in PosibleMoves)
                 {
-                    for (index.Y = 0; index.Y < height; ++index.Y)
-                    {
-                        if (unit.CanMoveTo(index))
-                        {
-                            HexTerrain.Get2DPosFromIndex(index, out pos);
-                            AddHexCell(meshBuilder, moveColor, pos);
-                            isEmpty = false;
-                        }
-                        else
-                        {
-                            if (!unit.HasAttackedThisTurn && unit.CanAttackTo(index))
-                            {
-                                HexTerrain.Get2DPosFromIndex(index, out pos);
-                                AddHexCell(meshBuilder, attackColor, pos);
-                                isEmpty = false;
-                            }
-                        }
-                    }
+                    AddHexCell(meshBuilder, moveColor, HexHelper.Get2DPosFromIndex(index));
                 }
             }
-            else
+            if (!unit.HasAttackedThisTurn)
             {
-                if (!unit.HasAttackedThisTurn)
+                Siblings.Clear();
+                unit.Cell.GetSiblings(Siblings);
+                foreach (var cell in Siblings)
                 {
-                    Siblings.Clear();
-                    unit.Cell.GetSiblings(Siblings);
-                    foreach (var sibling in Siblings)
+                    if (null != cell.GameUnit && cell.OwningPlayer != unit.OwningPlayer)
                     {
-                        if (unit.CanAttackTo(sibling.Index))
-                        {
-                            HexTerrain.Get2DPosFromIndex(sibling.Index, out pos);
-                            AddHexCell(meshBuilder, attackColor, pos);
-                            isEmpty = false;
-                        }
+                        isEmpty = false;
+                        AddHexCell(meshBuilder, attackColor, HexHelper.Get2DPosFromIndex(cell.Index));
                     }
                 }
-                else
-                {
-                    return null;
-                }
             }
+
+            //Vector2 pos;
+            //if (!unit.HasMovedThisTurn)
+            //{
+            //    int width = unit.GameScene.Terrain.Width;
+            //    int height = unit.GameScene.Terrain.Height;
+            //    Point index = new Point();
+            //    for (; index.X < width; ++index.X)
+            //    {
+            //        for (index.Y = 0; index.Y < height; ++index.Y)
+            //        {
+            //            if (unit.CanMoveTo(index))
+            //            {
+            //                HexTerrain.Get2DPosFromIndex(index, out pos);
+            //                AddHexCell(meshBuilder, moveColor, pos);
+            //                isEmpty = false;
+            //            }
+            //            else
+            //            {
+            //                if (!unit.HasAttackedThisTurn && unit.CanAttackTo(index))
+            //                {
+            //                    HexTerrain.Get2DPosFromIndex(index, out pos);
+            //                    AddHexCell(meshBuilder, attackColor, pos);
+            //                    isEmpty = false;
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    if (!unit.HasAttackedThisTurn)
+            //    {
+            //        Siblings.Clear();
+            //        unit.Cell.GetSiblings(Siblings);
+            //        foreach (var sibling in Siblings)
+            //        {
+            //            if (unit.CanAttackTo(sibling.Index))
+            //            {
+            //                HexTerrain.Get2DPosFromIndex(sibling.Index, out pos);
+            //                AddHexCell(meshBuilder, attackColor, pos);
+            //                isEmpty = false;
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        return null;
+            //    }
+            //}
 
             if (isEmpty)
             {

@@ -30,11 +30,6 @@ namespace Conquera
     [NonContentPipelineAsset(typeof(HexTerrainTileDescLoader))]
     public abstract class HexTerrainTileDesc : IDisposable //todo abstract
     {
-        /// <summary>
-        /// Corners around 0,0
-        /// </summary>
-        private static Vector3[] Corners;
-
         private bool mIsDisposed = false;
 
         public string Name
@@ -99,17 +94,6 @@ namespace Conquera
         public GraphicElement Icon { get; private set; }
 
         protected HexTerrainTileSettings Settings { get; private set; }
-
-        static HexTerrainTileDesc()
-        {
-            Corners = new Vector3[6];
-            Vector3 baseVec = new Vector3(0, 1, 0);
-            for (int i = 0; i < 6; ++i)
-            {
-                Quaternion rotQuat = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, -MathHelper.ToRadians(i * 60));
-                Vector3.Transform(ref baseVec, ref rotQuat, out Corners[i]);
-            }
-        }
 
         public HexTerrainTileDesc(HexTerrainTileSettings settings, ContentGroup content)
         {
@@ -176,33 +160,6 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Gets corners around 0,0
-        /// </summary>
-        /// <returns></returns>
-        public static Vector3[] GetCorners()
-        {
-            Vector3[] corners = new Vector3[6];
-            Corners.CopyTo(corners, 0);
-            return corners;
-        }
-
-        /// <summary>
-        /// Get a corner around 0,0
-        /// </summary>
-        public static void GetCornerPos(HexTileCorner corner, out Vector3 pos)
-        {
-            pos = Corners[(int)corner];
-        }
-
-        /// <summary>
-        /// Get a corners around 0,0
-        /// </summary>
-        public static Vector3 GetCornerPos(HexTileCorner corner)
-        {
-            return Corners[(int)corner];
-        }
-
-        /// <summary>
         /// Dispose
         /// </summary>
         public void Dispose()
@@ -210,19 +167,6 @@ namespace Conquera
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        protected internal virtual void OnBeginTurn(HexCell cell)
-        {
-            var unit = cell.GameUnit;
-            if (null != unit)
-            {
-                unit.Heal(Settings.HpIncrement);
-            }
-        }
-
-        protected internal abstract void OnActivated(HexCell cell);
-
-        protected internal abstract void OnDeactivating(HexCell cell);
 
         protected virtual void Dispose(bool isDisposing)
         {
@@ -256,7 +200,7 @@ namespace Conquera
                    );
 
             int vcI = meshBuilder.AddVertex(ref vert);
-            vert.Position = Corners[0];
+            vert.Position = HexHelper.GetHexCellCornerPos3D(HexTileCorner.Top); //0
 
             vert.Uv = new Vector2(
                    textureCellSize * (vert.Position.X / 2.0f + 0.5f) + baseCellSize * (float)(textureCellIndex.X),
@@ -267,7 +211,7 @@ namespace Conquera
             int vFirstI = vOldI;
             for (int i = 1; i < 6; ++i)
             {
-                vert.Position = Corners[i];
+                vert.Position = HexHelper.GetHexCellCornerPos3D((HexTileCorner)i);
 
                 vert.Uv = new Vector2(
                     textureCellSize * (vert.Position.X / 2.0f + 0.5f) + baseCellSize * (float)(textureCellIndex.X),
@@ -309,6 +253,22 @@ namespace Conquera
         }
     }
 
+    public abstract class CapturableHexTerrainTileDesc : HexTerrainTileDesc
+    {
+        public CapturableHexTerrainTileDesc(HexTerrainTileSettings settings, ContentGroup content)
+            : base(settings, content)
+        {
+        }
+
+        protected internal abstract void OnBeginTurn(HexCell cell);
+
+        protected internal abstract void OnCaptured(HexCell cell);
+
+        protected internal abstract void OnSetOwningPlayerDuringLoad(HexCell cell);
+
+        protected internal abstract void OnLost(HexCell cell);
+    }
+
     public class StaticGmConnectionPointAssigment
     {
         public ConnectionPointAssigmentDesc ConnectionPoint { get; private set; }
@@ -321,22 +281,12 @@ namespace Conquera
         }
     }
 
-    public enum HexTileCorner
-    {
-        Top = 0,
-        UperRight = 1,
-        LowerRight = 2,
-        Down = 3,
-        LowerLeft = 4,
-        UperLeft = 5
-    }
 
 
 
 
 
-
-  public class CastleTileDesc : HexTerrainTileDesc
+    public class CastleTileDesc : CapturableHexTerrainTileDesc
     {
         public CastleTileDesc(CastleTileSettings settings, ContentGroup content)
             : base(settings, content)
@@ -345,52 +295,64 @@ namespace Conquera
 
         protected internal override void OnBeginTurn(HexCell cell)
         {
-            base.OnBeginTurn(cell);
         }
 
-        protected internal override void OnActivated(HexCell cell)
+        protected internal override void OnCaptured(HexCell cell)
         {
             cell.OwningPlayer.CastleCnt++;
         }
 
-        protected internal override void OnDeactivating(HexCell cell)
+        protected internal override void OnSetOwningPlayerDuringLoad(HexCell cell)
+        {
+            OnCaptured(cell);
+        }
+
+        protected internal override void OnLost(HexCell cell)
         {
             cell.OwningPlayer.CastleCnt--;
         }
     }
 
-    public class GoldMineTileDesc : HexTerrainTileDesc
+    public class ManaMineTileDesc : CapturableHexTerrainTileDesc
     {
-        public int GoldIncrement
+        public int ManaIncrement
         {
-            get { return ((GoldMineTileSettings)Settings).GoldIncrement; }
+            get { return ((ManaMineTileSettings)Settings).ManaIncrement; }
         }
         private string NotificationString {get; set;}
 
-        public GoldMineTileDesc(GoldMineTileSettings settings, ContentGroup content)
+        public ManaMineTileDesc(ManaMineTileSettings settings, ContentGroup content)
             : base(settings, content)
         {
-            NotificationString = string.Format("+{0}", GoldIncrement.ToString());
+            NotificationString = string.Format("+{0}", ManaIncrement.ToString());
         }
 
         protected internal override void OnBeginTurn(HexCell cell)
         {
-            base.OnBeginTurn(cell);
             if (cell.IsActive)
             {
-                cell.OwningPlayer.Gold += GoldIncrement;
+                cell.OwningPlayer.Mana += ManaIncrement;
                 if (cell.OwningPlayer.IsHuman)
                 {
-                    cell.Scene.FireCellNotificationLabel(NotificationString, CellNotificationIcons.Coin, Color.Yellow, cell.Index);
+                    cell.Scene.FireCellNotificationLabel(NotificationString, CellNotificationIcons.Coin, Color.Purple, cell.Index);
                 }
             }
         }
 
-        protected internal override void OnActivated(HexCell cell)
+        protected internal override void OnCaptured(HexCell cell)
+        {
+            cell.OwningPlayer.Mana += ManaIncrement;
+            if (cell.OwningPlayer.IsHuman)
+            {
+                cell.Scene.FireCellNotificationLabel(NotificationString, CellNotificationIcons.Coin, Color.Purple, cell.Index);
+            }
+        }
+
+        protected internal override void OnSetOwningPlayerDuringLoad(HexCell cell)
         {
         }
 
-        protected internal override void OnDeactivating(HexCell cell)
+        protected internal override void OnLost(HexCell cell)
         {
         }
     }
@@ -401,22 +363,9 @@ namespace Conquera
             : base(settings, content)
         {
         }
-
-        protected internal override void OnBeginTurn(HexCell cell)
-        {
-            base.OnBeginTurn(cell);
-        }
-
-        protected internal override void OnActivated(HexCell cell)
-        {
-        }
-
-        protected internal override void OnDeactivating(HexCell cell)
-        {
-        }
     }
 
-    public class VillageTileDesc : HexTerrainTileDesc
+    public class VillageTileDesc : CapturableHexTerrainTileDesc
     {
         public VillageTileDesc(VillageTileSettings settings, ContentGroup content)
             : base(settings, content)
@@ -425,39 +374,22 @@ namespace Conquera
 
         protected internal override void OnBeginTurn(HexCell cell)
         {
-            base.OnBeginTurn(cell);
         }
 
-        protected internal override void OnActivated(HexCell cell)
+        protected internal override void OnCaptured(HexCell cell)
         {
             cell.OwningPlayer.MaxUnitCnt += ((VillageTileSettings)Settings).MaxUnitCntIncrement;
         }
 
-        protected internal override void OnDeactivating(HexCell cell)
+        protected internal override void OnSetOwningPlayerDuringLoad(HexCell cell)
+        {
+            OnCaptured(cell);
+        }
+
+        protected internal override void OnLost(HexCell cell)
         {
             cell.OwningPlayer.MaxUnitCnt -= ((VillageTileSettings)Settings).MaxUnitCntIncrement;
         }
+
     }
-
-    public class LandTempleTileDesc : HexTerrainTileDesc
-    {
-        public LandTempleTileDesc(LandTempleTileSettings settings, ContentGroup content)
-            : base(settings, content)
-        {
-        }
-
-        protected internal override void OnBeginTurn(HexCell cell)
-        {
-            base.OnBeginTurn(cell);
-        }
-
-        protected internal override void OnActivated(HexCell cell)
-        {
-        }
-
-        protected internal override void OnDeactivating(HexCell cell)
-        {
-        }
-    }
-
 }

@@ -48,7 +48,8 @@ namespace Conquera.Gui
                 mStatText.AppendLine(string.Format("Ready: {0}", !gameUnit.HasMovedThisTurn));
             }
 
-            mStatText.AppendLine(string.Format("Atck :   {0}", gameUnit.GameUnitDesc.Attack));
+            mStatText.AppendLine(string.Format("Atck :   {0}-{1}", gameUnit.GameUnitDesc.MinAttack, gameUnit.GameUnitDesc.MaxAttack));
+            mStatText.AppendLine(string.Format("Movement :   {0}", gameUnit.GameUnitDesc.MovementDistance));
         }
 
         protected override void OnDrawBackground()

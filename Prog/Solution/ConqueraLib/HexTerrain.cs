@@ -28,16 +28,11 @@ namespace Conquera
     [DataObject(MaxCachedCnt = 0)]
     public class HexTerrain : BaseDataObject, IDisposable
     {
+        public static float GroundHeight = 0;
+
         private HexTerrainTile[,] mTiles;
         private GameScene mScene;
         private bool mIsDisposed = false;
-
-        public static float TileR = 1.0f;
-        public static float TileW = 1.73205f; // mHalfW * 2
-        public static float TileH = 1.5f;//1.5*r
-        public static float GroundHeight = 0;
-        public static float HalfTileR = 0.5f;
-        public static float HalfTileW = 0.866025f; // cos30*r
 
         private string mDefaultTile;
 
@@ -96,7 +91,7 @@ namespace Conquera
                     if (0 < tileDescId)
                     {
                         HexTerrainTileDesc tileDesc = scene.Content.Load<HexTerrainTileDesc>(tileDescId);
-                        HexTerrainTile tile = new HexTerrainTile(tileDesc, TileNeedWall(i, j, tiles), GetPosFromIndex(new Point(i, j)));
+                        HexTerrainTile tile = new HexTerrainTile(tileDesc, TileNeedWall(i, j, tiles), HexHelper.Get3DPosFromIndex(new Point(i, j), GroundHeight));
                         mTiles[i, j] = tile;
                         tile.OnAddToScene(scene);
                     }
@@ -158,7 +153,7 @@ namespace Conquera
                 if (null == oldHexTerrainTile || oldHexTerrainTile.Desc != tileDesc)
                 {
                     bool wall = TileNeedWall(index.X, index.Y);
-                    HexTerrainTile hexTerrainTile = new HexTerrainTile(tileDesc, wall, GetPosFromIndex(index));
+                    HexTerrainTile hexTerrainTile = new HexTerrainTile(tileDesc, wall, HexHelper.Get3DPosFromIndex(index, GroundHeight));
                     mTiles[index.X, index.Y] = hexTerrainTile;
 
                     HexTerrainTileDesc oldDesc = null;
@@ -246,139 +241,6 @@ namespace Conquera
             return siblings;
         }
 
-        public static int GetDistance(Point a, Point b)
-        {
-            //based on  http://www-cs-students.stanford.edu/~amitp/Articles/HexLOS.html
-            if (a.Y == b.Y)
-            {
-                return Math.Abs(Math.Abs(a.X) - Math.Abs(b.X));
-            }
-            else
-            {
-                Point aa = new Point(a.X - Floor2(a.Y), a.X + Ceil2(a.Y));
-                Point bb = new Point(b.X - Floor2(b.Y), b.Y = b.X + Ceil2(b.Y));
-
-                int dx = bb.X - aa.X;
-                int dy = bb.Y - aa.Y;
-                if ((dx >= 0 && dy >= 0) || (dx < 0 && dy < 0))
-                {
-                    return Math.Max(Math.Abs(dx), Math.Abs(dy));
-                }
-                else
-                {
-                    return Math.Abs(dx) + Math.Abs(dy);
-                }
-            }
-        }
-
-        public static Vector3 GetPosFromIndex(Point index)
-        {
-            Vector3 pos;
-            GetPosFromIndex(index, out pos);
-            return pos;
-        }
-
-        public static void GetPosFromIndex(Point index, out Vector3 pos)
-        {
-            //http://www.gamedev.net/reference/articles/article747.asp
-            //PlotX=MapX*Width+(MapY AND 1)*(Width/2)
-            //HeightOverLapping=)*0.75
-            pos = new Vector3(
-                index.X * TileW + (index.Y & 1) * HalfTileW,
-                index.Y * TileH, GroundHeight);
-        }
-
-        public static Vector2 Get2DPosFromIndex(Point index)
-        {
-            Vector2 pos;
-            Get2DPosFromIndex(index, out pos);
-            return pos;
-        }
-
-        public static void Get2DPosFromIndex(Point index, out Vector2 pos)
-        {
-            //http://www.gamedev.net/reference/articles/article747.asp
-            //PlotX=MapX*Width+(MapY AND 1)*(Width/2)
-            //HeightOverLapping=)*0.75
-            pos = new Vector2(
-                index.X * TileW + (index.Y & 1) * HalfTileW,
-                index.Y * TileH);
-        }
-
-        public bool GetIndexFromPos(float x, float y, out Point index)
-        {
-            index = new Point();
-
-            x += HalfTileW;
-            y += HalfTileR;
-
-            if (x < 0 || y < -HalfTileR)
-            {
-                return false;
-            }
-
-            //must be floor to handle (-1,0)
-            int j = (int)Math.Floor(y / TileH);
-            int i = (int)Math.Floor((x - (j & 1) * HalfTileW) / TileW);
-
-            float inRecX = x - (i * TileW + (j & 1) * HalfTileW);
-            float inRecY = y - (j * TileH);
-
-
-            if (inRecY < TileR)
-            {
-                index.X = i;
-                index.Y = j;
-            }
-            else
-            {
-                if (inRecX < HalfTileW)
-                {
-                    float my = TileR + (TileH - TileR) * (inRecX / HalfTileW);
-                    if (inRecY < my)
-                    {
-                        index.X = i;
-                        index.Y = j;
-                    }
-                    else
-                    {
-                        if (0 == (j & 1))
-                        {
-                            index.X = i - 1;
-                        }
-                        else
-                        {
-                            index.X = i;
-                        }
-                        index.Y = j + 1;
-                    }
-                }
-                else
-                {
-                    float my = TileH + (TileR - TileH) * ((inRecX / HalfTileW) - 1);
-                    if (inRecY < my)
-                    {
-                        index.X = i;
-                        index.Y = j;
-                    }
-                    else
-                    {
-                        if (0 == (j & 1))
-                        {
-                            index.X = i;
-                        }
-                        else
-                        {
-                            index.X = i + 1;
-                        }
-                        index.Y = j + 1;
-                    }
-                }
-            }
-
-            return (index.X >= 0 && index.X < Width && index.Y >= 0 && index.Y < Height);
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -460,8 +322,8 @@ namespace Conquera
         private void CommonInit(GameScene scene)
         {
             mScene = scene;
-            LowerLeftTileCenter = GetPosFromIndex(new Point(0, 0));
-            UpperRightTileCenter = GetPosFromIndex(new Point(Width, Height));
+            LowerLeftTileCenter = HexHelper.Get3DPosFromIndex(new Point(0, 0), GroundHeight);
+            UpperRightTileCenter = HexHelper.Get3DPosFromIndex(new Point(Width, Height), GroundHeight);
         }
 
         private Point GetSiblingPos(Point index, HexDirection direction)
@@ -505,7 +367,7 @@ namespace Conquera
             HexTerrainTile oldHexTerrainTile = mTiles[i, j];
             if (null != oldHexTerrainTile && oldHexTerrainTile.HasWall != wall)
             {
-                HexTerrainTile hexTerrainTile = new HexTerrainTile(oldHexTerrainTile.Desc, wall, GetPosFromIndex(new Point(i, j)));
+                HexTerrainTile hexTerrainTile = new HexTerrainTile(oldHexTerrainTile.Desc, wall, HexHelper.Get3DPosFromIndex(new Point(i, j), GroundHeight));
                 oldHexTerrainTile.Dispose();
                 mTiles[i, j] = hexTerrainTile;
                 hexTerrainTile.OnAddToScene(mScene);
@@ -565,7 +427,7 @@ namespace Conquera
                 for (int j = 0; j < Height; ++j)
                 {
                     bool wall = (i == 0 || j == 0 || i == Width - 1 || j == Height - 1);
-                    HexTerrainTile tile = new HexTerrainTile(tileDesc, wall, GetPosFromIndex(new Point(i, j)));
+                    HexTerrainTile tile = new HexTerrainTile(tileDesc, wall, HexHelper.Get3DPosFromIndex(new Point(i, j), GroundHeight));
                     mTiles[i, j] = tile;
                     tile.OnAddToScene(scene);
                 }
@@ -575,27 +437,5 @@ namespace Conquera
         {
             return string.Format("HexTerrain_{0}", Id);
         }
-
-        private static int Floor2(int X)
-        {
-            //from http://www-cs-students.stanford.edu/~amitp/Articles/HexLOS.html            
-            return ((X >= 0) ? (X >> 1) : (X - 1) / 2);
-        }
-        private static int Ceil2(int X)
-        {
-            //from http://www-cs-students.stanford.edu/~amitp/Articles/HexLOS.html
-            return ((X >= 0) ? ((X + 1) >> 1) : (X / 2));
-        }
-
-    }
-
-    public enum HexDirection
-    {
-        UperRight = 0,
-        Right = 1,
-        LowerRight = 2,
-        LowerLeft = 3,
-        Left = 4,
-        UperLeft = 5
     }
 }

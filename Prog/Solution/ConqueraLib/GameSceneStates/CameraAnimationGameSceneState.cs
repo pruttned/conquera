@@ -52,6 +52,11 @@ namespace Conquera
         {
             mScene.EnableMouseCameraControl = false;
 
+            if (null != mScene.SelectedUnit)
+            {
+                mScene.ShowMovementArea(mScene.SelectedUnit);
+            }
+
             if (null == PreviousGameSceneState) throw new ArgumentNullException("PreviousGameSceneState");
         }
 
