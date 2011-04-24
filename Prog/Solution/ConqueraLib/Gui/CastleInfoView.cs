@@ -40,7 +40,7 @@ namespace Conquera.Gui
 
             mCell = cell;
             mBuyUnitButton.Visible = mCell.OwningPlayer == cell.Scene.CurrentPlayer && mCell.GameUnit == null &&
-                mCell.OwningPlayer.HasEnoughGoldForUnit("GameUnit1") && mCell.OwningPlayer.Units.Count < mCell.OwningPlayer.MaxUnitCnt;
+                mCell.OwningPlayer.HasEnoughManaForUnit("GameUnit1") && mCell.OwningPlayer.Units.Count < mCell.OwningPlayer.MaxUnitCnt;
         }
 
         private void mBuyUnitButton_Click(object sender, ControlEventArgs e)

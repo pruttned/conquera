@@ -165,6 +165,53 @@ namespace Conquera
             mState.Update(gameTime);
         }
 
+        struct Seed
+        {
+            public HexCell Cell;
+            public int Live;
+
+            public Seed(HexCell cell, int live)
+            {
+                Cell = cell;
+                Live = live;
+            }
+        }
+
+        private static HashSet<Point> CheckedPoints = new HashSet<Point>();
+        private static Queue<Seed> Seeds = new Queue<Seed>();
+        
+
+        /// <summary>
+        /// Gets all poitions where can unit move
+        /// </summary>
+        /// <param name="points"></param>
+        public void GetPossibleMoves(List<Point> points)
+        {
+            Seeds.Clear();
+            CheckedPoints.Clear();
+
+            Seeds.Enqueue(new Seed(Cell, GameUnitDesc.MovementDistance));
+            while (0 < Seeds.Count)
+            {
+                var seed = Seeds.Dequeue();
+                Siblings.Clear();
+                seed.Cell.GetSiblings(Siblings);
+                foreach (var sibling in Siblings)
+                {
+                    Point index = sibling.Index;
+                    if (sibling.IsPassable && !CheckedPoints.Contains(index))
+                    {
+                        points.Add(index);
+                        CheckedPoints.Add(index);
+                        if (0 < seed.Live - 1)
+                        {
+                            Seeds.Enqueue(new Seed(sibling, seed.Live - 1));
+                        }
+                    }
+                }
+            }
+        }
+
         public bool CanMoveTo(Point cell)
         {
             if (cell == CellIndex)
@@ -174,35 +221,46 @@ namespace Conquera
             HexCell srcCell = Cell;
             HexCell targetCell = GameScene.GetCell(cell);
 
-
-            if (targetCell.IsPassable && (srcCell.Region == targetCell.Region || srcCell.IsSiblingTo(targetCell)))
+            if (srcCell == targetCell)
             {
-                int distance = HexTerrain.GetDistance(srcCell.Index, targetCell.Index);
+                return false;
+            }
 
-                if (1 == distance)
+            if (targetCell.IsPassable && GameUnitDesc.MovementDistance >= HexHelper.GetDistance(srcCell.Index, targetCell.Index))
+            {
+                Point targetIndex = targetCell.Index;
+
+                //temp
+
+                Seeds.Clear();
+                CheckedPoints.Clear();
+
+                Seeds.Enqueue(new Seed(Cell, GameUnitDesc.MovementDistance));
+                while (0 < Seeds.Count)
                 {
-                    return true;
-                }
-                else
-                {
-                    if (distance == 2)
+                    var seed = Seeds.Dequeue();
+                    Siblings.Clear();
+                    seed.Cell.GetSiblings(Siblings);
+                    foreach (var sibling in Siblings)
                     {
-                        Siblings.Clear();
-                        srcCell.GetSiblings(Siblings);
-                        foreach (var sibling in Siblings)
+                        if (sibling.Index == targetIndex)
                         {
-                            if (null != sibling.HexTerrainTile && sibling.HexTerrainTile.IsPassable && sibling.Region == targetCell.Region)
+                            return true;
+                        }
+
+                        Point index = sibling.Index;
+                        if (sibling.IsPassable && !CheckedPoints.Contains(index))
+                        {
+                            CheckedPoints.Add(index);
+                            if (0 < seed.Live - 1)
                             {
-                                if (targetCell.IsSiblingTo(sibling))
-                                {
-                                    return true;
-                                }
+                                Seeds.Enqueue(new Seed(sibling, seed.Live - 1));
                             }
                         }
                     }
                 }
-
             }
+
             return false;
         }
 
@@ -288,14 +346,16 @@ namespace Conquera
 
         public int ComputeDamageTo(GameUnit unit, Spell activeSpell)
         {
-            if (null != activeSpell)
-            {
-                return activeSpell.ApplyAttackModifiers(GameUnitDesc.Attack);
-            }
-            else
-            {
-                return GameUnitDesc.Attack;
-            }
+            //if (null != activeSpell)
+            //{
+            //    return activeSpell.ApplyAttackModifiers(GameUnitDesc.Attack);
+            //}
+            //else
+            //{
+                return AleMathUtils.Random.Next(GameUnitDesc.MinAttack, GameUnitDesc.MaxAttack + 1);
+
+
+            //}
         }
 
         public void Heal(int amount)

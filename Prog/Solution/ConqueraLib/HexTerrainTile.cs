@@ -36,7 +36,8 @@ namespace Conquera
         private List<Renderable> mStaticCpRenderables;
         private GraphicModel mActiveGraphicModel;
         private GraphicModel mInactiveGraphicModel;
-        public Vector3 mCenterPos;
+        private Vector3 mCenterPos;
+        private HexCellCapturedMark mHexCellCapturedMark;
 
         public HexTerrainTileDesc Desc { get; private set; }
 
@@ -54,35 +55,76 @@ namespace Conquera
             mCenterPos = centerPos;
         }
 
-        internal void OnActivated(HexCell cell)
+        internal void OnCaptured(HexCell cell)
         {
-            if (null != mActiveGraphicModel)
+            if (Desc is CapturableHexTerrainTileDesc)
             {
-                mActiveGraphicModel.IsVisible = true;
-            }
-            if (null != mInactiveGraphicModel)
-            {
-                mInactiveGraphicModel.IsVisible = false;
-            }
-            Desc.OnActivated(cell);
-        }
+                if (null != mActiveGraphicModel)
+                {
+                    mActiveGraphicModel.IsVisible = true;
+                }
+                if (null != mInactiveGraphicModel)
+                {
+                    mInactiveGraphicModel.IsVisible = false;
+                }
 
-        internal void OnDeactivating(HexCell cell)
+                if (null == mHexCellCapturedMark)
+                {
+                    InitHexCellCapturedMark(cell);
+                }
+                mHexCellCapturedMark.Color = cell.OwningPlayer.Color;
+
+                ((CapturableHexTerrainTileDesc)Desc).OnCaptured(cell);
+            }
+        }
+       
+        internal void OnSetOwningPlayerDuringLoad(HexCell cell)
         {
-            if (null != mActiveGraphicModel)
+            if (null == cell.OwningPlayer) throw new ArgumentNullException("cell.OwningPlayer");
+
+            if (Desc is CapturableHexTerrainTileDesc)
             {
-                mActiveGraphicModel.IsVisible = false;
+                if (null != mActiveGraphicModel)
+                {
+                    mActiveGraphicModel.IsVisible = true;
+                }
+                InitHexCellCapturedMark(cell);
+                mHexCellCapturedMark.Color = cell.OwningPlayer.Color;
+
+                ((CapturableHexTerrainTileDesc)Desc).OnSetOwningPlayerDuringLoad(cell);
             }
-            if (null != mInactiveGraphicModel)
+        }
+        
+
+        internal void OnLost(HexCell cell, GamePlayer newPlayer)
+        {
+            if (Desc is CapturableHexTerrainTileDesc)
             {
-                mInactiveGraphicModel.IsVisible = true;
+                if (null != mActiveGraphicModel)
+                {
+                    mActiveGraphicModel.IsVisible = false;
+                }
+                if (null != mInactiveGraphicModel)
+                {
+                    mInactiveGraphicModel.IsVisible = true;
+                }
+                ((CapturableHexTerrainTileDesc)Desc).OnLost(cell);
+
+                if (null == newPlayer && null != mHexCellCapturedMark)
+                {
+                    ((GameScene)Scene).Octree.DestroyObject(mHexCellCapturedMark);
+                    mHexCellCapturedMark = null;
+                }
+
             }
-            Desc.OnDeactivating(cell);
         }
 
         internal void OnBeginTurn(HexCell cell)
         {
-            Desc.OnBeginTurn(cell);
+            if (Desc is CapturableHexTerrainTileDesc)
+            {
+                ((CapturableHexTerrainTileDesc)Desc).OnBeginTurn(cell);
+            }
         }
 
         protected override void OnAddToSceneImpl(BaseScene scene)
@@ -194,16 +236,48 @@ namespace Conquera
         {
             return scene is GameScene;
         }
+
+        private void InitHexCellCapturedMark(HexCell cell)
+        {
+            mHexCellCapturedMark = new HexCellCapturedMark(Scene.Content);
+            mHexCellCapturedMark.Position = cell.CenterPos;
+            ((GameScene)Scene).Octree.AddObject(mHexCellCapturedMark);
+        }
     }
 
-    public enum TileType
+    class HexCellCapturedMark : GraphicModel, IMaterialEffectParametersUpdater
     {
-        Land = 0,
-        Castle = 1,
-        Gold = 2,
-        Food = 3,
-        Shrine = 4,
-        Temple = 5,
-        Special = 6
+        private Vector3MaterialEffectParam mColorParam;
+
+        public Vector3 Color { get; set; }
+
+        public HexCellCapturedMark(ContentGroup content)
+            :base(CreateMesh(content), CreateMaterial(content))
+        {
+            if (1 != GraphicModelParts.Count)
+            {
+                throw new ArgumentException("HexCellCapturedMarkMesh must have only one material part");
+            }
+            mColorParam = (Vector3MaterialEffectParam)GraphicModelParts[0].Material.MaterialEffect.ManualParameters["gColor"];
+            if (null != mColorParam)
+            {
+                GraphicModelParts[0].CustomMaterialEffectParametersUpdater = this;
+            }
+        }
+
+        private static Material CreateMaterial(ContentGroup content)
+        {
+            return content.Load<Material>("HexCellCapturedMarkMat");
+        }
+
+        private static Mesh CreateMesh(ContentGroup content)
+        {
+            return content.Load<Mesh>("HexCellCapturedMarkMesh");
+        }
+
+        void IMaterialEffectParametersUpdater.UpdateMaterialEffectParameters()
+        {
+            mColorParam.Value = Color;
+        }
     }
 }

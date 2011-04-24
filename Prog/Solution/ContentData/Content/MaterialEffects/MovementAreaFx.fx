@@ -37,7 +37,7 @@ VsOutput mainVS(VsInput input)
     VsOutput output;
     
     output.Position = mul(input.Position, gWorldViewProj);
-    output.Color = float4(input.Color-(sin(gTime*2)*0.1), 0.5f);
+    output.Color = float4(input.Color -(sin(gTime*2)*0.1) + 0.1, 0.8f);
     
     return output;
 }
@@ -58,7 +58,7 @@ technique Default
 		AlphaBlendEnable = true;
 		
 		BlendOp = add;
-		DestBlend = ONE;//INVSRCALPHA;
+		DestBlend = INVSRCALPHA;
 		SrcBlend = SRCALPHA;
 		
 		ZEnable = true;

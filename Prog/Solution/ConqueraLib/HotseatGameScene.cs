@@ -67,8 +67,8 @@ namespace Conquera
         {
             GameSceneContextState.Players.Add(new HumanPlayer("Blue", Color.Blue.ToVector3()));
             GameSceneContextState.Players.Add(new HumanPlayer("Red", Color.Red.ToVector3()));
-            GameSceneContextState.Players[0].Gold = 1000;
-            GameSceneContextState.Players[1].Gold = 1000;
+            GameSceneContextState.Players[0].Mana = 1000;
+            GameSceneContextState.Players[1].Mana = 1000;
         }
 
         protected override GameSceneSettings CreateGameSettings()

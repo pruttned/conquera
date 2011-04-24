@@ -127,6 +127,7 @@
     <Compile Include="Gui\TileInfoPanel.cs" />
     <Compile Include="Gui\TileInfoView.cs" />
     <Compile Include="HexCell.cs" />
+    <Compile Include="HexHelper.cs" />
     <Compile Include="HexRegion.cs" />
     <Compile Include="HexTerrain.cs" />
     <Compile Include="HexTerrainSceneObject.cs" />

@@ -34,7 +34,7 @@ namespace Conquera
     [CustomBasicTypeProvider(typeof(Vector3), typeof(FieldCustomBasicTypeProvider<Vector3>))]
     public abstract class GamePlayer : BaseDataObject
     {
-        public event EventHandler GoldChanged;
+        public event EventHandler ManaChanged;
         public event EventHandler MaxUnitCntChanged;
         public event EventHandler UnitsChanged;
 
@@ -44,7 +44,7 @@ namespace Conquera
         private GameScene mScene;
         private Material mActiveBorderMaterial;
         private Material mInactiveBorderMaterial;
-        private int mGold;
+        private int mMana;
         private int mMaxUnitCnt;
 
         private Dictionary<string, IGameSceneState> mGameSceneStates = new Dictionary<string, IGameSceneState>();
@@ -86,18 +86,18 @@ namespace Conquera
         public abstract bool IsHuman { get; }
 
         [DataProperty(NotNull = true)]
-        public int Gold
+        public int Mana
         {
-            get { return mGold; }
+            get { return mMana; }
             set
             {
-                if (value != mGold)
+                if (value != mMana)
                 {
-                    mGold = value;
+                    mMana = value;
 
-                    if (GoldChanged != null)
+                    if (ManaChanged != null)
                     {
-                        GoldChanged(this, EventArgs.Empty);
+                        ManaChanged(this, EventArgs.Empty);
                     }
                 }
             }
@@ -172,7 +172,11 @@ namespace Conquera
             return removed;
         }
 
-        public abstract void OnBegineTurn();
+        public virtual void OnBeginTurn()
+        {
+            Mana = 0;
+        }
+
         public abstract void OnEndTurn();
 
         internal void Init(GameScene scene, ContentGroup content)
@@ -197,15 +201,15 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Whether has enough gold
+        /// Whether has enough mana
         /// </summary>
         /// <param name="descName"></param>
-        public bool HasEnoughGoldForUnit(string descName)
+        public bool HasEnoughManaForUnit(string descName)
         {
             CheckInit();
 
             var desc = Scene.Content.Load<GameUnitDesc>(descName);
-            return (desc.Cost <= Gold);
+            return (desc.Cost <= Mana);
         }
 
         public GameUnit BuyUnit(string descName, Point cell)
@@ -213,12 +217,12 @@ namespace Conquera
             CheckInit();
 
             var desc = Scene.Content.Load<GameUnitDesc>(descName);
-            if (desc.Cost > Gold)
+            if (desc.Cost > Mana)
             {
-                throw new ArgumentException("Not enough gold");
+                throw new ArgumentException("Not enough mana");
             }
 
-            Gold -= desc.Cost;
+            Mana -= desc.Cost;
 
             var unit =  Scene.AddGameUnit(this, descName, cell, false);
                                     
@@ -269,8 +273,10 @@ namespace Conquera
             CameraTargetPos = new Vector3(-10000, -10000, -10000);
         }
 
-        public override void OnBegineTurn()
+        public override void OnBeginTurn()
         {
+            base.OnBeginTurn();
+
             if (CameraTargetPos.X < -1000)
             {
                 if (0 < Units.Count)

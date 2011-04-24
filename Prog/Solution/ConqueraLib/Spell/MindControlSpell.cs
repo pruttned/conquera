@@ -69,7 +69,8 @@ namespace Conquera
 
         public override int ApplyAttackModifiers(int baseAttack)
         {
-            return baseAttack + (int)Math.Ceiling((float)Target.GameUnitDesc.Attack / DivCoef);
+            throw new NotImplementedException();
+            //return baseAttack + (int)Math.Ceiling((float)Target.GameUnitDesc.Attack / DivCoef);
         }
 
         protected override void BeforeAttackCastImpl()

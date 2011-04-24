@@ -72,15 +72,18 @@ namespace Conquera
         {
             if (MouseButton.Right == button)
             {
-                if (SelectedUnit.MoveTo(cellUnderCur.Index))
+                if (null != cellUnderCur)
                 {
-                    mScene.State = mScene.GetGameSceneState(GameSceneStates.UnitMoving);
-                }
-                else
-                {
-                    if (SelectedUnit.Attack(cellUnderCur.Index))
+                    if (SelectedUnit.MoveTo(cellUnderCur.Index))
                     {
-                        mScene.State = mScene.GetGameSceneState(GameSceneStates.Battle);
+                        mScene.State = mScene.GetGameSceneState(GameSceneStates.UnitMoving);
+                    }
+                    else
+                    {
+                        if (SelectedUnit.Attack(cellUnderCur.Index))
+                        {
+                            mScene.State = mScene.GetGameSceneState(GameSceneStates.Battle);
+                        }
                     }
                 }
             }
@@ -93,6 +96,7 @@ namespace Conquera
                     mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
                 }
             }
+
         }
 
         public void Update(AleGameTime gameTime)

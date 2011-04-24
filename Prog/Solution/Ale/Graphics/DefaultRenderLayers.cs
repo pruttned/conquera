@@ -50,17 +50,19 @@ namespace Ale.Graphics
         public const int MovementArea = 3100;
         public const int Region = 3200;
 
-        /// <summary>
-        /// Cursor3dCellSel
-        /// </summary>
-        public const int Cursor3dCellSel = 3300;
+
+
+        public const int HexCellCapturedMark = 3400;
 
         /// <summary>
         /// Cursor3D
         /// </summary>
         public const int Cursor3D = 3500;
 
-
+        /// <summary>
+        /// Cursor3dCellSel
+        /// </summary>
+        public const int Cursor3dCellSel = 3600;
         /// <summary>
         /// Objects that are standing on the ground
         /// </summary>

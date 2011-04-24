@@ -28,10 +28,10 @@ namespace Conquera
     public class HexCell
     {
         private bool mIsPassable;
-        private HexRegion mRegion = null;
         private GameScene mScene;
         private HexTerrainTile mHexTerrainTile;
         private GameUnit mGameUnit;
+        private GamePlayer mOwningPlayer;
 
         public bool IsPassable
         {
@@ -66,18 +66,28 @@ namespace Conquera
             }
         }
 
-        internal HexRegion NewRegion { get; set; }
-
-        public HexRegion Region
-        {
-            get { return mRegion; }
-        }
-
         public GamePlayer OwningPlayer
         {
             get 
             {
-                return null != mRegion ? mRegion.OwningPlayer : null;
+                return mOwningPlayer;
+            }
+            set 
+            {
+                if (value != mOwningPlayer)
+                {
+                    if (null != mOwningPlayer && null != mHexTerrainTile)
+                    {
+                        mHexTerrainTile.OnLost(this, value);
+                    }
+
+                    mOwningPlayer = value;
+
+                    if (null != mHexTerrainTile)
+                    {
+                        mHexTerrainTile.OnCaptured(this);
+                    }
+                }
             }
         }
 
@@ -93,14 +103,14 @@ namespace Conquera
                 }
                 else
                 {
-                    return HexTerrain.GetPosFromIndex(Index);
+                    return HexHelper.Get3DPosFromIndex(Index, HexTerrain.GroundHeight);
                 }
             }
         }
 
         public bool IsActive
         {
-            get { return (null != Region && Region.IsActive); }
+            get { return null != OwningPlayer; }
         }
 
         public bool BelongsToCurrentPlayer
@@ -126,62 +136,22 @@ namespace Conquera
             Index = index;
         }
 
-        internal void UpdateRegion()
+        internal void SetOwningPlayerDuringLoad(GamePlayer owningPlayer)
         {
-            GamePlayer oldOwner = OwningPlayer;
-            GamePlayer newOwner = null != NewRegion ? NewRegion.OwningPlayer : null;
-            bool oldIsActive = (null != mRegion && mRegion.IsActive);
-            bool newIsActive = (null != NewRegion && (NewRegion.IsActive));
+            mOwningPlayer = owningPlayer;
 
-            if (oldOwner != newOwner)
+            if (null != mOwningPlayer)
             {
-                if (null != oldOwner)
-                {
-                    oldOwner.RemoveCell(this);
-                }
-                if (null != newOwner)
-                {
-                    newOwner.AddCell(this);
-                }
-
                 if (null != mHexTerrainTile)
                 {
-                    if (oldIsActive)
-                    {
-                        mHexTerrainTile.OnDeactivating(this);
-                    }
-                    mRegion = NewRegion;
-
-                    if (newIsActive)
-                    {
-                        mHexTerrainTile.OnActivated(this);
-                    }
+                    mHexTerrainTile.OnSetOwningPlayerDuringLoad(this);
                 }
-                else
-                {
-                    mRegion = NewRegion;
-                }
-            }
-            else
-            {
-                if (null != mHexTerrainTile && oldIsActive != newIsActive)
-                {
-                    if (newIsActive)
-                    {
-                        mHexTerrainTile.OnActivated(this);
-                    }
-                    else
-                    {
-                        mHexTerrainTile.OnDeactivating(this);
-                    }
-                }
-                mRegion = NewRegion;
             }
         }
 
         public void GetCornerPos(HexTileCorner corner, out Vector3 pos)
         {
-            HexTerrainTileDesc.GetCornerPos(corner, out pos);
+            HexHelper.GetHexCellCornerPos3D(corner, out pos);
             Vector3 centerPos = CenterPos;
             Vector3.Add(ref centerPos, ref pos, out pos);
         }
@@ -217,14 +187,15 @@ namespace Conquera
             if(newTile != mHexTerrainTile)
             {
                 var owner = OwningPlayer;
-                mScene.SetCellOwner(Index, null); //not performance wise - but should be used in editor only
+                //mScene.SetCellOwner(Index, null); //not performance wise - but should be used in editor only
+                OwningPlayer = null;
 
                 HexTerrainTileDesc oldDesc = HexTerrainTile;
                 mHexTerrainTile = newTile;
                 UpdatePassableness();
                 mScene.HexCellTileChanged(this, oldDesc);
 
-                mScene.SetCellOwner(Index, owner);
+                OwningPlayer = owner;
             }
         }
 
@@ -338,5 +309,4 @@ namespace Conquera
             }
         }
     }
-
 }

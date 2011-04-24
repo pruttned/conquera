@@ -45,7 +45,6 @@ namespace Conquera.Editor
                 mPlayerListBox.Items.Add(player);
             }
             mPlayerListBox.SelectedIndex = 0;
-            mGoldUpDown.Value = EditorApplication.Players[0].Gold;
         }
 
         private void ToolBarForm_Load(object sender, EventArgs e)
@@ -103,13 +102,6 @@ namespace Conquera.Editor
         {
             var p = (GamePlayer)mPlayerListBox.SelectedItem;
             EditorApplication.CommandQueue.Enqueue(new SetPlayerCommand(p));
-            mGoldUpDown.Value = p.Gold;
-        }
-
-        private void mGoldUpDown_ValueChanged(object sender, EventArgs e)
-        {
-            var p = (GamePlayer)mPlayerListBox.SelectedItem;
-            p.Gold = (int)mGoldUpDown.Value;
         }
 
         private void mUnitListBox_SelectedIndexChanged(object sender, EventArgs e)

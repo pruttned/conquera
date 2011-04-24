@@ -453,7 +453,7 @@ namespace Conquera
                     //        obj.IdleAnimation = "Run";
                     //        obj.MoveAnimation = "Run";
                     //        obj.MaxHp = 200;
-                    //        obj.Cost = 100;
+                    //        obj.Cost = 1;
                     //        obj.Attack = 50;
                     //        obj.BloodParticleSystem = ormManager.FindObject(typeof(ParticleSystemSettings), "Name = 'BloodParticleSystem'"); ;
                     //        obj.DamageAnimationTime = 1.0f;
@@ -512,32 +512,31 @@ namespace Conquera
                     //        ormManager.SaveObject(new StringResource("DirtTileDescription", "Does nothing"));
                     //        ormManager.SaveObject(new StringResource("MountainsTileDescription", "Unpassable mountains"));
                     //        ormManager.SaveObject(new StringResource("CastleTileDescription", "Used to build new units"));
-                    //        ormManager.SaveObject(new StringResource("GoldMineLv1TileDescription", "Adds +100 gold each turn"));
+                     //       ormManager.SaveObject(new StringResource("MineLv1TileDescription", "Adds +1 mana per turn"));
                     //        ormManager.SaveObject(new StringResource("VillageLv1TileDescription", "Adds +3 to max unit count"));
                     //        ormManager.SaveObject(new StringResource("SpellTowerTileDescription", "Adds spell"));
                     //    }
 
-                    //    {
-                    //        LandTileSettings obj = new LandTileSettings();
-                    //        obj.Name = "Grass1Tile";
-                    //        obj.DisplayName = "Grass Land";
-                    //        obj.Description = ormManager.LoadObject<StringResource>("Name = 'GrassTileDescription'");
-                    //        obj.HpIncrement = 10;
-                    //        obj.UnitPosition = Vector3.Zero;
-                    //        obj.TileIndex = new Point(1, 0);
-                    //        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
-                    //        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
-                    //        obj.IsPassable = true;
-                    //        obj.Icon = "TileIconLand";
-                    //        ormManager.SaveObject(obj);
-                    //    }
+
+                    //{
+                    //    LandTileSettings obj = new LandTileSettings();
+                    //    obj.Name = "Grass1Tile";
+                    //    obj.DisplayName = "Grass Land";
+                    //    obj.Description = ormManager.LoadObject<StringResource>("Name = 'GrassTileDescription'");
+                    //    obj.UnitPosition = Vector3.Zero;
+                    //    obj.TileIndex = new Point(1, 0);
+                    //    obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
+                    //    obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
+                    //    obj.IsPassable = true;
+                    //    obj.Icon = "TileIconLand";
+                    //    ormManager.SaveObject(obj);
+                    //}
 
                     //{
                     //    LandTileSettings obj = new LandTileSettings();
                     //    obj.Name = "Grass2Tile";
                     //    obj.DisplayName = "Grass Land";
                     //    obj.Description = ormManager.LoadObject<StringResource>("Name = 'GrassTileDescription'");
-                    //    obj.HpIncrement = 10;
                     //    obj.UnitPosition = Vector3.Zero;
                     //    obj.TileIndex = new Point(0, 3);
                     //    obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
@@ -552,7 +551,6 @@ namespace Conquera
                     //        obj.Name = "Dirt1Tile";
                     //        obj.DisplayName = "Dirt Land";
                     //        obj.Description = ormManager.LoadObject<StringResource>("Name = 'DirtTileDescription'");
-                    //        obj.HpIncrement = 0;
                     //        obj.UnitPosition = Vector3.Zero;
                     //        obj.TileIndex = new Point(2, 0);
                     //        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
@@ -566,7 +564,6 @@ namespace Conquera
                     //        obj.Name = "MountainsTile";
                     //        obj.DisplayName = "Mountains";
                     //        obj.Description = ormManager.LoadObject<StringResource>("Name = 'MountainsTileDescription'");
-                    //        obj.HpIncrement = 0;
                     //        obj.UnitPosition = Vector3.Zero;
                     //        obj.TileIndex = new Point(1, 0);
                     //        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
@@ -581,7 +578,6 @@ namespace Conquera
                     //        obj.Name = "CastleTile";
                     //        obj.DisplayName = "Castle";
                     //        obj.Description = ormManager.LoadObject<StringResource>("Name = 'CastleTileDescription'");
-                    //        obj.HpIncrement = 5;
                     //        obj.UnitPosition = new Vector3(-0.4f, -0.4f, 0);
                     //        obj.TileIndex = new Point(4, 0);
                     //        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
@@ -592,21 +588,21 @@ namespace Conquera
                     //        obj.Icon = "TileIconCastle";
                     //        ormManager.SaveObject(obj);
                     //    }
-                    //    {
-                    //        GoldMineTileSettings obj = new GoldMineTileSettings();
-                    //        obj.Name = "GoldMineLv1Tile";
-                    //        obj.DisplayName = "Small Gold Mine";
-                    //        obj.Description = ormManager.LoadObject<StringResource>("Name = 'GoldMineLv1TileDescription'");
-                    //        obj.GoldIncrement = 100;
-                    //        obj.HpIncrement = 0;
-                    //        obj.UnitPosition = new Vector3(0.2f, 0.2f, 0);
-                    //        obj.TileIndex = new Point(3, 0);
-                    //        obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
-                    //        obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
-                    //        obj.IsPassable = true;
-                    //        obj.Icon = "TileIconSpellTower";
-                    //        ormManager.SaveObject(obj);
-                    //    }
+
+                    //{
+                    //    ManaMineTileSettings obj = new ManaMineTileSettings();
+                    //    obj.Name = "MineLv1Tile";
+                    //    obj.DisplayName = "Small Mine";
+                    //    obj.Description = ormManager.LoadObject<StringResource>("Name = 'MineLv1TileDescription'");
+                    //    obj.ManaIncrement = 1;
+                    //    obj.UnitPosition = new Vector3(0.2f, 0.2f, 0);
+                    //    obj.TileIndex = new Point(3, 0);
+                    //    obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
+                    //    obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
+                    //    obj.IsPassable = true;
+                    //    obj.Icon = "TileIconSpellTower";
+                    //    ormManager.SaveObject(obj);
+                    //}
 
 
                     //    {
@@ -811,7 +807,10 @@ namespace Conquera
                     //ormManager.SaveObject(obj);
                     //}
 
-
+                    //{
+                    //    MaterialSettings mat = new MaterialSettings("HexCellCapturedMarkMat", "HexCellCapturedMarkFx", DefaultRenderLayers.HexCellCapturedMark);
+                    //    ormManager.SaveObject(mat);
+                    //}
 
                     transaction.Commit();
                 }
