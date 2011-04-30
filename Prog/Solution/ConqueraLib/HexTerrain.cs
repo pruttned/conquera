@@ -141,7 +141,7 @@ namespace Conquera
                     mTiles[index.X, index.Y] = null;
 
                     //update siblings
-                    foreach (Point pos in GetSiblingsPos(index, false))
+                    foreach (Point pos in GetSiblings(index, false))
                     {
                         SetTileWall(pos.X, pos.Y, true);
                     }
@@ -166,7 +166,7 @@ namespace Conquera
                     else
                     {
                         //update siblings
-                        foreach (Point pos in GetSiblingsPos(index, false))
+                        foreach (Point pos in GetSiblings(index, false))
                         {
                             SetTileWall(pos.X, pos.Y, TileNeedWall(pos.X, pos.Y));
                         }
@@ -187,9 +187,9 @@ namespace Conquera
         /// <param name="direction"></param>
         /// <param name="sibling"></param>
         /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        public bool GetSiblingPos(Point index, bool includeGaps, HexDirection direction, out Point sibling)
+        public bool GetSibling(Point index, bool includeGaps, HexDirection direction, out Point sibling)
         {
-            sibling = GetSiblingPos(index, direction);
+            sibling = HexHelper.GetSibling(index, direction);
             if (IsInTerrain(sibling))
             {
                 return (includeGaps || null != mTiles[index.X, index.Y]);
@@ -204,7 +204,7 @@ namespace Conquera
         /// <param name="includeGaps"></param>
         /// <param name="siblings"></param>
         /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        public void GetSiblingsPos(Point index, bool includeGaps, IList<Point> siblings)
+        public void GetSiblings(Point index, bool includeGaps, IList<Point> siblings)
         {
             int i = index.X;
             int j = index.Y;
@@ -234,10 +234,10 @@ namespace Conquera
         /// <param name="includeGaps"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        public IList<Point> GetSiblingsPos(Point index, bool includeGaps)
+        public IList<Point> GetSiblings(Point index, bool includeGaps)
         {
             List<Point> siblings = new List<Point>();
-            GetSiblingsPos(index, includeGaps, siblings);
+            GetSiblings(index, includeGaps, siblings);
             return siblings;
         }
 
@@ -324,30 +324,6 @@ namespace Conquera
             mScene = scene;
             LowerLeftTileCenter = HexHelper.Get3DPosFromIndex(new Point(0, 0), GroundHeight);
             UpperRightTileCenter = HexHelper.Get3DPosFromIndex(new Point(Width, Height), GroundHeight);
-        }
-
-        private Point GetSiblingPos(Point index, HexDirection direction)
-        {
-            int i = index.X;
-            int j = index.Y;
-
-            switch (direction)
-            {
-                case HexDirection.UperRight:
-                    return (0 != (j & 1)) ? new Point(i + 1, j + 1) : new Point(i, j + 1);
-                case HexDirection.Right:
-                    return new Point(i + 1, j);
-                case HexDirection.LowerRight:
-                    return (0 != (j & 1)) ? new Point(i + 1, j - 1) : new Point(i, j - 1);
-                case HexDirection.LowerLeft:
-                    return (0 != (j & 1)) ? new Point(i, j - 1) : new Point(i - 1, j - 1);
-                case HexDirection.Left:
-                    return new Point(i - 1, j);
-                case HexDirection.UperLeft:
-                    return (0 != (j & 1)) ? new Point(i, j + 1) : new Point(i - 1, j + 1);
-                default:
-                    throw new ArgumentException("Invalid direction");
-            }
         }
 
 

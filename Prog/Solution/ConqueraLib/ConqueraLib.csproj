@@ -126,6 +126,7 @@
     <Compile Include="Gui\SpellView.cs" />
     <Compile Include="Gui\TileInfoPanel.cs" />
     <Compile Include="Gui\TileInfoView.cs" />
+    <Compile Include="HexAreaRenderable.cs" />
     <Compile Include="HexCell.cs" />
     <Compile Include="HexHelper.cs" />
     <Compile Include="HexRegion.cs" />
@@ -140,7 +141,6 @@
     <Compile Include="HexTerrainTileSettings.cs" />
     <Compile Include="HotseatGameScene.cs" />
     <Compile Include="MainMenuScene.cs" />
-    <Compile Include="MovementAreaRenderable.cs" />
     <Compile Include="MovementArrow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShadowOrthoCamera.cs" />
@@ -160,6 +160,7 @@
     <Compile Include="Spell\SpikesSpell.cs" />
     <Compile Include="Spell\VampiricTouchSpell.cs" />
     <Compile Include="StringResource.cs" />
+    <Compile Include="UnitAreaRenderable.cs" />
     <Compile Include="WaterReflectionCamera.cs" />
     <Compile Include="WaterReflectionPass.cs" />
   </ItemGroup>

@@ -67,6 +67,7 @@ namespace Conquera
             }
         }
 
+
         public void Update(AleGameTime gameTime)
         {
             GameCamera camera = mScene.GameCamera;
@@ -137,11 +138,6 @@ namespace Conquera
             {
                 //    mCursor3d.IsVisible = false;
             }
-
-
-
-
-            //}
         }
 
         private bool IsSelectedUnitReady()

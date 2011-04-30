@@ -244,6 +244,90 @@ namespace Conquera
             return Corners[(int)corner];
         }
 
+        /// <summary>
+        /// Gets the index of a hex cell's sibling
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        public static Point GetSibling(Point index, HexDirection direction)
+        {
+            int i = index.X;
+            int j = index.Y;
+
+            switch (direction)
+            {
+                case HexDirection.UperRight:
+                    return (0 != (j & 1)) ? new Point(i + 1, j + 1) : new Point(i, j + 1);
+                case HexDirection.Right:
+                    return new Point(i + 1, j);
+                case HexDirection.LowerRight:
+                    return (0 != (j & 1)) ? new Point(i + 1, j - 1) : new Point(i, j - 1);
+                case HexDirection.LowerLeft:
+                    return (0 != (j & 1)) ? new Point(i, j - 1) : new Point(i - 1, j - 1);
+                case HexDirection.Left:
+                    return new Point(i - 1, j);
+                case HexDirection.UperLeft:
+                    return (0 != (j & 1)) ? new Point(i, j + 1) : new Point(i - 1, j + 1);
+                default:
+                    throw new ArgumentException("Invalid direction");
+            }
+        }
+
+        /// <summary>
+        /// Gets the direction to a sibling hex cell
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="desc"></param>
+        /// <returns></returns>
+        public static HexDirection GetDirectionToSibling(Point src, Point desc)
+        {
+            if (desc.Y == src.Y + 1) //UperRight, UperLeft
+            {
+                if (0 != (src.Y & 1))
+                {
+                    if (desc.X == src.X + 1) return HexDirection.UperRight;
+                    if (desc.X == src.X) return HexDirection.UperLeft;
+                }
+                else
+                {
+                    if (desc.X == src.X) return HexDirection.UperRight;
+                    if (desc.X == src.X - 1) return HexDirection.UperLeft;
+                }
+            }
+            if (desc.Y == src.Y) //Right, Left
+            {
+                if (desc.X == src.X + 1) return HexDirection.Right;
+                if (desc.X == src.X - 1) return HexDirection.Left;
+            }
+            if (desc.Y == src.Y - 1) //LowerRight, LowerLeft
+            {
+                if (0 != (src.Y & 1))
+                {
+                    if (desc.X == src.X + 1) return HexDirection.LowerRight;
+                    if (desc.X == src.X) return HexDirection.LowerLeft;
+                }
+                else
+                {
+                    if (desc.X == src.X) return HexDirection.LowerRight;
+                    if (desc.X == src.X - 1) return HexDirection.LowerLeft;
+                }
+            }
+
+            throw new ArgumentException("Hex cells are not siblings");
+        }
+
+        /// <summary>
+        /// Rotats a given direction
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <param name="rot"></param>
+        /// <returns></returns>
+        public static HexDirection RotateDirection(HexDirection dir, int rot)
+        {
+            int resDir = (int)dir + rot;
+            return (HexDirection)(resDir % 6);
+        }
 
         private static int Floor2(int X)
         {

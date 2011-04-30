@@ -56,5 +56,31 @@ namespace Conquera
 
         [DataProperty(NotNull = true)]
         public long BloodParticleSystem { get; set; }
+
+        [DataListProperty(NotNull = false)]
+        public List<AdditionalAttackTargetSettings> AdditionalAttackTargets { get; set; }
+    }
+
+    [DataObject(MaxCachedCnt = 0)]
+    public class AdditionalAttackTargetSettings : BaseDataObject
+    {
+        [DataProperty(NotNull = true)]
+        public float AttackMultiplier { get; set; }
+
+        /// <summary>
+        /// Target cell to attack given by a set of directions when the direction from attacker to the target is UperRight
+        /// </summary>
+        [DataListProperty(NotNull=true)]
+        public List<HexDirection> Target { get; set; }
+
+        public AdditionalAttackTargetSettings()
+        {
+        }
+
+        public AdditionalAttackTargetSettings(float attackMultiplier, params HexDirection[] target)
+        {
+            AttackMultiplier = attackMultiplier;
+            Target = new List<HexDirection>(target);
+        }
     }
 }
