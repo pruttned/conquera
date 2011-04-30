@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////
- 
 texture2D gScreenMap;
 sampler2D gScreenMapSampler = sampler_state 
       {
@@ -72,7 +71,7 @@ VsOutput mainVS(float3 position : POSITION0, float2 uv : TEXCOORD0)
 {
       VsOutput output;
     output.pos = float4(position,1);
-    output.uv = uv;
+    output.uv= uv;
     return output;
 }     
       

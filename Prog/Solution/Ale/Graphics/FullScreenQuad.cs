@@ -54,6 +54,7 @@ namespace Ale.Graphics
                             new VertexPositionTexture( new Vector3(  1, -1, 1 ), new Vector2( 1, 1 ) ),
                             new VertexPositionTexture( new Vector3( -1, -1, 1 ), new Vector2( 0, 1 ) )
                         };
+
             mVertexBuffer = new DynamicVertexBuffer(graphicsDevice, 4 * VertexPositionTexture.SizeInBytes, BufferUsage.WriteOnly);
         }
 
@@ -109,17 +110,17 @@ namespace Ale.Graphics
         private void FillVertexBuffer(int width, int height)
         {
             var graphicsDevice = mGraphicsDeviceManager.GraphicsDevice;
-            float hpw = -(0.5f / (float)width);
-            float hph = +(0.5f / (float)height);
+            float hpw = (0.5f / (float)width);
+            float hph = (0.5f / (float)height);
 
-            mVertices[0].Position.X = -1 + hpw;
-            mVertices[0].Position.Y = 1 + hph;
-            mVertices[1].Position.X = 1 + hpw;
-            mVertices[1].Position.Y = 1 + hph;
-            mVertices[2].Position.X = 1 + hpw;
-            mVertices[2].Position.Y = -1 + hph;
-            mVertices[3].Position.X = -1 + hpw;
-            mVertices[3].Position.Y = -1 + hph;
+            mVertices[0].TextureCoordinate.X = 0 + hpw;
+            mVertices[0].TextureCoordinate.Y = 0 + hph;
+            mVertices[1].TextureCoordinate.X = 1 + hpw;
+            mVertices[1].TextureCoordinate.Y = 0 + hph;
+            mVertices[2].TextureCoordinate.X = 1 + hpw;
+            mVertices[2].TextureCoordinate.Y = 1 + hph;
+            mVertices[3].TextureCoordinate.X = 0 + hpw;
+            mVertices[3].TextureCoordinate.Y = 1 + hph;
 
             mVertexBuffer.SetData<VertexPositionTexture>(mVertices);
         }

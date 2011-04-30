@@ -37,7 +37,7 @@ VsOutput mainVS(float3 position : POSITION0, float2 uv : TEXCOORD0)
 {
 	VsOutput output;
     output.pos = float4(position,1);
-    output.uv = uv;
+    output.uv= uv;
     return output;
 }
 

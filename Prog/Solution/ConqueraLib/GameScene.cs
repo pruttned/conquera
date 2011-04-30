@@ -909,7 +909,7 @@ namespace Conquera
             }
 
             PostProcessEffectManager.PostProcessEffects.Add(new BloomProcessEffect(GraphicsDeviceManager, RenderTargetManager, Content));
-          //  PostProcessEffectManager.PostProcessEffects.Add(new InvertProcessEffect(GraphicsDeviceManager, RenderTargetManager,Content));
+            //PostProcessEffectManager.PostProcessEffects.Add(new InvertProcessEffect(GraphicsDeviceManager, RenderTargetManager, Content));
             PostProcessEffectManager.PostProcessEffects[0].Enabled = false;
 
             mCaptureParticleSystemDesc = Content.Load<ParticleSystemDesc>("CellCaptureParticleSystem");
