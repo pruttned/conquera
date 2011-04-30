@@ -84,9 +84,10 @@ VsOutput mainVS(VsInput input)
 float4 mainPS(float4 screenPosition : TEXCOORD0) : COLOR 
 {
     screenPosition.xy /= screenPosition.w;
+   // screenPosition.xy+=gHalfPixel;
 
     float2 uv = 0.5f * (float2(screenPosition.x,-screenPosition.y) + 1);
-    uv -=gHalfPixel;
+    uv +=gHalfPixel;
 
     float4 normalData = tex2D(gNormalMapSampler,uv);
     float3 normal = 2.0f * normalData.xyz - 1.0f;
