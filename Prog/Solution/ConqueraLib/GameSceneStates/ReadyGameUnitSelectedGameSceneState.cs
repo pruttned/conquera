@@ -56,7 +56,7 @@ namespace Conquera
                 mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
             }
 
-            mScene.ShowMovementArea(SelectedUnit);
+            mScene.UnitActionAreaRenderable.Show(SelectedUnit);
 
             mScene.EnableMouseCameraControl = true;
             MovementArrow.StartCell = mScene.GetCell(SelectedUnit.CellIndex);
@@ -64,7 +64,9 @@ namespace Conquera
 
         public void OnEnd()
         {
-            mScene.ShowMovementArea(null);
+            mScene.UnitAttackAreaRenderable.Hide();
+            mScene.UnitActionAreaRenderable.Hide();
+
             MovementArrow.IsVisible = false;
         }
 
@@ -116,18 +118,22 @@ namespace Conquera
                     {
                         if (!SelectedUnit.HasAttackedThisTurn && SelectedUnit.CanAttackTo(cellUnderCur.Index))
                         {
+                            mScene.UnitAttackAreaRenderable.Show(SelectedUnit, cellUnderCur.GameUnit);
+
                             MovementArrow.IsVisible = true;
                             Ale.Gui.GuiManager.Instance.Cursor = AlCursors.Attack;
                             MovementArrow.Color = new Vector3(1, 0.1f, 0.1f);
                         }
                         else
                         {
+                            mScene.UnitAttackAreaRenderable.Hide();
                             MovementArrow.IsVisible = false;
                             Ale.Gui.GuiManager.Instance.Cursor = AlCursors.MoveDisabled;
                         }
                     }
                     else
                     {
+                        mScene.UnitAttackAreaRenderable.Hide();
                         MovementArrow.IsVisible = true;
                         Ale.Gui.GuiManager.Instance.Cursor = AlCursors.Move;
                         MovementArrow.Color = Vector3.One;
@@ -135,6 +141,7 @@ namespace Conquera
                 }
                 else
                 {
+                    mScene.UnitAttackAreaRenderable.Hide();
                     MovementArrow.IsVisible = false;
                     Ale.Gui.GuiManager.Instance.Cursor = AlCursors.Default;
                 }

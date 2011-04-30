@@ -33,6 +33,7 @@ namespace SimpleOrmFramework
         public static string ParentColumnName = "ParentDataObject";
         private static readonly Type mIDataObjectType = typeof(IDataObject);
         private static readonly Type mDataObjectAttributeType = typeof(DataObjectAttribute);
+        private static readonly Type mEnumType = typeof(Enum);
 
         private string mListTable;
         private bool mIsWeakReference;
@@ -283,9 +284,19 @@ namespace SimpleOrmFramework
                 }
                 else
                 {
-                    while(dbReader2.Read())
+                    if (mEnumType.IsAssignableFrom(ItemType))
                     {
-                        list.Add(dbReader2[0]);
+                        while (dbReader2.Read())
+                        {
+                            list.Add(Enum.ToObject(ItemType, dbReader2[0]));
+                        }
+                    }
+                    else
+                    {
+                        while (dbReader2.Read())
+                        {
+                            list.Add(dbReader2[0]);
+                        }
                     }
                 }
             }

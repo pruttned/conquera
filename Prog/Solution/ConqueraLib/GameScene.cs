@@ -71,8 +71,6 @@ namespace Conquera
 
         private AleMessageBox mVictoryMessageBox;
 
-        private MovementAreaRenderable mMovementAreaRenderable;
-
         private LavaRenderable mLavaRenderable;
 
         public string Name 
@@ -118,6 +116,9 @@ namespace Conquera
                 }
             }
         }
+
+        public UnitAttackAreaRenderable UnitAttackAreaRenderable { get; private set; }
+        public UnitActionAreaRenderable UnitActionAreaRenderable { get; private set; }
 
         public GraphicsDeviceManager GraphicsDeviceManager
         {
@@ -193,7 +194,6 @@ namespace Conquera
         public GameScene(string name, SceneManager sceneManager, int width, int height, string defaultTile, ContentGroup content)
             : base(sceneManager, content, GetBoundsFromSize(width, height))
         {
-
             Terrain = new HexTerrain(width, height, defaultTile, this);
             mSettings = CreateGameSettings();
             mSettings.Name = name;
@@ -515,27 +515,6 @@ namespace Conquera
             mVictoryMessageBox.Show(true);
         }
 
-        /// <summary>
-        /// Null = hide
-        /// </summary>
-        /// <param name="unit"></param>
-        public void ShowMovementArea(GameUnit unit)
-        {
-            if (null != mMovementAreaRenderable)
-            {
-                Octree.DestroyObject(mMovementAreaRenderable);
-                mMovementAreaRenderable = null;
-            }
-            if (null != unit)
-            {
-                mMovementAreaRenderable = MovementAreaRenderable.TryCreate(GraphicsDeviceManager.GraphicsDevice, Content, unit);
-                if (null != mMovementAreaRenderable)
-                {
-                    Octree.AddObject(mMovementAreaRenderable);
-                }
-            }
-        }
-
         public void PanCamera(Vector2 pan)
         {
             Vector2 dirVec;
@@ -570,7 +549,8 @@ namespace Conquera
                 mMovementArrow.Dispose();
                 mCellLabelManager.Dispose();
                 Octree.DestroyObject(mLavaRenderable);
-
+                UnitAttackAreaRenderable.Dispose();
+                UnitActionAreaRenderable.Dispose();
                 GameCamera.Dispose();
             }
             base.Dispose(isDisposing);
@@ -1003,6 +983,9 @@ namespace Conquera
             cursorLight.Position = new Vector3(0, 0, 0.1f);
             //cursorLight.IsVisible = false;
             Octree.AddObject(cursorLight);
+
+            UnitAttackAreaRenderable = new UnitAttackAreaRenderable(this);
+            UnitActionAreaRenderable = new UnitActionAreaRenderable(this);
         }
         PointLight cursorLight;
 
@@ -1075,7 +1058,6 @@ namespace Conquera
 
 
 
-
     internal class LavaRenderable : GraphicModel
     {
         const float ZPos = -5.00f;
@@ -1129,5 +1111,4 @@ namespace Conquera
             
         }
     }
-
 }

@@ -24,6 +24,7 @@ struct VsInput
 {
     float4 Position : POSITION0;
     float3 Color : Normal;
+    float Alpha : TEXCOORD0;
 };
 	
 struct VsOutput
@@ -37,7 +38,7 @@ VsOutput mainVS(VsInput input)
     VsOutput output;
     
     output.Position = mul(input.Position, gWorldViewProj);
-    output.Color = float4(input.Color -(sin(gTime*2)*0.1) + 0.1, 0.8f);
+    output.Color = float4(input.Color -(sin(gTime*2)*0.1) + 0.1, input.Alpha);
     
     return output;
 }
