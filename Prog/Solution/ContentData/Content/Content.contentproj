@@ -525,13 +525,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MaterialEffects\MovementAreaFx.fx">
-      <Name>MovementAreaFx</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>MaterialEffectProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Models\VillageMesh.alm">
       <Name>VillageMesh</Name>
       <Importer>MeshImporter</Importer>
@@ -609,6 +602,13 @@
   <ItemGroup>
     <Compile Include="MaterialEffects\HexCellCapturedMarkFx.fx">
       <Name>HexCellCapturedMarkFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\HexAreaFx.fx">
+      <Name>HexAreaFx</Name>
       <Importer>EffectImporter</Importer>
       <Processor>MaterialEffectProcessor</Processor>
     </Compile>

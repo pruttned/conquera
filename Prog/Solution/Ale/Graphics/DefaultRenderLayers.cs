@@ -48,7 +48,7 @@ namespace Ale.Graphics
         public const int GroundLyingObjects = 3000;
 
         public const int MovementArea = 3100;
-        public const int Region = 3200;
+        public const int AttackArea = 3200;
 
 
 

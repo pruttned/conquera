@@ -54,7 +54,7 @@ namespace Conquera
 
             if (null != mScene.SelectedUnit)
             {
-                mScene.ShowMovementArea(mScene.SelectedUnit);
+                mScene.UnitActionAreaRenderable.Show(mScene.SelectedUnit);
             }
 
             if (null == PreviousGameSceneState) throw new ArgumentNullException("PreviousGameSceneState");

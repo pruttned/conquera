@@ -180,6 +180,15 @@ namespace Conquera
         private static HashSet<Point> CheckedPoints = new HashSet<Point>();
         private static Queue<Seed> Seeds = new Queue<Seed>();
         
+        public List<AdditionalAttackTarget> GetAdditionalAttackTargets(GameUnit target)
+        {
+            return GameUnitDesc.GetAdditionalAttackTargets(CellIndex, target.CellIndex);
+        }
+
+        public void GetAdditionalAttackTargets(GameUnit target, List<AdditionalAttackTarget> points)
+        {
+            GameUnitDesc.GetAdditionalAttackTargets(CellIndex, target.CellIndex, points);
+        }
 
         /// <summary>
         /// Gets all poitions where can unit move
@@ -314,18 +323,9 @@ namespace Conquera
                 GameUnit target = GameScene.GetCell(cell).GameUnit;
                 RotateTo(target.CellIndex);
 
-                if (null != GameScene.ActiveSpellSlot)
-                {
-                    var state = (CastingSpellBeforeAttackGameUnitState)States["CastingSpellBeforeAttack"];
-                    state.TargetUnit = target;
-                    State = state;
-                }
-                else
-                {
-                    var state = (AttackingGameUnitState)States["Attack"];
-                    state.TargetUnit = target;
-                    State = state;
-                }
+                var state = (AttackingGameUnitState)States["Attack"];
+                state.TargetUnit = target;
+                State = state;
                 
                 return true;
             }
@@ -344,18 +344,9 @@ namespace Conquera
             Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, angle);
         }
 
-        public int ComputeDamageTo(GameUnit unit, Spell activeSpell)
+        public int ComputeDamageTo(GameUnit unit)
         {
-            //if (null != activeSpell)
-            //{
-            //    return activeSpell.ApplyAttackModifiers(GameUnitDesc.Attack);
-            //}
-            //else
-            //{
-                return AleMathUtils.Random.Next(GameUnitDesc.MinAttack, GameUnitDesc.MaxAttack + 1);
-
-
-            //}
+            return AleMathUtils.Random.Next(GameUnitDesc.MinAttack, GameUnitDesc.MaxAttack + 1);
         }
 
         public void Heal(int amount)

@@ -22,6 +22,7 @@ using System.Text;
 using Ale.Content;
 using Ale.Scene;
 using Ale.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace Conquera
 {
@@ -83,6 +84,44 @@ namespace Conquera
             mSettings = settings;
             BloodParticleSystem = content.Load<ParticleSystemDesc>(settings.BloodParticleSystem);
         }
+
+        public List<AdditionalAttackTarget> GetAdditionalAttackTargets(Point attacker, Point target)
+        {
+            List<AdditionalAttackTarget> points = new List<AdditionalAttackTarget>();
+            GetAdditionalAttackTargets(attacker, target, points);
+            return points;
+        }
+
+        public void GetAdditionalAttackTargets(Point attacker, Point target, List<AdditionalAttackTarget> points)
+        {
+            //todo cahce?
+
+            int rot = (int)HexHelper.GetDirectionToSibling(attacker, target);
+            foreach (var additionalAttackTarget in mSettings.AdditionalAttackTargets)
+            {
+                Point index = attacker;
+                foreach (var dir in additionalAttackTarget.Target)
+                {
+                    index = HexHelper.GetSibling(index, HexHelper.RotateDirection(dir, rot));
+                }
+                points.Add(new AdditionalAttackTarget(index, additionalAttackTarget.AttackMultiplier));
+            }
+        }
     }
 
+    public class AdditionalAttackTarget
+    {
+        public Point Position {get; set;}
+        public float AttackMultiplier {get; set;}
+
+        public AdditionalAttackTarget ()
+	    {
+	    }
+
+        public AdditionalAttackTarget(Point position, float attackMultiplier)
+        {
+            Position = position;
+            AttackMultiplier = attackMultiplier;
+        }
+    }
 }
