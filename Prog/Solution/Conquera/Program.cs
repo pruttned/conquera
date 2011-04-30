@@ -598,22 +598,6 @@ namespace Conquera
                     //}
 
                     //{
-                    //    ManaMineTileSettings obj = new ManaMineTileSettings();
-                    //    obj.Name = "MineLv1Tile";
-                    //    obj.DisplayName = "Small Mine";
-                    //    obj.Description = ormManager.LoadObject<StringResource>("Name = 'MineLv1TileDescription'");
-                    //    obj.ManaIncrement = 1;
-                    //    obj.UnitPosition = new Vector3(0.2f, 0.2f, 0);
-                    //    obj.TileIndex = new Point(3, 0);
-                    //    obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
-                    //    obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
-                    //    obj.IsPassable = true;
-                    //    obj.Icon = "TileIconSpellTower";
-                    //    ormManager.SaveObject(obj);
-                    //}
-
-
-                    //{
                     //    MaterialSettings mat = new MaterialSettings("BeamParticleMat", "BeamParticleFx", DefaultRenderLayers.GroundStandingObjects);
                     //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "BeamText"));
                     //    mat.Params.Add(new Vector2ArrayMaterialParamSettings("gUvs", new Vector2[]
@@ -821,6 +805,44 @@ namespace Conquera
                     //    MaterialSettings mat = new MaterialSettings("HexCellCapturedMarkMat", "HexCellCapturedMarkFx", DefaultRenderLayers.HexCellCapturedMark);
                     //    ormManager.SaveObject(mat);
                     //}
+
+
+                    //{
+                    //    MaterialSettings settings = new MaterialSettings("MineLvl1CrystalMat", "CrystalFx");
+                    //    settings.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "MineDifTex"));
+                    //    //settings.Params.Add(new Vector3MaterialParamSettings("gColor", new Vector3(1,1,1)));
+                    //    ormManager.SaveObject(settings);
+                    //}
+                    //{
+                    //    MaterialSettings settings = new MaterialSettings("MineMat", "Simple");
+                    //    settings.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "MineDifTex"));
+                    //    ormManager.SaveObject(settings);
+                    //}
+                    //{
+                    //    GraphicModelSettings settings = new GraphicModelSettings();
+                    //    settings.Name = "MineLvl1Gm";
+                    //    settings.Mesh = "MineMesh";
+                    //    settings.MaterialAssignments.Add(new MaterialAssignmentsettings("Crystal", ormManager.FindObject(typeof(MaterialSettings), "Name='MineLvl1CrystalMat'")));
+                    //    settings.MaterialAssignments.Add(new MaterialAssignmentsettings("Other", ormManager.FindObject(typeof(MaterialSettings), "Name='MineMat'")));
+                    //    ormManager.SaveObject(settings);
+                    //}
+
+                    //{
+                    //    ManaMineTileSettings obj = new ManaMineTileSettings();
+                    //    obj.Name = "MineLv1Tile";
+                    //    obj.DisplayName = "Small Mine";
+                    //    obj.Description = ormManager.LoadObject<StringResource>("Name = 'MineLv1TileDescription'");
+                    //    obj.ManaIncrement = 1;
+                    //    obj.UnitPosition = new Vector3(0.2f, 0.2f, 0);
+                    //    obj.TileIndex = new Point(3, 0);
+                    //    obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
+                    //    obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
+                    //    obj.IsPassable = true;
+                    //    obj.Icon = "TileIconSpellTower";
+                    //    obj.ActiveGraphicModel = obj.InactiveGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name='MineLvl1Gm'");
+                    //    ormManager.SaveObject(obj);
+                    //}
+
 
                     transaction.Commit();
                 }
