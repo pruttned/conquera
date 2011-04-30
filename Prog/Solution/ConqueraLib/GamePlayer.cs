@@ -42,8 +42,6 @@ namespace Conquera
         private List<HexCell> mCells = new List<HexCell>();
 
         private GameScene mScene;
-        private Material mActiveBorderMaterial;
-        private Material mInactiveBorderMaterial;
         private int mMana;
         private int mMaxUnitCnt;
 
@@ -115,23 +113,6 @@ namespace Conquera
             set { mUnits = value; }
         }
 
-        internal Material ActiveBorderMaterial
-        {
-            get
-            {
-                CheckInit();
-                return mActiveBorderMaterial;
-            }
-        }
-        internal Material InactiveBorderMaterial
-        {
-            get
-            {
-                CheckInit();
-                return mInactiveBorderMaterial;
-            }
-        }
-
         public GamePlayer(string name, Vector3 color)
             : this()
         {
@@ -182,14 +163,6 @@ namespace Conquera
         internal void Init(GameScene scene, ContentGroup content)
         {
             mScene = scene;
-
-            MaterialSettings ms = new MaterialSettings("LineMat", "ActiveBorderFx");
-            ms.RenderLayer = DefaultRenderLayers.Region;
-            ms.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "lineText"));
-            ms.Params.Add(new Vector3MaterialParamSettings("gColor", Color));
-            mActiveBorderMaterial = new Material(ms, content);
-            ms.EffectName = "InactiveBorderFx";
-            mInactiveBorderMaterial = new Material(ms, content);
 
             foreach (var unit in Units)
             {

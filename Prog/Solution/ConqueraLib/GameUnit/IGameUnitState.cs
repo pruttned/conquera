@@ -161,6 +161,11 @@ namespace Conquera
             get { return false; }
         }
 
+        private GameScene GameScene
+        {
+            get { return mGameUnit.GameScene; }
+        }
+
         public AttackingGameUnitState(GameUnit gameUnit)
         {
             if (null == gameUnit) throw new ArgumentNullException("gameUnit");
@@ -185,21 +190,23 @@ namespace Conquera
             }
             if(gameTime.TotalTime > mDamageTime)
             {
-                var activeSpell = mGameUnit.GameScene.ActiveSpellSlot;
-
-                int damage = mGameUnit.ComputeDamageTo(TargetUnit, null != activeSpell ? activeSpell.Spell : null);
+                //main target
+                int damage = mGameUnit.ComputeDamageTo(TargetUnit);
                 TargetUnit.ReceiveDamage(damage);
 
-                if (null != activeSpell)
+                //additional targets
+                var targets = mGameUnit.GetAdditionalAttackTargets(TargetUnit);
+                foreach (var t in targets)
                 {
-                    var spellState = (CastingSpellAfterHitGameUnitState)mGameUnit.States["CastingSpellAfterHit"];
-                    spellState.TargetUnit = TargetUnit;
-                    mGameUnit.State = spellState;
+                    var targetUnit = GameScene.GetCell(t.Position).GameUnit;
+                    if (null != targetUnit && targetUnit.OwningPlayer != mGameUnit.OwningPlayer)
+                    {
+                        float damage2 = (float)damage * t.AttackMultiplier;
+                        targetUnit.ReceiveDamage((int)Math.Ceiling(damage2));
+                    }
                 }
-                else
-                {
-                    mGameUnit.State = mGameUnit.States["Idle"];
-                }
+
+                mGameUnit.State = mGameUnit.States["Idle"];
             }
         }
     }

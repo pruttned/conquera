@@ -82,10 +82,12 @@ namespace Conquera
                     }
 
                     mOwningPlayer = value;
-
-                    if (null != mHexTerrainTile)
+                    if (null != mOwningPlayer)
                     {
-                        mHexTerrainTile.OnCaptured(this);
+                        if (null != mHexTerrainTile)
+                        {
+                            mHexTerrainTile.OnCaptured(this);
+                        }
                     }
                 }
             }
@@ -239,7 +241,7 @@ namespace Conquera
         public HexCell GetSibling(HexDirection direction)
         {
             Point siblingPos;
-            if (mScene.Terrain.GetSiblingPos(Index, true, direction, out siblingPos))
+            if (mScene.Terrain.GetSibling(Index, true, direction, out siblingPos))
             {
                 return mScene.GetCell(siblingPos);
             }
