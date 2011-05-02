@@ -113,6 +113,7 @@ class Exporter(bpy.types.Operator):
                     WriteTransformation(xmlDoc, objElm, obj.matrix_world)
                     
                     meshElement = xmlDoc.createElement("mesh")
+                    meshElement.setAttribute("name", obj.name)
                     objElm.appendChild(meshElement)
 
                     bMesh = obj.to_mesh(scene, True, "PREVIEW")

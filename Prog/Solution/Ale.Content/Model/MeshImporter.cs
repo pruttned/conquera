@@ -47,45 +47,52 @@ namespace Ale.Content
         #endregion Properties
 
         #region Methods
-        
-        /// <summary>
-        /// Imports the mesh
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <param name="context"></param>
-        /// <returns>AleMeshContent</returns>
-        public override AleMeshContent Import(string filename, ContentImporterContext context)
+
+        public virtual AleMeshContent ImportFromXmlNode(XmlNode node)
         {
-            XmlDocument modelDocument = new XmlDocument();
-            modelDocument.Load(filename);
+            return ImportFromXmlNode(node, false);
+        }
 
-
-            MeshBuilder meshBuilder = MeshBuilder.StartMesh(modelDocument.SelectSingleNode(@"/model/mesh/@name").Value);
+        public virtual AleMeshContent ImportFromXmlNode(XmlNode node, bool onlyMesh)
+        {
+            MeshBuilder meshBuilder = MeshBuilder.StartMesh(node.SelectSingleNode(@"./mesh/@name").Value);
             int normalDataIndex = meshBuilder.CreateVertexChannel<Vector3>(VertexChannelNames.Normal());
             int uvDataIndex = meshBuilder.CreateVertexChannel<Vector2>(VertexChannelNames.TextureCoordinate(0));
 
-
-            //skeleton
-            SkeletalAnimationContentCollection skeletalAnimations = null;
-            BoneContent[] flatSkeleton;
-            BoneContent skeleton = LoadSkeleton(modelDocument, out flatSkeleton);
+            BoneContent[] flatSkeleton = null;
             int skinningDataIndex = -1;
-            if (null != skeleton)
+            List<ConnectionPointContent> connectionPoints = new List<ConnectionPointContent>();
+            SkeletalAnimationContentCollection skeletalAnimations = null;
+            BoneContent skeleton = null;
+
+            if (!onlyMesh)
             {
-                //skeletal animations
-                skeletalAnimations = new SkeletalAnimationContentCollection();
-                foreach (XmlNode animNode in modelDocument.SelectNodes(@"/model/anims/anim"))
+                //skeleton
+                skeleton = LoadSkeleton(node, out flatSkeleton);
+                if (null != skeleton)
                 {
-                    SkeletalAnimationContent anim = new SkeletalAnimationContent(animNode);
-                    skeletalAnimations.Add(anim.Name, anim);
+                    //skeletal animations
+                    skeletalAnimations = new SkeletalAnimationContentCollection();
+                    foreach (XmlNode animNode in node.SelectNodes(@"./anims/anim"))
+                    {
+                        SkeletalAnimationContent anim = new SkeletalAnimationContent(animNode);
+                        skeletalAnimations.Add(anim.Name, anim);
+                    }
+
+                    skinningDataIndex = meshBuilder.CreateVertexChannel<BoneWeightCollection>(VertexChannelNames.Weights());
                 }
 
-                skinningDataIndex = meshBuilder.CreateVertexChannel<BoneWeightCollection>(VertexChannelNames.Weights());
+
+                //connection points
+                foreach (XmlNode connectionPointNode in node.SelectNodes(@"./connectionPoints/connectionPoint"))
+                {
+                    connectionPoints.Add(LoadConnectionPoint(connectionPointNode));
+                }
             }
 
             //Verticies
             List<MeshVertex> verticies = new List<MeshVertex>();
-            foreach (XmlNode vertex in modelDocument.SelectNodes(@"/model/mesh/vertices/vertex"))
+            foreach (XmlNode vertex in node.SelectNodes(@"./mesh/vertices/vertex"))
             {
                 verticies.Add(new MeshVertex(vertex, flatSkeleton));
             }
@@ -93,13 +100,13 @@ namespace Ale.Content
 
             //register positions and create position map
             int[] positionMap = new int[verticies.Count];
-            for(int i = 0; i<verticies.Count; ++i)
+            for (int i = 0; i < verticies.Count; ++i)
             {
                 positionMap[i] = meshBuilder.CreatePosition(verticies[i].Position);
             }
 
             //submeshes
-            foreach (XmlNode submesh in modelDocument.SelectNodes(@"/model/mesh/submesh"))
+            foreach (XmlNode submesh in node.SelectNodes(@"./mesh/submesh"))
             {
                 BasicMaterialContent materialContent = new BasicMaterialContent();
                 materialContent.Name = submesh.Attributes["material"].Value;
@@ -113,14 +120,22 @@ namespace Ale.Content
                 }
             }
 
-            //connection points
-            List<ConnectionPointContent> connectionPoints = new List<ConnectionPointContent>();
-            foreach(XmlNode connectionPointNode in modelDocument.SelectNodes(@"/model/connectionPoints/connectionPoint"))
-            {
-                connectionPoints.Add(LoadConnectionPoint(connectionPointNode));
-            }
-
             return (new AleMeshContent(meshBuilder.FinishMesh(), skeleton, skeletalAnimations, connectionPoints));
+        }
+
+        /// <summary>
+        /// Imports the mesh
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="context"></param>
+        /// <returns>AleMeshContent</returns>
+        public override AleMeshContent Import(string filename, ContentImporterContext context)
+        {
+            XmlDocument modelDocument = new XmlDocument();
+            modelDocument.Load(filename);
+
+
+            return ImportFromXmlNode(modelDocument.SelectSingleNode("model"));
         }
 
         /// <summary>
@@ -144,9 +159,9 @@ namespace Ale.Content
             meshBuilder.AddTriangleVertex(vertexIndex);
         }
 
-        protected BoneContent LoadSkeleton(XmlDocument modelDocument, out BoneContent[] flatSkeleton)
+        protected BoneContent LoadSkeleton(XmlNode modelNode, out BoneContent[] flatSkeleton)
         {
-            XmlNode skeletonNode = modelDocument.SelectSingleNode(@"/model/bones");
+            XmlNode skeletonNode = modelNode.SelectSingleNode(@"./bones");
             if(null == skeletonNode)
             {
                 flatSkeleton = null;
@@ -175,63 +190,11 @@ namespace Ale.Content
                 }
 
                 //transformation
-                bone.Transform = LoadTransformation(boneNode);
+                bone.Transform = XmlCommonParser.LoadTransformation(boneNode);
             }
 
             flatSkeleton = bones;
             return bones[rootBoneIndex];
-        }
-
-        /// <summary>
-        /// No scale
-        /// </summary>
-        /// <param name="boneNode"></param>
-        /// <returns></returns>
-        protected Matrix LoadTransformation(XmlNode boneNode)
-        {
-            Matrix transf;
-            XmlNode orientationNode = boneNode.SelectSingleNode(@"./orientation");
-            if (null != orientationNode)
-            {
-                transf = Matrix.CreateFromQuaternion(XmlCommonParser.ParseQuaternion(orientationNode));
-            }
-            else
-            {
-                transf = Matrix.Identity;
-            }
-            XmlNode translationNode = boneNode.SelectSingleNode(@"./translation");
-            if (null != translationNode)
-            {
-                transf.Translation = XmlCommonParser.ParseVector3(translationNode);
-            }
-            return transf;
-        }
-
-        /// <summary>
-        /// No scale
-        /// </summary>
-        /// <param name="boneNode"></param>
-        /// <returns></returns>
-        protected void LoadTransformation(XmlNode boneNode, out Vector3 position, out Quaternion orientation)
-        {
-            XmlNode orientationNode = boneNode.SelectSingleNode(@"./orientation");
-            if (null != orientationNode)
-            {
-                orientation = XmlCommonParser.ParseQuaternion(orientationNode);
-            }
-            else
-            {
-                orientation = Quaternion.Identity;
-            }
-            XmlNode translationNode = boneNode.SelectSingleNode(@"./translation");
-            if (null != translationNode)
-            {
-                position = XmlCommonParser.ParseVector3(translationNode);
-            }
-            else
-            {
-                position = Vector3.Zero;
-            }
         }
 
         protected ConnectionPointContent LoadConnectionPoint(XmlNode connectionPointElement)
@@ -249,7 +212,7 @@ namespace Ale.Content
 
             Quaternion orientation;
             Vector3 position;
-            LoadTransformation(connectionPointElement, out position, out orientation);
+            XmlCommonParser.LoadTransformation(connectionPointElement, out position, out orientation);
             connectionPointContent.Position = position;
             connectionPointContent.Orientation = orientation;
 

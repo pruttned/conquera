@@ -66,5 +66,72 @@ namespace Ale.Content.Tools
                 float.Parse(quaternionXmlNode.Attributes["w"].Value, CultureInfo.InvariantCulture));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="position"></param>
+        /// <param name="orientation"></param>
+        /// <param name="scale"></param>
+        public static void LoadTransformation(XmlNode node, out Vector3 position, out Quaternion orientation, out float scale)
+        {
+            XmlNode orientationNode = node.SelectSingleNode(@"./orientation");
+            if (null != orientationNode)
+            {
+                orientation = ParseQuaternion(orientationNode);
+            }
+            else
+            {
+                orientation = Quaternion.Identity;
+            }
+            XmlNode translationNode = node.SelectSingleNode(@"./translation");
+            if (null != translationNode)
+            {
+                position = ParseVector3(translationNode);
+            }
+            else
+            {
+                position = Vector3.Zero;
+            }
+            XmlNode scaleNode = node.SelectSingleNode(@"./scale");
+            if (null != scaleNode)
+            {
+                scale = float.Parse(scaleNode.Attributes["v"].Value, CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                scale = 1;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="position"></param>
+        /// <param name="orientation"></param>
+        public static void LoadTransformation(XmlNode node, out Vector3 position, out Quaternion orientation)
+        {
+            float scale;
+            LoadTransformation(node, out position, out orientation, out scale);
+        }
+
+        /// <summary>
+        /// No scale
+        /// </summary>
+        /// <param name="boneNode"></param>
+        /// <returns></returns>
+        public static Matrix LoadTransformation(XmlNode node)
+        {
+            Vector3 position;
+            Quaternion orientation;
+            float scale;
+
+            LoadTransformation(node, out position, out orientation, out scale);
+
+            Matrix m = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(orientation);
+            m.Translation = position;
+            return m;
+        }
     }
 }

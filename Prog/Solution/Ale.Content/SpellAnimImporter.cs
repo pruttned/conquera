@@ -34,7 +34,14 @@ using System.Collections.ObjectModel;
 namespace Ale.Content
 {
     public class SpellAnimContent
-    { }
+    {
+        public List<SpellAnimObjectContent> Objects { get; private set; }
+
+        public SpellAnimContent()
+        {
+            Objects = new List<SpellAnimObjectContent>();
+        }
+    }
 
     public class CompiledSpellAnim
     {
@@ -44,6 +51,7 @@ namespace Ale.Content
     {
         public override CompiledSpellAnim Process(SpellAnimContent input, ContentProcessorContext context)
         {
+
             return new CompiledSpellAnim();
         }
     }
@@ -54,13 +62,126 @@ namespace Ale.Content
     [ContentImporter(".sanim", DisplayName = "Spell animation", CacheImportedData = true, DefaultProcessor = "SpellAnimProcessor")]
     public class SpellAnimImporter : ContentImporter<SpellAnimContent>
     {
+        Dictionary<string, SpellAnimObjectImporter> mSpellAnimObjectImporters = new Dictionary<string, SpellAnimObjectImporter>();
+        
+        public SpellAnimImporter()
+        {
+            RegisterSpellAnimObjectImporters();
+        }
+
         public override SpellAnimContent Import(string filename, ContentImporterContext context)
         {
-            XmlDocument modelDocument = new XmlDocument();
-            modelDocument.Load(filename);
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(filename);
 
-            return new SpellAnimContent();
+            var content = new SpellAnimContent();
+
+            foreach (XmlNode objectNode in xmlDoc.SelectNodes("/spellAnim/objects/*"))
+            {
+                content.Objects.Add(mSpellAnimObjectImporters[objectNode.Name].Import(objectNode));
+            }
+
+            return content;
         }
+
+        protected void RegisterSpellAnimObjectImporter(SpellAnimObjectImporter importer)
+        {
+            mSpellAnimObjectImporters.Add(importer.ElementName, importer);
+        }
+        protected virtual void RegisterSpellAnimObjectImporters()
+        {
+            RegisterSpellAnimObjectImporter(new MeshSpellAnimObjectImporter());
+            RegisterSpellAnimObjectImporter(new ParticleSystemSpellAnimObjectImporter());
+            RegisterSpellAnimObjectImporter(new ConnectionPointSpellAnimObjectImporter());
+        }
+
+    }
+
+
+    public class MeshSpellAnimObjectImporter : SpellAnimObjectImporter
+    {
+        public override string ElementName
+        {
+            get { return "meshObject"; }
+        }
+
+        protected override SpellAnimObjectContent CreateContent()
+        {
+            return new MeshAnimObjectContent();
+        }
+
+        public override SpellAnimObjectContent Import(XmlNode objectNode)
+        {
+            MeshAnimObjectContent content = (MeshAnimObjectContent)base.Import(objectNode);
+
+            MeshImporter meshImporter = new MeshImporter();
+            content.MeshContent = meshImporter.ImportFromXmlNode(objectNode, true);
+
+            return content;
+        }
+    }
+    public class ParticleSystemSpellAnimObjectImporter : SpellAnimObjectImporter
+    {
+        public override string ElementName
+        {
+            get { return "particleSystem"; }
+        }
+
+        protected override SpellAnimObjectContent CreateContent()
+        {
+            return new SpellAnimObjectContent();
+        }
+    }
+    public class ConnectionPointSpellAnimObjectImporter : SpellAnimObjectImporter
+    {
+        public override string ElementName
+        {
+            get { return "connectionPoint"; }
+        }
+
+        protected override SpellAnimObjectContent CreateContent()
+        {
+            return new SpellAnimObjectContent();
+        }
+    }
+
+    public abstract class SpellAnimObjectImporter
+    {
+        public abstract string ElementName { get; }
+
+        public virtual SpellAnimObjectContent Import(XmlNode objectNode)
+        {
+            var content = CreateContent();
+            content.Name = objectNode.Attributes["name"].Value;
+
+            Vector3 position;
+            Quaternion orientation;
+            float scale;
+            XmlCommonParser.LoadTransformation(objectNode, out position, out orientation, out scale);
+            content.Position = position;
+            content.Orientation = orientation;
+            content.Scale = scale;
+
+
+            return content;
+        }
+
+        protected abstract SpellAnimObjectContent CreateContent();
+    }
+
+
+
+    public class SpellAnimObjectContent
+    {
+        public string Name { get; set; }
+        public Vector3 Position { get; set; }
+        public Quaternion Orientation { get; set; }
+        public float Scale { get; set; }
+    }
+
+    public class MeshAnimObjectContent : SpellAnimObjectContent
+    {
+        public AleMeshContent MeshContent { get; set; }
     }
 
 
@@ -69,9 +190,11 @@ namespace Ale.Content
 
 
 
-
-
-
-
-
 }
+
+
+
+
+
+
+
