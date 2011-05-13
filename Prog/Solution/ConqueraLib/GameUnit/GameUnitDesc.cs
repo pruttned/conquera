@@ -43,10 +43,6 @@ namespace Conquera
         {
             get { return mSettings.IdleAnimation; }
         }
-        public string MoveAnimation
-        {
-            get { return mSettings.MoveAnimation; }
-        }
         public string AttackAnimation
         {
             get { return mSettings.AttackAnimation; }

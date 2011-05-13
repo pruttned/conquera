@@ -134,6 +134,7 @@ namespace Ale.Content
                 {
                     output.Write(skeletalAnimation.Name.Name);
                     output.Write(skeletalAnimation.Duration);
+                    output.Write(skeletalAnimation.DefaultSpeed);
                     output.Write(skeletalAnimation.Channels.Count);
                     foreach (SkeletalAnimationChannel channel in skeletalAnimation.Channels)
                     {

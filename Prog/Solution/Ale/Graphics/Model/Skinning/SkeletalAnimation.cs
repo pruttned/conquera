@@ -42,6 +42,8 @@ namespace Ale.Graphics
         /// </summary>
         public float Duration { get; private set; }
 
+        public float DefaultSpeed { get; private set; }
+
         /// <summary>
         /// Gets the animation channels
         /// </summary>
@@ -56,11 +58,13 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="name"></param>
         /// <param name="duration"></param>
+        /// <param name="defaultSpeed"></param>
         /// <param name="channels">channel list that will be wrapped by this class</param>
-        public SkeletalAnimation(NameId name, float duration, List<SkeletalAnimationChannel> channels)
+        public SkeletalAnimation(NameId name, float duration, float defaultSpeed, List<SkeletalAnimationChannel> channels)
         {
             Name = name;
             Duration = duration;
+            DefaultSpeed = defaultSpeed;
             Channels = new SkeletalAnimationChannelCollection(channels);
         }
 
@@ -72,6 +76,7 @@ namespace Ale.Graphics
         {
             Name = input.ReadString();
             Duration = input.ReadSingle();
+            DefaultSpeed = input.ReadSingle();
             Channels = new SkeletalAnimationChannelCollection(input);
         }
 

@@ -29,6 +29,7 @@ namespace Ale.Content
     {
         private string mName;
         private float mDuration;
+        private float mDefaultSpeed;
         private List<SkeletalAnimationChannelContent> mChannels;
 
         public string Name
@@ -39,6 +40,10 @@ namespace Ale.Content
         {
             get { return mDuration; }
         }
+        public float DefaultSpeed
+        {
+            get { return mDefaultSpeed; }
+        }
 
         public List<SkeletalAnimationChannelContent>  Channels
         {
@@ -48,6 +53,15 @@ namespace Ale.Content
         public SkeletalAnimationContent(XmlNode animNode)
         {
             mDuration = float.Parse(animNode.Attributes["duration"].Value, CultureInfo.InvariantCulture);
+            var defaultSpeedAtt = animNode.Attributes["defaultSpeed"];
+            if (null != defaultSpeedAtt)
+            {
+                mDefaultSpeed = float.Parse(defaultSpeedAtt.Value, CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                mDefaultSpeed = 1.0f;
+            }
             mName = animNode.Attributes["name"].Value;
             mChannels = new List<SkeletalAnimationChannelContent>();
             foreach (XmlNode channelNode in animNode.SelectNodes("./channel"))

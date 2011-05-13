@@ -125,7 +125,7 @@ namespace Ale.Content
                     skeletalAnimationChannels.Add(new SkeletalAnimationChannel(boneId, keyFrames));
                 }
 
-                animations.Add(new SkeletalAnimation(animationContent.Name, animationContent.Duration, skeletalAnimationChannels));
+                animations.Add(new SkeletalAnimation(animationContent.Name, animationContent.Duration, animationContent.DefaultSpeed,  skeletalAnimationChannels));
             }
 
             return animations;

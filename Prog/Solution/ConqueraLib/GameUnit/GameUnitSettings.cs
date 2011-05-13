@@ -33,8 +33,6 @@ namespace Conquera
         [DataProperty(NotNull = true)]
         public string IdleAnimation { get; set; }
         [DataProperty(NotNull = true)]
-        public string MoveAnimation { get; set; }
-        [DataProperty(NotNull = true)]
         public string AttackAnimation { get; set; }
 
         [DataProperty(NotNull = true)]

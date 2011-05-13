@@ -445,30 +445,6 @@ namespace Conquera
                     //}
 
                     //{
-                    //    GameUnitSettings obj = new GameUnitSettings();
-                    //    obj.DisplayName = "Dwarf";
-                    //    obj.Name = "GameUnit1";
-                    //    obj.GraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'ujoGm'");
-                    //    obj.AttackAnimation = "Attack";
-                    //    obj.IdleAnimation = "Run";
-                    //    obj.MoveAnimation = "Run";
-                    //    obj.MovementDistance = 3;
-                    //    obj.MaxHp = 6;
-                    //    obj.Cost = 1;
-                    //    obj.MinAttack = 0;
-                    //    obj.MaxAttack = 4;
-                    //    obj.BloodParticleSystem = ormManager.FindObject(typeof(ParticleSystemSettings), "Name = 'BloodParticleSystem'"); ;
-                    //    obj.DamageAnimationTime = 1.0f;
-                    //    obj.AdditionalAttackTargets = new List<AdditionalAttackTargetSettings>()
-                    //        {
-                    //            new AdditionalAttackTargetSettings(1, HexDirection.UperRight, HexDirection.UperRight),
-                    //            new AdditionalAttackTargetSettings(0.5f, HexDirection.UperRight, HexDirection.UperLeft),
-                    //            new AdditionalAttackTargetSettings(0.5f, HexDirection.UperRight, HexDirection.Right),
-                    //        };
-                    //    ormManager.SaveObject(obj);
-                    //}
-
-                    //{
                     //    MaterialSettings mat = new MaterialSettings("Cursor3dMat", "Cursor3dFx", DefaultRenderLayers.Cursor3D);
                     //    mat.Params.Add(new Vector3MaterialParamSettings("gColor", Vector3.One));
                     //    ormManager.SaveObject(mat);
@@ -841,6 +817,67 @@ namespace Conquera
                     //    obj.Icon = "TileIconSpellTower";
                     //    obj.ActiveGraphicModel = obj.InactiveGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name='MineLvl1Gm'");
                     //    ormManager.SaveObject(obj);
+                    //}
+
+                    //{
+                    //    MaterialSettings mat = new MaterialSettings("TempDwarfMat", "GameUnitFx", DefaultRenderLayers.GroundStandingObjects);
+                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "TempDwarfDif"));
+                    //    ormManager.SaveObject(mat);
+                    //}
+
+                    //{
+                    //    GraphicModelSettings settings = new GraphicModelSettings();
+                    //    settings.Mesh = "TempDwarf";
+                    //    settings.Name = "TempDwarfGm";
+                    //    settings.BoundsMultiplicator = 1.1f;
+                    //    settings.MaterialAssignments.Add(new MaterialAssignmentsettings("m1", ormManager.FindObjects(typeof(MaterialSettings), "Name='TempDwarfMat'")[0]));
+                    //    ormManager.SaveObject(settings);
+                    //}
+
+                    //{
+                    //    //GameUnitSettings obj = new GameUnitSettings();
+                    //    //obj.DisplayName = "Dwarf";
+                    //    //obj.Name = "GameUnit1";
+                    //    //obj.GraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'ujoGm'");
+                    //    //obj.AttackAnimation = "Attack";
+                    //    //obj.IdleAnimation = "Run";
+                    //    //obj.MoveAnimation = "Run";
+                    //    //obj.MovementDistance = 3;
+                    //    //obj.MaxHp = 6;
+                    //    //obj.Cost = 1;
+                    //    //obj.MinAttack = 0;
+                    //    //obj.MaxAttack = 4;
+                    //    //obj.BloodParticleSystem = ormManager.FindObject(typeof(ParticleSystemSettings), "Name = 'BloodParticleSystem'"); ;
+                    //    //obj.DamageAnimationTime = 1.0f;
+                    //    //obj.AdditionalAttackTargets = new List<AdditionalAttackTargetSettings>()
+                    //    //    {
+                    //    //        new AdditionalAttackTargetSettings(1, HexDirection.UperRight, HexDirection.UperRight),
+                    //    //        new AdditionalAttackTargetSettings(0.5f, HexDirection.UperRight, HexDirection.UperLeft),
+                    //    //        new AdditionalAttackTargetSettings(0.5f, HexDirection.UperRight, HexDirection.Right),
+                    //    //    };
+                    //    //ormManager.SaveObject(obj);
+
+                    //    GameUnitSettings obj = new GameUnitSettings();
+                    //    //GameUnitSettings obj = ormManager.LoadObject<GameUnitSettings>("Name = 'GameUnit1'");
+                    //    obj.DisplayName = "Dwarf";
+                    //    obj.Name = "GameUnit1";
+                    //    obj.GraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'TempDwarfGm'");
+                    //    obj.AttackAnimation = "Attack";
+                    //    obj.IdleAnimation = "Idle";
+                    //    obj.MovementDistance = 3;
+                    //    obj.MaxHp = 6;
+                    //    obj.Cost = 1;
+                    //    obj.MinAttack = 0;
+                    //    obj.MaxAttack = 4;
+                    //    obj.BloodParticleSystem = ormManager.FindObject(typeof(ParticleSystemSettings), "Name = 'BloodParticleSystem'"); ;
+                    //    obj.DamageAnimationTime = 1.0f;
+                    //    obj.AdditionalAttackTargets = new List<AdditionalAttackTargetSettings>()
+                    //        {
+                    //            new AdditionalAttackTargetSettings(1, HexDirection.UperRight, HexDirection.UperRight),
+                    //            new AdditionalAttackTargetSettings(0.5f, HexDirection.UperRight, HexDirection.UperLeft),
+                    //            new AdditionalAttackTargetSettings(0.5f, HexDirection.UperRight, HexDirection.Right),
+                    //        };
+                    //    ormManager.SaveObject(obj);                    
                     //}
 
 

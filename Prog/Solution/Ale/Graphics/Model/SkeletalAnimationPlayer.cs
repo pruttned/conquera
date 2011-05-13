@@ -101,6 +101,7 @@ namespace Ale.Graphics
                 }
 
                 mAnimation = skeletalAnimations[skeletalAnimationIndex];
+                mAnimSpeed = mAnimation.DefaultSpeed;
                 Rewind();
             }
         }
