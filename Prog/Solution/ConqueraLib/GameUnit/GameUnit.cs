@@ -340,7 +340,7 @@ namespace Conquera
             Vector3 movementVect = targetPos - Position;
             movementVect.Normalize();
 
-            float angle = (float)Math.Atan2(movementVect.Y, movementVect.X) - 1.570f;
+            float angle = (float)Math.Atan2(movementVect.Y, movementVect.X) + 1.570f;
             Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, angle);
         }
 

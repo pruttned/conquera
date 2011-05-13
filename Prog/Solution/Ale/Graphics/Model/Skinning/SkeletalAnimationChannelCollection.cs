@@ -56,25 +56,46 @@ namespace Ale.Graphics
         /// <returns></returns>
         public SkeletalAnimationChannel FindBoneChannel(int boneId)
         {
-            int start = 0;
-            int end = this.Count;
-            while (start <= end)
+            int cnt = Count;
+            if (0 == cnt)
             {
-                int middle = start + ((end - start) >> 1);
+                return null;
+            }
 
-                int cmpResult = this[middle].Bone.CompareTo(boneId);
+            if (10 > cnt)
+            {
+                for (int i = 0; i < cnt; ++i)
+                {
+                    var channel = this[i];
+                    if (boneId == channel.Bone)
+                    {
+                        return channel;
+                    }
+                }
+            }
+            else
+            {
+                //binary search
+                int start = 0;
+                int end = this.Count;
+                while (start <= end)
+                {
+                    int middle = start + ((end - start) >> 1);
 
-                if (0 == cmpResult)
-                {
-                    return this[middle];
-                }
-                if (0 > cmpResult)
-                {
-                    start = middle + 1;
-                }
-                else
-                {
-                    end = middle - 1;
+                    int cmpResult = this[middle].Bone.CompareTo(boneId);
+
+                    if (0 == cmpResult)
+                    {
+                        return this[middle];
+                    }
+                    if (0 > cmpResult)
+                    {
+                        start = middle + 1;
+                    }
+                    else
+                    {
+                        end = middle - 1;
+                    }
                 }
             }
             return null;

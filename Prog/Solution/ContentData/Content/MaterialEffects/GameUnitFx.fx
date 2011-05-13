@@ -53,13 +53,13 @@ struct VsOutput
     float4 Position : POSITION;
     float2 Uv : TEXCOORD0;
     float3 Normal : TEXCOORD1;
+    float2 Depth : TEXCOORD2;
 };	
 	
 VsOutput mainVS(VsInput input)
 {
     VsOutput output;
     
-    // Blend between the weighted bone matrices.
     float4x4 skinTransform = 0;
     
     skinTransform += Skin[input.BoneIndices.x] * input.BoneWeights.x;
@@ -67,41 +67,36 @@ VsOutput mainVS(VsInput input)
     skinTransform += Skin[input.BoneIndices.z] * input.BoneWeights.z;
     skinTransform += Skin[input.BoneIndices.w] * input.BoneWeights.w;
     
-    // Skin the vertex position.
     float4 position = mul(input.Position, skinTransform);
     output.Position = mul(position, gViewProjection);
 
-    // Skin the vertex normal, then compute lighting.
     output.Normal = normalize(mul(input.Normal, skinTransform));
+	output.Depth = float2(output.Position.z, output.Position.w);
     
     output.Uv = input.Uv;
     
     return output;
 }
 
-float4 mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01) : COLOR 
+struct PsOut
 {
-	float4 color  = float4(gPlayerColor, 1); //tex2D(gDiffuseMapSampler, uv);
-	color.rgb =  saturate(color.rgb * (dot(gSunLightDirection, normal)+0.5) );
-	return color;   
-}
+    half4 Color : COLOR0;
+    half4 Normal : COLOR1;
+    half4 Depth : COLOR2;
+};
 
-
-
-void ShadowCasterVs(VsInput input,   out float4 outPos : POSITION0, out float outDepth : TEXCOORD0)
+PsOut mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01, float2 depth : TEXCOORD02) : COLOR 
 {
-    // Blend between the weighted bone matrices.
-    float4x4 skinTransform = 0;
-    
-    skinTransform += Skin[input.BoneIndices.x] * input.BoneWeights.x;
-    skinTransform += Skin[input.BoneIndices.y] * input.BoneWeights.y;
-    skinTransform += Skin[input.BoneIndices.z] * input.BoneWeights.z;
-    skinTransform += Skin[input.BoneIndices.w] * input.BoneWeights.w;
-    
-    // Skin the vertex position.
-    float4 position = mul(input.Position, skinTransform);
-    outPos = mul(position, gViewProjection);
-    outDepth = outPos.y/outPos.w;
+	PsOut output;
+
+	output.Color  = tex2D(gDiffuseMapSampler, uv);
+	
+	output.Color = lerp (output.Color * float4(gPlayerColor, 1), output.Color, output.Color.a);
+	
+    output.Normal = float4(0.5f * (normalize(normal) + 1.0f), 1-output.Color.a); //a = diff color power
+    output.Depth = depth.x / depth.y;
+	
+	return output;
 }
 
 float4 ShadowCasterPs(float depth : TEXCOORD0) : COLOR 
@@ -114,7 +109,8 @@ technique Default
 	pass p0 
 	<
 		bool IsTransparent=false;
-		//string MainTexture = "gDiffuseMap";  
+		string MainTexture = "gDiffuseMap";  
+		bool ReceivesLight = true;
 	>
 	{
 		AlphaBlendEnable = false;
@@ -144,7 +140,7 @@ technique ShadowPass
 		CullMode = CCW;
 		ZFUNC = lessequal;
 		
-		VertexShader = compile vs_2_0 ShadowCasterVs();
+		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 ShadowCasterPs();
 	}
 }

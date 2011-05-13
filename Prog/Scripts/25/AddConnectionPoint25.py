@@ -1,4 +1,4 @@
-##################################################################
+# #################################################################
 #  Copyright (C) 2010 by Conquera Team
 #  Part of the Conquera Project
 #
@@ -13,11 +13,11 @@
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-##################################################################
+# #################################################################
 
-bl_addon_info = {
+bl_info = {
     "name": "Connection Point",
-    "blender": (2, 5, 5),
+    "blender": (2, 5, 7),
     "location": "View3D > Add > Mesh ",
     "description": "Adds a connection point",
     "category": "Add Mesh"}
@@ -133,11 +133,14 @@ def menu_func(self, context):
 
 
 def register():
+    bpy.utils.register_module(__name__)
     bpy.types.INFO_MT_mesh_add.append(menu_func)
 
 
 def unregister():
+    bpy.utils.unregister_module(__name__)
     bpy.types.INFO_MT_mesh_add.remove(menu_func)
+	
 
 if __name__ == "__main__":
     register()
