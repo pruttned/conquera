@@ -18,9 +18,10 @@
 
 float4x4 gWorldViewProj : WorldViewProjection;
 float4x4 gWorld : World;
-float3 gColor = float3(0.2,0.2,1);
+float3 gColor = float3(0.6,0.0,0.6);
 //float3 gSunLightDirection  = float3(-0.2310634, 0.06931902, 0.9704662);  //treba spravit SunLightDirection auto param  - to budu vlastne s polu s kamerami per scene auto params
 float3 gSunLightDirection  = float3(-0.2857143, -0.4285714, 0.8571429);  //treba spravit SunLightDirection auto param  - to budu vlastne s polu s kamerami per scene auto params
+float gTime : Time;
 
 texture2D gDiffuseMap;
 sampler2D gDiffuseMapSampler = sampler_state 
@@ -46,6 +47,7 @@ struct VsOutput
     float2 Uv : TEXCOORD0;
     float3 Normal : TEXCOORD1;
     float2 Depth : TEXCOORD2;
+    float4 posWorld : TEXCOORD3;
 };	
 	
 VsOutput mainVS(VsInput input)
@@ -53,6 +55,7 @@ VsOutput mainVS(VsInput input)
     VsOutput output;
     
     output.Position = mul(input.Position, gWorldViewProj);
+	output.posWorld = mul(input.Position, gWorld);
     output.Normal = normalize(mul(input.Normal, gWorld));
 	output.Depth = float2(output.Position.z, output.Position.w);
     output.Uv = input.Uv;
@@ -67,12 +70,13 @@ struct PsOut
     half4 Depth : COLOR2;
 };
 
-PsOut mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01, float2 depth : TEXCOORD02) : COLOR 
+PsOut mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01, float2 depth : TEXCOORD02, float4 posWorld : TEXCOORD03) : COLOR 
 {
 	PsOut output;
 
-	output.Color  = tex2D(gDiffuseMapSampler, uv) * float4(gColor, 1);
-    output.Normal = float4(0.5f * (normalize(normal) + 1.0f), 1); //a = diff color power
+	float a = 0.3*sin(gTime*2+posWorld.x+posWorld.y*2)-0.1;
+	output.Color  = (tex2D(gDiffuseMapSampler, uv) + float4(gColor, 0))+ float4(a,a,a,0);
+    output.Normal = float4(0.5f * (normalize(normal) + 1.0f), 0.8); //a = diff color power
     output.Depth = depth.x / depth.y;
 	
 	return output;
