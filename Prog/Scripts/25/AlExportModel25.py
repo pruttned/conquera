@@ -48,6 +48,56 @@ def WriteTransformation(xmlDoc, parentElement, translation, orientation):
         orientationElement.setAttribute("z", "%.6f" % orientation.z)
         orientationElement.setAttribute("w", "%.6f" % orientation.w)
 
+def WriteSubmesh(xmlDoc, meshElement, verticies, mesh, materialIndex):
+    submeshElement = xmlDoc.createElement("submesh")
+    meshElement.appendChild(submeshElement)
+    
+    submeshElement.setAttribute("material", mesh.materials[materialIndex].name)
+        
+    #write faces that belongs to the this submesh (by material)
+    for bFace in mesh.faces:
+        if bFace.material_index == materialIndex:
+            WriteFaceToXml(xmlDoc, submeshElement, verticies, bFace)
+
+def WriteTriangleFaceToXml(xmlDoc, submeshElement, v0Index, v1Index, v2Index):
+    faceElement = xmlDoc.createElement("face")
+    submeshElement.appendChild(faceElement)
+    faceElement.setAttribute("v0", str(v0Index))
+    faceElement.setAttribute("v1", str(v1Index))
+    faceElement.setAttribute("v2", str(v2Index))
+
+def WriteFaceToXml(xmlDoc, submeshElement, verticies, bFace):
+    if 4 < len(bFace.vertices):
+        raise Exception("Only faces with three or four vertices are supported")
+    
+    bVertices = verticies.mBMesh.vertices
+    
+    vIndexes = []
+    for i in range(0, len(bFace.vertices)):
+        vIndexes.append(verticies.GetVertexIndex(bFace, i))
+        
+    if 3 == len(bFace.vertices): #triangle
+        WriteTriangleFaceToXml(xmlDoc, submeshElement, vIndexes[2], vIndexes[1], vIndexes[0])
+    else: # quad => split it to triangles
+        if (bVertices[bFace.vertices[2]].co - bVertices[bFace.vertices[0]].co).length < (bVertices[bFace.vertices[3]].co - bVertices[bFace.vertices[1]].co).length: #0-2
+            WriteTriangleFaceToXml(xmlDoc, submeshElement, vIndexes[2], vIndexes[1], vIndexes[0])
+            WriteTriangleFaceToXml(xmlDoc, submeshElement, vIndexes[3], vIndexes[2], vIndexes[0])
+        else: #1-3
+            WriteTriangleFaceToXml(xmlDoc, submeshElement, vIndexes[3], vIndexes[1], vIndexes[0])
+            WriteTriangleFaceToXml(xmlDoc, submeshElement, vIndexes[3], vIndexes[2], vIndexes[1])
+            
+            
+def GetObjChildrens(obj):
+    return filter(lambda o : o.parent == obj, bpy.context.scene.objects)
+             
+def IsConnectionPointObject(obj):
+    return "cp_" == obj.name[0:3]
+    
+def GetChildConnectionPoints(obj):
+    return filter(lambda o : IsConnectionPointObject(o), GetObjChildrens(obj))
+
+
+
 
 class AlmExporter(bpy.types.Operator):
     '''Save Ale model'''
@@ -99,15 +149,13 @@ class AlmExporter(bpy.types.Operator):
         bMesh = activeObject.to_mesh(scene, True, "PREVIEW")
         
         
-        
-        
         ##########
         #Connection points
         ##########
         connectionPointsElement = xmlDoc.createElement("connectionPoints")			
         arm = activeObject.find_armature()
         if arm is not None:
-            for obj in self.GetChildConnectionPoints(arm): #connection point attached to the armature
+            for obj in GetChildConnectionPoints(arm): #connection point attached to the armature
                 parentBoneName = obj.parent_bone
                 if parentBoneName:
                     bone = arm.data.bones[parentBoneName]
@@ -120,11 +168,11 @@ class AlmExporter(bpy.types.Operator):
                     WriteTransformation(xmlDoc, connectionPointElement, relTransf.to_translation(), relTransf.to_quaternion())
            		
         rootObject = activeObject
-        for obj in self.GetChildConnectionPoints(rootObject): #connection point attached to the mesh
+        for obj in GetChildConnectionPoints(rootObject): #connection point attached to the mesh
             relTransf = obj.matrix_local
             connectionPointElement = xmlDoc.createElement("connectionPoint")
             connectionPointsElement.appendChild(connectionPointElement)
-            self.WriteTransformation(xmlDoc, connectionPointElement, relTransf.to_translation(), relTransf.to_quaternion())
+            WriteTransformation(xmlDoc, connectionPointElement, relTransf.to_translation(), relTransf.to_quaternion())
             connectionPointElement.setAttribute("name", obj.name[3:])
         
         if 0 != len(connectionPointsElement.childNodes):
@@ -187,14 +235,13 @@ class AlmExporter(bpy.types.Operator):
         ##########
         #Mesh
         ##########
-        #create copy of the object and the mesh with all modificators applied
         meshElement = xmlDoc.createElement("mesh")
         modelElement.appendChild(meshElement)
         meshElement.setAttribute("name", activeObject.name)        
 
         verticies = VertexCollection(bMesh, bBoneIdsByGroup)
         for i in range(0, len(bMesh.materials)):
-            self.WriteSubmesh(xmlDoc, meshElement, verticies, bMesh, i)
+            WriteSubmesh(xmlDoc, meshElement, verticies, bMesh, i)
         verticies.WriteToXml(xmlDoc, meshElement)
  
  
@@ -215,13 +262,13 @@ class AlmExporter(bpy.types.Operator):
                 if(1 < len(nameParts)):
                     m = re.search("speed=(?P<speed>[0-9\.]+)", nameParts[1])
                     if m is not None:
-                        animElement.setAttribute("defaultSpeed", m.groups('speed')[0])
+                        animElement.setAttribute("defaultSpeed", m.group('speed'))
                         
                 animElement.setAttribute("name", name)
                 start, end = action.frame_range
                 start = int(start)
                 end= int(end)
-                animElement.setAttribute("duration", str((end  - start)/float(fps)))
+                animElement.setAttribute("duration", "%.6f" % ((end  - start)/float(fps)))
                                          
                 animsElement.appendChild(animElement)
                 arm.animation_data.action = action
@@ -253,71 +300,7 @@ class AlmExporter(bpy.types.Operator):
                     o.update_tag()
             scene.frame_set(scene.frame_current)        
 
-    def WriteTransformation(self, xmlDoc, parentElement, translation, orientation):
-        if (0.000001 < abs(translation.x) or 0.000001 < abs(translation.y) or 0.000001 < abs(translation.z)):
-            transElement = xmlDoc.createElement("translation")
-            parentElement.appendChild(transElement)
-            transElement.setAttribute("x", "%.6f" % translation.x)
-            transElement.setAttribute("y", "%.6f" % translation.y)
-            transElement.setAttribute("z", "%.6f" % translation.z)
-    
-        if (0.000001 < abs(orientation.x) or 0.000001 < abs(orientation.y) or 0.000001 < abs(orientation.z) or 0.000001 < abs(orientation.w - 1.0)):
-            orientationElement = xmlDoc.createElement("orientation")
-            parentElement.appendChild(orientationElement)
-            orientationElement.setAttribute("x", "%.6f" % orientation.x)
-            orientationElement.setAttribute("y", "%.6f" % orientation.y)
-            orientationElement.setAttribute("z", "%.6f" % orientation.z)
-            orientationElement.setAttribute("w", "%.6f" % orientation.w)
-
-
-    def WriteSubmesh(self, xmlDoc, meshElement, verticies, mesh, materialIndex):
-        submeshElement = xmlDoc.createElement("submesh")
-        meshElement.appendChild(submeshElement)
-    
-        submeshElement.setAttribute("material", mesh.materials[materialIndex].name)
-        
-        #write faces that belongs to the this submesh (by material)
-        for bFace in mesh.faces:
-            if bFace.material_index == materialIndex:
-                self.WriteFaceToXml(xmlDoc, submeshElement, verticies, bFace)
-
-    def WriteTriangleFaceToXml(self, xmlDoc, submeshElement, v0Index, v1Index, v2Index):
-        faceElement = xmlDoc.createElement("face")
-        submeshElement.appendChild(faceElement)
-        faceElement.setAttribute("v0", str(v0Index))
-        faceElement.setAttribute("v1", str(v1Index))
-        faceElement.setAttribute("v2", str(v2Index))
-
-    def WriteFaceToXml(self, xmlDoc, submeshElement, verticies, bFace):
-        if 4 < len(bFace.vertices):
-            raise Exception("Only faces with three or four vertices are supported")
-    
-        bVertices = verticies.mBMesh.vertices
-    
-        vIndexes = []
-        for i in range(0, len(bFace.vertices)):
-            vIndexes.append(verticies.GetVertexIndex(bFace, i))
-        
-        if 3 == len(bFace.vertices): #triangle
-            self.WriteTriangleFaceToXml(xmlDoc, submeshElement, vIndexes[2], vIndexes[1], vIndexes[0])
-        else: # quad => split it to triangles
-            if (bVertices[bFace.vertices[2]].co - bVertices[bFace.vertices[0]].co).length < (bVertices[bFace.vertices[3]].co - bVertices[bFace.vertices[1]].co).length: #0-2
-                self.WriteTriangleFaceToXml(xmlDoc, submeshElement, vIndexes[2], vIndexes[1], vIndexes[0])
-                self.WriteTriangleFaceToXml(xmlDoc, submeshElement, vIndexes[3], vIndexes[2], vIndexes[0])
-            else: #1-3
-                self.WriteTriangleFaceToXml(xmlDoc, submeshElement, vIndexes[3], vIndexes[1], vIndexes[0])
-                self.WriteTriangleFaceToXml(xmlDoc, submeshElement, vIndexes[3], vIndexes[2], vIndexes[1])
-            
-            
-    def GetObjChildrens(self, obj):
-        return filter(lambda o : o.parent == obj, bpy.context.scene.objects)
-             
-    def IsConnectionPointObject(self, obj):
-        return "cp_" == obj.name[0:3]
-    
-    def GetChildConnectionPoints(self, obj):
-        return filter(lambda o : self.IsConnectionPointObject(o), self.GetObjChildrens(obj))
-    
+   
     def invoke(self, context, event):
         wm = context.window_manager
         wm.fileselect_add(self)
