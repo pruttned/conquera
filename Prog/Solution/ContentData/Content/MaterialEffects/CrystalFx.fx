@@ -98,7 +98,7 @@ technique Default
 		string MainTexture = "gDiffuseMap";  
 	>
 	{
-		AlphaTestEnable = true;
+		AlphaTestEnable = false;
 		AlphaBlendEnable = false;
 		AlphaFunc = Greater; 
 		AlphaRef = 0x000001;
