@@ -19,9 +19,8 @@
 float4x4 gWorldViewProj : WorldViewProjection;
 float4x4 gWorld : World;
 float3 gColor = float3(0.6,0.0,0.6);
-//float3 gSunLightDirection  = float3(-0.2310634, 0.06931902, 0.9704662);  //treba spravit SunLightDirection auto param  - to budu vlastne s polu s kamerami per scene auto params
-float3 gSunLightDirection  = float3(-0.2857143, -0.4285714, 0.8571429);  //treba spravit SunLightDirection auto param  - to budu vlastne s polu s kamerami per scene auto params
 float gTime : Time;
+float3 gEyePosition : EyePosition;
 
 texture2D gDiffuseMap;
 sampler2D gDiffuseMapSampler = sampler_state 
@@ -34,6 +33,18 @@ sampler2D gDiffuseMapSampler = sampler_state
 	  AddressV = Wrap;
 	};
 	
+textureCUBE gEnvMap;
+samplerCUBE gEnvMapSampler = sampler_state 
+	{
+	  Texture = <gEnvMap>;
+	  MinFilter = Linear;
+	  MagFilter = Linear;
+	  MipFilter = Linear;
+	  AddressU = Wrap;
+	  AddressV = Wrap;
+	  //AddressW = Wrap;
+	};
+		
 struct VsInput
 {
     float4 Position : POSITION0;
@@ -48,6 +59,7 @@ struct VsOutput
     float3 Normal : TEXCOORD1;
     float2 Depth : TEXCOORD2;
     float4 posWorld : TEXCOORD3;
+    float3 Reflect : TEXCOORD4;
 };	
 	
 VsOutput mainVS(VsInput input)
@@ -60,6 +72,8 @@ VsOutput mainVS(VsInput input)
 	output.Depth = float2(output.Position.z, output.Position.w);
     output.Uv = input.Uv;
     
+    output.Reflect = 1-reflect(normalize(output.posWorld - gEyePosition), output.Normal);
+    
     return output;
 }
 
@@ -70,14 +84,21 @@ struct PsOut
     half4 Depth : COLOR2;
 };
 
-PsOut mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01, float2 depth : TEXCOORD02, float4 posWorld : TEXCOORD03) : COLOR 
+PsOut mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01, float2 depth : TEXCOORD02, float4 posWorld : TEXCOORD03,
+	float3 reflect : TEXCOORD04) : COLOR 
 {
 	PsOut output;
 
-	float a = 0.3*sin(gTime*2+posWorld.x+posWorld.y*2)-0.1;
-	output.Color  = (tex2D(gDiffuseMapSampler, uv) + float4(gColor, 0))+ float4(a,a,a,0);
+	//float a = 0.3*sin(gTime*2+posWorld.x+posWorld.y*2)-0.1;
+	float a = 0.1*sin(gTime*2+posWorld.x+posWorld.y*2)-0.3;
+	output.Color  = (tex2D(gDiffuseMapSampler, uv) + float4(gColor, 0)) + float4(a,a,a,0);
     output.Normal = float4(0.5f * (normalize(normal) + 1.0f), 0.8); //a = diff color power
     output.Depth = depth.x / depth.y;
+	
+	float3 env = texCUBE(gEnvMapSampler, reflect);
+	output.Color.xyz *= (env.x+env.y+env.z)/3*2;
+	//output.Color = lerp(output.Color, , 0.4);
+	//output.Color = output.Color + 0.2*texCUBE(gEnvMapSampler, reflect);
 	
 	return output;
 }

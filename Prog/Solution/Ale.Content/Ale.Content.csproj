@@ -67,6 +67,7 @@
     <Compile Include="Material\AleCompiledMaterialParam.cs" />
     <Compile Include="Material\AleCompiledMaterialPass.cs" />
     <Compile Include="Material\AleCompiledMaterialTechnique.cs" />
+    <Compile Include="SpellAnimImporter.cs" />
     <Compile Include="Model\AleCompiledMesh.cs" />
     <Compile Include="Model\AleCompiledMeshPart.cs" />
     <Compile Include="Model\AleCompiledMeshWriter.cs" />
