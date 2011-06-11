@@ -1,0 +1,666 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <ProjectGuid>ecd42d52-a087-49a9-8110-c51ae06b5297</ProjectGuid>
+    <ProjectTypeGuids>{96E2B04D-8817-42c6-938A-82C39BA4D311};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <XnaFrameworkVersion>v3.1</XnaFrameworkVersion>
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\$(Platform)\$(Configuration)</OutputPath>
+    <ContentRootDirectory>Data</ContentRootDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <XnaPlatform>Windows</XnaPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <XnaPlatform>Windows</XnaPlatform>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.EffectImporter, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.FBXImporter, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.TextureImporter, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.XImporter, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.AudioImporters, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.VideoImporters, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Fonts\CellNotificationFont.png">
+      <Name>CellNotificationFont</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>FontTextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Fonts\SpriteFont1.spritefont">
+      <Name>SpriteFont1</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Fonts\SpriteFontSmall.spritefont">
+      <Name>SpriteFontSmall</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Fonts\TileInfo\GameCardDialogCardName.spritefont">
+      <Name>GameCardDialogCardName</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Fonts\TileInfo\GameCardDialogDescription.spritefont">
+      <Name>GameCardDialogDescription</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Fonts\TileInfo\TileDescription.spritefont">
+      <Name>TileDescription</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Fonts\TileInfo\TileTypeName.spritefont">
+      <Name>TileTypeName</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\bwNoise.png">
+      <Name>bwNoise</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\CastleLightText.png">
+      <Name>CastleLightText</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\CastleText.png">
+      <Name>CastleText</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\CellNotificationText.png">
+      <Name>CellNotificationText</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\domUv.png">
+      <Name>domUv</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\EnvMap.dds">
+      <Name>EnvMap</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\grass.png">
+      <Name>grass</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\HexCellUv.png">
+      <Name>HexCellUv</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\LineText.png">
+      <Name>LineText</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\MountainsText.png">
+      <Name>MountainsText</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Palette.tga">
+      <Name>Palette</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Sky.png">
+      <Name>Sky</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\smoke.png">
+      <Name>smoke</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\treeText.png">
+      <Name>treeText</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\WallLightMap.png">
+      <Name>WallLightMap</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\WallSurface.png">
+      <Name>WallSurface</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\waveSingle.png">
+      <Name>waveSingle</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Ale.Content\Ale.Content.csproj">
+      <Project>{C6F28F4A-1703-49AB-B004-F8BE5FFAA8E3}</Project>
+      <Name>Ale.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Ale\Ale.csproj">
+      <Project>{ED4D5999-4D8A-46CE-B367-BD67B84E4DC8}</Project>
+      <Name>Ale</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GuiPalettes\CellNotificationPalette.plt">
+      <Name>CellNotificationPalette</Name>
+      <Importer>GuiPaletteImporter</Importer>
+      <Processor>GuiPaletteProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GuiPalettes\PaletteDef.plt">
+      <Name>PaletteDef</Name>
+      <Importer>GuiPaletteImporter</Importer>
+      <Processor>GuiPaletteProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\ActiveBorderFx.fx">
+      <Name>ActiveBorderFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\BoundingBoxPrimitiveFx.fx">
+      <Name>BoundingBoxPrimitiveFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\BoundingPrimitiveFx.fx">
+      <Name>BoundingPrimitiveFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\CastleActiveFx.fx">
+      <Name>CastleActiveFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\Cursor3dCellSelFx.fx">
+      <Name>Cursor3dCellSelFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\Cursor3DFx.fx">
+      <Name>Cursor3DFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\FalloffFx.fx">
+      <Name>FalloffFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\GameUnitFx.fx">
+      <Name>GameUnitFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\grassFx.fx">
+      <Name>grassFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\InactiveBorderFx.fx">
+      <Name>InactiveBorderFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\MovementArrowFx.fx">
+      <Name>MovementArrowFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\particle.fx">
+      <Name>particle</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\particle2.fx">
+      <Name>particle2</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\PostProcessEffects\BloomCombine.fx">
+      <Name>BloomCombine</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\PostProcessEffects\BlurHoriz.fx">
+      <Name>BlurHoriz</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\PostProcessEffects\BlurVert.fx">
+      <Name>BlurVert</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\PostProcessEffects\ExtractBrightness.fx">
+      <Name>ExtractBrightness</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\PostProcessEffects\Invert.fx">
+      <Name>Invert</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\Simple.fx">
+      <Name>Simple</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\SimpleNoShadow.fx">
+      <Name>SimpleNoShadow</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\Skinning.fx">
+      <Name>Skinning</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\SkyPlaneFx.fx">
+      <Name>SkyPlaneFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\surfaceFx.fx">
+      <Name>surfaceFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\test.fx">
+      <Name>test</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\wallFx.fx">
+      <Name>wallFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\WaterPlaneFx.fx">
+      <Name>WaterPlaneFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\WaterWaveFx.fx">
+      <Name>WaterWaveFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\ZalohaWaterPlaneFx.fx">
+      <Name>ZalohaWaterPlaneFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\Castle.alm">
+      <Name>Castle</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\Cursor3D.alm">
+      <Name>Cursor3D</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\Cursor3dCellSel.alm">
+      <Name>Cursor3dCellSel</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\dom.alm">
+      <Name>dom</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\HexCellWall.alm">
+      <Name>HexCellWall</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\hill.alm">
+      <Name>hill</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\Mountains.alm">
+      <Name>Mountains</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\Sphere.alm">
+      <Name>Sphere</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\tree.alm">
+      <Name>tree</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\ujo.alm">
+      <Name>ujo</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\BeamParticleFx.fx">
+      <Name>BeamParticleFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\BeamText.png">
+      <Name>BeamText</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\BeamBottomParticleFx.fx">
+      <Name>BeamBottomParticleFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\GlowingParticleFx.fx">
+      <Name>GlowingParticleFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\VillageMesh.alm">
+      <Name>VillageMesh</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\VillageDifTex.png">
+      <Name>VillageDifTex</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\LavaFx.fx">
+      <Name>LavaFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\WallLavaGlowFx.fx">
+      <Name>WallLavaGlowFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\WallLavalGlowTex.png">
+      <Name>WallLavalGlowTex</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\LavaColdTex.png">
+      <Name>LavaColdTex</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\LavaNoiseTex.png">
+      <Name>LavaNoiseTex</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\Deferred\DeferredClearFx.fx">
+      <Name>DeferredClearFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\Deferred\PointLightFx.fx">
+      <Name>PointLightFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\Deferred\CombineFx.fx">
+      <Name>CombineFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\HexCellCapturedMarkMesh.alm">
+      <Name>HexCellCapturedMarkMesh</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\HexCellCapturedMarkFx.fx">
+      <Name>HexCellCapturedMarkFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\HexAreaFx.fx">
+      <Name>HexAreaFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\CrystalFx.fx">
+      <Name>CrystalFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\MineMesh.alm">
+      <Name>MineMesh</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\MineDifTex.png">
+      <Name>MineDifTex</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\TempDwarf.alm">
+      <Name>TempDwarf</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\TempDwarfDif.png">
+      <Name>TempDwarfDif</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="SpecialEffects\TestSpellAnim.alsfx">
+      <Name>TestSpellAnim</Name>
+      <Importer>SpecialEffectImporter</Importer>
+      <Processor>SpecialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

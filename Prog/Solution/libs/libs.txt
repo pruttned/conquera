@@ -1,0 +1,7 @@
+Antlr3.Runtime.dll (3.1.3.42154) -  http://www.antlr.org/download/CSharp
+fmodex.dll (4.32.4) - http://www.fmod.org/
+System.Data.SQLite.dll (1.0.65) - http://sqlite.phxsoftware.com/
+Ionic.Zip.dll (1.8.4.29) - http://www.codeplex.com/DotNetZip
+
+for test projects
+http://www.nunit.org/index.php
