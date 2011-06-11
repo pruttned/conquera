@@ -72,7 +72,7 @@ VsOutput mainVS(VsInput input)
 	output.Depth = float2(output.Position.z, output.Position.w);
     output.Uv = input.Uv;
     
-    output.Reflect = 1-reflect(normalize(output.posWorld - gEyePosition), output.Normal);
+    output.Reflect = reflect(normalize(output.posWorld - gEyePosition), output.Normal);
     
     return output;
 }
@@ -91,14 +91,27 @@ PsOut mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01, float2 depth : TE
 
 	//float a = 0.3*sin(gTime*2+posWorld.x+posWorld.y*2)-0.1;
 	float a = 0.1*sin(gTime*2+posWorld.x+posWorld.y*2)-0.3;
-	output.Color  = (tex2D(gDiffuseMapSampler, uv) + float4(gColor, 0)) + float4(a,a,a,0);
-    output.Normal = float4(0.5f * (normalize(normal) + 1.0f), 0.8); //a = diff color power
+	float b = 0.2*sin(gTime/10+posWorld.x+posWorld.y);
+	float c = 0.5*sin(gTime*2+posWorld.x+posWorld.y*2);
+	float3 clr = float3(0.4,0.1,0.1);
+	
+	float someConst = 2;	
+	float someSin = abs(sin((gTime*2 + sin(posWorld.x) * someConst + cos(posWorld.y) * someConst) / 2)+0.7);
+	//float someSin = abs(sin((gTime + sin(posWorld.x) * someConst + cos(posWorld.y) * someConst) / 2)+0.7);
+	//float someSin = sin(gTime+sin(posWorld.x) * someConst + cos(posWorld.y) * someConst);
+	
+	output.Color  = (tex2D(gDiffuseMapSampler, uv) + float4(clr, 0)); //+ float4(0.3,0.3,0.3,0);
+    output.Normal = float4(0.5f * (normalize(normal) + 1.0f), someSin); //a = diff color power
     output.Depth = depth.x / depth.y;
 	
 	float3 env = texCUBE(gEnvMapSampler, reflect);
-	output.Color.xyz *= (env.x+env.y+env.z)/3*2;
-	//output.Color = lerp(output.Color, , 0.4);
-	//output.Color = output.Color + 0.2*texCUBE(gEnvMapSampler, reflect);
+	//output.Color= float4(env, 1);
+	
+	output.Color.xyz = (output.Color.xyz - env.x)*1.5 -0.0;
+	output.Color.xyz += (clr) * (someSin);
+	
+
+
 	
 	return output;
 }
