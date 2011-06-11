@@ -33,123 +33,142 @@ using System.Collections.ObjectModel;
 
 namespace Ale.Content
 {
-    public class SpellAnimContent
+    public class SpecialEffectContent
     {
-        public List<SpellAnimObjectContent> Objects { get; private set; }
+        public List<SpecialEffectObjectContent> Objects { get; private set; }
 
-        public SpellAnimContent()
+        public SpecialEffectContent()
         {
-            Objects = new List<SpellAnimObjectContent>();
+            Objects = new List<SpecialEffectObjectContent>();
         }
     }
 
-    public class CompiledSpellAnim
+    public class CompiledSpecialEffect
     {
-    }
-    [ContentProcessor(DisplayName = "Spell animation")]
-    public class SpellAnimProcessor : ContentProcessor<SpellAnimContent, CompiledSpellAnim>
-    {
-        public override CompiledSpellAnim Process(SpellAnimContent input, ContentProcessorContext context)
-        {
+        public List<CompiledSpecialEffectObject> Objects { get; private set; }
 
-            return new CompiledSpellAnim();
+        public CompiledSpecialEffect()
+        {
+            Objects = new List<CompiledSpecialEffectObject>();
+        }
+    }
+    [ContentProcessor(DisplayName = "Ale Special Effect")]
+    public class SpecialEffectProcessor : ContentProcessor<SpecialEffectContent, CompiledSpecialEffect>
+    {
+        public override CompiledSpecialEffect Process(SpecialEffectContent input, ContentProcessorContext context)
+        {
+            var compiledSpecialEffect = new CompiledSpecialEffect();
+            foreach (var obj in input.Objects)
+            {
+                compiledSpecialEffect.Objects.Add(obj.Process(context));
+            }
+            return compiledSpecialEffect;
         }
     }
 
     /// <summary>
     /// Ale mesh importer
     /// </summary>
-    [ContentImporter(".sanim", DisplayName = "Spell animation", CacheImportedData = true, DefaultProcessor = "SpellAnimProcessor")]
-    public class SpellAnimImporter : ContentImporter<SpellAnimContent>
+    [ContentImporter(".alsfx", DisplayName = "Ale Special Effect", CacheImportedData = true, DefaultProcessor = "SpecialEffectProcessor")]
+    public class SpecialEffectImporter : ContentImporter<SpecialEffectContent>
     {
-        Dictionary<string, SpellAnimObjectImporter> mSpellAnimObjectImporters = new Dictionary<string, SpellAnimObjectImporter>();
+        Dictionary<string, SpecialEffectObjectImporter> mSpecialEffectObjectImporters = new Dictionary<string, SpecialEffectObjectImporter>();
         
-        public SpellAnimImporter()
+        public SpecialEffectImporter()
         {
-            RegisterSpellAnimObjectImporters();
+            RegisterSpecialEffectObjectImporters();
         }
 
-        public override SpellAnimContent Import(string filename, ContentImporterContext context)
+        public override SpecialEffectContent Import(string filename, ContentImporterContext context)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(filename);
 
-            var content = new SpellAnimContent();
+            var content = new SpecialEffectContent();
 
-            foreach (XmlNode objectNode in xmlDoc.SelectNodes("/spellAnim/objects/*"))
+            foreach (XmlNode objectNode in xmlDoc.SelectNodes("/specialEffect/objects/*"))
             {
-                content.Objects.Add(mSpellAnimObjectImporters[objectNode.Name].Import(objectNode));
+                content.Objects.Add(mSpecialEffectObjectImporters[objectNode.Name].Import(objectNode));
             }
 
             return content;
         }
 
-        protected void RegisterSpellAnimObjectImporter(SpellAnimObjectImporter importer)
+        protected void RegisterSpecialEffectObjectImporter(SpecialEffectObjectImporter importer)
         {
-            mSpellAnimObjectImporters.Add(importer.ElementName, importer);
+            mSpecialEffectObjectImporters.Add(importer.ElementName, importer);
         }
-        protected virtual void RegisterSpellAnimObjectImporters()
+        protected virtual void RegisterSpecialEffectObjectImporters()
         {
-            RegisterSpellAnimObjectImporter(new MeshSpellAnimObjectImporter());
-            RegisterSpellAnimObjectImporter(new ParticleSystemSpellAnimObjectImporter());
-            RegisterSpellAnimObjectImporter(new ConnectionPointSpellAnimObjectImporter());
+            RegisterSpecialEffectObjectImporter(new MeshSpecialEffectObjectImporter());
+            RegisterSpecialEffectObjectImporter(new ParticleSystemSpecialEffectObjectImporter());
+            RegisterSpecialEffectObjectImporter(new DummySpecialEffectObjectImporter());
         }
 
     }
 
 
-    public class MeshSpellAnimObjectImporter : SpellAnimObjectImporter
+    public class MeshSpecialEffectObjectImporter : SpecialEffectObjectImporter
     {
         public override string ElementName
         {
             get { return "meshObject"; }
         }
 
-        protected override SpellAnimObjectContent CreateContent()
+        public override SpecialEffectObjectContent Import(XmlNode objectNode)
         {
-            return new MeshAnimObjectContent();
-        }
-
-        public override SpellAnimObjectContent Import(XmlNode objectNode)
-        {
-            MeshAnimObjectContent content = (MeshAnimObjectContent)base.Import(objectNode);
+            MeshSpecialEffectObjectContent content = (MeshSpecialEffectObjectContent)base.Import(objectNode);
 
             MeshImporter meshImporter = new MeshImporter();
-            content.MeshContent = meshImporter.ImportFromXmlNode(objectNode, true);
+            content.Mesh = meshImporter.ImportFromXmlNode(objectNode, true);
 
             return content;
         }
+        
+        protected override SpecialEffectObjectContent CreateContent()
+        {
+            return new MeshSpecialEffectObjectContent();
+        }
     }
-    public class ParticleSystemSpellAnimObjectImporter : SpellAnimObjectImporter
+    public class ParticleSystemSpecialEffectObjectImporter : SpecialEffectObjectImporter
     {
         public override string ElementName
         {
             get { return "particleSystem"; }
         }
 
-        protected override SpellAnimObjectContent CreateContent()
+        public override SpecialEffectObjectContent Import(XmlNode objectNode)
         {
-            return new SpellAnimObjectContent();
+            ParticleSystemSpecialEffectObjectContent content = (ParticleSystemSpecialEffectObjectContent)base.Import(objectNode);
+
+            content.PsysName = objectNode.Attributes["psys"].Value;
+
+            return content;
+        }
+
+        protected override SpecialEffectObjectContent CreateContent()
+        {
+            return new ParticleSystemSpecialEffectObjectContent();
         }
     }
-    public class ConnectionPointSpellAnimObjectImporter : SpellAnimObjectImporter
+    public class DummySpecialEffectObjectImporter : SpecialEffectObjectImporter
     {
         public override string ElementName
         {
-            get { return "connectionPoint"; }
+            get { return "dummy"; }
         }
 
-        protected override SpellAnimObjectContent CreateContent()
+        protected override SpecialEffectObjectContent CreateContent()
         {
-            return new SpellAnimObjectContent();
+            return new DummySpecialEffectObjectContent();
         }
     }
 
-    public abstract class SpellAnimObjectImporter
+    public abstract class SpecialEffectObjectImporter
     {
         public abstract string ElementName { get; }
 
-        public virtual SpellAnimObjectContent Import(XmlNode objectNode)
+        public virtual SpecialEffectObjectContent Import(XmlNode objectNode)
         {
             var content = CreateContent();
             content.Name = objectNode.Attributes["name"].Value;
@@ -162,34 +181,153 @@ namespace Ale.Content
             content.Orientation = orientation;
             content.Scale = scale;
 
+            content.Anim = ImportAnim(objectNode);
 
             return content;
         }
 
-        protected abstract SpellAnimObjectContent CreateContent();
+        protected abstract SpecialEffectObjectContent CreateContent();
+
+        protected SpecialEffectObjectAnim ImportAnim(XmlNode objectNode)
+        {
+            var animNode = objectNode.SelectSingleNode("./anim");
+            if (null == animNode)
+            {
+                return null;
+            }
+
+            SpecialEffectObjectAnim animContent = new SpecialEffectObjectAnim();
+            animContent.Duration = float.Parse(animNode.Attributes["duration"].Value, CultureInfo.InvariantCulture);
+            foreach(XmlNode keyframeNode in animNode.SelectNodes("./keyframe"))
+            {
+                float time = float.Parse(keyframeNode.Attributes["time"].Value, CultureInfo.InvariantCulture);
+                Vector3 position;
+                Quaternion orientation;
+                float scale;
+                XmlCommonParser.LoadTransformation(objectNode, out position, out orientation, out scale);
+                animContent.Keyframes.Add(new SpecialEffectAnimKeyframe(time, position, orientation, scale));
+            }
+
+            return animContent;
+        }
     }
 
 
 
-    public class SpellAnimObjectContent
+    public abstract class SpecialEffectObjectContent
     {
         public string Name { get; set; }
         public Vector3 Position { get; set; }
         public Quaternion Orientation { get; set; }
         public float Scale { get; set; }
+
+        public SpecialEffectObjectAnim Anim { get; set; }
+
+        public virtual CompiledSpecialEffectObject Process(ContentProcessorContext context)
+        {
+            CompiledSpecialEffectObject c = CreateCompiledSpecialEffectObject();
+            c.Name = Name;
+            c.Position = Position;
+            c.Orientation = Orientation;
+            c.Scale = Scale;
+            c.Anim = Anim;
+
+            return c;
+        }
+
+        protected abstract CompiledSpecialEffectObject CreateCompiledSpecialEffectObject();
     }
 
-    public class MeshAnimObjectContent : SpellAnimObjectContent
+    public class MeshSpecialEffectObjectContent : SpecialEffectObjectContent
     {
-        public AleMeshContent MeshContent { get; set; }
+        public AleMeshContent Mesh { get; set; }
+
+        public override CompiledSpecialEffectObject Process(ContentProcessorContext context)
+        {
+            var c = (MeshCompiledSpecialEffectObject)base.Process(context);
+            c.Mesh = new MeshProcessor().Process(Mesh, context);
+            return c;
+        }
+
+        protected override CompiledSpecialEffectObject CreateCompiledSpecialEffectObject()
+        {
+            return new MeshCompiledSpecialEffectObject();
+        }
+    }
+    public class ParticleSystemSpecialEffectObjectContent : SpecialEffectObjectContent
+    {
+        public string PsysName { get; set; }
+
+        public override CompiledSpecialEffectObject Process(ContentProcessorContext context)
+        {
+            var c = (ParticleSystemCompiledSpecialEffectObject)base.Process(context);
+            c.PsysName = PsysName;
+
+            return c;
+        }
+
+        protected override CompiledSpecialEffectObject CreateCompiledSpecialEffectObject()
+        {
+            return new ParticleSystemCompiledSpecialEffectObject();
+        }
+    }
+    public class DummySpecialEffectObjectContent : SpecialEffectObjectContent
+    {
+        protected override CompiledSpecialEffectObject CreateCompiledSpecialEffectObject()
+        {
+            return new DummyCompiledSpecialEffectObject();
+        }
+    }
+
+    public class SpecialEffectAnimKeyframe
+    {
+        public float Time { get; private set; }
+
+        public Vector3 Translation { get; private set; }
+        public Quaternion Orientation { get; private set; }
+        public float Scale { get; private set; }
+
+        public SpecialEffectAnimKeyframe(float time, Vector3 translation, Quaternion orientation, float scale)
+        {
+            Time = time;
+            Translation = translation;
+            Orientation = orientation;
+            Scale = scale;
+        }
+    }
+
+    public class SpecialEffectObjectAnim
+    {
+        public float Duration { get; set; }
+        public List<SpecialEffectAnimKeyframe> Keyframes {get; private set;}
+
+        public SpecialEffectObjectAnim()
+        {
+            Keyframes = new List<SpecialEffectAnimKeyframe>();
+        }
     }
 
 
+    public class CompiledSpecialEffectObject
+    {
+        public string Name { get; set; }
+        public Vector3 Position { get; set; }
+        public Quaternion Orientation { get; set; }
+        public float Scale { get; set; }
 
+        public SpecialEffectObjectAnim Anim { get; set; }
+    }
 
-
-
-
+    public class MeshCompiledSpecialEffectObject : CompiledSpecialEffectObject
+    {
+        public AleCompiledMesh Mesh { get; set; }
+    }
+    public class ParticleSystemCompiledSpecialEffectObject : CompiledSpecialEffectObject
+    {
+        public string PsysName { get; set; }
+    }
+    public class DummyCompiledSpecialEffectObject : CompiledSpecialEffectObject
+    { }
 }
 
 

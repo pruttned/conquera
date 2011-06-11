@@ -91,7 +91,8 @@ def GetObjChildrens(obj):
     return filter(lambda o : o.parent == obj, bpy.context.scene.objects)
              
 def IsConnectionPointObject(obj):
-    return "cp_" == obj.name[0:3]
+    return obj.name.startswith("cp_")
+
     
 def GetChildConnectionPoints(obj):
     return filter(lambda o : IsConnectionPointObject(o), GetObjChildrens(obj))

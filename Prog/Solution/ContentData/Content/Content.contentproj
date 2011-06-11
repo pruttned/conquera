@@ -649,10 +649,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SpellAnims\TestSpellAnim.sanim">
+    <Compile Include="SpecialEffects\TestSpellAnim.alsfx">
       <Name>TestSpellAnim</Name>
-      <Importer>SpellAnimImporter</Importer>
-      <Processor>SpellAnimProcessor</Processor>
+      <Importer>SpecialEffectImporter</Importer>
+      <Processor>SpecialEffectProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

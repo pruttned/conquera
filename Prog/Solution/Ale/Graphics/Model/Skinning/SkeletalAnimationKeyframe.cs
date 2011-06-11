@@ -25,7 +25,7 @@ using Microsoft.Xna.Framework.Content;
 namespace Ale.Graphics
 {
     /// <summary>
-    /// KEyframe of the skeletal animation
+    /// Keyframe of the skeletal animation
     /// </summary>
     public class SkeletalAnimationKeyframe : IComparable<SkeletalAnimationKeyframe>
     {
@@ -49,8 +49,6 @@ namespace Ale.Graphics
         #endregion Properties
 
         #region Methods
-
-        #region IComparable
 
         /// <summary>
         /// Ctor
@@ -85,8 +83,6 @@ namespace Ale.Graphics
         {
             return Comparer<float>.Default.Compare(Time, other.Time);
         }
-
-        #endregion IComparable
 
         #endregion Methods
     }

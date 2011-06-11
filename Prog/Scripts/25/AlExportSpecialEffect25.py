@@ -16,10 +16,10 @@
 # #################################################################
 
 bl_info = {
-    "name": "Ale Spell Anim",
+    "name": "Ale Special Effect",
     "blender": (2, 5, 7),
-    "location": "File > Export > AleSpellAnim",
-    "description": "Exports Spell animation",
+    "location": "File > Export > AleSpecialEffect",
+    "description": "Ale Special Effect",
     "warning": "",
     "category": "Import-Export"}
 
@@ -64,9 +64,9 @@ def WriteTransformation(xmlDoc, parentElement, transfMatrix):
         scaleElement.setAttribute("v", "%.6f" % uniformScale)
 
 class Exporter(bpy.types.Operator):
-    '''Save Ale spell anim'''
-    bl_idname = "export_spell_anim.sanim"
-    bl_label = "Export Ale Spell Anim"
+    '''Save Ale Special Effect'''
+    bl_idname = "export_ale_special_effect.alsfx"
+    bl_label = "Export Ale Special Effect"
 
     filepath = StringProperty(name="File Path", description="Filepath", maxlen= 1024, default= "", subtype='FILE_PATH')
 
@@ -77,10 +77,10 @@ class Exporter(bpy.types.Operator):
 
         xmlDoc = Document()
         
-        spellAnimElement = xmlDoc.createElement("spellAnim")
-        xmlDoc.appendChild(spellAnimElement)
+        specialEffectElement = xmlDoc.createElement("specialEffect")
+        xmlDoc.appendChild(specialEffectElement)
         objsElement = xmlDoc.createElement("objects")
-        spellAnimElement.appendChild(objsElement)
+        specialEffectElement.appendChild(objsElement)
         
         animatedObjects = []
         endFrame = -1   
@@ -91,18 +91,23 @@ class Exporter(bpy.types.Operator):
                 
                 objElm = None
                 
-                #Connection point
-                if "cp_" == obj.name[0:3] : 
-                    objElm = xmlDoc.createElement("connectionPoint")
+                #dummy
+                if obj.name.startswith("dummy_") : 
+                    objElm = xmlDoc.createElement("dummy")
                     objsElement.appendChild(objElm)
-                    objElm.setAttribute("name", obj.name[3:])
+                    objElm.setAttribute("name", obj.name[6:])
                     WriteTransformation(xmlDoc, objElm, obj.matrix_world)
                     
                 #Particle system
-                elif "psys_" == obj.name[0:5]:
+                elif obj.name.startswith("psys_"):
                     objElm = xmlDoc.createElement("particleSystem")
                     objsElement.appendChild(objElm)
                     objElm.setAttribute("name", obj.name[5:])
+                    
+                    if "psys" not in obj:
+                        raise Exception("Missing psys property in {}".format(obj.name))
+                    objElm.setAttribute("psys", obj["psys"])
+                    
                     WriteTransformation(xmlDoc, objElm, obj.matrix_world)
                     
                 #Mesh object
@@ -139,9 +144,9 @@ class Exporter(bpy.types.Operator):
                 if endFrame == -1 or endFrame < frame:
                     endFrame = frame
                 
-        #spell anim duration        
+        #special effect duration        
         endFrame = int(endFrame)
-        spellAnimElement.setAttribute("duration", "%.6f" % ((frameRange.y  - frameRange.x)/float(fps)))
+        specialEffectElement.setAttribute("duration", "%.6f" % ((frameRange.y  - frameRange.x)/float(fps)))
 
         #Animations
         if 0 < len(animatedObjects):
@@ -161,7 +166,7 @@ class Exporter(bpy.types.Operator):
         #Time markers
         if 0 < len(scene.timeline_markers):
             timeMarkersElement = xmlDoc.createElement("timeMarkers")
-            spellAnimElement.appendChild(timeMarkersElement)
+            specialEffectElement.appendChild(timeMarkersElement)
             for timeMarker in scene.timeline_markers:
                 name = timeMarker.name
                 frame = timeMarker.frame
@@ -205,8 +210,8 @@ class Exporter(bpy.types.Operator):
 
 def menu_func(self, context):
     import os
-    default_path = os.path.splitext(bpy.data.filepath)[0] + ".sanim"
-    self.layout.operator("export_spell_anim.sanim", text="Ale Spell anim (.sanim)").filepath = default_path
+    default_path = os.path.splitext(bpy.data.filepath)[0] + ".alsfx"
+    self.layout.operator("export_ale_special_effect.alsfx", text="Ale Special Effect (.alsfx)").filepath = default_path
 
 def register():
     bpy.utils.register_module(__name__)
