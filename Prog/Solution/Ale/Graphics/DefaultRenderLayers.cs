@@ -72,5 +72,10 @@ namespace Ale.Graphics
         /// MovementArrow
         /// </summary>
         public const int MovementArrow = 7000;
+
+        /// <summary>
+        /// Objects that are above the ground
+        /// </summary>
+        public const int FlyingObjects = 8000;
     }
 }

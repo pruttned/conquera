@@ -322,6 +322,11 @@
     <Compile Include="Sound\SoundLoader.cs" />
     <Compile Include="Sound\SoundManager.cs" />
     <Compile Include="Sound\SoundSettings.cs" />
+    <Compile Include="SpecialEffects\SpecialEffect.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectAnimKeyframe.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectObjectAnim.cs" />
+    <Compile Include="Content\SpecialEffectReader.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectObjectDesc.cs" />
     <Compile Include="TimeFunction.cs" />
     <Compile Include="Tools\AleMathUtils.cs" />
     <Compile Include="Tools\CommandLineReader.cs" />

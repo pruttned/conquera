@@ -25,6 +25,7 @@ using Ale.Settings;
 using Ale.Graphics;
 using Ale.Tools;
 using Ale.Sound;
+using Ale.SpecialEffects;
 
 namespace Ale
 {
@@ -104,6 +105,7 @@ namespace Ale
             AleContentManager.RegisterAssetTypeDirectory(typeof(Ale.Gui.Palette), "GuiPalettes");
             AleContentManager.RegisterAssetTypeDirectory(typeof(SpriteFont), "Fonts");
             AleContentManager.RegisterAssetTypeDirectory(typeof(Mesh), "Models");
+            AleContentManager.RegisterAssetTypeDirectory(typeof(SpecialEffect), "SpecialEffects");
 
             mBaseApplication = baseApplication;
 

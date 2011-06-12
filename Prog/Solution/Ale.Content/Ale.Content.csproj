@@ -67,7 +67,11 @@
     <Compile Include="Material\AleCompiledMaterialParam.cs" />
     <Compile Include="Material\AleCompiledMaterialPass.cs" />
     <Compile Include="Material\AleCompiledMaterialTechnique.cs" />
-    <Compile Include="SpellAnimImporter.cs" />
+    <Compile Include="SpecialEffects\CompiledSpecialEffect.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectContent.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectImporter.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectProcessor.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectWriter.cs" />
     <Compile Include="Model\AleCompiledMesh.cs" />
     <Compile Include="Model\AleCompiledMeshPart.cs" />
     <Compile Include="Model\AleCompiledMeshWriter.cs" />
