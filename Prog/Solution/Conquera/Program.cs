@@ -299,14 +299,7 @@ namespace Conquera
 
                     //{
                     //    MaterialSettings mat = new MaterialSettings("CastleMat", "Simple", DefaultRenderLayers.GroundStandingObjects);
-                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "CastleText"));
-                    //    ormManager.SaveObject(mat);
-                    //}
-
-                    //{
-                    //    MaterialSettings mat = new MaterialSettings("CastleActiveMat", "CastleActiveFx", DefaultRenderLayers.GroundStandingObjects);
-                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "CastleText"));
-                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gLightMap", "CastleLightText"));
+                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "CastleDifTex"));
                     //    ormManager.SaveObject(mat);
                     //}
 
@@ -316,45 +309,13 @@ namespace Conquera
                     //}
 
                     //{
-                    //    PointLightSettings s = new PointLightSettings();
-                    //    s.Name = "CastlePointLight";
-                    //    s.Material = ormManager.FindObject(typeof(MaterialSettings), "Name='PointLightMat'");
-                    //    s.Color = new Vector3(0.8f, 0.4f, 0.4f);
-                    //    s.Radius = 2.0f;
-                    //    ormManager.SaveObject(s);
-                    //}
-                    //{
-                    //    PointLightSettings s = new PointLightSettings();
-                    //    s.Name = "ActiveCastlePointLight";
-                    //    s.Material = ormManager.FindObject(typeof(MaterialSettings), "Name='PointLightMat'");
-                    //    s.Color = new Vector3(1.5f, 0.8f, 0.8f);
-                    //    s.Radius = 2.0f;
-                    //    ormManager.SaveObject(s);
-                    //}
-
-
-                    //{
                     //    GraphicModelSettings settings = new GraphicModelSettings();
                     //    //GraphicModelSettings settings = ormManager.LoadObject<GraphicModelSettings>("Name='CastleGm'");
-                    //    settings.Mesh = "Castle";
+                    //    settings.Mesh = "CastleMesh";
                     //    settings.Name = "CastleGm";
                     //    settings.MaterialAssignments.Add(new MaterialAssignmentsettings("m1", ormManager.FindObjects(typeof(MaterialSettings), "Name='CastleMat'")[0]));
-                    //    settings.ConnectionPointAssigments.Add(new ConnectionPointAssigmentSettings("Light",
-                    //        ormManager.FindObject(typeof(PointLightSettings), "Name='CastlePointLight'"), 3));
                     //    ormManager.SaveObject(settings);
                     //}
-
-                    //{
-                    //    GraphicModelSettings settings = new GraphicModelSettings();
-                    //    //GraphicModelSettings settings = ormManager.LoadObject<GraphicModelSettings>("Name='CastleActiveGm'");
-                    //    settings.Mesh = "Castle";
-                    //    settings.Name = "CastleActiveGm";
-                    //    settings.MaterialAssignments.Add(new MaterialAssignmentsettings("m1", ormManager.FindObjects(typeof(MaterialSettings), "Name='CastleActiveMat'")[0]));
-                    //    settings.ConnectionPointAssigments.Add(new ConnectionPointAssigmentSettings("Light",
-                    //        ormManager.FindObject(typeof(PointLightSettings), "Name='ActiveCastlePointLight'"), 3));
-                    //    ormManager.SaveObject(settings);
-                    //}
-
 
                     ////{
                     ////    HexTerrainTileSettings obj = new HexTerrainTileSettings();
@@ -559,14 +520,15 @@ namespace Conquera
                     //}
                     //{
                     //    CastleTileSettings obj = new CastleTileSettings();
+                    //    //CastleTileSettings obj = ormManager.LoadObject<CastleTileSettings>("Name = 'CastleTile'");
                     //    obj.Name = "CastleTile";
                     //    obj.DisplayName = "Castle";
                     //    obj.Description = ormManager.LoadObject<StringResource>("Name = 'CastleTileDescription'");
                     //    obj.UnitPosition = new Vector3(-0.4f, -0.4f, 0);
                     //    obj.TileIndex = new Point(4, 0);
                     //    obj.WallGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'Wall1Gm'");
-                    //    obj.ActiveGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'CastleActiveGm'");
                     //    obj.InactiveGraphicModel = ormManager.FindObject(typeof(GraphicModelSettings), "Name = 'CastleGm'");
+                    //    obj.ActiveGraphicModel = obj.InactiveGraphicModel;
                     //    obj.HexTerrainTileAtlas = ormManager.FindObject(typeof(HexTerrainTileAtlasSettings), "Name = 'HexTerrainTileAtlas1'");
                     //    obj.IsPassable = true;
                     //    obj.Icon = "TileIconCastle";
