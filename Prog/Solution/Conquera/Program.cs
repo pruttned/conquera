@@ -785,7 +785,7 @@ namespace Conquera
                     //{
                     //    MaterialSettings settings = new MaterialSettings("MineLvl1CrystalMat", "CrystalFx");
                     //    settings.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "MineDifTex"));
-                    //    settings.Params.Add(new TextureCubeMaterialParamSettings("gEnvMap", "EnvMap"));
+                    //    settings.Params.Add(new TextureCubeMaterialParamSettings("gEnvMap", "CrystalEnvMap"));
                     //    settings.Params.Add(new Vector3MaterialParamSettings("gColor", new Vector3(0.6,0,0.6)));
                     //    ormManager.SaveObject(settings);
                     //}
