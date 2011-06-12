@@ -850,6 +850,12 @@ namespace Conquera
                     //}
 
 
+                    //{
+                    //    MaterialSettings mat = new MaterialSettings("TestSpellAnimSwordMat", "SimpleNoLightNoShadow", DefaultRenderLayers.FlyingObjects);
+                    //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "TestSpellAnimSwordDif"));
+                    //    ormManager.SaveObject(mat);
+                    //}
+
                     transaction.Commit();
                 }
             }

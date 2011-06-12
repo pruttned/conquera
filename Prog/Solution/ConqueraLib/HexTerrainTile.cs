@@ -88,6 +88,10 @@ namespace Conquera
                 {
                     mActiveGraphicModel.IsVisible = true;
                 }
+                if (null != mInactiveGraphicModel)
+                {
+                    mInactiveGraphicModel.IsVisible = false;
+                }
                 InitHexCellCapturedMark(cell);
                 mHexCellCapturedMark.Color = cell.OwningPlayer.Color;
 

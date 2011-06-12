@@ -60,6 +60,8 @@ namespace Conquera
 
         protected override BaseScene CreateDefaultScene(SceneManager sceneManager)
         {
+           // var s  = Content.Load<Ale.SpecialEffects.SpecialEffect>("TestSpellAnim");
+
             return HotseatGameScene.Load("TestMap", sceneManager, Content.DefaultContentGroup);
          //   return new MainMenuScene(sceneManager, Content.DefaultContentGroup);
             //return new HotseatGameScene("TestMap", sceneManager, 15, 15, "Grass1Tile", Content.DefaultContentGroup);
