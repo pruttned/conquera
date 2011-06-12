@@ -102,13 +102,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Textures\CastleText.png">
-      <Name>CastleText</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Textures\CellNotificationText.png">
       <Name>CellNotificationText</Name>
       <Importer>TextureImporter</Importer>
@@ -427,13 +420,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Castle.alm">
-      <Name>Castle</Name>
-      <Importer>MeshImporter</Importer>
-      <Processor>MeshProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Models\Cursor3D.alm">
       <Name>Cursor3D</Name>
       <Importer>MeshImporter</Importer>
@@ -658,6 +644,20 @@
   <ItemGroup>
     <Compile Include="Textures\CrystalEnvMap.dds">
       <Name>CrystalEnvMap</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\CastleMesh.alm">
+      <Name>CastleMesh</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\CastleDifTex.png">
+      <Name>CastleDifTex</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
