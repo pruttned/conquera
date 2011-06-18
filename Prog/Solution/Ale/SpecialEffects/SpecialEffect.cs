@@ -25,44 +25,135 @@ using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Ale.Tools;
 using Ale.Content;
+using Ale.Scene;
 
 namespace Ale.SpecialEffects
 {
-    public class SpecialEffect
+    public class SpecialEffect : IDisposable
     {
-        public static Dictionary<string, SpecialEffectObjectReader> SpecialEffectObjectReaders { get; private set; }
-        private SpecialEffectObjectDesc[] mSpecialEffectObjects;
+        private bool mIsDisposed = false;
 
-        static SpecialEffect()
-        {
-            SpecialEffectObjectReaders = new Dictionary<string, SpecialEffectObjectReader>(StringComparer.InvariantCultureIgnoreCase);
-            SpecialEffectObjectReaders["Mesh"] = new MeshSpecialEffectObjectReader();
-            SpecialEffectObjectReaders["Psys"] = new ParticleSystemSpecialEffectObjectReader();
-            SpecialEffectObjectReaders["Dummy"] = new DummySpecialEffectObjectReader();
-        }
+        private Vector3 mPos;
+        private SpecialEffectDesc mDesc;
+        private List<SpecialEffectObject> mObjects = null;
+        private float mEndTime = -1;
+        private float mStartTime;
+        private bool mPendingDestroy = false;
 
-        public SpecialEffect(ContentReader input)
+
+        public SpecialEffect(SpecialEffectDesc desc, Vector3 pos, IAleServiceProvider services)
         {
-            int objCnt = input.ReadInt32();
-            mSpecialEffectObjects = new SpecialEffectObjectDesc[objCnt];
-            for (int i = 0; i < objCnt; ++i)
+            mDesc = desc;
+            mPos = pos;
+
+            if (null != desc.Objects)
             {
-                string objType = input.ReadString();
-                var objReader = GetObjectReader(objType);
-                var obj = objReader.Read(input);
-
-                mSpecialEffectObjects[i] = obj;
+                mObjects = new List<SpecialEffectObject>();
+                foreach (var objDesc in desc.Objects)
+                {
+                    mObjects.Add(objDesc.CreateObjectInstance(services, pos));
+                }
             }
         }
 
-        protected static SpecialEffectObjectReader GetObjectReader(string name)
+        public bool EnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime, bool firstInFrame)
         {
-            SpecialEffectObjectReader reader;
-            if (!SpecialEffectObjectReaders.TryGetValue(name, out reader))
+            //todo marker actions
+            //pozor na efekty kde bude duration=0 a nebude mat objekty a vsetky marker animacie sa vykoaju v case = 0
+
+            if (firstInFrame) 
             {
-                throw new KeyNotFoundException(string.Format("Special effect object reader '{0}' doesn't exists", name));
+                if (0 > mEndTime)
+                {
+                    mEndTime = gameTime.TotalTime + mDesc.Duration;
+                    mStartTime = gameTime.TotalTime;
+                }
+                else
+                {
+                    if (!mPendingDestroy)
+                    {
+                        if (mEndTime <= gameTime.TotalTime)
+                        {
+                            if (null != mObjects)
+                            {
+                                for (int i = mObjects.Count - 1; i >= 0; --i)
+                                {
+                                    if (mObjects[i].Destroy())
+                                    {
+                                        RemoveObject(i);
+                                    }
+                                }
+                                if (0 == mObjects.Count)
+                                {
+                                    return false;
+                                }
+
+                                mPendingDestroy = true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    if (null != mObjects)
+                    {
+                        for (int i = mObjects.Count - 1; i >= 0; --i)
+                        {
+                            if (!mObjects[i].EnqueRenderableUnits(renderer, gameTime, mStartTime, true))
+                            {//ready to be removed
+                                RemoveObject(i);
+                            }
+                        }
+                        if (mPendingDestroy && 0 == mObjects.Count) //all object has been removed
+                        {
+                            return false;
+                        }
+                    }
+                }
             }
-            return reader;
+            else //only render without update
+            {
+                for (int i = mObjects.Count - 1; i >= 0; --i)
+                {
+                    mObjects[i].EnqueRenderableUnits(renderer, gameTime, mStartTime, false);
+                }
+            }
+
+            return true;
+
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (!mIsDisposed)
+            {
+                if (isDisposing)
+                {
+                    if (null != mObjects)
+                    {
+                        foreach (var obj in mObjects)
+                        {
+                            obj.Dispose();
+                        }
+                    }
+                }
+                mIsDisposed = true;
+            }
+        }
+
+        private void RemoveObject(int index)
+        {
+            mObjects[index].Dispose();
+            mObjects.RemoveAt(index);
+        }
+
     }
 }

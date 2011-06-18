@@ -132,7 +132,7 @@ namespace Ale.Sound
             MusicPlayer = new MusicPlayer(this, musicDir);
         }
 
-        internal void SetPauseAll(bool pause)
+        internal void PauseAll(bool pause)
         {
             CheckError(mMasterChannelGroup.setPaused(pause));
         }
@@ -218,7 +218,7 @@ namespace Ale.Sound
         }
     }
 
-    public class SoundEmitter
+    public class SoundEmitter2d
     {
      //   private Sound3d mSound;
         private FMOD.Channel mChannel = null;
@@ -372,58 +372,5 @@ namespace Ale.Sound
             }
         }
     }
-
-
-    //public class AleSoundInstance
-    //{
-    //    private AleSound mSound;
-    //    private FMOD.Channel mChannel;
-
-    //    public AleSoundInstance(AleSound sound)
-    //    {
-    //        mSound = sound;
-    //    }
-    //}
-
-    ////aux
-    ////toto bude content - jedna sound sa da spustit viac krat..
-    //public sealed class Sound : IDisposable
-    //{
-    //    SoundManager mSoundManager;
-    //    private FMOD.Sound mSound = null;
-
-    //    //aux musi byt v instancii prehravania a nie tu
-    //    //private FMOD.Channel mChannel = null;
-
-    //    private bool mIsDisposed = false;
-
-    //    internal Sound(SoundManager soundManager, string fileName)
-    //    {
-    //        mSoundManager = soundManager;
-
-    //        SoundManager.CheckError(mSoundManager.System.createSound(fileName, FMOD.MODE.HARDWARE, ref mSound));
-    //    }
-
-    //    public void Play()
-    //    {
-    //        FMOD.Channel channel = null;
-    //        SoundManager.CheckError(mSoundManager.System.playSound(FMOD.CHANNELINDEX.FREE, mSound, false, ref channel));
-    //    }
-
-    //    ~Sound()
-    //    {
-    //        Dispose();
-    //    }
-
-    //    public void Dispose()
-    //    {
-    //        if (!mIsDisposed)
-    //        {
-    //            SoundManager.CheckError(mSound.release());
-
-    //            mIsDisposed = true;
-    //            GC.SuppressFinalize(this);
-    //        }
-    //    }
-    //}
+  
 }

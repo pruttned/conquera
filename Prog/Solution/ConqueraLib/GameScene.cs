@@ -61,7 +61,7 @@ namespace Conquera
 
         private HexCell mSelectedCell = null;
 
-        SoundEmitter mSoundEmitter = new SoundEmitter();
+        SoundEmitter2d mSoundEmitter = new SoundEmitter2d();
         private GameGuiScene mGuiScene;
 
         private IGameSceneState mState;
@@ -556,7 +556,7 @@ namespace Conquera
             base.Dispose(isDisposing);
         }
 
-        protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentGroup content)
+        protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, IRenderTargetManager renderTargetManager, ContentGroup content)
         {
             GameCamera mainCamera = new GameCamera(this);
 
@@ -597,10 +597,10 @@ namespace Conquera
 
         protected override void OnActivatedImpl()
         {
-            SceneManager.KeyboardManager.KeyDown += new KeyboardManager.KeyEventHandler(KeyboardManager_KeyDown);
-            SceneManager.KeyboardManager.KeyUp += new KeyboardManager.KeyEventHandler(KeyboardManager_KeyUp);
-            SceneManager.MouseManager.MouseButtonUp += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonUp);
-            SceneManager.MouseManager.MouseButtonDown += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonDown);
+            SceneManager.KeyboardManager.KeyDown += new KeyEventHandler(KeyboardManager_KeyDown);
+            SceneManager.KeyboardManager.KeyUp += new KeyEventHandler(KeyboardManager_KeyUp);
+            SceneManager.MouseManager.MouseButtonUp += new MouseButtonEventHandler(MouseManager_MouseButtonUp);
+            SceneManager.MouseManager.MouseButtonDown += new MouseButtonEventHandler(MouseManager_MouseButtonDown);
             
             GuiManager.Instance.ActiveScene = mGuiScene;
         }
@@ -730,8 +730,8 @@ namespace Conquera
 
             AleMathUtils.GetPerpVector(ref dirVec, out perpDir);
         }
-        
-        private void KeyboardManager_KeyDown(Microsoft.Xna.Framework.Input.Keys key, KeyboardManager keyboardManager)
+
+        private void KeyboardManager_KeyDown(Microsoft.Xna.Framework.Input.Keys key, IKeyboardManager keyboardManager)
         {
             GuiManager.Instance.HandleKeyDown(key);
 
@@ -812,9 +812,15 @@ namespace Conquera
                     Console.WriteLine(CurrentPlayer.Mana);
                 }
             }
+
+            if (key == Microsoft.Xna.Framework.Input.Keys.O)
+            {
+
+                SpecialEffectManager.FireSpecialEffect("TestSpellAnim", HexHelper.Get3DPosFromIndex(new Point(1, 1), 0));
+            }
         }
 
-        private void KeyboardManager_KeyUp(Microsoft.Xna.Framework.Input.Keys key, KeyboardManager keyboardManager)
+        private void KeyboardManager_KeyUp(Microsoft.Xna.Framework.Input.Keys key, IKeyboardManager keyboardManager)
         {
             GuiManager.Instance.HandleKeyUp(key);
         }
@@ -861,7 +867,7 @@ namespace Conquera
             return Path.Combine(Path.Combine(Path.GetDirectoryName(modFile), Path.GetFileNameWithoutExtension(modFile)), string.Format("Maps\\{0}", gameType));
         }
 
-        private void MouseManager_MouseButtonUp(MouseButton button, MouseManager mouseManager)
+        private void MouseManager_MouseButtonUp(MouseButton button, IMouseManager mouseManager)
         {
             if (!GuiManager.Instance.HandleMouseUp(button) && !GuiManager.Instance.HandlesMouse)
             {
@@ -869,7 +875,7 @@ namespace Conquera
             }
         }
 
-        private void MouseManager_MouseButtonDown(MouseButton button, MouseManager mouseManager)
+        private void MouseManager_MouseButtonDown(MouseButton button, IMouseManager mouseManager)
         {
             GuiManager.Instance.HandleMouseDown(button);
         }

@@ -25,6 +25,18 @@ using Ale.Content;
 
 namespace Ale.Graphics
 {
+
+    public interface IRenderer : IDisposable
+    {
+        void BeginForward(ICamera camera, Scene.BaseScene actviveScene, NameId scenePass, AleRenderTarget renderTarget);
+        void BeginDeferred(ICamera camera, Scene.BaseScene actviveScene, NameId scenePass);
+        bool EnqueueRenderable(IRenderableUnit renderableUnit);
+        bool EnqueLight(ILightRenderableUnit light);
+        void End(AleGameTime gameTime);
+        ICamera ActiveCamera { get; }
+    }
+
+
     /// <summary>
     /// Manages the rendering process
     /// </summary>
@@ -45,7 +57,7 @@ namespace Ale.Graphics
     /// renderer.End(gameTime); 
     /// </code>
     /// </example>        
-    public sealed class Renderer : IDisposable
+    public sealed class Renderer : IRenderer
     {
         //Deferred rendering  is based on http://www.catalinzima.com/tutorials/deferred-rendering-in-xna/
 
@@ -92,6 +104,8 @@ namespace Ale.Graphics
         public bool mContentIsLoaded = false;
 
         public AleRenderTarget mActiveRenderTarget = null;
+       
+        private IRenderTargetManager mRenderTargetManager;
 
 
         #endregion Fields
@@ -106,21 +120,20 @@ namespace Ale.Graphics
             get { return mActiveCamera; }
         }
 
-        public GraphicsDeviceManager GraphicsDeviceManager
+        private GraphicsDeviceManager GraphicsDeviceManager
         {
-            get { return RenderTargetManager.GraphicsDeviceManager; }
+            get { return mRenderTargetManager.GraphicsDeviceManager; }
         }
-        public RenderTargetManager RenderTargetManager { get; private set; }
 
         #endregion Properties
 
         #region Methods
 
-        public Renderer(RenderTargetManager renderTargetManager, ContentGroup content)
+        public Renderer(IRenderTargetManager renderTargetManager, ContentGroup content)
         {
             if (null == renderTargetManager) throw new ArgumentNullException("renderTargetManager");
 
-            RenderTargetManager = renderTargetManager;
+            mRenderTargetManager = renderTargetManager;
             GraphicsDeviceManager.DeviceReset += new EventHandler(GraphicsDeviceManager_DeviceReset);
 
             mFullScreenQuad = new FullScreenQuad(GraphicsDeviceManager);
@@ -301,7 +314,7 @@ namespace Ale.Graphics
                                     lastUsedMaterialPass = materialPass;
                                 }
 
-                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, RenderTargetManager);
+                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
 
                                 renderableUnit.Render(gameTime);
                             });
@@ -326,7 +339,7 @@ namespace Ale.Graphics
                             lastUsedMaterialPass = matPass;
                         }
 
-                        matPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, light, mActviveScene, RenderTargetManager);
+                        matPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, light, mActviveScene, mRenderTargetManager);
 
                         light.Render(gameTime);
                     }
@@ -339,7 +352,7 @@ namespace Ale.Graphics
             //combine + restore depth
             GraphicsDeviceManager.GraphicsDevice.SetRenderTarget(0, null);
             GraphicsDeviceManager.GraphicsDevice.Clear(Color.White);
-            mFullScreenQuad.Draw(mCombineEffect, gameTime, RenderTargetManager);
+            mFullScreenQuad.Draw(mCombineEffect, gameTime, mRenderTargetManager);
 
             //////////////////////
             //Forward pass
@@ -393,7 +406,7 @@ namespace Ale.Graphics
                                     lastUsedMaterialPass = materialPass;
                                 }
 
-                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, RenderTargetManager);
+                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
 
                                 renderableUnit.Render(gameTime);
                             });
@@ -414,7 +427,7 @@ namespace Ale.Graphics
                                     lastUsedMaterialPass = materialPass;
                                 }
 
-                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, RenderTargetManager);
+                                materialPass.MaterialEffectPass.Apply(gameTime, ActiveCamera, renderableUnit, mActviveScene, mRenderTargetManager);
 
                                 renderableUnit.Render(gameTime);
                             });
@@ -455,10 +468,10 @@ namespace Ale.Graphics
         private void LoadRenderTargets()
         {
             PresentationParameters pp = GraphicsDeviceManager.GraphicsDevice.PresentationParameters;
-            mColorRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenColorMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth24);
-            mDepthRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenDepthMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Single, DepthFormat.Depth24);
-            mNormalRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenNormalMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth16);
-            mLightRenderTarget = RenderTargetManager.CreateRenderTarget("ScreenLightMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color);
+            mColorRenderTarget = mRenderTargetManager.CreateRenderTarget("ScreenColorMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth24);
+            mDepthRenderTarget = mRenderTargetManager.CreateRenderTarget("ScreenDepthMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Single, DepthFormat.Depth24);
+            mNormalRenderTarget = mRenderTargetManager.CreateRenderTarget("ScreenNormalMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color, DepthFormat.Depth16);
+            mLightRenderTarget = mRenderTargetManager.CreateRenderTarget("ScreenLightMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color);
             mColorRenderTarget.ClearOnBegin = false;
             mDepthRenderTarget.ClearOnBegin = false;
             mNormalRenderTarget.ClearOnBegin = false;
@@ -480,19 +493,19 @@ namespace Ale.Graphics
             {
                 if (null != mColorRenderTarget)
                 {
-                    RenderTargetManager.DestroyRenderTarget(mColorRenderTarget.Name);
+                    mRenderTargetManager.DestroyRenderTarget(mColorRenderTarget.Name);
                 }
                 if (null != mDepthRenderTarget)
                 {
-                    RenderTargetManager.DestroyRenderTarget(mDepthRenderTarget.Name);
+                    mRenderTargetManager.DestroyRenderTarget(mDepthRenderTarget.Name);
                 }
                 if (null != mNormalRenderTarget)
                 {
-                    RenderTargetManager.DestroyRenderTarget(mNormalRenderTarget.Name);
+                    mRenderTargetManager.DestroyRenderTarget(mNormalRenderTarget.Name);
                 }
                 if (null != mLightRenderTarget)
                 {
-                    RenderTargetManager.DestroyRenderTarget(mLightRenderTarget.Name);
+                    mRenderTargetManager.DestroyRenderTarget(mLightRenderTarget.Name);
                 }
             }
         }

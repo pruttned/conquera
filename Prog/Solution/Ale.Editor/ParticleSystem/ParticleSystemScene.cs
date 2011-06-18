@@ -70,7 +70,7 @@ namespace Ale.Editor
 
         }
 
-        protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentGroup content)
+        protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, IRenderTargetManager renderTargetManager, ContentGroup content)
         {
             Camera mainCamera = new Camera(Vector3.Zero, 100, new Vector2(-0.8f, 0), 20000, 3, 1.55f, -1.57f);
             mainCamera.DistanceToTarget = 10;

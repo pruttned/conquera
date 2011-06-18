@@ -152,8 +152,6 @@ namespace Ale
             get { return mSceneManager; }
         }
 
-        public SoundManager SoundManager { get; private set; }
-
         protected abstract string GuiPaletteName { get; }
         protected abstract Ale.Gui.CursorInfo DefaultCursor { get; }
         protected bool ShowSysCursor
@@ -201,10 +199,6 @@ namespace Ale
 
             mGame.Activated += new EventHandler(mGame_Activated);
             mGame.Deactivated += new EventHandler(mGame_Deactivated);
-
-            SoundManager = new SoundManager(dataDirectory);
-            mGame.Services.AddService(typeof(SoundManager), SoundManager);
-            RegisterFrameListener(SoundManager);
         }
 
         /// <summary>
@@ -261,7 +255,7 @@ namespace Ale
 
         protected virtual SceneManager CreateSceneManager(GraphicsDeviceManager graphicsDeviceManager, Control renderControl)
         {
-            return new SceneManager(graphicsDeviceManager, SoundManager, renderControl);
+            return new SceneManager(graphicsDeviceManager, renderControl, mGame.AleServiceProvider, Content);
         }
         
         protected abstract BaseScene CreateDefaultScene(SceneManager sceneManager);
@@ -439,8 +433,6 @@ namespace Ale
                     mGame.Dispose();
 
                     mSceneManager.Dispose();
-
-                    SoundManager.Dispose();
                 }
                 mIsDisposed = true;
             }
@@ -460,7 +452,7 @@ namespace Ale
                 mRenderControl.Resume();
             }
 
-            SoundManager.SetPauseAll(false);
+            mSceneManager.OnAppActivate();
 
             if (null != ApplicationFocusChanged)
             {
@@ -480,7 +472,7 @@ namespace Ale
                 mRenderControl.Pause();
             }
 
-            SoundManager.SetPauseAll(true);
+            mSceneManager.OnAppDeactivate();
 
             if (null != ApplicationFocusChanged)
             {

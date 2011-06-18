@@ -82,7 +82,7 @@ namespace Ale.Graphics
         /// </summary>
         private Scene.BaseScene mLastSceneUpdate = null;
 
-        private RenderTargetManager mLastRenderTargetManagerUpdate = null;
+        private IRenderTargetManager mLastRenderTargetManagerUpdate = null;
 
         /// <summary>
         /// Effect parameters that are configured manually
@@ -251,8 +251,8 @@ namespace Ale.Graphics
         /// <param name="renderTargetManager"></param>
         /// <param name="pass">- pass that should be used</param>
         /// <param name="scene"></param>
-        internal void Apply(AleGameTime gameTime, ICamera camera, IRenderableUnit renderableUnit, Scene.BaseScene scene, 
-            RenderTargetManager renderTargetManager, MaterialEffectPass pass)
+        internal void Apply(AleGameTime gameTime, ICamera camera, IRenderableUnit renderableUnit, Scene.BaseScene scene,
+            IRenderTargetManager renderTargetManager, MaterialEffectPass pass)
         {
             MaterialEffectTechnique passTechnique = pass.ParentTechnique;
             //New frame or different technique => update all

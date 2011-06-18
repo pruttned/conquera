@@ -50,7 +50,7 @@ namespace Ale.Sound
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="playList">relative to Music folder. Without txt extension. null == music</param>
+        /// <param name="playList">relative to Music folder. Without txt extension.</param>
         public void Play(string playList)
         {
             if (string.IsNullOrEmpty(playList)) throw new ArgumentNullException("playList");

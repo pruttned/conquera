@@ -309,7 +309,7 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="renderer">- Renderer that should be used for enqueueing (Use Renderer.EnqueueRenderable method)</param>
         /// <param name="gameTime">- Actual game time</param>
-        public void EnqueRenderableUnits(Renderer renderer, AleGameTime gameTime)
+        public void EnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime)
         {
             if (IsVisible)
             {
@@ -366,7 +366,7 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="renderer">- Renderer that should be used for enqueueing (Use Renderer.EnqueueRenderable method)</param>
         /// <param name="gameTime">- Actual game time</param>
-        protected abstract void OnEnqueRenderableUnits(Renderer renderer, AleGameTime gameTime);
+        protected abstract void OnEnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime);
 
         private void BuildTransformation(out Matrix matrix)
         {

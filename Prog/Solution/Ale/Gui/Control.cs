@@ -133,7 +133,7 @@ namespace Ale.Gui
             return new Point((int)screenLocation.X - ScreenLocation.X, (int)screenLocation.Y - ScreenLocation.Y);
         }
 
-        protected internal virtual void OnMouseDown(MouseButton button, MouseManager mouseManager)
+        protected internal virtual void OnMouseDown(MouseButton button, IMouseManager mouseManager)
         {
             if (null != MouseDown)
             {
@@ -141,7 +141,7 @@ namespace Ale.Gui
             }
         }
 
-        protected internal virtual void OnMouseUp(MouseButton button, MouseManager mouseManager)
+        protected internal virtual void OnMouseUp(MouseButton button, IMouseManager mouseManager)
         {
             if (null != MouseUp)
             {

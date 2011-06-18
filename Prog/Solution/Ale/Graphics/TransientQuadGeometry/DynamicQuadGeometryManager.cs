@@ -23,11 +23,18 @@ using Microsoft.Xna.Framework;
 
 namespace Ale.Graphics
 {
+    public interface IDynamicQuadGeometryManager<T> : IFrameListener, IDisposable where T : struct
+    {
+        void AllocGeometry(T[] vData, int startIndex, int vCnt, ref TransientQuadGeometry<T> geometry);
+        void AllocGeometry(T[] vData, ref TransientQuadGeometry<T> geometry);
+        void PrepareForRender();
+     }
+
     /// <summary>
     /// Manager of the dynamic quad geometry (see TransientQuadGeometry).
     /// </summary>
     /// <typeparam name="T">Vertex type</typeparam>
-    public class DynamicQuadGeometryManager<T> : IFrameListener, IDisposable where T : struct
+    public class DynamicQuadGeometryManager<T> : IDynamicQuadGeometryManager<T> where T : struct
     {
         #region Fields
 
@@ -72,14 +79,6 @@ namespace Ale.Graphics
         private int mIndexBufferSizeInQuads = -1;
 
         #endregion Fields
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public GraphicsDeviceManager GraphicsDeviceManager
-        {
-            get { return mGraphicsDeviceManager; }
-        }
 
         #region Methods
 
@@ -181,7 +180,7 @@ namespace Ale.Graphics
         /// <summary>
         /// Prepares the graphics device for rendering the geometry based on this manager
         /// </summary>
-        internal void PrepareForRender()
+        public void PrepareForRender()
         {
             mGraphicsDeviceManager.GraphicsDevice.Indices = mIndexBuffer;
         }

@@ -58,13 +58,13 @@ namespace Ale.Graphics
             mVertexBuffer = new DynamicVertexBuffer(graphicsDevice, 4 * VertexPositionTexture.SizeInBytes, BufferUsage.WriteOnly);
         }
 
-        public void Draw(MaterialEffect effect, AleGameTime gameTime,RenderTargetManager renderTargetManager)
+        public void Draw(MaterialEffect effect, AleGameTime gameTime, IRenderTargetManager renderTargetManager)
         {
             PresentationParameters pp = mGraphicsDeviceManager.GraphicsDevice.PresentationParameters;
             Draw(effect, gameTime, renderTargetManager, pp.BackBufferWidth, pp.BackBufferHeight);
         }
 
-        public void Draw(MaterialEffect effect, AleGameTime gameTime, RenderTargetManager renderTargetManager, int width, int height)
+        public void Draw(MaterialEffect effect, AleGameTime gameTime, IRenderTargetManager renderTargetManager, int width, int height)
         {
             var graphicsDevice = mGraphicsDeviceManager.GraphicsDevice;
 

@@ -24,23 +24,31 @@ using Microsoft.Xna.Framework;
 
 namespace Ale.Input
 {
+
+    /// <summary>
+    /// Handler for mouse button events
+    /// </summary>
+    /// <param name="button"></param>
+    /// <param name="mouseManager"></param>
+    public delegate void MouseButtonEventHandler(MouseButton button, IMouseManager mouseManager);
+
+    public interface IMouseManager : IDisposable, IFrameListener
+	{
+        event MouseButtonEventHandler MouseButtonDown;
+        event MouseButtonEventHandler MouseButtonUp;
+        Vector2 CursorPosition { get; }
+        Vector3 CursorPositionDelta { get; }
+        bool ClipRealCursor { get; set; }
+
+        bool IsButtonDown(MouseButton button);
+	}
+
     /// <summary>
     /// Handles mouse input.
     /// Only one instance of mouse manager can exist at a same time
     /// </summary>
-    public sealed class MouseManager : IDisposable, IFrameListener
+    public sealed class MouseManager : IMouseManager 
     {
-        #region Delegates
-
-        /// <summary>
-        /// Handler for mouse button events
-        /// </summary>
-        /// <param name="button"></param>
-        /// <param name="mouseManager"></param>
-        public delegate void MouseButtonEventHandler(MouseButton button, MouseManager mouseManager);
-        
-        #endregion Delegates
-
         #region Events
 
         /// <summary>

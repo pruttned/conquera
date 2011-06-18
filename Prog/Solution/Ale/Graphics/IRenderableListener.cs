@@ -22,7 +22,7 @@ namespace Ale.Graphics
 {
 	public interface IRenderableListener
 	{
-        void OnEnqueRenderableUnits(Renderable renderable, Renderer renderer, AleGameTime gameTime);
+        void OnEnqueRenderableUnits(Renderable renderable, IRenderer renderer, AleGameTime gameTime);
         void OnWorldBoundsChanged(Renderable renderable);
         void OnVisibleChanged(Renderable renderable);
 	}

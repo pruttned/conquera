@@ -23,7 +23,7 @@ namespace Ale.Graphics
 {
     public class GraphicModelRenderableFactory : IRenderableFactory
     {
-        private RenderableProvider mRenderableProvider;
+        private IRenderableProvider mRenderableProvider;
 
         public int Id
         {
@@ -34,8 +34,8 @@ namespace Ale.Graphics
         {
             get { return "GraphicModel"; }
         }
-        
-        public GraphicModelRenderableFactory(RenderableProvider renderableProvider)
+
+        public GraphicModelRenderableFactory(IRenderableProvider renderableProvider)
         {
             mRenderableProvider = renderableProvider;
         }

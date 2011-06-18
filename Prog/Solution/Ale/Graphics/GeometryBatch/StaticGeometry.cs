@@ -25,6 +25,15 @@ using Ale.Scene;
 
 namespace Ale.Graphics
 {
+    public interface IStaticGeometry : IFrameListener, IDisposable
+    {
+        ICamera MainCamera { get; set; }
+        bool ShowWorldBounds { get; set; }
+
+        BathcedModelIdentifier AddGraphicModel(GraphicModel model);
+        void RemoveGraphicModel(BathcedModelIdentifier model);
+    }
+
     /// <summary>
     /// Used for batching many graphic models to bigger vertex and index buffers. 
     /// Batched models are static (no skinning animation is possible).
@@ -33,7 +42,7 @@ namespace Ale.Graphics
     /// Static geometry is divided to geometry batches that are loaded (bulding of its vb and ib) and unloaded dynamically according to view frustum of a 
     /// given camera
     /// </summary>
-    public sealed class StaticGeometry : IFrameListener, IDisposable
+    public sealed class StaticGeometry : IStaticGeometry
     {
         private DynamicallyLoadableObjectsDistanceUnloader mDynamicallyLoadableObjectsDistanceUnloader;
 
@@ -54,11 +63,6 @@ namespace Ale.Graphics
         private Octree mOctree;
 
         private bool mIsDisposed = false;
-
-		public GraphicsDeviceManager GraphicsDeviceManager 
-		{
-			get { return mGraphicsDeviceManager; }
-		}
 
 		/// <summary>
         /// Main scene camera for batch dynamic loading/unloading

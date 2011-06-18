@@ -28,11 +28,26 @@ using Ale.Scene;
 
 namespace Ale.Graphics
 {
-    public sealed class ParticleSystemManager : IDisposable, IFrameListener, ISceneDrawableComponent
+    public interface IParticleSystemManager :IDisposable, IFrameListener, ISceneDrawableComponent
+    {
+        /// <summary>
+        /// Main scene camera for checking psys distance and dynamic loading/unloading
+        /// </summary>
+        ICamera MainCamera { get; set; }
+        
+        ParticleSystem CreateParticleSystem(ContentGroup contentGroup, string particleDescName);
+        ParticleSystem CreateParticleSystem(ParticleSystemDesc particleSystemDesc);
+        void CreateFireAndforgetParticleSystem(ParticleSystemDesc particleSystemDesc, ref Vector3 worldPosition);
+        void CreateFireAndForgetParticleSystem(ParticleSystemDesc particleSystemDesc, Vector3 worldPosition);
+        void EnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime);
+    }
+
+
+    public sealed class ParticleSystemManager : IParticleSystemManager
     {
         #region Fields
 
-        private DynamicQuadGeometryManager<ParticleVertex> mParticleDynamicGeometryManager;
+        private IParticleDynamicGeometryManager mParticleDynamicGeometryManager;
         private DynamicallyLoadableObjectsDistanceUnloader mDynamicallyLoadableObjectsDistanceUnloader;
         private bool mIsDisposed = false;
 
@@ -50,15 +65,10 @@ namespace Ale.Graphics
             get { return mDynamicallyLoadableObjectsDistanceUnloader.MainCamera; }
             set { mDynamicallyLoadableObjectsDistanceUnloader.MainCamera = value; }
         }
-        
-        internal DynamicQuadGeometryManager<ParticleVertex> ParticleDynamicGeometryManager
-        {
-            get { return mParticleDynamicGeometryManager; }
-        }
                 
         #endregion Properties
 
-        public ParticleSystemManager(ParticleDynamicGeometryManager particleDynamicGeometryManager, ICamera mainCamera)
+        public ParticleSystemManager(IParticleDynamicGeometryManager particleDynamicGeometryManager, ICamera mainCamera)
         {
             if (null == particleDynamicGeometryManager) throw new ArgumentNullException("particleDynamicGeometryManager");
             if (null == mainCamera) throw new ArgumentNullException("mainCamera");
@@ -80,7 +90,7 @@ namespace Ale.Graphics
         {
             if (null == particleSystemDesc) throw new ArgumentNullException("particleSystemDesc");
 
-            ParticleSystem particleSystem = new ParticleSystem(this, particleSystemDesc, true);
+            ParticleSystem particleSystem = new ParticleSystem(mParticleDynamicGeometryManager, particleSystemDesc, true);
             mDynamicallyLoadableObjectsDistanceUnloader.RegisterObject(particleSystem);
 
             return particleSystem;
@@ -90,7 +100,7 @@ namespace Ale.Graphics
         {
             if (null == particleSystemDesc) throw new ArgumentNullException("particleSystemDesc");
 
-            ParticleSystem particleSystem = new ParticleSystem(this, particleSystemDesc, false);
+            ParticleSystem particleSystem = new ParticleSystem(mParticleDynamicGeometryManager, particleSystemDesc, false);
             particleSystem.Position = worldPosition;
             mFireAndForgetParticleSystems.Add(particleSystem);
         }
@@ -114,7 +124,7 @@ namespace Ale.Graphics
             }
         }
 
-        public void EnqueRenderableUnits(Renderer renderer, AleGameTime gameTime)
+        public void EnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime)
         {
             if (0 != mFireAndForgetParticleSystems.Count)
             {
@@ -136,7 +146,7 @@ namespace Ale.Graphics
             }
         }
 
-        void ISceneDrawableComponent.EnqueRenderableUnits(AleGameTime gameTime, Renderer renderer, ScenePass scenePass)
+        void ISceneDrawableComponent.EnqueRenderableUnits(AleGameTime gameTime, IRenderer renderer, ScenePass scenePass)
         {
             EnqueRenderableUnits(renderer, gameTime);
         }

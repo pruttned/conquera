@@ -59,7 +59,7 @@ namespace Ale.Scene
 
         #region ISceneDrawableComponent Members
 
-        public void EnqueRenderableUnits(AleGameTime gameTime, Renderer renderer, ScenePass scenePass)
+        public void EnqueRenderableUnits(AleGameTime gameTime, IRenderer renderer, ScenePass scenePass)
         {
             mGraphicsModel.EnqueRenderableUnits(renderer, gameTime);
         }

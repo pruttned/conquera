@@ -41,11 +41,21 @@ namespace Ale.Content
     {
         public override CompiledSpecialEffect Process(SpecialEffectContent input, ContentProcessorContext context)
         {
+            float duration = 0;
             var compiledSpecialEffect = new CompiledSpecialEffect();
-            foreach (var obj in input.Objects)
+            foreach (var objC in input.Objects)
             {
-                compiledSpecialEffect.Objects.Add(obj.Process(context));
+                var obj = objC.Process(context);
+                compiledSpecialEffect.Objects.Add(obj);
+
+                if (null != obj.Anim && duration < obj.Anim.Duration)
+                {
+                    duration = obj.Anim.Duration;
+                }
             }
+            compiledSpecialEffect.Duration = duration;
+            //todo marker animation  - also update duration 
+
             return compiledSpecialEffect;
         }
     }

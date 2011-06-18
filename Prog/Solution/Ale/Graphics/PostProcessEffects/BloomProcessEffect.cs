@@ -121,7 +121,7 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="graphicsDeviceManager"></param>
         /// <param name="content"></param>
-        public BloomProcessEffect(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentManager content)
+        public BloomProcessEffect(GraphicsDeviceManager graphicsDeviceManager, IRenderTargetManager renderTargetManager, ContentManager content)
             : base(graphicsDeviceManager, renderTargetManager)
         {
             //mExtractBrightnessEffect = content.Load<MaterialEffect>(@"PostProcessEffects/ExtractBrightness");

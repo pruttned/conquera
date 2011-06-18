@@ -25,7 +25,25 @@ using Microsoft.Xna.Framework;
 
 namespace Ale.Graphics
 {
-    public sealed class RenderTargetManager : IDisposable
+    public interface IRenderTargetManager : IDisposable
+    {
+        GraphicsDeviceManager GraphicsDeviceManager { get; }
+        AleRenderTarget this[NameId item] { get; }
+
+        AleRenderTarget CreateRenderTarget(NameId name, int width, int height, int numberLevels, SurfaceFormat format, DepthFormat depthFormat, MultiSampleType multiSampleType, int multiSampleQuality, RenderTargetUsage usage);
+        AleRenderTarget CreateRenderTarget(NameId name, int width, int height, int numberLevels, SurfaceFormat format, MultiSampleType multiSampleType, int multiSampleQuality, RenderTargetUsage usage);
+        AleRenderTarget CreateRenderTarget(NameId name, int width, int height, int numberLevels, SurfaceFormat format, DepthFormat depthFormat, MultiSampleType multiSampleType, int multiSampleQuality);
+        AleRenderTarget CreateRenderTarget(NameId name, int width, int height, int numberLevels, SurfaceFormat format, MultiSampleType multiSampleType, int multiSampleQuality);
+        AleRenderTarget CreateRenderTarget(NameId name, int width, int height, int numberLevels, SurfaceFormat format, DepthFormat depthFormat, RenderTargetUsage usage);
+        AleRenderTarget CreateRenderTarget(NameId name, int width, int height, int numberLevels, SurfaceFormat format, RenderTargetUsage usage);
+        AleRenderTarget CreateRenderTarget(NameId name, int width, int height, int numberLevels, SurfaceFormat format, DepthFormat depthFormat);
+        AleRenderTarget CreateRenderTarget(NameId name, int width, int height, int numberLevels, SurfaceFormat format);
+        AleRenderTarget GetRenderTarget(NameId name);
+        bool DestroyRenderTarget(NameId name);
+
+    }
+
+    public sealed class RenderTargetManager : IRenderTargetManager
     {
         private Dictionary<NameId, AleRenderTarget> mRenderTargets = new Dictionary<NameId, AleRenderTarget>();
         private GraphicsDeviceManager mGraphicsDeviceManager;
@@ -35,16 +53,6 @@ namespace Ale.Graphics
         public GraphicsDeviceManager GraphicsDeviceManager
         {
             get { return mGraphicsDeviceManager; }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns>Rt or Null</returns>
-        public AleRenderTarget this[string name]
-        {
-            get { return this[(NameId)name]; }
         }
 
         /// <summary>

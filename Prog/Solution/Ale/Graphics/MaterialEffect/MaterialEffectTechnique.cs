@@ -202,7 +202,7 @@ namespace Ale.Graphics
         /// Updates per render target manager
         /// </summary>
         /// <param name="renderTargetManager"></param>
-        internal void PerRenderTargetManagerUpdate(RenderTargetManager renderTargetManager)
+        internal void PerRenderTargetManagerUpdate(IRenderTargetManager renderTargetManager)
         {
             if (null != mRenderTargetAutoParams)
             {

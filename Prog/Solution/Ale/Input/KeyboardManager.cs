@@ -24,21 +24,24 @@ using Microsoft.Xna.Framework.Input;
 namespace Ale.Input
 {
     /// <summary>
+    /// Handler for keyboard events
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="keyboardManager"></param>
+    public delegate void KeyEventHandler(Keys key, IKeyboardManager keyboardManager);
+
+    public interface IKeyboardManager : IFrameListener
+    {
+        bool IsKeyDown(Keys key);
+        event KeyEventHandler KeyDown;
+        event KeyEventHandler KeyUp;
+    }
+
+    /// <summary>
     /// Keyboard manager
     /// </summary>
-    public class KeyboardManager : IFrameListener
+    public class KeyboardManager : IKeyboardManager
     {
-        #region Delegates
-        
-        /// <summary>
-        /// Handler for keyboard events
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="keyboardManager"></param>
-        public delegate void KeyEventHandler(Keys key, KeyboardManager keyboardManager);
-        
-        #endregion Delegates
-
         #region Events
 
         /// <summary>

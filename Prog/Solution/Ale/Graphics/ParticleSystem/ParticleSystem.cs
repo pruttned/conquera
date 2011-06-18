@@ -42,7 +42,7 @@ namespace Ale.Graphics
         private bool mIsDisposed = false;
         private bool mHasDefaultBounds = true;
         private bool mIsEnabled = true;
-
+        
         #region IDynamicallyLoadableObject
 
         public long LastRenderFrameNum
@@ -73,7 +73,7 @@ namespace Ale.Graphics
 
         #endregion IDynamicallyLoadableObject
 
-        internal ParticleSystem(ParticleSystemManager particleSystemManager, ParticleSystemDesc desc, bool loop)
+        internal ParticleSystem(IParticleDynamicGeometryManager particleDynamicGeometryManager, ParticleSystemDesc desc, bool loop)
             :base(new BoundingSphere(Vector3.Zero, 1), false)
         {
             mDesc = desc;
@@ -81,7 +81,7 @@ namespace Ale.Graphics
 
             for (int i = 0; i < mEmitters.Length; ++i)
             {
-                mEmitters[i] = new ParticleEmitter(particleSystemManager, desc.Emitters[i], this, !loop);
+                mEmitters[i] = new ParticleEmitter(particleDynamicGeometryManager, desc.Emitters[i], this, !loop);
             }
             mLoop = loop;
         }
@@ -116,7 +116,7 @@ namespace Ale.Graphics
             }
         }
 
-        protected override void OnEnqueRenderableUnits(Renderer renderer, AleGameTime gameTime)
+        protected override void OnEnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime)
         {
             if (IsVisible)
             {

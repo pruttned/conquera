@@ -26,15 +26,16 @@ using Microsoft.Xna.Framework;
 using Ale.Input;
 using System.Windows.Forms;
 using Ale.Sound;
+using Ale.Content;
 
 namespace Ale.Scene
 {
     public class SceneManager : CompositeFrameListener, IDisposable
     {
         private GraphicsDeviceManager mGraphicsDeviceManager;
-        private MouseManager mMouseManager;
-        private KeyboardManager mKeyboardManager;
-        private ParticleDynamicGeometryManager mParticleDynamicGeometryManager;
+        private IMouseManager mMouseManager;
+        private IKeyboardManager mKeyboardManager;
+        private IParticleDynamicGeometryManager mParticleDynamicGeometryManager;
         private BaseScene mActiveScene;
         private bool mExitingApp = false;
 
@@ -53,7 +54,7 @@ namespace Ale.Scene
         /// <summary>
         /// Gets the mouse manager
         /// </summary>
-        public MouseManager MouseManager
+        public IMouseManager MouseManager
         {
             get { return mMouseManager; }
         }
@@ -61,40 +62,53 @@ namespace Ale.Scene
         /// <summary>
         /// Gets the keyboard manager
         /// </summary>
-        public KeyboardManager KeyboardManager
+        public IKeyboardManager KeyboardManager
         {
             get { return mKeyboardManager; }
         }
 
-        public ParticleDynamicGeometryManager ParticleDynamicGeometryManager
+        public IParticleDynamicGeometryManager ParticleDynamicGeometryManager
         {
             get { return mParticleDynamicGeometryManager; }
         }
 
         public SoundManager SoundManager { get; private set; }
 
+        public IAleServiceProvider Services { get; private set; }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="graphicsDevice"></param>
         /// <param name="renderControl"></param>
-        public SceneManager(GraphicsDeviceManager graphicsDeviceManager, SoundManager mSoundManager, Control renderControl)
+        /// <param name="graphicsDeviceManager"></param>
+        /// <param name="services"></param>
+        /// <param name="content"></param>
+        public SceneManager(GraphicsDeviceManager graphicsDeviceManager, Control renderControl, IAleServiceProvider services, AleContentManager content)
         {
             if (null == graphicsDeviceManager) { throw new NullReferenceException("graphicsDeviceManager"); }
             if (null == renderControl) { throw new NullReferenceException("renderControl"); }
+            if (null == services) throw new ArgumentNullException("services");
+            if (null == content) throw new ArgumentNullException("content");
 
+            Services = services;
             mGraphicsDeviceManager = graphicsDeviceManager;
 
-            SoundManager = mSoundManager;
-
-            mMouseManager = new MouseManager(renderControl);
+            mMouseManager = CreateMouseManager(renderControl);
             RegisterFrameListener(mMouseManager);
-            
-            mKeyboardManager = new KeyboardManager();
+            Services.RegisterService(typeof(IMouseManager), mMouseManager);
+
+            mKeyboardManager = CreateKeyboardManager();
             RegisterFrameListener(mKeyboardManager);
-            
-            mParticleDynamicGeometryManager = new ParticleDynamicGeometryManager(graphicsDeviceManager);
+            Services.RegisterService(typeof(IKeyboardManager), mKeyboardManager);
+
+            mParticleDynamicGeometryManager = CreateParticleDynamicGeometryManager();
             RegisterFrameListener(mParticleDynamicGeometryManager);
+            Services.RegisterService(typeof(IParticleDynamicGeometryManager), mParticleDynamicGeometryManager);
+
+            SoundManager = new SoundManager(content.RootDirectory);
+            RegisterFrameListener(SoundManager);
+            Services.RegisterService(typeof(SoundManager), SoundManager);
         }
 
         public void ActivateScene(BaseScene scene)
@@ -136,7 +150,7 @@ namespace Ale.Scene
         /// Draws the frame
         /// </summary>
         /// <param name="gameTime"></param>
-        public void DrawActiveScene(AleGameTime gameTime)
+        public virtual void DrawActiveScene(AleGameTime gameTime)
         {
             if (null != mActiveScene)
             {
@@ -148,7 +162,7 @@ namespace Ale.Scene
         /// Updates the game logic
         /// </summary>
         /// <param name="gameTime"></param>
-        public bool UpdateActiveScene(AleGameTime gameTime)
+        public virtual bool UpdateActiveScene(AleGameTime gameTime)
         {
             if (mExitingApp)
             {
@@ -171,22 +185,48 @@ namespace Ale.Scene
             GC.SuppressFinalize(this);
         }
 
+        public void OnAppActivate()
+        {
+            SoundManager.PauseAll(false);
+        }
+
+        public void OnAppDeactivate()
+        {
+            SoundManager.PauseAll(true);
+        }
+
         protected virtual void Dispose(bool isDisposing)
         {
             if (!mIsDisposed)
             {
                 if (isDisposing)
                 {
-                    mParticleDynamicGeometryManager.Dispose();
-                    mMouseManager.Dispose();
-
                     if (null != mActiveScene)
                     {
                         mActiveScene.Dispose();
                     }
+                    mParticleDynamicGeometryManager.Dispose();
+                    mMouseManager.Dispose();
+                    SoundManager.Dispose();
+
                 }
                 mIsDisposed = true;
             }
+        }
+
+        protected virtual IKeyboardManager CreateKeyboardManager()
+        {
+            return new KeyboardManager();
+        }
+
+        protected virtual IMouseManager CreateMouseManager(System.Windows.Forms.Control renderControl)
+        {
+            return new MouseManager(renderControl);
+        }
+
+        protected virtual IParticleDynamicGeometryManager CreateParticleDynamicGeometryManager()
+        {
+            return new ParticleDynamicGeometryManager(GraphicsDeviceManager);
         }
     }
 }

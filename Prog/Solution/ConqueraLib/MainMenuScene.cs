@@ -48,9 +48,9 @@ namespace Conquera
         public MainMenuScene(SceneManager sceneManager, ContentGroup content)
             : base(sceneManager, content, new BoundingBox(new Vector3(-100,-100,-100), new Vector3(100,100,100)))
         {
-            SceneManager.KeyboardManager.KeyDown += new KeyboardManager.KeyEventHandler(KeyboardManager_KeyDown);
-            SceneManager.MouseManager.MouseButtonUp += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonUp);
-            SceneManager.MouseManager.MouseButtonDown += new MouseManager.MouseButtonEventHandler(MouseManager_MouseButtonDown);
+            SceneManager.KeyboardManager.KeyDown += new KeyEventHandler(KeyboardManager_KeyDown);
+            SceneManager.MouseManager.MouseButtonUp += new MouseButtonEventHandler(MouseManager_MouseButtonUp);
+            SceneManager.MouseManager.MouseButtonDown += new MouseButtonEventHandler(MouseManager_MouseButtonDown);
 
             for (int i = 0; i < 20; ++i)
             {
@@ -81,7 +81,7 @@ namespace Conquera
             GuiManager.Instance.Draw(gameTime);
         }
 
-        protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentGroup content)
+        protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, IRenderTargetManager renderTargetManager, ContentGroup content)
         {
             Camera mainCamera = new Camera(Vector3.Zero,10, new Vector2(-1.1f, 0), 20, 3, 1.55f, -1.57f);
 
@@ -147,7 +147,7 @@ namespace Conquera
             return new ParticleSystemMissile(this, AleMathUtils.GetRandomVector3(ref src, ref srcVar), AleMathUtils.GetRandomVector3(ref dest, ref destVar), FireBallPsys, FireBallPsysSpeed);
         }
 
-        private void KeyboardManager_KeyDown(Microsoft.Xna.Framework.Input.Keys key, KeyboardManager keyboardManager)
+        private void KeyboardManager_KeyDown(Microsoft.Xna.Framework.Input.Keys key, IKeyboardManager keyboardManager)
         {
             if (key == Microsoft.Xna.Framework.Input.Keys.Enter)
             {
@@ -163,12 +163,12 @@ namespace Conquera
             }
         }
 
-        private void MouseManager_MouseButtonUp(MouseButton button, MouseManager mouseManager)
+        private void MouseManager_MouseButtonUp(MouseButton button, IMouseManager mouseManager)
         {
             GuiManager.Instance.HandleMouseUp(button);
         }
 
-        private void MouseManager_MouseButtonDown(MouseButton button, MouseManager mouseManager)
+        private void MouseManager_MouseButtonDown(MouseButton button, IMouseManager mouseManager)
         {
             GuiManager.Instance.HandleMouseDown(button);
         }

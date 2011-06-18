@@ -23,7 +23,7 @@ namespace Ale.Graphics
 {
     public class ParticleSystemRenderableFactory : IRenderableFactory
     {
-        private ParticleSystemManager mParticleSystemManager;
+        private IParticleSystemManager mParticleSystemManager;
 
         public int Id
         {
@@ -35,7 +35,7 @@ namespace Ale.Graphics
             get { return "ParticleSys"; }
         }
 
-        public ParticleSystemRenderableFactory(ParticleSystemManager particleSystemManager)
+        public ParticleSystemRenderableFactory(IParticleSystemManager particleSystemManager)
         {
             mParticleSystemManager = particleSystemManager;
         }

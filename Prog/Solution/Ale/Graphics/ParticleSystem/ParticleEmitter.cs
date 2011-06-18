@@ -112,12 +112,11 @@ namespace Ale.Graphics
 
         private bool mDeactivateAfterCycle;
 
-        private ParticleSystemManager mParticleSystemManager;
         private ICamera mSortedForCamera = null;
 
         private ParticleSystem mParticleSystem;
         private TransientQuadGeometry<ParticleVertex> mTransientQuadGeometry = new TransientQuadGeometry<ParticleVertex>();
-
+        private IParticleDynamicGeometryManager mParticleDynamicGeometryManager;
 
         public bool IsActive
         {
@@ -145,14 +144,13 @@ namespace Ale.Graphics
         #endregion IRenderableUnit
 
 
-        internal ParticleEmitter(ParticleSystemManager particleSystemManager, ParticleEmitterDesc desc, ParticleSystem particleSystem, bool deactivateAfterCycle)
+        internal ParticleEmitter(IParticleDynamicGeometryManager particleDynamicGeometryManager, ParticleEmitterDesc desc, ParticleSystem particleSystem, bool deactivateAfterCycle)
             :base(new BoundingSphere(), false)
         {
-            mParticleSystemManager = particleSystemManager;
             mDesc = desc;
             mParticleSystem = particleSystem;
             mDeactivateAfterCycle = deactivateAfterCycle;
-
+            mParticleDynamicGeometryManager = particleDynamicGeometryManager;
             Position = desc.RelativePosition;
         }
 
@@ -286,7 +284,7 @@ namespace Ale.Graphics
             return mParticleVertices;
         }
 
-        protected override void OnEnqueRenderableUnits(Renderer renderer, AleGameTime gameTime)
+        protected override void OnEnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime)
         {
             if (mLastRenderedFrameNum != gameTime.FrameNum) //first render a current frame
             {
@@ -319,7 +317,7 @@ namespace Ale.Graphics
                             }
                         }
 
-                        mParticleSystemManager.ParticleDynamicGeometryManager.AllocGeometry(particleVertices, 0, particlesToRender * 4, ref mTransientQuadGeometry);
+                        mParticleDynamicGeometryManager.AllocGeometry(particleVertices, 0, particlesToRender * 4, ref mTransientQuadGeometry);
                         mLastRenderedFrameNum = gameTime.FrameNum;
                     }
                 }

@@ -45,7 +45,7 @@ namespace Ale.Graphics
         /// Updates the binded parameter's value
         /// </summary>
         /// <param name="gameTime">- Actual game time (null = reset parameter)</param>
-        public void Update(RenderTargetManager renderTargetManager)
+        public void Update(IRenderTargetManager renderTargetManager)
         {
             if (null != renderTargetManager)
             {

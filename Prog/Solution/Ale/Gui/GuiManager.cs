@@ -80,7 +80,7 @@ namespace Ale.Gui
             }
         }
 
-        public MouseManager MouseManager { get; private set; }
+        public IMouseManager MouseManager { get; private set; }
 
         public bool HandlesMouse
         {
@@ -93,7 +93,7 @@ namespace Ale.Gui
             }
         }
 
-        private GuiManager(GraphicsDeviceManager graphicsDeviceManager, AleContentManager content, MouseManager mouseManager)
+        private GuiManager(GraphicsDeviceManager graphicsDeviceManager, AleContentManager content, IMouseManager mouseManager)
         {
             GraphicsDevice device = graphicsDeviceManager.GraphicsDevice;
             mGraphicsDeviceManager = graphicsDeviceManager;
@@ -108,7 +108,7 @@ namespace Ale.Gui
             AppSettingsManager.Default.AppSettingsCommitted += new AppSettingsManager.CommittedHandler(Default_AppSettingsCommitted);
         }
 
-        public static void Initialize(GraphicsDeviceManager graphicsDeviceManager, AleContentManager content, MouseManager mouseManager)
+        public static void Initialize(GraphicsDeviceManager graphicsDeviceManager, AleContentManager content, IMouseManager mouseManager)
         {
             if (Instance != null)
             {

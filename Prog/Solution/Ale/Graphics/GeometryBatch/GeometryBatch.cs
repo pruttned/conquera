@@ -399,7 +399,7 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="renderer"></param>
         /// <param name="gameTime"></param>
-        protected override void OnEnqueRenderableUnits(Renderer renderer, AleGameTime gameTime)
+        protected override void OnEnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime)
         {
             if (!IsLoaded)
             {

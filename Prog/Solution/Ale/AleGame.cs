@@ -80,6 +80,8 @@ namespace Ale
             get { return mGraphicsDeviceManager; }
         }
 
+        public IAleServiceProvider AleServiceProvider { get; private set; }
+
         #endregion Properties
 
         #region Methods
@@ -93,8 +95,10 @@ namespace Ale
         public AleGame(BaseApplication baseApplication, AleRenderControl renderControl, string dataDirectory, string modFile)
             :base()
         {
+            AleServiceProvider = new AleServiceProvider(Services);
+
             Content.Dispose();
-            Content = mAleContentManager = new AleContentManager(Services, modFile, dataDirectory);
+            Content = mAleContentManager = new AleContentManager(AleServiceProvider, modFile, dataDirectory);
             mAleRenderControl = renderControl;
 
             AleContentManager.RegisterAssetTypeDirectory(typeof(Texture), "Textures");
@@ -105,7 +109,7 @@ namespace Ale
             AleContentManager.RegisterAssetTypeDirectory(typeof(Ale.Gui.Palette), "GuiPalettes");
             AleContentManager.RegisterAssetTypeDirectory(typeof(SpriteFont), "Fonts");
             AleContentManager.RegisterAssetTypeDirectory(typeof(Mesh), "Models");
-            AleContentManager.RegisterAssetTypeDirectory(typeof(SpecialEffect), "SpecialEffects");
+            AleContentManager.RegisterAssetTypeDirectory(typeof(SpecialEffectDesc), "SpecialEffects");
 
             mBaseApplication = baseApplication;
 
@@ -173,7 +177,7 @@ namespace Ale
             {
                 throw new InvalidOperationException("Couldn't find graphicsDeviceManager field in the Game class");
             }
-            IGraphicsDeviceManager graphicsDeviceManager = this.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;
+            IGraphicsDeviceManager graphicsDeviceManager = this.AleServiceProvider.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;
             if (graphicsDeviceManager != null)
             {
                 graphicsDeviceManager.CreateDevice();

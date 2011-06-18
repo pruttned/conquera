@@ -70,7 +70,7 @@ namespace Ale.Graphics
 
         private FullScreenQuad mFullScreenQuad;
 
-        private RenderTargetManager mRenderTargetManager;
+        private IRenderTargetManager mRenderTargetManager;
 
         #endregion Fields
 
@@ -120,7 +120,7 @@ namespace Ale.Graphics
         /// Ctor
         /// </summary>
         /// <param name="graphicsDevice"></param>
-        public PostProcessEffect(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager)
+        public PostProcessEffect(GraphicsDeviceManager graphicsDeviceManager, IRenderTargetManager renderTargetManager)
         {
             mGraphicsDeviceManager = graphicsDeviceManager;
             mFullScreenQuad = new FullScreenQuad(graphicsDeviceManager);
