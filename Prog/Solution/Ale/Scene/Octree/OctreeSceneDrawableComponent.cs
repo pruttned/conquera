@@ -42,7 +42,7 @@ namespace Ale.Scene
         {
         }
 
-        public void EnqueRenderableUnits(AleGameTime gameTime, Renderer renderer, ScenePass scenePass)
+        public void EnqueRenderableUnits(AleGameTime gameTime, IRenderer renderer, ScenePass scenePass)
         {
             mSceneQueuingStatistics = ForEachObject(delegate(IOctreeObject obj)
             {

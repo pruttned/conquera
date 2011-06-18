@@ -24,11 +24,11 @@ using Ale.Tools;
 
 namespace Ale.Content
 {
-    public class SpecialEffectReader : ContentTypeReader<SpecialEffect>
+    public class SpecialEffectReader : ContentTypeReader<SpecialEffectDesc>
     {
-        protected override SpecialEffect Read(ContentReader input, SpecialEffect existingInstance)
+        protected override SpecialEffectDesc Read(ContentReader input, SpecialEffectDesc existingInstance)
         {
-            return new SpecialEffect(input);
+            return new SpecialEffectDesc(input);
         }
     }
 
@@ -78,7 +78,7 @@ namespace Ale.Content
             var obj = (MeshSpecialEffectObjectDesc)base.Read(input);
 
             obj.Mesh = new Mesh(input);
-            Dictionary<string, Material> materials = new Dictionary<string, Material>();
+            Dictionary<NameId, Material> materials = new Dictionary<NameId, Material>();
             //materials
             foreach (var meshPart in obj.Mesh.MeshParts)
             {
@@ -86,7 +86,7 @@ namespace Ale.Content
                 materials[materialGroup] = input.ContentManager.Load<Material>(materialGroup);
             }
 
-            obj.Materials = new ReadOnlyDictionary<string, Material>(materials);
+            obj.Materials = new ReadOnlyDictionary<NameId, Material>(materials);
             return obj;
         }
         protected override SpecialEffectObjectDesc CreateSpecialEffectObject()

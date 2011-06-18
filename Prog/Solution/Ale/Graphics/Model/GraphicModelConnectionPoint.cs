@@ -68,7 +68,7 @@ namespace Ale.Graphics
             UpdateWorldTransformation();
         }
 
-        public void EnqueRenderableUnits(Renderer renderer, AleGameTime gameTime)
+        public void EnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime)
         {
             if (null != mRenderables)
             {

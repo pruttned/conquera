@@ -193,7 +193,7 @@ namespace Conquera.Editor
             }
         }
 
-        protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentGroup content)
+        protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, IRenderTargetManager renderTargetManager, ContentGroup content)
         {
             //dummy
             Camera mainCamera = new Camera(Vector3.Zero, 10, new Vector2(-1.1f, 0), 20, 3, 1.55f, -1.57f);

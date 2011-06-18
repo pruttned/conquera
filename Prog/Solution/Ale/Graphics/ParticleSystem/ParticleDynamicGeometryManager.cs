@@ -25,7 +25,11 @@ using Microsoft.Xna.Framework;
 
 namespace Ale.Graphics
 {
-    public class ParticleDynamicGeometryManager : DynamicQuadGeometryManager<ParticleVertex>
+    public interface IParticleDynamicGeometryManager : IDynamicQuadGeometryManager<ParticleVertex>
+    {
+    }
+
+    public class ParticleDynamicGeometryManager : DynamicQuadGeometryManager<ParticleVertex>, IParticleDynamicGeometryManager
     {
         public ParticleDynamicGeometryManager(GraphicsDeviceManager graphicsDeviceManager)
             : base(graphicsDeviceManager, new VertexDeclaration(graphicsDeviceManager.GraphicsDevice, ParticleVertex.VertexElements))

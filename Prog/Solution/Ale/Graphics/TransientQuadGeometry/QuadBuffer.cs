@@ -36,7 +36,7 @@ namespace Ale.Graphics
         private DynamicVertexBuffer mVertexBuffer;
 
         /// <summary>
-        /// MAximum number of quads that can this buffer hold
+        /// Maximum number of quads that can this buffer hold
         /// </summary>
         private int mMaxQuadCnt;
 
@@ -68,7 +68,7 @@ namespace Ale.Graphics
         /// <summary>
         /// Parent dynamic geometry manager
         /// </summary>
-        DynamicQuadGeometryManager<T> mDynamicQuadGeometryManager;
+        IDynamicQuadGeometryManager<T> mDynamicQuadGeometryManager;
 
         /// <summary>
         /// Whether is this object disposed
@@ -106,7 +106,7 @@ namespace Ale.Graphics
         /// <param name="graphicsDeviceManager">- Graphics device manager</param>
         /// <param name="vertexDeclaration">- Vertex declaration</param>
         /// <param name="dynamicQuadGeometryManager">- Parent DynamicGeometryManager</param>
-        public QuadBuffer(int quadCnt, GraphicsDeviceManager graphicsDeviceManager, VertexDeclaration vertexDeclaration, DynamicQuadGeometryManager<T> dynamicQuadGeometryManager)
+        public QuadBuffer(int quadCnt, GraphicsDeviceManager graphicsDeviceManager, VertexDeclaration vertexDeclaration, IDynamicQuadGeometryManager<T> dynamicQuadGeometryManager)
         {
             mDynamicQuadGeometryManager = dynamicQuadGeometryManager;
 

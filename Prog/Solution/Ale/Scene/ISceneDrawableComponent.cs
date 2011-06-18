@@ -28,6 +28,6 @@ namespace Ale.Scene
     /// </summary>
     public interface ISceneDrawableComponent
     {
-        void EnqueRenderableUnits(AleGameTime gameTime, Renderer renderer, ScenePass scenePass);
+        void EnqueRenderableUnits(AleGameTime gameTime, IRenderer renderer, ScenePass scenePass);
     }
 }

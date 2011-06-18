@@ -80,7 +80,7 @@ namespace Ale.Scene
         /// </summary>
         /// <param name="camera"></param>
         /// <param name="renderer"></param>
-        protected internal void EnqueBoundingBoxRenderable(Renderer renderer, AleGameTime gameTime)
+        protected internal void EnqueBoundingBoxRenderable(IRenderer renderer, AleGameTime gameTime)
         {
             if(null == mBoundingBoxRenderable)
             {
@@ -241,7 +241,7 @@ namespace Ale.Scene
         /// <param name="renderer"></param>
         /// <param name="gameTime"></param>
         /// <param name="cameraFrustumOctreeObjectNodeFilter"></param>
-        protected void EnqueDebugRenderables(Renderer renderer, AleGameTime gameTime, CameraFrustumOctreeObjectNodeFilter cameraFrustumOctreeObjectNodeFilter)
+        protected void EnqueDebugRenderables(IRenderer renderer, AleGameTime gameTime, CameraFrustumOctreeObjectNodeFilter cameraFrustumOctreeObjectNodeFilter)
         {
             EnqueDebugRenderables(renderer, gameTime, cameraFrustumOctreeObjectNodeFilter, true);
         }
@@ -315,7 +315,7 @@ namespace Ale.Scene
         /// <param name="gameTime"></param>
         /// <param name="cameraFrustumOctreeObjectNodeFilter"></param>
         /// <param name="checkIfVisible"></param>
-        private void EnqueDebugRenderables(Renderer renderer, AleGameTime gameTime, CameraFrustumOctreeObjectNodeFilter cameraFrustumOctreeObjectNodeFilter, bool checkIfVisible)
+        private void EnqueDebugRenderables(IRenderer renderer, AleGameTime gameTime, CameraFrustumOctreeObjectNodeFilter cameraFrustumOctreeObjectNodeFilter, bool checkIfVisible)
         {
             NodeFilterResult thisNodeFilterResult;
             if (checkIfVisible)

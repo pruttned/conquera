@@ -111,7 +111,7 @@ namespace Ale.Scene
         /// </summary>
         /// <param name="renderer"></param>
         /// <param name="gameTime"></param>
-        public void EnqueDebugRenderables(ICamera camera, Renderer renderer, AleGameTime gameTime)
+        public void EnqueDebugRenderables(ICamera camera, IRenderer renderer, AleGameTime gameTime)
         {
             mCameraFrustumOctreeObjectNodeFilter.Camera = camera;
             EnqueDebugRenderables(renderer, gameTime, mCameraFrustumOctreeObjectNodeFilter);

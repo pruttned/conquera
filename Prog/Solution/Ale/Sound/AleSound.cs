@@ -53,6 +53,11 @@ namespace Ale.Sound
             SoundManager.CheckError(soundManager.System.createSound(fileName, Mode, ref mSound));
         }
 
+        /// <summary>
+        /// !! Not protected - will be visible outside of assembly
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="paused"></param>
         internal void Play(ref FMOD.Channel channel, bool paused)
         {
             SoundManager.CheckError(SoundManager.System.playSound(FMOD.CHANNELINDEX.FREE, mSound, true, ref channel));

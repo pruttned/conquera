@@ -152,7 +152,7 @@ namespace Conquera
                 mColorParam.Value = Color;
             }
 
-            protected override void OnEnqueRenderableUnits(Renderer renderer, AleGameTime gameTime)
+            protected override void OnEnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime)
             {
                 if (null != EndCell && null != StartCell)
                 {
@@ -260,7 +260,7 @@ namespace Conquera
             }
         }
 
-        void ISceneDrawableComponent.EnqueRenderableUnits(AleGameTime gameTime, Renderer renderer, ScenePass scenePass)
+        void ISceneDrawableComponent.EnqueRenderableUnits(AleGameTime gameTime, IRenderer renderer, ScenePass scenePass)
         {
             if (null != StartCell && null != EndCell && StartCell != EndCell)
             {

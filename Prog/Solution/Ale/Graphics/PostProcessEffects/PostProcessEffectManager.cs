@@ -26,10 +26,16 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Ale.Graphics
 {
+    public interface IPostProcessEffectManager : IDisposable
+    {
+        PostProcessEffectCollection PostProcessEffects { get; }
+        void Apply(AleGameTime gameTime);
+    }
+
     /// <summary>
     /// Manager of the post-prcess effects
     /// </summary>
-    public sealed class PostProcessEffectManager : IDisposable
+    public sealed class PostProcessEffectManager : IPostProcessEffectManager
     {
         #region Fields
         
@@ -63,14 +69,6 @@ namespace Ale.Graphics
         #region Properties
 
         /// <summary>
-        /// Gets the graphics device
-        /// </summary>
-        public GraphicsDevice GraphicsDevice
-        {
-            get { return mGraphicsDeviceManager.GraphicsDevice; }
-        }
-
-        /// <summary>
         /// Gets the collection of registered post-process effects. Effect are applied in order as they are present in
         /// the collection (from 0 to last).
         /// </summary>
@@ -85,6 +83,14 @@ namespace Ale.Graphics
         private bool ContentIsLoaded
         {
             get { return (null != mScreenResolveTexture); }
+        }
+
+        /// <summary>
+        /// Gets the graphics device
+        /// </summary>
+        private GraphicsDevice GraphicsDevice
+        {
+            get { return mGraphicsDeviceManager.GraphicsDevice; }
         }
 
         #endregion Properties

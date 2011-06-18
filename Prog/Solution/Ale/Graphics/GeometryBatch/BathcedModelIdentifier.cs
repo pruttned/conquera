@@ -27,7 +27,7 @@ namespace Ale.Graphics
     {
         private int mIdInBatch;
         private GeometryBatch mBatch;
-        private StaticGeometry mStaticGeometry;
+        private IStaticGeometry mStaticGeometry;
         
 		public int IdInBatch 
         {
@@ -39,12 +39,12 @@ namespace Ale.Graphics
 			get { return mBatch; }
 		}
 
-        public StaticGeometry StaticGeometry
+        public IStaticGeometry StaticGeometry
         {
             get { return mStaticGeometry; }
         }
 
-        internal BathcedModelIdentifier(StaticGeometry staticGeometry, GeometryBatch batch, int idInBatch)
+        internal BathcedModelIdentifier(IStaticGeometry staticGeometry, GeometryBatch batch, int idInBatch)
 		{
             mStaticGeometry = staticGeometry;
 			mIdInBatch = idInBatch;

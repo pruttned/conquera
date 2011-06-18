@@ -135,7 +135,7 @@ namespace Ale.Graphics
             Init(mesh, partMaterialsList);
         }
 
-        public GraphicModel(GraphicModelDesc desc, RenderableProvider renderableProvider, ContentGroup content)
+        public GraphicModel(GraphicModelDesc desc, IRenderableProvider renderableProvider, ContentGroup content)
             :this(desc.Mesh,desc.PartMaterials) 
         {
             BoundsMultiplicator = desc.BoundsMultiplicator;
@@ -259,7 +259,7 @@ namespace Ale.Graphics
             }
         }
 
-        protected override void OnEnqueRenderableUnits(Renderer renderer, AleGameTime gameTime)
+        protected override void OnEnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime)
         {
             for (int i = 0; i < mGraphicModelParts.Count; ++i)
             {

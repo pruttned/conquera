@@ -68,7 +68,7 @@ namespace Ale.Scene
         {
             get { return Scene.SceneManager.GraphicsDeviceManager; }
         }
-        public RenderTargetManager RenderTargetManager 
+        public IRenderTargetManager RenderTargetManager 
         {
             get { return Scene.RenderTargetManager; }
         }
@@ -110,7 +110,7 @@ namespace Ale.Scene
             GC.SuppressFinalize(this);
         }
 
-        public virtual void Draw(GraphicsDevice graphicsDevice, Renderer renderer, AleGameTime gameTime)
+        public virtual void Draw(GraphicsDevice graphicsDevice, IRenderer renderer, AleGameTime gameTime)
         {
             Begin(graphicsDevice, renderer);
             EnqueRenderableUnits(graphicsDevice, gameTime, renderer);
@@ -122,7 +122,7 @@ namespace Ale.Scene
         /// </summary>
         /// <param name="renderTargetManager"></param>
         /// <returns></returns>
-        protected virtual AleRenderTarget CreateRenderTarget(RenderTargetManager renderTargetManager)
+        protected virtual AleRenderTarget CreateRenderTarget(IRenderTargetManager renderTargetManager)
         {
             return null;
         }
@@ -149,7 +149,7 @@ namespace Ale.Scene
             mRenderTarget = null;
         }
 
-        protected virtual void Begin(GraphicsDevice graphicsDevice, Renderer renderer)
+        protected virtual void Begin(GraphicsDevice graphicsDevice, IRenderer renderer)
         {
             if (mNeedReload)
             {
@@ -167,12 +167,12 @@ namespace Ale.Scene
             }
         }
 
-        protected virtual void End(GraphicsDevice graphicsDevice, AleGameTime gameTime, Renderer renderer)
+        protected virtual void End(GraphicsDevice graphicsDevice, AleGameTime gameTime, IRenderer renderer)
         {
             renderer.End(gameTime);
         }
 
-        protected virtual void EnqueRenderableUnits(GraphicsDevice graphicsDevice, AleGameTime gameTime, Renderer renderer)
+        protected virtual void EnqueRenderableUnits(GraphicsDevice graphicsDevice, AleGameTime gameTime, IRenderer renderer)
         {
             mScene.EnqueRenderableUnits(gameTime, this);
         }

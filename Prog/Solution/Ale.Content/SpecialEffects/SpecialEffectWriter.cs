@@ -40,6 +40,7 @@ namespace Ale.Content
     {
         protected override void Write(ContentWriter output, CompiledSpecialEffect value)
         {
+            output.Write(value.Duration);
             //objects
             output.Write(value.Objects.Count);
             foreach (var obj in value.Objects)

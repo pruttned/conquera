@@ -36,7 +36,7 @@ namespace Conquera
         {
         }
 
-        protected override AleRenderTarget CreateRenderTarget(RenderTargetManager renderTargetManager)
+        protected override AleRenderTarget CreateRenderTarget(IRenderTargetManager renderTargetManager)
         {
             PresentationParameters pp = renderTargetManager.GraphicsDeviceManager.GraphicsDevice.PresentationParameters;
             var rt = renderTargetManager.CreateRenderTarget("ShadowMap", pp.BackBufferWidth, pp.BackBufferHeight, 1, pp.BackBufferFormat, DepthFormat.Depth16);

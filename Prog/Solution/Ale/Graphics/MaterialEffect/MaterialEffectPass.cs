@@ -164,7 +164,7 @@ namespace Ale.Graphics
         /// <param name="camera">- Actual camera</param>
         /// <param name="renderableUnit">- Actual renderable unit that is going to be rendered</param>
         /// <param name="renderTargetManager">- Render target manager (nullable)</param>
-        public void Apply(AleGameTime gameTime, ICamera camera, IRenderableUnit renderableUnit, RenderTargetManager renderTargetManager)
+        public void Apply(AleGameTime gameTime, ICamera camera, IRenderableUnit renderableUnit, IRenderTargetManager renderTargetManager)
         {
             mParentTechnique.ParentMaterialEffect.Apply(gameTime, camera, renderableUnit, null, renderTargetManager, this);
         }
@@ -180,7 +180,7 @@ namespace Ale.Graphics
         /// <param name="renderableUnit">- Actual renderable unit that is going to be rendered</param>
         /// <param name="scene">- nullable</param>
         /// <param name="renderTargetManager">- Render target manager (nullable)</param>
-        public void Apply(AleGameTime gameTime, ICamera camera, IRenderableUnit renderableUnit, Scene.BaseScene scene, RenderTargetManager renderTargetManager)
+        public void Apply(AleGameTime gameTime, ICamera camera, IRenderableUnit renderableUnit, Scene.BaseScene scene, IRenderTargetManager renderTargetManager)
         {
             mParentTechnique.ParentMaterialEffect.Apply(gameTime, camera, renderableUnit, scene, renderTargetManager, this);
         }

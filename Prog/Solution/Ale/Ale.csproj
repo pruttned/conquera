@@ -99,6 +99,7 @@
     <Compile Include="AleRenderControl.Designer.cs">
       <DependentUpon>AleRenderControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="AleServiceProvider.cs" />
     <Compile Include="CompositeFrameListener.cs" />
     <Compile Include="Content\AleAssetInfo.cs" />
     <Compile Include="Content\BaseAssetLoader.cs" />
@@ -324,6 +325,9 @@
     <Compile Include="Sound\SoundSettings.cs" />
     <Compile Include="SpecialEffects\SpecialEffect.cs" />
     <Compile Include="SpecialEffects\SpecialEffectAnimKeyframe.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectDesc.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectManager.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectObject.cs" />
     <Compile Include="SpecialEffects\SpecialEffectObjectAnim.cs" />
     <Compile Include="Content\SpecialEffectReader.cs" />
     <Compile Include="SpecialEffects\SpecialEffectObjectDesc.cs" />

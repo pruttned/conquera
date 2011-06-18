@@ -67,7 +67,7 @@ namespace Ale.Graphics
             Color = desc.Color;
         }
 
-        protected override void OnEnqueRenderableUnits(Renderer renderer, AleGameTime gameTime)
+        protected override void OnEnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime)
         {
             renderer.EnqueLight(this);
         }

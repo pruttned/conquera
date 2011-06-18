@@ -70,7 +70,6 @@ namespace Ale.Content
             RegisterSpecialEffectObjectImporter(new ParticleSystemSpecialEffectObjectImporter());
             RegisterSpecialEffectObjectImporter(new DummySpecialEffectObjectImporter());
         }
-
     }
 
     public abstract class SpecialEffectObjectImporter
@@ -89,7 +88,6 @@ namespace Ale.Content
             content.Position = position;
             content.Orientation = orientation;
             content.Scale = scale;
-
             content.Anim = ImportAnim(objectNode);
 
             return content;
@@ -113,7 +111,7 @@ namespace Ale.Content
                 Vector3 position;
                 Quaternion orientation;
                 float scale;
-                XmlCommonParser.LoadTransformation(objectNode, out position, out orientation, out scale);
+                XmlCommonParser.LoadTransformation(keyframeNode, out position, out orientation, out scale);
                 keyframes.Add(new SpecialEffectAnimKeyframe(time, position, orientation, scale));
             }
 

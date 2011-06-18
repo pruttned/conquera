@@ -38,6 +38,7 @@ namespace Ale.Content
     public class CompiledSpecialEffect
     {
         public List<CompiledSpecialEffectObject> Objects { get; private set; }
+        public float Duration { get; set; }
 
         public CompiledSpecialEffect()
         {

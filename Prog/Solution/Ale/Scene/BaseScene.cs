@@ -26,6 +26,7 @@ using Microsoft.Xna.Framework;
 using Ale.Input;
 using Ale.Content;
 using Ale.Sound;
+using Ale.SpecialEffects;
 
 namespace Ale.Scene
 {
@@ -38,20 +39,20 @@ namespace Ale.Scene
         private SceneManager mSceneManager;
         private bool mIsDisposed = false;
         private ScenePass mMainScenePass;
-        private ParticleSystemManager mParticleSystemManager;
-        private RenderableProvider mRenderableProvider = new RenderableProvider();
+        private IParticleSystemManager mParticleSystemManager;
+        private IRenderableProvider mRenderableProvider;
         private ContentGroup mContent;
-        private PostProcessEffectManager mPostProcessEffectManager;
-        private Renderer mRenderer;
-        private RenderTargetManager mRenderTargetManager;
+        private IPostProcessEffectManager mPostProcessEffectManager;
+        private IRenderer mRenderer;
+        private IRenderTargetManager mRenderTargetManager;
 
         private List<ISceneDrawableComponent> mSceneDrawableComponents = new List<ISceneDrawableComponent>();
 
-        public Renderer Renderer
+        public IRenderer Renderer
         {
             get { return mRenderer; }
         }
-        public RenderTargetManager RenderTargetManager
+        public IRenderTargetManager RenderTargetManager
         {
             get { return mRenderTargetManager; }
         }
@@ -60,7 +61,7 @@ namespace Ale.Scene
             get { return mSceneManager; }
         }
 
-        public ParticleSystemManager ParticleSystemManager
+        public IParticleSystemManager ParticleSystemManager
         {
             get { return mParticleSystemManager; }
         }
@@ -70,7 +71,7 @@ namespace Ale.Scene
             get { return mMainScenePass.Camera; }
         }
 
-        public RenderableProvider RenderableProvider
+        public IRenderableProvider RenderableProvider
         {
             get { return mRenderableProvider; }
         }
@@ -85,7 +86,7 @@ namespace Ale.Scene
             get { return mSceneDrawableComponents; }
         }
 
-        public PostProcessEffectManager PostProcessEffectManager
+        public IPostProcessEffectManager PostProcessEffectManager
         {
             get { return mPostProcessEffectManager; }
         }
@@ -94,16 +95,25 @@ namespace Ale.Scene
         {
             get { return mSceneManager.SoundManager; }
         }
+        public ISpecialEffectManager SpecialEffectManager { get; private set; }
+
+        public IAleServiceProvider Services { get; private set; }
 
         public BaseScene(SceneManager sceneManager, ContentGroup content)
         {
             if (null == sceneManager) { throw new NullReferenceException("sceneManager"); }
 
+            Services = new AleServiceProvider(sceneManager.Services);
+
             mSceneManager = sceneManager;
             mContent = content;
-            mRenderTargetManager = new RenderTargetManager(sceneManager.GraphicsDeviceManager);
-            mRenderer = new Renderer(mRenderTargetManager, content);
-            mPostProcessEffectManager = new PostProcessEffectManager(sceneManager.GraphicsDeviceManager);
+            Services.RegisterService(typeof(ContentGroup), mContent);
+            mRenderTargetManager = CreateRenderTargetManager();
+            Services.RegisterService(typeof(IRenderTargetManager), mRenderTargetManager);
+            mRenderer = CreateRenderer();
+            Services.RegisterService(typeof(IRenderer), mRenderer);
+            mPostProcessEffectManager = CreatePostProcessEffectManager();
+            Services.RegisterService(typeof(IPostProcessEffectManager), mPostProcessEffectManager);
 
             mScenePasses = CreateScenePasses(sceneManager.GraphicsDeviceManager, RenderTargetManager, content);
             if(null == mScenePasses ||  0 == mScenePasses.Count)
@@ -115,12 +125,19 @@ namespace Ale.Scene
             {
                 throw new ArgumentException("Name of the main scene phase must be 'Default'");
             }
-            mParticleSystemManager = new ParticleSystemManager(sceneManager.ParticleDynamicGeometryManager, MainCamera);
 
+            mParticleSystemManager = CreateParticleSystemManager();
             SceneDrawableComponents.Add(mParticleSystemManager);
             RegisterFrameListener(mParticleSystemManager);
+            Services.RegisterService(typeof(IParticleSystemManager), mParticleSystemManager);
 
-            RegisterRenderableFactories(RenderableProvider);
+            mRenderableProvider = CreateRenderableProvider();
+            RegisterRenderableFactories(mRenderableProvider);
+            Services.RegisterService(typeof(IRenderableProvider), mRenderableProvider);
+
+            SpecialEffectManager = CreateSpecialEffectManager();
+            SceneDrawableComponents.Add(SpecialEffectManager);
+            Services.RegisterService(typeof(ISpecialEffectManager), SpecialEffectManager);
 
             MainCamera.ViewTransformationChanged += new CameraTransformationChangedHandler(MainCamera_ViewTransformationChanged);
         }
@@ -151,7 +168,7 @@ namespace Ale.Scene
             }
         }
 
-        public virtual void RegisterRenderableFactories(RenderableProvider renderableProvider)
+        public virtual void RegisterRenderableFactories(IRenderableProvider renderableProvider)
         {
             renderableProvider.RegisterFactory(new GraphicModelRenderableFactory(renderableProvider));
             renderableProvider.RegisterFactory(new ParticleSystemRenderableFactory(mParticleSystemManager));
@@ -215,22 +232,22 @@ namespace Ale.Scene
             {
                 if (isDisposing)
                 {
-                    mPostProcessEffectManager.Dispose();
-                    mRenderer.Dispose();
-                    mRenderTargetManager.Dispose();
-                    MainCamera.ViewTransformationChanged -= MainCamera_ViewTransformationChanged;
-
                     foreach (ScenePass scenePass in mScenePasses)
                     {
                         scenePass.Dispose();
                     }
+                    MainCamera.ViewTransformationChanged -= MainCamera_ViewTransformationChanged;
+
                     mPostProcessEffectManager.Dispose();
+                    mRenderer.Dispose();
+                    mRenderTargetManager.Dispose();
+                    mParticleSystemManager.Dispose();
+                    SpecialEffectManager.Dispose();
+                    mRenderableProvider.Dispose();
                 }
                 mIsDisposed = true;
             }
         }
-        
-        //protected abstract void EnqueRenderableUnits(AleGameTime gameTime, Renderer renderer, ICamera camera);
         
         /// <summary>
         /// Creates scene passes. Last scene pass is considered as a main scene phase. It name must be "Default"
@@ -239,7 +256,7 @@ namespace Ale.Scene
         /// <param name="renderTargetManager"></param>
         /// <param name="content"></param>
         /// <returns>Scene passes or null</returns>
-        protected abstract List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, RenderTargetManager renderTargetManager, ContentGroup content);
+        protected abstract List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, IRenderTargetManager renderTargetManager, ContentGroup content);
 
         protected virtual void OnActivatedImpl()
         {
@@ -251,6 +268,30 @@ namespace Ale.Scene
 
         protected abstract void UpdateSoundListener(SoundManager SoundManager);
 
+        protected virtual IRenderableProvider CreateRenderableProvider()
+        {
+            return new RenderableProvider();
+        }
+        protected virtual IParticleSystemManager CreateParticleSystemManager()
+        {
+            return new ParticleSystemManager(SceneManager.ParticleDynamicGeometryManager, MainCamera);
+        }
+        protected virtual IRenderTargetManager CreateRenderTargetManager()
+        {
+            return new RenderTargetManager(SceneManager.GraphicsDeviceManager);
+        }
+        protected virtual IPostProcessEffectManager CreatePostProcessEffectManager()
+        {
+            return new PostProcessEffectManager(SceneManager.GraphicsDeviceManager);
+        }
+        protected virtual IRenderer CreateRenderer()
+        {
+            return new Renderer(RenderTargetManager, Content);
+        }
+        protected virtual ISpecialEffectManager CreateSpecialEffectManager()
+        {
+            return new SpecialEffectManager(Content, Services);
+        } 
         private void MainCamera_ViewTransformationChanged(ICamera camera)
         {
             UpdateSoundListener(SoundManager);

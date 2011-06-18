@@ -22,7 +22,22 @@ using Ale.Content;
 
 namespace Ale.Graphics
 {
-    public sealed class RenderableProvider : IDisposable
+    public interface IRenderableProvider : IDisposable
+    {
+        ICollection<IRenderableFactory> Factories { get; }
+
+        void RegisterFactory(IRenderableFactory factory);
+        IRenderableFactory GetFactory(string name);
+        IRenderableFactory GetFactory(int id);
+        bool TryGetFactory(string name, out IRenderableFactory factory);
+        bool GetFactory(int id, out IRenderableFactory factory);
+        Renderable CreateRenderable(string factory, string renderable, ContentGroup content);
+        Renderable CreateRenderable(string factory, long renderable, ContentGroup content);
+        Renderable CreateRenderable(int factory, string renderable, ContentGroup content);
+        Renderable CreateRenderable(int factory, long renderable, ContentGroup content);
+    }
+
+    public sealed class RenderableProvider : IRenderableProvider
     {
         Dictionary<string, IRenderableFactory> mFactoriesByName = new Dictionary<string, IRenderableFactory>();
         Dictionary<int, IRenderableFactory> mFactoriesById = new Dictionary<int, IRenderableFactory>();

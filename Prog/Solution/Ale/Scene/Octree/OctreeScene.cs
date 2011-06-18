@@ -31,7 +31,7 @@ namespace Ale.Scene
     public abstract class OctreeScene : BaseScene
     {
         private OctreeSceneDrawableComponent mOctree;
-        private StaticGeometry mStaticGeomtery;
+        private IStaticGeometry mStaticGeomtery;
         private List<OctreeSceneObject> mSceneObjects = new List<OctreeSceneObject>();
         private ReadOnlyCollection<OctreeSceneObject> mReadonlySceneObjects;
         private bool mIsUpdatingObjects = false;
@@ -42,7 +42,7 @@ namespace Ale.Scene
             get { return mOctree; }
         }
 
-        public StaticGeometry StaticGeomtery
+        public IStaticGeometry StaticGeomtery
         {
             get { return mStaticGeomtery; }
         }
@@ -68,7 +68,8 @@ namespace Ale.Scene
 
             mReadonlySceneObjects = new ReadOnlyCollection<OctreeSceneObject>(mSceneObjects);
 
-            mStaticGeomtery = new StaticGeometry(SceneManager.GraphicsDeviceManager, Octree, MainCamera, 20);
+            mStaticGeomtery = CreateStaticGeometry();
+                
             RegisterFrameListener(mStaticGeomtery);
         }
 
@@ -148,6 +149,11 @@ namespace Ale.Scene
                 }
             }
             return false;
+        }
+
+        protected virtual IStaticGeometry CreateStaticGeometry()
+        {
+            return new StaticGeometry(SceneManager.GraphicsDeviceManager, Octree, MainCamera, 20);
         }
     }
 }
