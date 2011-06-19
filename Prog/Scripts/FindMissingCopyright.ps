@@ -1,0 +1,1 @@
+dir D:\Prog\Projects\Conquera\Prog\Solution *.cs -Recurse | where {[string]::Join($(Get-Content $_.FullName)) -notmatch "Copyright"}
