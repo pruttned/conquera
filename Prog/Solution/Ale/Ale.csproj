@@ -331,6 +331,8 @@
     <Compile Include="SpecialEffects\SpecialEffectObjectAnim.cs" />
     <Compile Include="Content\SpecialEffectReader.cs" />
     <Compile Include="SpecialEffects\SpecialEffectObjectDesc.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectTimeTriggerAction.cs" />
+    <Compile Include="SpecialEffects\SpecialEffectTimeTriggerDesc.cs" />
     <Compile Include="TimeFunction.cs" />
     <Compile Include="Tools\AleMathUtils.cs" />
     <Compile Include="Tools\CommandLineReader.cs" />

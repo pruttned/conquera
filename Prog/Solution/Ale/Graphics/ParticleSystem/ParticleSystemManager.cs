@@ -37,7 +37,7 @@ namespace Ale.Graphics
         
         ParticleSystem CreateParticleSystem(ContentGroup contentGroup, string particleDescName);
         ParticleSystem CreateParticleSystem(ParticleSystemDesc particleSystemDesc);
-        void CreateFireAndforgetParticleSystem(ParticleSystemDesc particleSystemDesc, ref Vector3 worldPosition);
+        void CreateFireAndForgetParticleSystem(ParticleSystemDesc particleSystemDesc, ref Vector3 worldPosition);
         void CreateFireAndForgetParticleSystem(ParticleSystemDesc particleSystemDesc, Vector3 worldPosition);
         void EnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime);
     }
@@ -96,7 +96,7 @@ namespace Ale.Graphics
             return particleSystem;
         }
 
-        public void CreateFireAndforgetParticleSystem(ParticleSystemDesc particleSystemDesc, ref Vector3 worldPosition)
+        public void CreateFireAndForgetParticleSystem(ParticleSystemDesc particleSystemDesc, ref Vector3 worldPosition)
         {
             if (null == particleSystemDesc) throw new ArgumentNullException("particleSystemDesc");
 
@@ -107,7 +107,7 @@ namespace Ale.Graphics
 
         public void CreateFireAndForgetParticleSystem(ParticleSystemDesc particleSystemDesc, Vector3 worldPosition)
         {
-            CreateFireAndforgetParticleSystem(particleSystemDesc, ref worldPosition);
+            CreateFireAndForgetParticleSystem(particleSystemDesc, ref worldPosition);
         }
 
         public void Dispose()

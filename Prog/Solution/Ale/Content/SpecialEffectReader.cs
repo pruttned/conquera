@@ -32,7 +32,6 @@ namespace Ale.Content
         }
     }
 
-
     public abstract class SpecialEffectObjectReader
     {
         public virtual SpecialEffectObjectDesc Read(ContentReader input)

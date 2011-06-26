@@ -47,6 +47,19 @@ namespace Ale.Content
             {
                 obj.Write(output);
             }
+            //triggers
+            output.Write(value.TimeTriggers.Count);
+            foreach (var trigger in value.TimeTriggers)
+            {
+                output.Write(trigger.Action);
+                output.Write(trigger.Time);
+                output.Write(trigger.Params.Count);
+                foreach (var paramValuePair in trigger.Params)
+                {
+                    output.Write(paramValuePair.Key);
+                    output.Write(paramValuePair.Value);
+                }
+            }
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)

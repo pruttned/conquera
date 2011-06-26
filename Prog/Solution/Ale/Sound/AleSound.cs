@@ -40,7 +40,7 @@ namespace Ale.Sound
         }
 
         /// <summary>
-        /// !! Not protected - will be visible outside of assembly
+        /// !! Not protected - would be visible outside of assembly
         /// </summary>
         internal abstract FMOD.MODE Mode
         {
@@ -54,7 +54,7 @@ namespace Ale.Sound
         }
 
         /// <summary>
-        /// !! Not protected - will be visible outside of assembly
+        /// !! Not protected - would be visible outside of assembly
         /// </summary>
         /// <param name="channel"></param>
         /// <param name="paused"></param>
