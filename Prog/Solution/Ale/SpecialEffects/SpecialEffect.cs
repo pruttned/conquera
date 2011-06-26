@@ -18,14 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Ale.Tools;
-using Ale.Content;
-using Ale.Scene;
 
 namespace Ale.SpecialEffects
 {
@@ -35,16 +30,24 @@ namespace Ale.SpecialEffects
 
         private Vector3 mPos;
         private SpecialEffectDesc mDesc;
+        private ISpecialEffectManager mSpecialEffectManager;
         private List<SpecialEffectObject> mObjects = null;
         private float mEndTime = -1;
         private float mStartTime;
         private bool mPendingDestroy = false;
 
+        private int mFirstTriggerActionIndex = 0;
+
+        private bool HasTimeTriggersToExecute
+        {
+            get { return null != mDesc.TimeTriggers && mFirstTriggerActionIndex < mDesc.TimeTriggers.Count; }
+        }
 
         public SpecialEffect(SpecialEffectDesc desc, Vector3 pos, IAleServiceProvider services)
         {
             mDesc = desc;
             mPos = pos;
+            mSpecialEffectManager = services.GetService<ISpecialEffectManager>();
 
             if (null != desc.Objects)
             {
@@ -56,73 +59,94 @@ namespace Ale.SpecialEffects
             }
         }
 
+        public SpecialEffectObject GetObject(NameId name)
+        {
+            var obj = mObjects.Find(o => name == o.Desc.Name);
+            if (null == obj)
+            {
+                throw new ArgumentException(string.Format("Object '{0}' doesn't exists in special effect (may have been already destroyed)", name));
+            }
+            return obj;
+        }
+
         public bool EnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime, bool firstInFrame)
         {
-            //todo marker actions
-            //pozor na efekty kde bude duration=0 a nebude mat objekty a vsetky marker animacie sa vykoaju v case = 0
-
-            if (firstInFrame) 
+            if (firstInFrame)
             {
                 if (0 > mEndTime)
                 {
                     mEndTime = gameTime.TotalTime + mDesc.Duration;
                     mStartTime = gameTime.TotalTime;
                 }
-                else
-                {
-                    if (!mPendingDestroy)
-                    {
-                        if (mEndTime <= gameTime.TotalTime)
-                        {
-                            if (null != mObjects)
-                            {
-                                for (int i = mObjects.Count - 1; i >= 0; --i)
-                                {
-                                    if (mObjects[i].Destroy())
-                                    {
-                                        RemoveObject(i);
-                                    }
-                                }
-                                if (0 == mObjects.Count)
-                                {
-                                    return false;
-                                }
+                float timeInAnimation = gameTime.TotalTime - mStartTime;
 
-                                mPendingDestroy = true;
+                if (HasTimeTriggersToExecute)
+                {
+                    while (mFirstTriggerActionIndex < mDesc.TimeTriggers.Count &&
+                        mDesc.TimeTriggers[mFirstTriggerActionIndex].Time <= timeInAnimation)
+                    {
+                        var actionDesc = mDesc.TimeTriggers[mFirstTriggerActionIndex];
+                        var action = mSpecialEffectManager.GetTriggerAction(actionDesc.Action);
+                        action.Execute(timeInAnimation, this, actionDesc.Params);
+                        mFirstTriggerActionIndex++;
+                    }
+                }
+
+                if (!mPendingDestroy)
+                {
+                    if (mEndTime <= gameTime.TotalTime)
+                    {
+                        if (null != mObjects)
+                        {
+                            for (int i = mObjects.Count - 1; i >= 0; --i)
+                            {
+                                if (mObjects[i].Destroy())
+                                {
+                                    RemoveObject(i);
+                                }
                             }
-                            else
+                            if (0 == mObjects.Count)
                             {
                                 return false;
                             }
-                        }
-                    }
 
-                    if (null != mObjects)
-                    {
-                        for (int i = mObjects.Count - 1; i >= 0; --i)
-                        {
-                            if (!mObjects[i].EnqueRenderableUnits(renderer, gameTime, mStartTime, true))
-                            {//ready to be removed
-                                RemoveObject(i);
-                            }
+                            mPendingDestroy = true;
                         }
-                        if (mPendingDestroy && 0 == mObjects.Count) //all object has been removed
+                        else
                         {
                             return false;
                         }
                     }
                 }
+
+                if (null != mObjects)
+                {
+                    for (int i = mObjects.Count - 1; i >= 0; --i)
+                    {
+                        if (!mObjects[i].EnqueRenderableUnits(renderer, gameTime, timeInAnimation, true))
+                        {//ready to be removed
+                            RemoveObject(i);
+                        }
+                    }
+                    if (mPendingDestroy && 0 == mObjects.Count) //all object has been removed
+                    {
+                        return false;
+                    }
+                }
             }
             else //only render without update
             {
-                for (int i = mObjects.Count - 1; i >= 0; --i)
+                float timeInAnimation = gameTime.TotalTime - mStartTime;
+                if (null != mObjects)
                 {
-                    mObjects[i].EnqueRenderableUnits(renderer, gameTime, mStartTime, false);
+                    for (int i = mObjects.Count - 1; i >= 0; --i)
+                    {
+                        mObjects[i].EnqueRenderableUnits(renderer, gameTime, timeInAnimation, false);
+                    }
                 }
             }
 
             return true;
-
         }
 
         public void Dispose()
@@ -154,6 +178,5 @@ namespace Ale.SpecialEffects
             mObjects[index].Dispose();
             mObjects.RemoveAt(index);
         }
-
     }
 }

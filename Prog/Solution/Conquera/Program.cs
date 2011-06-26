@@ -851,7 +851,7 @@ namespace Conquera
 
 
                     //{
-                    //    MaterialSettings mat = new MaterialSettings("TestSpellAnimSwordMat", "SimpleNoLightNoShadow", DefaultRenderLayers.FlyingObjects);
+                    //    MaterialSettings mat = new MaterialSettings("TestSpellAnimSwordMat", "SpellSpecialEffectObject", DefaultRenderLayers.FlyingObjects);
                     //    mat.Params.Add(new Texture2DMaterialParamSettings("gDiffuseMap", "TestSpellAnimSwordDif"));
                     //    ormManager.SaveObject(mat);
                     //}
