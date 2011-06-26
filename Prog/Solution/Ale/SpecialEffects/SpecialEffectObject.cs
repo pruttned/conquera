@@ -40,7 +40,7 @@ namespace Ale.SpecialEffects
         {
             get { return mPosition; }
         }
-        protected SpecialEffectObjectDesc Desc { get; private set; }
+        public SpecialEffectObjectDesc Desc { get; private set; }
         protected Vector3 EffectPosition
         {
             get { return mEffectPosition; }
@@ -59,7 +59,7 @@ namespace Ale.SpecialEffects
         /// 
         /// </summary>
         /// <returns>false - has been destroyed and its ready to be removed</returns>
-        public bool EnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime, float startTime, bool firstInFrame)
+        public bool EnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime, float timeInAnimation, bool firstInFrame)
         {
             //anim update
             if (null == Desc.Anim)
@@ -75,7 +75,6 @@ namespace Ale.SpecialEffects
             {
                 if(firstInFrame)
                 {
-                    float timeInAnimation = gameTime.TotalTime - startTime;
                     Quaternion orientation;
                     float scale;
                     Desc.GetTransformation(timeInAnimation, out mPosition, out orientation, out scale);

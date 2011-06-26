@@ -867,6 +867,15 @@ namespace Conquera
             return Path.Combine(Path.Combine(Path.GetDirectoryName(modFile), Path.GetFileNameWithoutExtension(modFile)), string.Format("Maps\\{0}", gameType));
         }
 
+        protected override Ale.SpecialEffects.ISpecialEffectManager CreateSpecialEffectManager()
+        {
+            var specialEffectManager =  base.CreateSpecialEffectManager();
+            specialEffectManager.RegisterTriggerAction(new CameraShakeTimeTriggerAction(GameCamera));
+
+            return specialEffectManager;
+        }
+
+
         private void MouseManager_MouseButtonUp(MouseButton button, IMouseManager mouseManager)
         {
             if (!GuiManager.Instance.HandleMouseUp(button) && !GuiManager.Instance.HandlesMouse)
