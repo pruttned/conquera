@@ -33,6 +33,8 @@ namespace Ale.SpecialEffects
     {
         void FireSpecialEffect(NameId effect, Vector3 position);
         void FireSpecialEffect(SpecialEffectDesc effect, Vector3 position);
+        void RegisterTriggerAction(ISpecialEffectTimeTriggerAction action);
+        ISpecialEffectTimeTriggerAction GetTriggerAction(NameId action);
     }
 
     public sealed class SpecialEffectManager : ISpecialEffectManager
@@ -42,6 +44,7 @@ namespace Ale.SpecialEffects
         private ContentGroup mContent;
         private IAleServiceProvider mServices;
         private Dictionary<NameId, SpecialEffectDesc> mDescs = new Dictionary<NameId, SpecialEffectDesc>();
+        private Dictionary<NameId, ISpecialEffectTimeTriggerAction> mTriggerActions = new Dictionary<NameId, ISpecialEffectTimeTriggerAction>();
         private long mLastRenderFrame = -1;
 
         private List<SpecialEffect> mActiveEffects = new List<SpecialEffect>();
@@ -109,5 +112,18 @@ namespace Ale.SpecialEffects
                 }
             }
         }
+
+        public void RegisterTriggerAction(ISpecialEffectTimeTriggerAction action)
+        {
+            if (null == action) throw new ArgumentNullException("action");
+
+            mTriggerActions[action.Name] = action;
+        }
+
+        public ISpecialEffectTimeTriggerAction GetTriggerAction(NameId action)
+        {
+            return mTriggerActions[action];
+        }
+
     }
 }

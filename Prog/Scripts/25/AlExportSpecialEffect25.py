@@ -165,29 +165,26 @@ class Exporter(bpy.types.Operator):
 
         #Time markers
         if 0 < len(scene.timeline_markers):
-            timeMarkersElement = xmlDoc.createElement("timeMarkers")
-            specialEffectElement.appendChild(timeMarkersElement)
+            timeTriggersElement = xmlDoc.createElement("timeTriggers")
+            specialEffectElement.appendChild(timeTriggersElement)
             for timeMarker in scene.timeline_markers:
                 name = timeMarker.name
                 frame = timeMarker.frame
                 frameTime = frame/float(fps)
-                timeMarkerElement = xmlDoc.createElement("timeMarker")
-                timeMarkersElement.appendChild(timeMarkerElement)
-                timeMarkerElement.setAttribute("name", name)
-                timeMarkerElement.setAttribute("time", "%.6f" % frameTime)
-                
                 text = bpy.data.texts[name]
                 for line in text.lines:
                     lineText = line.body
                     actionName = lineText[0:lineText.index('(')].strip()
-                    actionElement = xmlDoc.createElement("action")
-                    timeMarkerElement.appendChild(actionElement)
-                    actionElement.setAttribute("action", actionName)
+                    timeTriggerElement = xmlDoc.createElement("timeTrigger")
+                    timeTriggersElement.appendChild(timeTriggerElement)
+                    timeTriggerElement.setAttribute("action", actionName)
+                    timeTriggerElement.setAttribute("time", "%.6f" % frameTime)
                     #action params
                     for m in re.finditer("\s*(?P<param>[\w_]+)\s*=\s*\"(?P<value>[^\"]+)\"", lineText):
-                        param = m.group("param")
-                        value = m.group("value")
-                        actionElement.setAttribute(param, value)
+                        paramElement = xmlDoc.createElement("param")
+                        timeTriggerElement.appendChild(paramElement)
+                        paramElement.setAttribute("name", m.group("param"))
+                        paramElement.setAttribute("value", m.group("value"))
                     
         #write xmlDoc to file
         outFile = open(self.filepath, "w")

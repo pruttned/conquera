@@ -43,6 +43,7 @@ namespace Ale.Content
         {
             float duration = 0;
             var compiledSpecialEffect = new CompiledSpecialEffect();
+            //objects
             foreach (var objC in input.Objects)
             {
                 var obj = objC.Process(context);
@@ -53,9 +54,18 @@ namespace Ale.Content
                     duration = obj.Anim.Duration;
                 }
             }
-            compiledSpecialEffect.Duration = duration;
-            //todo marker animation  - also update duration 
+            //time triggers
+            foreach (var trigger in input.TimeTriggers)
+            {
+                if (duration < trigger.Time)
+                {
+                    duration = trigger.Time;
+                }
+            }
+            compiledSpecialEffect.TimeTriggers = new List<SpecialEffectTimeTriggerContent>(input.TimeTriggers);
 
+            compiledSpecialEffect.Duration = duration;
+            
             return compiledSpecialEffect;
         }
     }

@@ -51,10 +51,23 @@ namespace Ale.Content
             xmlDoc.Load(filename);
 
             var content = new SpecialEffectContent();
-
+            //objects
             foreach (XmlNode objectNode in xmlDoc.SelectNodes("/specialEffect/objects/*"))
             {
                 content.Objects.Add(mSpecialEffectObjectImporters[objectNode.Name].Import(objectNode));
+            }
+            //time triggers
+            foreach (XmlNode timeTriggerNode in xmlDoc.SelectNodes("/specialEffect/timeTriggers/timeTrigger"))
+            {
+                var trigger = new SpecialEffectTimeTriggerContent();
+                trigger.Action = timeTriggerNode.Attributes["action"].Value;
+                trigger.Time = float.Parse(timeTriggerNode.Attributes["time"].Value, CultureInfo.InvariantCulture);
+                //params
+                foreach (XmlNode paramNode in timeTriggerNode.SelectNodes("./param"))
+                {
+                    trigger.Params.Add(paramNode.Attributes["name"].Value, paramNode.Attributes["value"].Value);
+                }
+                content.TimeTriggers.Add(trigger);
             }
 
             return content;

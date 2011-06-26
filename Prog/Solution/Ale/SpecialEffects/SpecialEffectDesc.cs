@@ -35,6 +35,7 @@ namespace Ale.SpecialEffects
 
         public static Dictionary<string, SpecialEffectObjectReader> SpecialEffectObjectReaders { get; private set; }
         public ReadOnlyCollection<SpecialEffectObjectDesc> Objects { get; private set; }
+        public ReadOnlyCollection<SpecialEffectTimeTriggerDesc> TimeTriggers { get; private set; }
         public float Duration { get; private set; }
 
         static SpecialEffectDesc()
@@ -61,6 +62,18 @@ namespace Ale.SpecialEffects
                     specialEffectObjects[i] = obj;
                 }
                 Objects = new ReadOnlyCollection<SpecialEffectObjectDesc>(specialEffectObjects);
+            }
+
+            int triggerCnt = input.ReadInt32();
+            if (0 < triggerCnt)
+            {
+                var timeTriggers = new List<SpecialEffectTimeTriggerDesc>();
+                for (int i = 0; i < triggerCnt; i++)
+                {
+                    timeTriggers.Add(new SpecialEffectTimeTriggerDesc(input));
+                }
+                timeTriggers.Sort((v1, v2) => Comparer<float>.Default.Compare(v1.Time, v2.Time));
+                TimeTriggers = new ReadOnlyCollection<SpecialEffectTimeTriggerDesc>(timeTriggers);
             }
         }
 

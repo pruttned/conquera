@@ -29,12 +29,27 @@ namespace Ale.Content
     public class SpecialEffectContent
     {
         public List<SpecialEffectObjectContent> Objects { get; private set; }
+        public List<SpecialEffectTimeTriggerContent> TimeTriggers { get; private set; }
 
         public SpecialEffectContent()
         {
             Objects = new List<SpecialEffectObjectContent>();
+            TimeTriggers = new List<SpecialEffectTimeTriggerContent>();
         }
     }
+
+    public class SpecialEffectTimeTriggerContent
+    {
+        public float Time { get; set; }
+        public string Action { get; set; }
+        public Dictionary<string, string> Params { get; private set; }
+
+        public SpecialEffectTimeTriggerContent()
+        {
+            Params = new Dictionary<string, string>();
+        }
+    }
+
 
     public abstract class SpecialEffectObjectContent
     {
@@ -100,4 +115,6 @@ namespace Ale.Content
             return new DummyCompiledSpecialEffectObject();
         }
     }
+
+
 }

@@ -290,7 +290,12 @@ namespace Ale.Scene
         }
         protected virtual ISpecialEffectManager CreateSpecialEffectManager()
         {
-            return new SpecialEffectManager(Content, Services);
+            var specialEffectManager =  new SpecialEffectManager(Content, Services);
+            specialEffectManager.RegisterTriggerAction(new PsysExplosionTimeTriggerAction(ParticleSystemManager, Content));
+            specialEffectManager.RegisterTriggerAction(new Sound3dTimeTriggerAction(SoundManager, Content));
+            specialEffectManager.RegisterTriggerAction(new DestroyObjTimeTriggerAction());
+
+            return specialEffectManager;
         } 
         private void MainCamera_ViewTransformationChanged(ICamera camera)
         {
