@@ -198,6 +198,7 @@ class AlmExporter(bpy.types.Operator):
         ##########
         #Armature hierarchy and bind pose
         ##########
+        bBoneIdsByGroup = None
         arm = activeObject.find_armature()
         hasArmature = False
         if(arm is not None): #Has armature assigned
