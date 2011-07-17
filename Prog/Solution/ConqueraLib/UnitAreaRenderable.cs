@@ -141,9 +141,8 @@ namespace Conquera
             {
                 mGameScene.Octree.DestroyObject(mHexAreaRenderable);
                 mHexAreaRenderable = null;
-
-                mLastUnit = null;
             }
+            mLastUnit = null;
         }
 
         public void Dispose()
