@@ -1,0 +1,55 @@
+add>mesh>hexcell
+	jeden vert je rozpojeny mozno a mozno aj nie
+transfomacie musia byt vynulovane - ked napr skalujem, tak len v edit mode
+ked nie je skinovana, tak nemusim mat model v strede.. len ked je skinovana
+modifikatori musim dat apply
+mark sharp pre ostre hrany + treba modifikator edge split, ktory sa nealikuje
+mozno nemusim modifikatori aplikovat
+ked uz raz exportujem, tak to radsej nebusem savovat, ale zatvorim a otvorim
+pre uvw treba mark seam
+treba pridat material, aby sa to vobec exportovalo - musi mat meno hociake
+tu len priradujem materialove groupy a potom v AL k nim pridarim materialy
+moze byt viac materialov na jednom modeli
+connection point
+	v obj mode
+	musim mat zaselectovany objekt
+	add connection point cez ponuku
+	potom si ho mozem posunut
+	ked zrotujem connection point, tak by to na particli nemalo mat vplyv, ale na submeshe, ktore na neho budu pripojene ano
+	meno - "cp_<meno>"
+	
+Spojenie armature a mesh - selec mesh a armature a stlacit ctrl+p - named groups alebo trake daco
+
+Skinovana mesha
+----------------
+ziadne transformacie modelu a kostry (to znamena, ze aj translate musi byt 0,0,0)
+Ked chcem vyhodit kostru:
+	delete kostry
+	vyhodit armature modifikator
+	object data -> vertex groups - vsetko remove
+ked chcem presunut 3d cursor do nejakeho vertexu - select vertex->shift+s->cursor to selected
+x-ray aby som videl kostru aj kead je vtutri modelu
+ctrl+p ked potrebujem spojit kosti (napr pri dupplicate(connected) alebo ked exturdujem kost opacnym smerom(keep offset))
+[skinnovanie]	
+najprv
+	select najprv model, potom kostry
+	ctrl+p -> with auto weights
+na 1 vertexe min 1 max 4 kosti
+skript na pocet vertexov, ktore maju viac ako n kosti
+	len(list(filter(lambda v : len(v.groups)>4, bpy.context.scene.objects.active.data.vertices)))
+weight paint/clean/keep single(min jedna vaha)+allgroups(vsetky vertexy) - vyhodi vsetky assignutia, ktore su mensie ako limit
+normalize all - sucet 1
+[animovanie]
+animaiton layout
+preput do action editora - takt combo box
+horny lavy panel - vyhodenie animacie - setnut pocet userov na nula(vypnut F a shif+stlacit 'x'tlacitko vpravo), restartovat blender
+alt+r - remove rotation - aj uprostred animacie ked napr chcem, aby som mal v 0 snimku kost nezrotovanu
+cervene dole - auto keyframe
+pridanie animacie - take '+'; meno: '<nazov>|speed=<rychlost>' - napr: 'idle|speed=0.2'; ten speed je nepovinny
+potom sa uz len posuvat v time line a otacam kostami
+pri pridani novej animacie musim manualne vyhodit keyframes, ktore nechcem
+
+http://www.blendernation.com/2011/04/15/armatures-in-blender-2-5-a-crash-course/
+http://www.blendercookie.com/2010/05/13/game-enginecharacter-part-1/
+http://www.turbosquid.com/FullPreview/Index.cfm/ID/415222
+http://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Model_a_Low_Poly_Head
