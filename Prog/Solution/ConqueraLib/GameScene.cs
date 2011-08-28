@@ -656,7 +656,7 @@ namespace Conquera
                 mCursor3dCellSel.Position = mSelectedCell.CenterPos;
                 SelectedUnit = mSelectedCell.GameUnit;
             }
-            mGuiScene.UpdateHexCell(mSelectedCell);
+            //mGuiScene.UpdateHexCell(mSelectedCell);
         }
 
 
@@ -769,10 +769,6 @@ namespace Conquera
             if (key == Microsoft.Xna.Framework.Input.Keys.Escape)
             {
                 ExitToMainMenu();
-            }
-            if (key == Microsoft.Xna.Framework.Input.Keys.G)
-            {
-                mGuiScene.SidePanelsVisible = !mGuiScene.SidePanelsVisible;
             }
             if (key == Microsoft.Xna.Framework.Input.Keys.T)
             {

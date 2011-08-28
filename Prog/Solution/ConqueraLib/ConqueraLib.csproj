@@ -115,7 +115,6 @@
     <Compile Include="Gui\ConqueraTextButton.cs" />
     <Compile Include="Gui\GameGuiScene.cs" />
     <Compile Include="Gui\GameUnitInfoPanel.cs" />
-    <Compile Include="Gui\HeaderPanel.cs" />
     <Compile Include="Gui\ListBox.cs" />
     <Compile Include="Gui\MainMenuGuiScene.cs" />
     <Compile Include="Gui\MegaDebugLabel.cs" />

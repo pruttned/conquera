@@ -25,6 +25,27 @@ namespace Conquera.Gui
     public static class ConqueraPalette
     {
         private static readonly Texture2D mPaletteTexture = GuiManager.Instance.Content.Load<Texture2D>("Palette");
+
+        public static readonly Image IngameMenuButtonDefault = new Image(new Rectangle(0, 0, 42, 42), mPaletteTexture);
+        public static readonly Image IngameMenuButtonOver = new Image(new Rectangle(43, 0, 42, 42), mPaletteTexture);
+
+        public static readonly Image ToolTipBackground = new Image(new Rectangle(0, 983, 1024, 41), mPaletteTexture);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         private static readonly Texture2D mCellNotificationTexture = GuiManager.Instance.Content.Load<Texture2D>("CellNotificationText");
 
         public static readonly Image MessageBoxBackground = new Image(new Rectangle(257, 1, 510, 475), mPaletteTexture);
