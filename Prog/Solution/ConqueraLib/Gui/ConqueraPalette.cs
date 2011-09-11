@@ -26,10 +26,15 @@ namespace Conquera.Gui
     {
         private static readonly Texture2D mPaletteTexture = GuiManager.Instance.Content.Load<Texture2D>("Palette");
 
+        public static readonly Image ToolTipBackground = new Image(new Rectangle(0, 983, 1024, 41), mPaletteTexture);
+
         public static readonly Image IngameMenuButtonDefault = new Image(new Rectangle(0, 0, 42, 42), mPaletteTexture);
         public static readonly Image IngameMenuButtonOver = new Image(new Rectangle(43, 0, 42, 42), mPaletteTexture);
 
-        public static readonly Image ToolTipBackground = new Image(new Rectangle(0, 983, 1024, 41), mPaletteTexture);
+        public static readonly Image EndTurnButtonDefault = new Image(new Rectangle(0, 0, 42, 42), mPaletteTexture);
+        public static readonly Image EndTurnButtonOver = new Image(new Rectangle(43, 0, 42, 42), mPaletteTexture);
+
+
 
 
 

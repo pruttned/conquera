@@ -31,8 +31,9 @@ namespace Conquera.Gui
         private GameScene mGameScene;
         private MegaDebugLabel mDebugLabel = new MegaDebugLabel();
         private GraphicButton mIngameMenuButton;
+        private GraphicButton mEndTurnButton;
         private ToolTipBar mToolTipBar;
-
+        
         public string DebugText
         {
             get { return mDebugLabel.Text; }
@@ -61,8 +62,14 @@ namespace Conquera.Gui
             //Ingame menu button
             mIngameMenuButton = new GraphicButton(ConqueraPalette.IngameMenuButtonDefault, ConqueraPalette.IngameMenuButtonOver);
             mIngameMenuButton.Click += new EventHandler<ControlEventArgs>(mIngameMenuButton_Click);
-            mToolTipBar.SetToolTipTextToControl(mIngameMenuButton, "Ingame menu");
+            mToolTipBar.SetToolTipTextToControl(mIngameMenuButton, "Ingame Menu");
             RootControls.Add(mIngameMenuButton);
+
+            //End turn button
+            mEndTurnButton = new GraphicButton(ConqueraPalette.EndTurnButtonDefault, ConqueraPalette.EndTurnButtonOver);
+            mEndTurnButton.Click += new EventHandler<ControlEventArgs>(mEndTurnButton_Click);
+            mToolTipBar.SetToolTipTextToControl(mEndTurnButton, "End Turn");
+            RootControls.Add(mEndTurnButton);
 
             //Other
             UpdateLocations();
@@ -79,6 +86,11 @@ namespace Conquera.Gui
             dialog.Show(true);
         }
 
+        private void mEndTurnButton_Click(object sender, ControlEventArgs e)
+        {
+            mGameScene.EndTurn();
+        }
+
         private void ScreenSizeChanged(object sender, EventArgs e)
         {
             UpdateLocations();
@@ -90,11 +102,9 @@ namespace Conquera.Gui
             int screenHeight = (int)GuiManager.Instance.ScreenSize.Height;
             int screenMiddleX = screenWidth / 2;
 
-            //Ingame menu button
-            mIngameMenuButton.Location = new Point((int)(screenWidth - mIngameMenuButton.Size.Width), 0);
-
-            //Tool tip bar
             mToolTipBar.Location = new Point((int)(screenMiddleX - mToolTipBar.Size.Width / 2), (int)(screenHeight - mToolTipBar.Size.Height));
+            mIngameMenuButton.Location = new Point((int)(screenWidth - mIngameMenuButton.Size.Width), 0);
+            mEndTurnButton.Location = new Point(mIngameMenuButton.Location.X, mIngameMenuButton.Location.Y + (int)mIngameMenuButton.Size.Height + 0);
         }
     }
 
