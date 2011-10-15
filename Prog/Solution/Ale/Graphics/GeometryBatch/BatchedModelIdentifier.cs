@@ -23,7 +23,7 @@ namespace Ale.Graphics
     /// <summary>
     /// Identifies a batched model
     /// </summary>
-	public class BathcedModelIdentifier
+	public class BatchedModelIdentifier
     {
         private int mIdInBatch;
         private GeometryBatch mBatch;
@@ -44,7 +44,7 @@ namespace Ale.Graphics
             get { return mStaticGeometry; }
         }
 
-        internal BathcedModelIdentifier(IStaticGeometry staticGeometry, GeometryBatch batch, int idInBatch)
+        internal BatchedModelIdentifier(IStaticGeometry staticGeometry, GeometryBatch batch, int idInBatch)
 		{
             mStaticGeometry = staticGeometry;
 			mIdInBatch = idInBatch;

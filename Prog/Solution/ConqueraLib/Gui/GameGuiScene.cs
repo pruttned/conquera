@@ -27,9 +27,8 @@ namespace Conquera.Gui
 {
     public class GameGuiScene : GuiScene
     {
-        private GameScene mGameScene;
+        private BattleScene mGameScene;
         private GameUnitInfoPanel mGameUnitInfoPanel = new GameUnitInfoPanel();
-        private TileInfoPanel mTilePanel = new TileInfoPanel();
         private MegaDebugLabel mDebugLabel = new MegaDebugLabel();
         private PlayerManaView mPlayerManaView = new PlayerManaView();
         private PlayerUnitCountView mPlayerUnitCountView = new PlayerUnitCountView();
@@ -40,11 +39,10 @@ namespace Conquera.Gui
 
         public bool SidePanelsVisible
         {
-            get { return mGameUnitInfoPanel.Visible || mTilePanel.Visible; }
+            get { return mGameUnitInfoPanel.Visible; }
             set
             {
                 mGameUnitInfoPanel.Visible = value;
-                mTilePanel.Visible = value;
             }
         }
 
@@ -60,10 +58,10 @@ namespace Conquera.Gui
             set { mDebugLabel.Visible = value; }
         }
 
-        public GameGuiScene(GameScene gameScene)
+        public GameGuiScene(BattleScene gameScene)
         {
             mGameScene = gameScene;
-            BindToCurrentPlayer();            
+            BindToCurrentPlayer();
 
             //Debug label.
             mDebugLabel.Visible = false;
@@ -71,11 +69,11 @@ namespace Conquera.Gui
 
             //Side panels.
             RootControls.Add(mGameUnitInfoPanel);
-            RootControls.Add(mTilePanel);
 
             //Player stats.
             mPlayerManaView.Update(mGameScene.CurrentPlayer.Mana);
-            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);
+            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, 10);
+//            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);
             RootControls.Add(mPlayerManaView);
             RootControls.Add(mPlayerUnitCountView);
 
@@ -91,7 +89,7 @@ namespace Conquera.Gui
 
             //End turn button.
             mEndTurnButton = new ConqueraTextButton("EndTurn");
-            mEndTurnButton.Click += new EventHandler<ControlEventArgs>(mEndTurnButton_Click);            
+            mEndTurnButton.Click += new EventHandler<ControlEventArgs>(mEndTurnButton_Click);
             RootControls.Add(mEndTurnButton);
 
             //Current player display.
@@ -102,47 +100,32 @@ namespace Conquera.Gui
             //Other.
             UpdateLocations();
             GuiManager.Instance.ScreenSizeChanged += new EventHandler(ScreenSizeChanged);
-        }        
-
-        public void UpdateHexCell(HexCell cell)
-        {
-            if (cell == null || cell.IsGap)
-            {
-                SidePanelsVisible = false;
-            }
-            else
-            {
-                //Unit info.
-                if (cell.GameUnit == null)
-                {
-                    mGameUnitInfoPanel.Visible = false;
-                }
-                else
-                {
-                    mGameUnitInfoPanel.Update(cell.GameUnit);
-                    mGameUnitInfoPanel.Visible = true;
-                }
-
-                //Tile info.
-                if (cell.HexTerrainTile == null)
-                {
-                    mTilePanel.Visible = false;
-                }
-                else
-                {
-                    mTilePanel.Update(cell);
-                    mTilePanel.Visible = true;
-                }
-            }
         }
 
-        internal void HandleEndTurn(GamePlayer oldPlayer)
+        public void UpdateHexTile(HexTerrainTile tile)
+        {
+            //todo!!
+
+            //Unit info.
+            //if (tile.GameUnit == null)
+            //{
+            //    mGameUnitInfoPanel.Visible = false;
+            //}
+            //else
+            //{
+            //    mGameUnitInfoPanel.Update(tile.GameUnit);
+            //    mGameUnitInfoPanel.Visible = true;
+            //}
+        }
+
+        internal void HandleEndTurn(BattlePlayer oldPlayer)
         {
             UnBindFromPlayer(oldPlayer);
             BindToCurrentPlayer();
 
             mPlayerManaView.Update(mGameScene.CurrentPlayer.Mana);
-            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);            
+            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, 10);
+//            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);
 
             UpdateSpellPanel();
 
@@ -159,15 +142,15 @@ namespace Conquera.Gui
 
         private void BindToCurrentPlayer()
         {
-            mGameScene.CurrentPlayer.ManaChanged += new EventHandler(Player_ManaChanged);
-            mGameScene.CurrentPlayer.MaxUnitCntChanged += new EventHandler(Player_MaxUnitCntChanged);
-            mGameScene.CurrentPlayer.UnitsChanged += new EventHandler(Player_UnitsChanged);
+            //todo
+            //mGameScene.CurrentPlayer.ManaChanged += new EventHandler(Player_ManaChanged);
+            //mGameScene.CurrentPlayer.UnitsChanged += new EventHandler(Player_UnitsChanged);
         }
 
-        private void UnBindFromPlayer(GamePlayer player)
+        private void UnBindFromPlayer(BattlePlayer player)
         {
             player.ManaChanged -= Player_ManaChanged;
-            player.MaxUnitCntChanged -= Player_MaxUnitCntChanged;
+            //player.MaxUnitCntChanged -= Player_MaxUnitCntChanged;
             player.UnitsChanged -= Player_UnitsChanged;
         }
 
@@ -178,12 +161,13 @@ namespace Conquera.Gui
 
         private void Player_MaxUnitCntChanged(object sender, EventArgs e)
         {
-            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);
+            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, 10);
         }
 
         private void Player_UnitsChanged(object sender, EventArgs e)
         {
-            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, mGameScene.CurrentPlayer.MaxUnitCnt);
+            //todo : 10 - extract
+            mPlayerUnitCountView.Update(mGameScene.CurrentPlayer.Units.Count, 10);
         }
 
         private void ScreenSizeChanged(object sender, EventArgs e)
@@ -198,7 +182,6 @@ namespace Conquera.Gui
 
             //Side panels.
             mGameUnitInfoPanel.Location = new Point(screenWidth - (int)mGameUnitInfoPanel.Size.Width, 0);
-            mTilePanel.Location = new Point(screenWidth - (int)mTilePanel.Size.Width, screenHeight - (int)mTilePanel.Size.Height);
 
             //Player stat views.
             mPlayerManaView.Location = Point.Zero;
@@ -211,7 +194,7 @@ namespace Conquera.Gui
             mSpellPanel.Location = new Point(0, screenHeight - (int)mSpellPanel.Size.Height);
 
             //EndTurnButton.
-            mEndTurnButton.Location = new Point(screenWidth - (int)mEndTurnButton.Size.Width, 
+            mEndTurnButton.Location = new Point(screenWidth - (int)mEndTurnButton.Size.Width,
                                                 mMainMenuButton.Location.Y + (int)mMainMenuButton.Size.Height + 2);
 
             //Current player display.
@@ -226,7 +209,7 @@ namespace Conquera.Gui
 
         private void UpdateSpellPanel()
         {
-            mSpellPanel.SpellSlotCollection = mGameScene.Spells;
+          //  mSpellPanel.SpellSlotCollection = mGameScene.Spells;
         }
 
         private void mEndTurnButton_Click(object sender, ControlEventArgs e)
@@ -283,18 +266,18 @@ namespace Conquera.Gui
     }
 
     public class MainMenuDialog : Dialog
-    {        
+    {
         private GraphicElement mBackground;
         private ConqueraTextButton mQuitButton;
         private ConqueraTextButton mContinueButton;
-        private GameScene mGameScene;
+        private BattleScene mGameScene;
 
         public override System.Drawing.SizeF Size
         {
             get { return mBackground.Size; }
         }
 
-        public MainMenuDialog(GameScene gameScene)
+        public MainMenuDialog(BattleScene gameScene)
         {
             mGameScene = gameScene;
             mBackground = ConqueraPalette.MainMenuBackground;
@@ -326,7 +309,7 @@ namespace Conquera.Gui
         {
             Hide();
         }
-    }    
+    }
 
     public class CurrentPlayerDisplay : Control
     {
@@ -342,8 +325,8 @@ namespace Conquera.Gui
             mPlayerColorLabel = new TextElement(ConqueraFonts.SpriteFont1, Color.Black);
         }
 
-        public void SetPlayer(GamePlayer player)
-        {            
+        public void SetPlayer(BattlePlayer player)
+        {
             mPlayerColorLabel.Color = new Color(player.Color);
             mPlayerColorLabel.Text = player.Name;
         }

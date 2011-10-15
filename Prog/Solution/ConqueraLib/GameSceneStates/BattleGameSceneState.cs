@@ -26,9 +26,9 @@ namespace Conquera
 {
     public class BattleGameSceneState : IGameSceneState
     {
-        private GameScene mScene;
+        private BattleScene mScene;
 
-        public BattleGameSceneState(GameScene scene)
+        public BattleGameSceneState(BattleScene scene)
         {
             mScene = scene;
         }
@@ -50,7 +50,7 @@ namespace Conquera
         {
         }
 
-        public void OnClickOnCell(HexCell cellUnderCur, MouseButton button)
+        public void OnClickOnTile(HexTerrainTile tileUnderCur, MouseButton button)
         {
         }
 
@@ -58,7 +58,6 @@ namespace Conquera
         {
             if (null == mScene.SelectedUnit || mScene.SelectedUnit.IsIdle)
             {
-                mScene.ActiveSpellSlot = null;
                 mScene.State = mScene.GetGameSceneState(GameSceneStates.VictoryEvaluation);
             }
         }

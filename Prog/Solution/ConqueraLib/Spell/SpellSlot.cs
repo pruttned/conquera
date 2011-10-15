@@ -29,30 +29,27 @@ using SimpleOrmFramework;
 
 namespace Conquera
 {
-    [DataObject(MaxCachedCnt = 0)]
-    public class SpellSlot :BaseDataObject
+    public class SpellSlot
     {
         public static List<string> SpellNames = new List<string>();
         private static Dictionary<string, Spell> Spells = new Dictionary<string, Spell>();
 
         public Spell Spell { get; private set; }
-        [DataProperty(NotNull = true)]
         public bool Enabled { get; private set; }
         
-        [DataProperty(Column="Spell", NotNull = true)]
         private string SpellName { get; set; }
 
         static SpellSlot()
         {
-            RegisterSpell(new SlayerSpell());
-            RegisterSpell(new SpikesSpell());
-            RegisterSpell(new FireStormSpell());
-            RegisterSpell(new VampiricTouchSpell());
-            RegisterSpell(new PackReinforcementSpell());
-            RegisterSpell(new MindControlSpell());
-            RegisterSpell(new PlagueSpell());
-            RegisterSpell(new BloodMadnessSpell());
-            RegisterSpell(new LastSacrificeSpell());
+            //RegisterSpell(new SlayerSpell());
+            //RegisterSpell(new SpikesSpell());
+            //RegisterSpell(new FireStormSpell());
+            //RegisterSpell(new VampiricTouchSpell());
+            //RegisterSpell(new PackReinforcementSpell());
+            //RegisterSpell(new MindControlSpell());
+            //RegisterSpell(new PlagueSpell());
+            //RegisterSpell(new BloodMadnessSpell());
+            //RegisterSpell(new LastSacrificeSpell());
         }
 
         public SpellSlot(string spellName)
@@ -60,12 +57,6 @@ namespace Conquera
             SpellName = spellName;
             Spell = Spells[SpellName];
             Enabled = true;
-        }
-
-        protected override void AfterLoadImpl(OrmManager ormManager)
-        {
-            base.AfterLoadImpl(ormManager);
-            Spell = Spells[SpellName];
         }
 
         private SpellSlot()

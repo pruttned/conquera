@@ -43,7 +43,7 @@ namespace Ale.Graphics
             var graphicsDevice = mGraphicsDeviceManager.GraphicsDevice;
 
             mIndexBuffer = new IndexBuffer(graphicsDevice, 12, BufferUsage.WriteOnly, IndexElementSize.SixteenBits);
-            mIndexBuffer.SetData<short>(new short[] { 0, 1, 2, 0, 2, 3 });
+            mIndexBuffer.SetData<ushort>(new ushort[] { 0, 1, 2, 0, 2, 3 });
 
             mVertexDeclaration = new VertexDeclaration(graphicsDevice, VertexPositionTexture.VertexElements);
 

@@ -31,24 +31,22 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Conquera
 {
-    [DataObject(MaxCachedCnt = 0)]
-    [CustomBasicTypeProvider(typeof(Point), typeof(FieldCustomBasicTypeProvider<Point>))]
-    public class GameUnit : OctreeSceneObject, IDataObject
+    public class BattleUnit : OctreeSceneObject
     {
         //promoted collections
-        private static List<HexCell> Siblings = new List<HexCell>(6);
+        private static List<HexTerrainTile> Siblings = new List<HexTerrainTile>(6);
 
-        public delegate void CellIndexChangedHandler(GameUnit obj, Point oldValue);
+        public delegate void CellIndexChangedHandler(BattleUnit obj, Point oldValue);
         public event CellIndexChangedHandler CellIndexChanged;
 
         private Point mCellIndex;
         private IGameUnitState mState;
         private Dictionary<string, IGameUnitState> mStates = new Dictionary<string, IGameUnitState>();
         
-        public GamePlayer OwningPlayer { get; internal set; }
+        public BattlePlayer OwningPlayer { get; internal set; }
 
         [DataProperty(NotNull = true)]
-        public Point CellIndex
+        public Point TileIndex
         {
             get { return mCellIndex; }
             set
@@ -73,17 +71,17 @@ namespace Conquera
             }
         }
 
-        public HexCell Cell
+        public HexTerrainTile Tile
         {
             get
             {
-                return GameScene.GetCell(CellIndex);
+                return BattleScene.Terrain[TileIndex];
             }
         }
 
-        public GameScene GameScene
+        public BattleScene BattleScene
         {
-            get { return (GameScene)Scene; }
+            get { return (BattleScene)Scene; }
         }
 
         public GameUnitDesc GameUnitDesc
@@ -98,7 +96,6 @@ namespace Conquera
 
         public bool IsIdle { get; private set; }
 
-        [DataProperty(NotNull = true)]
         public int Hp { get; private set; }
         
         public int MaxHp 
@@ -108,12 +105,12 @@ namespace Conquera
 
         public bool HasMovedThisTurn
         {
-            get { return (LastMovedTurn == GameScene.GameSceneContextState.TurnNum); }
+            get { return (LastMovedTurn == BattleScene.TurnNum); }
         }
 
         public bool HasAttackedThisTurn
         {
-            get { return (LastAttackedTurn == GameScene.GameSceneContextState.TurnNum); }
+            get { return (LastAttackedTurn == BattleScene.TurnNum); }
         }
 
         public IGameUnitState State
@@ -132,18 +129,13 @@ namespace Conquera
             get { return mStates; }
         }
 
-        long IDataObject.Id { get; set; }
-
-        [DataProperty(NotNull = true)]
         private int LastMovedTurn { get; set; }
 
-        [DataProperty(NotNull = true)]
         private int LastAttackedTurn { get; set; }
 
-        [DataProperty(NotNull = true)]
         private long DescId { get; set; }
 
-        public GameUnit(long descId, GamePlayer owningPlayer, bool isReady)
+        public BattleUnit(long descId, BattlePlayer owningPlayer, bool isReady)
             :this()
         {
             DescId = descId;
@@ -156,7 +148,7 @@ namespace Conquera
             }
             else
             {
-                LastAttackedTurn = LastMovedTurn = owningPlayer.Scene.GameSceneContextState.TurnNum;
+                LastAttackedTurn = LastMovedTurn = owningPlayer.Scene.TurnNum;
             }
         }
 
@@ -167,12 +159,12 @@ namespace Conquera
 
         struct Seed
         {
-            public HexCell Cell;
+            public HexTerrainTile Tile;
             public int Live;
 
-            public Seed(HexCell cell, int live)
+            public Seed(HexTerrainTile tile, int live)
             {
-                Cell = cell;
+                Tile = tile;
                 Live = live;
             }
         }
@@ -180,14 +172,14 @@ namespace Conquera
         private static HashSet<Point> CheckedPoints = new HashSet<Point>();
         private static Queue<Seed> Seeds = new Queue<Seed>();
         
-        public List<AdditionalAttackTarget> GetAdditionalAttackTargets(GameUnit target)
+        public List<AdditionalAttackTarget> GetAdditionalAttackTargets(BattleUnit target)
         {
-            return GameUnitDesc.GetAdditionalAttackTargets(CellIndex, target.CellIndex);
+            return GameUnitDesc.GetAdditionalAttackTargets(TileIndex, target.TileIndex);
         }
 
-        public void GetAdditionalAttackTargets(GameUnit target, List<AdditionalAttackTarget> points)
+        public void GetAdditionalAttackTargets(BattleUnit target, List<AdditionalAttackTarget> points)
         {
-            GameUnitDesc.GetAdditionalAttackTargets(CellIndex, target.CellIndex, points);
+            GameUnitDesc.GetAdditionalAttackTargets(TileIndex, target.TileIndex, points);
         }
 
         /// <summary>
@@ -199,12 +191,13 @@ namespace Conquera
             Seeds.Clear();
             CheckedPoints.Clear();
 
-            Seeds.Enqueue(new Seed(Cell, GameUnitDesc.MovementDistance));
+            Seeds.Enqueue(new Seed(Tile, GameUnitDesc.MovementDistance));
             while (0 < Seeds.Count)
             {
                 var seed = Seeds.Dequeue();
                 Siblings.Clear();
-                seed.Cell.GetSiblings(Siblings);
+
+                BattleScene.Terrain.GetSiblings(seed.Tile.Index, Siblings);
                 foreach (var sibling in Siblings)
                 {
                     Point index = sibling.Index;
@@ -221,14 +214,14 @@ namespace Conquera
             }
         }
 
-        public bool CanMoveTo(Point cell)
+        public bool CanMoveTo(Point index)
         {
-            if (cell == CellIndex)
+            if (index == TileIndex)
             {
                 return false;
             }
-            HexCell srcCell = Cell;
-            HexCell targetCell = GameScene.GetCell(cell);
+            HexTerrainTile srcCell = Tile;
+            HexTerrainTile targetCell = BattleScene.Terrain[index];
 
             if (srcCell == targetCell)
             {
@@ -244,12 +237,12 @@ namespace Conquera
                 Seeds.Clear();
                 CheckedPoints.Clear();
 
-                Seeds.Enqueue(new Seed(Cell, GameUnitDesc.MovementDistance));
+                Seeds.Enqueue(new Seed(Tile, GameUnitDesc.MovementDistance));
                 while (0 < Seeds.Count)
                 {
                     var seed = Seeds.Dequeue();
                     Siblings.Clear();
-                    seed.Cell.GetSiblings(Siblings);
+                    BattleScene.Terrain.GetSiblings(seed.Tile.Index, Siblings);
                     foreach (var sibling in Siblings)
                     {
                         if (sibling.Index == targetIndex)
@@ -257,10 +250,10 @@ namespace Conquera
                             return true;
                         }
 
-                        Point index = sibling.Index;
-                        if (sibling.IsPassable && !CheckedPoints.Contains(index))
+                        Point siblingIndex = sibling.Index;
+                        if (sibling.IsPassable && !CheckedPoints.Contains(siblingIndex))
                         {
-                            CheckedPoints.Add(index);
+                            CheckedPoints.Add(siblingIndex);
                             if (0 < seed.Live - 1)
                             {
                                 Seeds.Enqueue(new Seed(sibling, seed.Live - 1));
@@ -275,34 +268,37 @@ namespace Conquera
 
         public bool CanAttackTo(Point cell)
         {
-            if (cell == CellIndex)
-            {
-                return false;
-            }
+            return false;
+            //todo !!
 
-            HexCell srcCell = Cell;
-            HexCell targetCell = GameScene.GetCell(cell);
+            //if (cell == CellIndex)
+            //{
+            //    return false;
+            //}
 
-            if (null == targetCell.GameUnit)
-            {
-                return false;
-            }
+            //HexTerrainTile srcCell = Tile;
+            //HexTerrainTile targetCell = BattleScene.GetCell(cell);
 
-            return null != targetCell.GameUnit && OwningPlayer != targetCell.GameUnit.OwningPlayer &&  srcCell.IsSiblingTo(targetCell);
+            //if (null == targetCell.GameUnit)
+            //{
+            //    return false;
+            //}
+
+            //return null != targetCell.GameUnit && OwningPlayer != targetCell.GameUnit.OwningPlayer &&  srcCell.IsSiblingTo(targetCell);
         }
 
-        public bool MoveTo(Point cell)
+        public bool MoveTo(Point tileIndex)
         {
             CheckIdle();
 
-            if (cell != CellIndex)
+            if (tileIndex != TileIndex)
             {
-                if (!HasMovedThisTurn && CanMoveTo(cell))
+                if (!HasMovedThisTurn && CanMoveTo(tileIndex))
                 {
-                    LastMovedTurn = GameScene.GameSceneContextState.TurnNum;
+                    LastMovedTurn = BattleScene.TurnNum;
 
                     var state = (MovingGameUnitState)States["Move"];
-                    state.TargetCell = cell;
+                    state.TargetCell = tileIndex;
                     State = state;
 
                     return true;
@@ -311,24 +307,26 @@ namespace Conquera
             return false;
         }
 
-        public bool Attack(Point cell)
+        public bool Attack(Point tileIndex)
         {
             CheckIdle();
 
-            if (!HasAttackedThisTurn && CanAttackTo(cell))
-            {
-                LastAttackedTurn = GameScene.GameSceneContextState.TurnNum;
-                LastMovedTurn = GameScene.GameSceneContextState.TurnNum;
+            //todo
+            throw new NotImplementedException();
+            //if (!HasAttackedThisTurn && CanAttackTo(tileIndex))
+            //{
+            //    LastAttackedTurn = BattleScene.TurnNum;
+            //    LastMovedTurn = BattleScene.TurnNum;
 
-                GameUnit target = GameScene.GetCell(cell).GameUnit;
-                RotateTo(target.CellIndex);
+            //    BattleUnit target = BattleScene.Terrain[tileIndex].GameUnit;
+            //    RotateTo(target.TileIndex);
 
-                var state = (AttackingGameUnitState)States["Attack"];
-                state.TargetUnit = target;
-                State = state;
+            //    var state = (AttackingGameUnitState)States["Attack"];
+            //    state.TargetUnit = target;
+            //    State = state;
                 
-                return true;
-            }
+            //    return true;
+            //}
             return false;
         }
 
@@ -344,7 +342,7 @@ namespace Conquera
             Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, angle);
         }
 
-        public int ComputeDamageTo(GameUnit unit)
+        public int ComputeDamageTo(BattleUnit unit)
         {
             return AleMathUtils.Random.Next(GameUnitDesc.MinAttack, GameUnitDesc.MaxAttack + 1);
         }
@@ -358,7 +356,7 @@ namespace Conquera
                 
                 int realHealAmount = Hp-oldHp;
 
-                GameScene.FireCellNotificationLabel(string.Format("+{0}", realHealAmount), CellNotificationIcons.Hearth, Color.Red, CellIndex);
+                BattleScene.FireTileNotificationLabel(string.Format("+{0}", realHealAmount), CellNotificationIcons.Hearth, Color.Red, TileIndex);
             }
 
         }
@@ -374,49 +372,45 @@ namespace Conquera
             Hp = Math.Max(Hp - damage, 0);
             int realDamage = Hp - oldHp;
 
-            GameScene.FireCellNotificationLabel(string.Format("-{0}", Math.Abs(realDamage)), CellNotificationIcons.BrokenHearth, Color.Red, CellIndex);
+            BattleScene.FireTileNotificationLabel(string.Format("-{0}", Math.Abs(realDamage)), CellNotificationIcons.BrokenHearth, Color.Red, TileIndex);
             if (Hp == 0)
             {
-                GameScene.KillUnit(this);
+                BattleScene.KillUnit(this);
             }
             else
             {
                 if (blood)
                 {
-                    GameScene.ParticleSystemManager.CreateFireAndForgetParticleSystem(GameUnitDesc.BloodParticleSystem, Position);
+                    BattleScene.ParticleSystemManager.CreateFireAndForgetParticleSystem(GameUnitDesc.BloodParticleSystem, Position);
                 }
             }
 
             return realDamage;
         }
 
+        /// <summary>
+        /// Gets the unti position on a given cell
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public Vector3 GetPositionFromIndex(Point index)
         {
-            HexCell cell = GameScene.GetCell(index);
-            if (!cell.IsGap)
-            {
-                return cell.CenterPos + cell.HexTerrainTile.UnitPosition;
-            }
-            else
-            {
-                return cell.CenterPos;
-            }
+            var tile = BattleScene.Terrain[index];
+            return tile.CenterPos + tile.Desc.UnitPosition;
         }
 
-        protected GameUnit()
+        protected BattleUnit()
         {
             IsIdle = true;
 
             States.Add("Idle", new IdleGameUnitState(this));
             States.Add("Move", new MovingGameUnitState(this));
-            States.Add("CastingSpellBeforeAttack", new CastingSpellBeforeAttackGameUnitState(this));
             States.Add("Attack", new AttackingGameUnitState(this));
-            States.Add("CastingSpellAfterHit", new CastingSpellAfterHitGameUnitState(this));
         }
 
         protected override bool IsSceneValid(BaseScene scene)
         {
-            return (scene is GameScene);
+            return (scene is BattleScene);
         }
 
         protected override void OnAddToSceneImpl(BaseScene scene)
@@ -458,22 +452,6 @@ namespace Conquera
         private void UpdatePositionFromIndex()
         {
             Position = GetPositionFromIndex(mCellIndex);
-        }
-
-        void IDataObject.AfterLoad(OrmManager ormManager)
-        {
-        }
-
-        void IDataObject.BeforeSave(OrmManager ormManager)
-        {
-        }
-
-        void IDataObject.AfterSave(OrmManager ormManager, bool isNew)
-        {
-        }
-
-        void IDataObject.BeforeDelete(OrmManager ormManager)
-        {
         }
 
         private void CheckIdle()

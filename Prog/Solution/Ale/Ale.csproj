@@ -104,6 +104,7 @@
     <Compile Include="Content\AleAssetInfo.cs" />
     <Compile Include="Content\BaseAssetLoader.cs" />
     <Compile Include="Graphics\FullScreenQuad.cs" />
+    <Compile Include="Graphics\GeometryBatch\BatchedModelIdentifier.cs" />
     <Compile Include="Graphics\IRenderableListener.cs" />
     <Compile Include="Graphics\Light\ILightRenderableUnit.cs" />
     <Compile Include="Graphics\Light\PointLight.cs" />
@@ -209,7 +210,6 @@
     <Compile Include="Graphics\DynamicallyLoadableObject\DynamicallyLoadableObjectsUnloader.cs" />
     <Compile Include="Graphics\GeometryBatch\BatchedGraphicModel.cs" />
     <Compile Include="Graphics\GeometryBatch\BatchedGraphicModelPart.cs" />
-    <Compile Include="Graphics\GeometryBatch\BathcedModelIdentifier.cs" />
     <Compile Include="Graphics\GeometryBatch\GeometryBatchUnit.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -301,7 +301,6 @@
     <Compile Include="Scene\BaseScene.cs" />
     <Compile Include="Scene\SceneManager.cs" />
     <Compile Include="Scene\ScenePass.cs" />
-    <Compile Include="Scene\TerrainScene.cs" />
     <Compile Include="Settings\Ini\IniFileDocument.cs" />
     <Compile Include="Settings\Ini\IniFileDocumentLoadSettings.cs" />
     <Compile Include="Settings\Ini\IniFileLoadingException.cs" />

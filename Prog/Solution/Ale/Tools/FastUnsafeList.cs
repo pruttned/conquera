@@ -18,6 +18,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Collections;
 
 namespace Ale.Tools
 {
@@ -29,6 +31,66 @@ namespace Ale.Tools
     /// <typeparam name="T">Type of the list's element</typeparam>
     internal class FastUnsafeList<T> : IEnumerable<T>
     {
+        #region Types
+
+        [Serializable, StructLayout(LayoutKind.Sequential)]
+        public struct Enumerator : IEnumerator<T>, IDisposable, IEnumerator
+        {
+            private FastUnsafeList<T> mList;
+            private int mIndex;
+            private T mCurrent;
+
+            public T Current
+            {
+                get
+                {
+                    return mCurrent;
+                }
+            }
+
+            object IEnumerator.Current
+            {
+                get
+                {
+                    return mCurrent;
+                }
+            }
+
+            internal Enumerator(FastUnsafeList<T> list)
+            {
+                mList = list;
+                mIndex = 0;
+                mCurrent = default(T);
+            }
+
+            public void Dispose()
+            {
+            }
+
+            public bool MoveNext()
+            {
+                if (mIndex < mList.Count)
+                {
+                    mCurrent = mList[mIndex];
+                    mIndex++;
+                    return true;
+                }
+                mIndex = mList.Count + 1;
+                mCurrent = default(T);
+                return false;
+            }
+
+            void IEnumerator.Reset()
+            {
+                mIndex = 0;
+                mCurrent = default(T);
+            }
+        }
+
+
+
+        #endregion Types
+
         #region Fields
 
         /// <summary>
@@ -133,7 +195,7 @@ namespace Ale.Tools
         /// <returns></returns>
         public IEnumerator<T> GetEnumerator()
         {
-            return (IEnumerator<T>)mItems.GetEnumerator();
+            return new Enumerator(this);
         }
 
         /// <summary>
@@ -142,7 +204,7 @@ namespace Ale.Tools
         /// <returns></returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return mItems.GetEnumerator();
+            return new Enumerator(this);
         }
 
         #endregion IEnumerable<T>

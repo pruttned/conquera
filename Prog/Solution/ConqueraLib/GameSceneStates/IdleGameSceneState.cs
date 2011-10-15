@@ -30,9 +30,9 @@ namespace Conquera
 {
     public class IdleGameSceneState : IGameSceneState
     {
-        private GameScene mScene;
+        private BattleScene mScene;
 
-        public IdleGameSceneState(GameScene scene)
+        public IdleGameSceneState(BattleScene scene)
         {
             mScene = scene;
         }
@@ -55,11 +55,11 @@ namespace Conquera
         {
         }
 
-        public void OnClickOnCell(HexCell cellUnderCur, MouseButton button)
+        public void OnClickOnTile(HexTerrainTile tileUnderCur, MouseButton button)
         {
             if (MouseButton.Left == button)
             {
-                mScene.SelectedCell = cellUnderCur;
+                mScene.SelectedTile = tileUnderCur;
                 if (IsSelectedUnitReady())
                 {
                     mScene.State = mScene.GetGameSceneState(GameSceneStates.ReadyGameUnitSelected);
@@ -70,74 +70,6 @@ namespace Conquera
 
         public void Update(AleGameTime gameTime)
         {
-            GameCamera camera = mScene.GameCamera;
-
-            var cellUnderCur = mScene.GetCellUnderCur();
-            if (null != cellUnderCur)
-            {
-                Point index = cellUnderCur.Index;
-                // mCursor3d.Position = cellUnderCur.CenterPos;
-                // mCursor3d.IsVisible = true;
-
-                if (mScene.SceneManager.MouseManager.IsButtonDown(MouseButton.Left))
-                {
-                    if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.E))
-                    {
-                        //Terrain.SetTile(index, null);
-                        cellUnderCur.OwningPlayer = null;
-                    }
-                    else
-                    {
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F))
-                        {
-                            mScene.GetCell(index).SetTile(null);
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.C))
-                        {
-                            mScene.GetCell(index).SetTile("CastleTile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.G))
-                        {
-                            mScene.GetCell(index).SetTile("Grass1Tile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.M))
-                        {
-                            mScene.GetCell(index).SetTile("MineLv1Tile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D))
-                        {
-                            mScene.GetCell(index).SetTile("Dirt1Tile");
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Q))
-                        {
-                            mScene.GetCell(index).SetTile(null);
-                        }
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.H))
-                        {
-                            mScene.GetCell(index).SetTile("MountainsTile");
-                        }
-
-                        //  Terrain.SetTile(index, "Grass1Tile");
-                        // mHexTerrain.SetTile(index.X, index.Y, "Grass2Tile");
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.OemTilde ))
-                        {
-                            if (cellUnderCur.IsPassable)
-                            {
-                                cellUnderCur.OwningPlayer = mScene.CurrentPlayer;
-                            }
-                        }
-
-                        if (mScene.SceneManager.KeyboardManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.V))
-                        {
-                            mScene.GetCell(index).SetTile("VillageLv1Tile");
-                        }
-                    }
-                }
-            }
-            else
-            {
-                //    mCursor3d.IsVisible = false;
-            }
         }
 
         private bool IsSelectedUnitReady()
