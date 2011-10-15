@@ -36,8 +36,8 @@ namespace Conquera
         class MovementArrowRenderable : Renderable, IRenderableUnit, IDisposable
         {
             private VertexDeclaration mVertexDeclaration;
-            private HexCell mStartCell;
-            private HexCell mEndCell;
+            private HexTerrainTile mStartTile;
+            private HexTerrainTile mEndTile;
             private Material mMaterial;
             private DynamicVertexBuffer mVertexBuffer;
             private IndexBuffer mIndexBuffer;
@@ -50,27 +50,27 @@ namespace Conquera
                 get { return mVertexDeclaration.GraphicsDevice; }
             }
 
-            public HexCell StartCell
+            public HexTerrainTile StartTile
             {
-                get { return mStartCell; }
+                get { return mStartTile; }
                 set
                 {
-                    if (mStartCell != value)
+                    if (mStartTile != value)
                     {
-                        mStartCell = value;
+                        mStartTile = value;
                         RebuildGeometry();
                     }
                 }
             }
 
-            public HexCell EndCell
+            public HexTerrainTile EndTile
             {
-                get { return mEndCell; }
+                get { return mEndTile; }
                 set
                 {
-                    if (mEndCell != value)
+                    if (mEndTile != value)
                     {
-                        mEndCell = value;
+                        mEndTile = value;
                         RebuildGeometry();
                     }
                 }
@@ -92,14 +92,14 @@ namespace Conquera
                                     VertexElementMethod.Default,
                                     VertexElementUsage.Position, 0)});
 
-                short[] indices = new short[]
+                ushort[] indices = new ushort[]
                 {
                     1, 2, 0,
                     3, 2, 1,
                     6, 4, 5,
                 };
                 mIndexBuffer = new IndexBuffer(graphicsDevice, 9 * 2, BufferUsage.WriteOnly, IndexElementSize.SixteenBits);
-                mIndexBuffer.SetData<short>(indices);
+                mIndexBuffer.SetData<ushort>(indices);
             }
 
             /// <summary>
@@ -154,7 +154,7 @@ namespace Conquera
 
             protected override void OnEnqueRenderableUnits(IRenderer renderer, AleGameTime gameTime)
             {
-                if (null != EndCell && null != StartCell)
+                if (null != EndTile && null != StartTile)
                 {
                     if (null == mVertexBuffer || mVertexBuffer.IsContentLost)
                     {
@@ -171,16 +171,16 @@ namespace Conquera
 
             private void RebuildGeometry()
             {
-                if (null != EndCell && null != StartCell)
+                if (null != EndTile && null != StartTile)
                 {
-                    if (null != mVertexBuffer && StartCell != EndCell)
+                    if (null != mVertexBuffer && StartTile != EndTile)
                     {
                         float lineThickness = 0.3f;
                         float halfLineThickness = lineThickness * 0.5f;
                         float lineZPos = 0.05f;
 
-                        Vector3 cell1Center = mStartCell.CenterPos;
-                        Vector3 cell2Center = mEndCell.CenterPos;
+                        Vector3 cell1Center = mStartTile.CenterPos;
+                        Vector3 cell2Center = mEndTile.CenterPos;
 
                         Vector2 p1 = new Vector2(cell1Center.X, cell1Center.Y);
                         Vector2 p2 = new Vector2(cell2Center.X, cell2Center.Y);
@@ -210,16 +210,16 @@ namespace Conquera
         private bool mIsDisposed = false;
         private MovementArrowRenderable mMovementArrowRenderable;
 
-        public HexCell StartCell
+        public HexTerrainTile StartCell
         {
-            get { return mMovementArrowRenderable.StartCell; }
-            set { mMovementArrowRenderable.StartCell = value; }
+            get { return mMovementArrowRenderable.StartTile; }
+            set { mMovementArrowRenderable.StartTile = value; }
         }
 
-        public HexCell EndCell
+        public HexTerrainTile EndCell
         {
-            get { return mMovementArrowRenderable.EndCell; }
-            set { mMovementArrowRenderable.EndCell = value; }
+            get { return mMovementArrowRenderable.EndTile; }
+            set { mMovementArrowRenderable.EndTile = value; }
         }
 
         public bool IsVisible

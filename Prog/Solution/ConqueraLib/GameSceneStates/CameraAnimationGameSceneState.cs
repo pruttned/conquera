@@ -26,7 +26,7 @@ namespace Conquera
 {
     public class CameraAnimationGameSceneState : IGameSceneState
     {
-        private GameScene mScene;
+        private BattleScene mScene;
 
         private IGameSceneState mPreviousGameSceneState;
 
@@ -43,7 +43,7 @@ namespace Conquera
             }
         }
 
-        public CameraAnimationGameSceneState(GameScene scene)
+        public CameraAnimationGameSceneState(BattleScene scene)
         {
             mScene = scene;
         }
@@ -64,7 +64,7 @@ namespace Conquera
         {
         }
 
-        public void OnClickOnCell(HexCell cellUnderCur, MouseButton button)
+        public void OnClickOnTile(HexTerrainTile tileUnderCur, MouseButton button)
         {
         }
 

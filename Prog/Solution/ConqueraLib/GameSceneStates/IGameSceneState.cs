@@ -28,7 +28,7 @@ namespace Conquera
     {
         void OnStart();
         void OnEnd();
-        void OnClickOnCell(HexCell cellUnderCur, MouseButton button);
+        void OnClickOnTile(HexTerrainTile tileUnderCur, MouseButton button);
         void Update(AleGameTime gameTime);
     }
 

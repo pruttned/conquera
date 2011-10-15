@@ -26,9 +26,9 @@ namespace Conquera
 {
     public class VictoryEvaluationGameSceneState : IGameSceneState
     {
-        private GameScene mScene;
+        private BattleScene mScene;
 
-        public VictoryEvaluationGameSceneState(GameScene scene)
+        public VictoryEvaluationGameSceneState(BattleScene scene)
         {
             mScene = scene;
         }
@@ -49,7 +49,7 @@ namespace Conquera
         {
         }
 
-        public void OnClickOnCell(HexCell cellUnderCur, MouseButton button)
+        public void OnClickOnTile(HexTerrainTile tileUnderCur, MouseButton button)
         {
         }
 
@@ -57,19 +57,20 @@ namespace Conquera
         {
         }
 
-        protected virtual bool EvaluateVictory(GamePlayer player)
+        protected virtual bool EvaluateVictory(BattlePlayer player)
         {
-            if (0 < player.CastleCnt)
-            {
-                foreach (var p in mScene.GameSceneContextState.Players)
-                {
-                    if (p != player && 0 < p.CastleCnt)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
+            //todo
+            //if (0 < player.CastleCnt)
+            //{
+            //    foreach (var p in mScene.GameSceneContextState.Players)
+            //    {
+            //        if (p != player && 0 < p.CastleCnt)
+            //        {
+            //            return false;
+            //        }
+            //    }
+            //    return true;
+            //}
 
             return false;
         }

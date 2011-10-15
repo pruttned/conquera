@@ -34,7 +34,7 @@ using Conquera.Gui;
 using Ale;
 namespace Conquera
 {
-    public class HotseatGameScene : GameScene
+    public class HotseatGameScene : BattleScene
     {
         public override string GameType
         {
@@ -48,30 +48,27 @@ namespace Conquera
         /// <summary>
         /// Use only in GameSceneSettings
         /// </summary>
-        public HotseatGameScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState)
-            : base(sceneManager, content, ormManager, settings, terrain, gameSceneState)
+        public HotseatGameScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, BattleSceneHeader settings, HexTerrain terrain)
+            : base(sceneManager, content, ormManager, settings, terrain)
         {
         }
 
         public new static HotseatGameScene Load(string mapName, SceneManager sceneManager, ContentGroup content)
         {
-            return (HotseatGameScene)GameScene.Load(mapName, "Hotseat", sceneManager, content);
+            return (HotseatGameScene)BattleScene.Load(mapName, "Hotseat", sceneManager, content);
         }
 
         public static IList<string> QueryMapFiles()
         {
-            return GameScene.QueryMapFiles("Hotseat");
+            return BattleScene.QueryMapFiles("Hotseat");
         }
 
         protected override void CreatePlayers()
         {
-            GameSceneContextState.Players.Add(new HumanPlayer("Blue", Color.Blue.ToVector3()));
-            GameSceneContextState.Players.Add(new HumanPlayer("Red", Color.Red.ToVector3()));
-            GameSceneContextState.Players[0].Mana = 0;
-            GameSceneContextState.Players[1].Mana = 0;
+            //todo
         }
 
-        protected override GameSceneSettings CreateGameSettings()
+        protected override BattleSceneHeader CreateGameSettings()
         {
             return new HotseatGameSceneSettings();
         }

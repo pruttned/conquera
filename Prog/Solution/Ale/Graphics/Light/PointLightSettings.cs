@@ -32,7 +32,7 @@ namespace Ale.Graphics
     [CustomBasicTypeProvider(typeof(Vector3), typeof(FieldCustomBasicTypeProvider<Vector3>))]
     public class PointLightSettings : BaseDataObject
     {
-        [DataProperty(NotNull = true)]
+        [DataProperty(NotNull = true, Unique=true)]
         public string Name { get; set; }
 
         [DataProperty(NotNull = true)]

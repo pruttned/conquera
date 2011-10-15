@@ -24,74 +24,60 @@ using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Ale.Gui;
+using System.Collections.ObjectModel;
 
 namespace Conquera
 {
+    public class StaticGmConnectionPointAssigment
+    {
+        public ConnectionPointAssigmentDesc ConnectionPoint { get; private set; }
+        public GraphicModelDesc GraphicModelDesc { get; private set; }
+
+        public StaticGmConnectionPointAssigment(ConnectionPointAssigmentDesc connectionPoint, GraphicModelDesc graphicModelDesc)
+        {
+            ConnectionPoint = connectionPoint;
+            GraphicModelDesc = graphicModelDesc;
+        }
+    }
+
     [NonContentPipelineAsset(typeof(HexTerrainTileDescLoader))]
-    public abstract class HexTerrainTileDesc : IDisposable //todo abstract
+    public abstract class HexTerrainTileDesc : IDisposable
     {
         private bool mIsDisposed = false;
+
+        List<GraphicModel> mStaticGraphicModels;
+        List<GraphicModelDesc> mNonStaticGraphicModels;
+        List<StaticGmConnectionPointAssigment> mStaticGraphicModelsConnectionPointAssigments;
 
         public string Name
         {
             get { return Settings.Name; }
         }
-        
+
         public string DisplayName
         {
             get { return Settings.DisplayName; }
         }
 
-        public string Description
-        {
-            get { return Settings.Description.Text; }
-        }
-
-        public GraphicModel GroundGraphicModel { get; private set; }
-        public GraphicModel WallGraphicModel { get; private set; }
         /// <summary>
         /// Graphic models inserted to the static geometry
         /// </summary>
-        public GraphicModel[] StaticGraphicModels { get; private set; } 
+        public ReadOnlyCollection<GraphicModel> StaticGraphicModels { get; private set; }
         /// <summary>
-        /// Graphic models that can't be inserted to the static geometry - transparenta nd models with a skinned animation
+        /// Graphic models that can't be inserted to the static geometry - transparent and models with a skinned animation
         /// </summary>
-        public GraphicModelDesc[] GraphicModels { get; private set; }
+        public ReadOnlyCollection<GraphicModelDesc> NonStaticGraphicModels { get; private set; }
 
-        /// <summary>
-        /// This graphic model will be never placed into the static geometry
-        /// </summary>
-        public GraphicModelDesc ActiveGraphicModel { get; private set; }
+        public ReadOnlyCollection<StaticGmConnectionPointAssigment> StaticGraphicModelsConnectionPointAssigments { get; private set; }
 
-        /// <summary>
-        /// This graphic model will be never placed into the static geometry
-        /// </summary>
-        public GraphicModelDesc InactiveGraphicModel { get; private set; }
+        public abstract bool IsPassable { get; }
 
-
-        public StaticGmConnectionPointAssigment[] StaticGmConnectionPointAssigments { get; private set; }
-
-        //public TileType TileType
-        //{
-        //    get { return mSettings.TileType; }
-        //}
-
-        public bool IsPassable
-        {
-            get { return Settings.IsPassable; }
-        }
+        public abstract Vector3 UnitPosition { get; }
 
         public long Id
         {
             get { return Settings.Id; }
         }
-
-        public Vector3 UnitPosition 
-        {
-            get { return Settings.UnitPosition; }
-        }
-
-        public GraphicElement Icon { get; private set; }
 
         protected HexTerrainTileSettings Settings { get; private set; }
 
@@ -99,64 +85,14 @@ namespace Conquera
         {
             Settings = settings;
             GraphicsDevice graphicsDevice = ((IGraphicsDeviceService)content.ServiceProvider.GetService(typeof(IGraphicsDeviceService))).GraphicsDevice;
-            GroundGraphicModel = CreateGroundGraphicModel(settings, content, graphicsDevice);
-            WallGraphicModel = new GraphicModel(content.Load<GraphicModelDesc>(settings.WallGraphicModel), content);
 
-            if (0 < settings.ActiveGraphicModel)
+            if (null != settings.GraphicModels && 0 < settings.GraphicModels.Count)
             {
-                ActiveGraphicModel = content.Load<GraphicModelDesc>(settings.ActiveGraphicModel);
-            }
-            if (0 <  settings.InactiveGraphicModel)
-            {
-                InactiveGraphicModel = content.Load<GraphicModelDesc>(settings.InactiveGraphicModel);
-            }
-
-            var graphicModelsFromSettings = settings.GraphicModels;
-            if (null != graphicModelsFromSettings && 0 < graphicModelsFromSettings.Count)
-            {
-                List<GraphicModel> staticGraphicModels = new List<GraphicModel>();
-                List<GraphicModelDesc> graphicModels = new List<GraphicModelDesc>();
-                List<StaticGmConnectionPointAssigment> staticGmConnectionPointAssigments = new List<StaticGmConnectionPointAssigment>();
-                
-                for (int i = 0; i < graphicModelsFromSettings.Count; ++i)
+                foreach (var graphicModel in settings.GraphicModels)
                 {
-                    GraphicModelDesc modelDesc = content.Load<GraphicModelDesc>(graphicModelsFromSettings[i]);
-
-                    if (null == modelDesc.Mesh.SkeletalAnimations && IsOpaque(modelDesc)) //no animations and opaque
-                    {
-                        var gm = new GraphicModel(modelDesc, content);
-                        staticGraphicModels.Add(gm);
-
-                        //connection points
-                        if(null != modelDesc.ConnectionPointAssigments)
-                        {
-                            foreach (var cpAssigment in modelDesc.ConnectionPointAssigments)
-                            {
-                                staticGmConnectionPointAssigments.Add(new StaticGmConnectionPointAssigment(cpAssigment, modelDesc));
-                            }
-                        }
-                    }
-                    else
-                    {
-                        graphicModels.Add(modelDesc);
-                    }
-                }
-             
-                if (0 < staticGraphicModels.Count)
-                {
-                    StaticGraphicModels = staticGraphicModels.ToArray();
-                }
-                if (0 < graphicModels.Count)
-                {
-                    GraphicModels = graphicModels.ToArray();
-                }
-                if(0< staticGmConnectionPointAssigments.Count)
-                {
-                    StaticGmConnectionPointAssigments = staticGmConnectionPointAssigments.ToArray();
+                    AddGraphicModel(graphicModel, content);
                 }
             }
-
-            Icon = Conquera.Gui.ConqueraPalette.GetTileIcon(settings.Icon);
         }
 
         /// <summary>
@@ -168,21 +104,146 @@ namespace Conquera
             GC.SuppressFinalize(this);
         }
 
+        public virtual HexTerrainTile CreateHexTerrainTile(BattleScene scene, Point index)
+        {
+            return new HexTerrainTile(scene, index, this);
+        }
+
         protected virtual void Dispose(bool isDisposing)
         {
             if (!mIsDisposed)
             {
                 if (isDisposing)
                 {
-                    GroundGraphicModel.Dispose();
+                    if (null != mStaticGraphicModels)
+                    {
+                        foreach (var graphicModel in mStaticGraphicModels)
+                        {
+                            graphicModel.Dispose();
+                        }
+                    }
                 }
                 mIsDisposed = true;
             }
         }
 
-        protected GraphicModel CreateGroundGraphicModel(HexTerrainTileSettings settings, ContentGroup content, GraphicsDevice graphicsDevice)
+        protected void AddGraphicModel(long graphicModelDesc, ContentGroup content)
+        {
+            GraphicModelDesc modelDesc = content.Load<GraphicModelDesc>(graphicModelDesc);
+
+            if (null == modelDesc.Mesh.SkeletalAnimations && IsGraphicModelFullyOpaque(modelDesc)) //no animations and opaque
+            {
+                AddStaticGraphicModel(modelDesc, content);
+            }
+            else
+            {
+                AddNonStaticGraphicModel(modelDesc);
+            }
+        }
+
+        protected void AddNonStaticGraphicModel(GraphicModelDesc graphicModelDesc)
+        {
+            if (null == mNonStaticGraphicModels)
+            {
+                mNonStaticGraphicModels = new List<GraphicModelDesc>();
+                NonStaticGraphicModels = new ReadOnlyCollection<GraphicModelDesc>(mNonStaticGraphicModels);
+            }
+            mNonStaticGraphicModels.Add(graphicModelDesc);
+        }
+
+        protected void AddStaticGraphicModel(GraphicModelDesc graphicModelDesc, ContentGroup content)
+        {
+            var gm = new GraphicModel(graphicModelDesc, content);
+            if (null == mStaticGraphicModels)
+            {
+                mStaticGraphicModels = new List<GraphicModel>();
+                StaticGraphicModels = new ReadOnlyCollection<GraphicModel>(mStaticGraphicModels);
+            }
+            mStaticGraphicModels.Add(gm);
+
+            //connection points
+            if (null != graphicModelDesc.ConnectionPointAssigments)
+            {
+                if (null == mStaticGraphicModelsConnectionPointAssigments)
+                {
+                    mStaticGraphicModelsConnectionPointAssigments = new List<StaticGmConnectionPointAssigment>();
+                    StaticGraphicModelsConnectionPointAssigments = new ReadOnlyCollection<StaticGmConnectionPointAssigment>(mStaticGraphicModelsConnectionPointAssigments);
+                }
+
+                foreach (var cpAssigment in graphicModelDesc.ConnectionPointAssigments)
+                {
+                    mStaticGraphicModelsConnectionPointAssigments.Add(new StaticGmConnectionPointAssigment(cpAssigment, graphicModelDesc));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// GraphicModel will be disposed automatically. Contected renderables are ignored
+        /// </remarks>
+        /// <param name="graphicModel"></param>
+        protected void AddStaticGraphicModel(GraphicModel graphicModel)
+        {
+            if (null == mStaticGraphicModels)
+            {
+                mStaticGraphicModels = new List<GraphicModel>();
+                StaticGraphicModels = new ReadOnlyCollection<GraphicModel>(mStaticGraphicModels);
+            }
+            mStaticGraphicModels.Add(graphicModel);
+        }
+
+        protected bool IsGraphicModelFullyOpaque(GraphicModelDesc graphicModelDesc)
+        {
+            foreach (var material in graphicModelDesc.PartMaterials.Values)
+            {
+                foreach (var technique in material.Techniques.Values)
+                {
+                    foreach (var pass in technique.MaterialEffectTechnique.Passes)
+                    {
+                        if (pass.IsTransparent)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+    }
+
+    public abstract class GroundHexTerrainTileDesc : HexTerrainTileDesc
+    {
+        public override bool IsPassable
+        {
+            get { return ((GroundHexTerrainTileSettings)Settings).IsPassable; }
+        }
+
+        public long Id
+        {
+            get { return Settings.Id; }
+        }
+
+        public override Vector3 UnitPosition
+        {
+            get { return ((GroundHexTerrainTileSettings)Settings).UnitPosition; }
+        }
+
+        protected HexTerrainTileSettings Settings { get; private set; }
+
+        public GroundHexTerrainTileDesc(GroundHexTerrainTileSettings settings, ContentGroup content)
+            : base(settings, content)
+        {
+            GraphicsDevice graphicsDevice = ((IGraphicsDeviceService)content.ServiceProvider.GetService(typeof(IGraphicsDeviceService))).GraphicsDevice;
+            AddStaticGraphicModel(CreateGroundGraphicModel(settings, content, graphicsDevice));
+        }
+
+        protected GraphicModel CreateGroundGraphicModel(GroundHexTerrainTileSettings settings, ContentGroup content, GraphicsDevice graphicsDevice)
         {
             HexTerrainTileAtlas atlas = content.Load<HexTerrainTileAtlas>(settings.HexTerrainTileAtlas);
+
+            Settings = settings;
 
             float baseCellSize = 1.0f / (float)atlas.Size;
             float textureCellSpacing = atlas.TextureCellSpacing * baseCellSize;
@@ -233,58 +294,39 @@ namespace Conquera
 
             return new GraphicModel(tileMesh, atlas.Material);
         }
-
-        private bool IsOpaque(GraphicModelDesc graphicModelDesc)
-        {
-            foreach (var material in graphicModelDesc.PartMaterials.Values)
-            {
-                foreach (var technique in material.Techniques.Values)
-                {
-                    foreach(var pass in technique.MaterialEffectTechnique.Passes)
-                    {
-                        if (pass.IsTransparent)
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
-        }
     }
 
-    public abstract class CapturableHexTerrainTileDesc : HexTerrainTileDesc
+    public abstract class CapturableHexTerrainTileDesc : GroundHexTerrainTileDesc
     {
-        public CapturableHexTerrainTileDesc(HexTerrainTileSettings settings, ContentGroup content)
+        public CapturableHexTerrainTileDesc(GroundHexTerrainTileSettings settings, ContentGroup content)
             : base(settings, content)
         {
         }
 
-        protected internal abstract void OnBeginTurn(HexCell cell);
+        protected internal abstract void OnOwningPlayerBeginTurn(HexTerrainTile tile);
 
-        protected internal abstract void OnCaptured(HexCell cell);
+        protected internal abstract void OnCaptured(HexTerrainTile tile);
 
-        protected internal abstract void OnSetOwningPlayerDuringLoad(HexCell cell);
-
-        protected internal abstract void OnLost(HexCell cell);
+        protected internal abstract void OnLost(HexTerrainTile tile);
     }
 
-    public class StaticGmConnectionPointAssigment
+    public class HexTerrainGapTileDesc : HexTerrainTileDesc
     {
-        public ConnectionPointAssigmentDesc ConnectionPoint { get; private set; }
-        public GraphicModelDesc GraphicModelDesc { get; private set; }
-
-        public StaticGmConnectionPointAssigment(ConnectionPointAssigmentDesc connectionPoint, GraphicModelDesc graphicModelDesc)
+        public HexTerrainGapTileDesc(HexTerrainTileSettings settings, ContentGroup content)
+            : base(settings, content)
         {
-            ConnectionPoint = connectionPoint;
-            GraphicModelDesc = graphicModelDesc;
+        }
+
+        public override bool IsPassable
+        {
+            get { return false; }
+        }
+
+        public override Vector3 UnitPosition
+        {
+            get { return Vector3.Zero; }
         }
     }
-
-
-
-
-
 
     public class CastleTileDesc : CapturableHexTerrainTileDesc
     {
@@ -293,23 +335,20 @@ namespace Conquera
         {
         }
 
-        protected internal override void OnBeginTurn(HexCell cell)
+        protected internal override void OnOwningPlayerBeginTurn(HexTerrainTile tile)
         {
         }
 
-        protected internal override void OnCaptured(HexCell cell)
+        protected internal override void OnCaptured(HexTerrainTile tile)
         {
-            cell.OwningPlayer.CastleCnt++;
+            //todo
+            //tile.OwningPlayer.CastleCnt++;
         }
 
-        protected internal override void OnSetOwningPlayerDuringLoad(HexCell cell)
+        protected internal override void OnLost(HexTerrainTile tile)
         {
-            OnCaptured(cell);
-        }
-
-        protected internal override void OnLost(HexCell cell)
-        {
-            cell.OwningPlayer.CastleCnt--;
+            //todo
+            //tile.OwningPlayer.CastleCnt--;
         }
     }
 
@@ -319,7 +358,7 @@ namespace Conquera
         {
             get { return ((ManaMineTileSettings)Settings).ManaIncrement; }
         }
-        private string NotificationString {get; set;}
+        private string NotificationString { get; set; }
 
         public ManaMineTileDesc(ManaMineTileSettings settings, ContentGroup content)
             : base(settings, content)
@@ -327,37 +366,26 @@ namespace Conquera
             NotificationString = string.Format("+{0}", ManaIncrement.ToString());
         }
 
-        protected internal override void OnBeginTurn(HexCell cell)
+        protected internal override void OnOwningPlayerBeginTurn(HexTerrainTile tile)
         {
-            if (cell.IsActive)
-            {
-                cell.OwningPlayer.Mana += ManaIncrement;
-                if (cell.OwningPlayer.IsHuman)
-                {
-                    cell.Scene.FireCellNotificationLabel(NotificationString, CellNotificationIcons.Coin, Color.Purple, cell.Index);
-                }
-            }
+            //todo
+            //cell.OwningPlayer.Mana += ManaIncrement;
+            //if (cell.OwningPlayer.IsHuman)
+            //{
+            //    cell.Scene.FireCellNotificationLabel(NotificationString, CellNotificationIcons.Coin, Color.Purple, cell.Index);
+            //}
         }
 
-        protected internal override void OnCaptured(HexCell cell)
-        {
-            cell.OwningPlayer.Mana += ManaIncrement;
-            if (cell.OwningPlayer.IsHuman)
-            {
-                cell.Scene.FireCellNotificationLabel(NotificationString, CellNotificationIcons.Coin, Color.Purple, cell.Index);
-            }
-        }
-
-        protected internal override void OnSetOwningPlayerDuringLoad(HexCell cell)
+        protected internal override void OnCaptured(HexTerrainTile tile)
         {
         }
 
-        protected internal override void OnLost(HexCell cell)
+        protected internal override void OnLost(HexTerrainTile tile)
         {
         }
     }
 
-    public class LandTileDesc : HexTerrainTileDesc
+    public class LandTileDesc : GroundHexTerrainTileDesc
     {
         public LandTileDesc(LandTileSettings settings, ContentGroup content)
             : base(settings, content)
@@ -365,31 +393,46 @@ namespace Conquera
         }
     }
 
-    public class VillageTileDesc : CapturableHexTerrainTileDesc
+    public class GapHexTerrainTileDesc : HexTerrainTileDesc
     {
-        public VillageTileDesc(VillageTileSettings settings, ContentGroup content)
+        private bool mIsDisposed = false;
+
+        public GraphicModel WallGraphicModel { get; private set; }
+
+        public override bool IsPassable
+        {
+            get { return false; }
+        }
+
+        public override Vector3 UnitPosition
+        {
+            get { return Vector3.Zero; }
+        }
+
+        public GapHexTerrainTileDesc(GapHexTerrainTileSettings settings, ContentGroup content)
             : base(settings, content)
         {
+            WallGraphicModel = new GraphicModel(content.Load<GraphicModelDesc>(settings.GapWallGraphicModel), content);
         }
 
-        protected internal override void OnBeginTurn(HexCell cell)
+        protected override void Dispose(bool isDisposing)
         {
+            if (!mIsDisposed)
+            {
+                if (isDisposing)
+                {
+                    WallGraphicModel.Dispose();
+                }
+                mIsDisposed = true;
+            } 
+            base.Dispose(isDisposing);
         }
 
-        protected internal override void OnCaptured(HexCell cell)
+        public override HexTerrainTile CreateHexTerrainTile(BattleScene scene, Point index)
         {
-            cell.OwningPlayer.MaxUnitCnt += ((VillageTileSettings)Settings).MaxUnitCntIncrement;
+            return new GapHexTerrainTile(scene, index, this);
         }
-
-        protected internal override void OnSetOwningPlayerDuringLoad(HexCell cell)
-        {
-            OnCaptured(cell);
-        }
-
-        protected internal override void OnLost(HexCell cell)
-        {
-            cell.OwningPlayer.MaxUnitCnt -= ((VillageTileSettings)Settings).MaxUnitCntIncrement;
-        }
-
+     
     }
+
 }
