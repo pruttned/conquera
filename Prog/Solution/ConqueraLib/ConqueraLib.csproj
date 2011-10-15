@@ -83,15 +83,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BattlePlayer.cs" />
+    <Compile Include="BattleScene.cs" />
+    <Compile Include="BattleSceneHeader.cs" />
     <Compile Include="BorderRenderable.cs" />
     <Compile Include="CellNotificationLabel.cs" />
     <Compile Include="GameCamera.cs" />
     <Compile Include="GameCard.cs" />
     <Compile Include="GameDefaultScenePass.cs" />
-    <Compile Include="GamePlayer.cs" />
-    <Compile Include="GameScene.cs" />
     <Compile Include="GameSceneContextState.cs" />
-    <Compile Include="GameSceneSettings.cs" />
     <Compile Include="GameSceneStates\BattleGameSceneState.cs" />
     <Compile Include="GameSceneStates\BeginTurnGameSceneState.cs" />
     <Compile Include="GameSceneStates\CameraAnimationGameSceneState.cs" />
@@ -101,13 +101,7 @@
     <Compile Include="GameSceneStates\UnitMovingGameSceneState.cs" />
     <Compile Include="GameSceneStates\VictoryEvaluationGameSceneState.cs" />
     <Compile Include="GameSettings.cs" />
-    <Compile Include="GameUnit\GameUnit.cs" />
-    <Compile Include="GameUnit\GameUnitDesc.cs" />
-    <Compile Include="GameUnit\GameUnitDescLoader.cs" />
-    <Compile Include="GameUnit\GameUnitSettings.cs" />
-    <Compile Include="GameUnit\IGameUnitState.cs" />
     <Compile Include="Gui\AlCursors.cs" />
-    <Compile Include="Gui\CastleInfoView.cs" />
     <Compile Include="EventHelper.cs" />
     <Compile Include="Gui\ConqueraFonts.cs" />
     <Compile Include="Gui\ConqueraMessageBox.cs" />
@@ -124,8 +118,6 @@
     <Compile Include="Gui\SpellSlotButton.cs" />
     <Compile Include="Gui\SpellTowerInfoView.cs" />
     <Compile Include="Gui\SpellView.cs" />
-    <Compile Include="Gui\TileInfoPanel.cs" />
-    <Compile Include="Gui\TileInfoView.cs" />
     <Compile Include="HexAreaRenderable.cs" />
     <Compile Include="HexCell.cs" />
     <Compile Include="HexHelper.cs" />
@@ -162,6 +154,11 @@
     <Compile Include="Spell\VampiricTouchSpell.cs" />
     <Compile Include="StringResource.cs" />
     <Compile Include="UnitAreaRenderable.cs" />
+    <Compile Include="Unit\BattleUnit.cs" />
+    <Compile Include="Unit\IBattleUnitState.cs" />
+    <Compile Include="Unit\UnitDesc.cs" />
+    <Compile Include="Unit\UnitDescLoader.cs" />
+    <Compile Include="Unit\UnitSettings.cs" />
     <Compile Include="WaterReflectionCamera.cs" />
     <Compile Include="WaterReflectionPass.cs" />
   </ItemGroup>

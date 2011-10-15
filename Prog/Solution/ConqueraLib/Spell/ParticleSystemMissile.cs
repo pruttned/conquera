@@ -111,11 +111,11 @@ namespace Conquera
 
     public class SpellParticleSystemMissile : ParticleSystemMissile
     {
-        public GameUnit Target { get; private set; }
-        public GameScene GameScene { get { return Target.GameScene; } }
+        public BattleUnit Target { get; private set; }
+        public BattleScene GameScene { get { return Target.BattleScene; } }
 
-        public SpellParticleSystemMissile(GameUnit target, Vector3 srcPos, Vector3 destPos, string pSysName, float speed)
-            : base(target.GameScene, srcPos, destPos, pSysName, speed)
+        public SpellParticleSystemMissile(BattleUnit target, Vector3 srcPos, Vector3 destPos, string pSysName, float speed)
+            : base(target.BattleScene, srcPos, destPos, pSysName, speed)
         {
             Target = target;
         }

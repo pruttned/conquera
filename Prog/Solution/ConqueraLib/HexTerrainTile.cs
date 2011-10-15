@@ -29,140 +29,188 @@ using Ale.Scene;
 
 namespace Conquera
 {
-    internal class HexTerrainTile : SceneObject
+    public class HexTerrainTile : IDisposable
     {
-        private List<BathcedModelIdentifier> mStaticGeometryIds = new List<BathcedModelIdentifier>();
+        private List<BatchedModelIdentifier> mStaticGeometryIds = new List<BatchedModelIdentifier>();
         private List<GraphicModel> mGraphicModels;
         private List<Renderable> mStaticCpRenderables;
-        private GraphicModel mActiveGraphicModel;
-        private GraphicModel mInactiveGraphicModel;
+
         private Vector3 mCenterPos;
-        private HexCellCapturedMark mHexCellCapturedMark;
+        private HexTileCapturedMark mHexCellCapturedMark;
+        private bool mIsDisposed = false;
 
         public HexTerrainTileDesc Desc { get; private set; }
-
         public Vector3 CenterPos
         {
             get { return mCenterPos; }
         }
+        public Point Index { get; private set; }
+        public BattleScene Scene { get; private set; }
 
-        internal bool HasWall { get; private set; }
-
-        internal HexTerrainTile(HexTerrainTileDesc desc, bool hasWall, Vector3 centerPos)
+        public bool IsPassable
         {
+            //todo - unit
+            get { return Desc.IsPassable; }
+        }
+
+        public HexTerrainTile(BattleScene scene, Point index, HexTerrainTileDesc desc)
+        {
+            Scene = scene;
+            Index = index;
             Desc = desc;
-            HasWall = hasWall;
-            mCenterPos = centerPos;
+            mCenterPos = HexHelper.Get3DPosFromIndex(index, HexTerrain.GroundHeight);
         }
 
-        internal void OnCaptured(HexCell cell)
+        public void GetCornerPos(HexTileCorner corner, out Vector3 pos)
         {
-            if (Desc is CapturableHexTerrainTileDesc)
-            {
-                if (null != mActiveGraphicModel)
-                {
-                    mActiveGraphicModel.IsVisible = true;
-                }
-                if (null != mInactiveGraphicModel)
-                {
-                    mInactiveGraphicModel.IsVisible = false;
-                }
-
-                if (null == mHexCellCapturedMark)
-                {
-                    InitHexCellCapturedMark(cell);
-                }
-                mHexCellCapturedMark.Color = cell.OwningPlayer.Color;
-
-                ((CapturableHexTerrainTileDesc)Desc).OnCaptured(cell);
-            }
+            HexHelper.GetHexCellCornerPos3D(corner, out pos);
+            Vector3 centerPos = CenterPos;
+            Vector3.Add(ref centerPos, ref pos, out pos);
         }
-       
-        internal void OnSetOwningPlayerDuringLoad(HexCell cell)
+
+        public Vector3 GetCornerPos(HexTileCorner corner)
         {
-            if (null == cell.OwningPlayer) throw new ArgumentNullException("cell.OwningPlayer");
-
-            if (Desc is CapturableHexTerrainTileDesc)
-            {
-                if (null != mActiveGraphicModel)
-                {
-                    mActiveGraphicModel.IsVisible = true;
-                }
-                if (null != mInactiveGraphicModel)
-                {
-                    mInactiveGraphicModel.IsVisible = false;
-                }
-                InitHexCellCapturedMark(cell);
-                mHexCellCapturedMark.Color = cell.OwningPlayer.Color;
-
-                ((CapturableHexTerrainTileDesc)Desc).OnSetOwningPlayerDuringLoad(cell);
-            }
+            Vector3 pos;
+            GetCornerPos(corner, out pos);
+            return pos;
         }
-        
 
-        internal void OnLost(HexCell cell, GamePlayer newPlayer)
+        public void GetCorner2DPos(HexTileCorner corner, out Vector2 pos)
         {
-            if (Desc is CapturableHexTerrainTileDesc)
+            Vector3 pos3D;
+            GetCornerPos(corner, out pos3D);
+            pos = new Vector2(pos3D.X, pos3D.Y);
+        }
+
+        public Vector2 GetCorner2DPos(HexTileCorner corner)
+        {
+            Vector2 pos;
+            GetCorner2DPos(corner, out pos);
+            return pos;
+        }
+
+        public void GetCornerIndex(HexTileCorner corner, out Point index)
+        {
+            int i = Index.X;
+            int j = Index.Y;
+            bool isEven = (0 == (j & 1));
+
+            switch (corner)
             {
-                if (null != mActiveGraphicModel)
-                {
-                    mActiveGraphicModel.IsVisible = false;
-                }
-                if (null != mInactiveGraphicModel)
-                {
-                    mInactiveGraphicModel.IsVisible = true;
-                }
-                ((CapturableHexTerrainTileDesc)Desc).OnLost(cell);
-
-                if (null == newPlayer && null != mHexCellCapturedMark)
-                {
-                    ((GameScene)Scene).Octree.DestroyObject(mHexCellCapturedMark);
-                    mHexCellCapturedMark = null;
-                }
-
+                case HexTileCorner.Top:
+                    index = isEven ? new Point(i, j * 2 + 3) : new Point(i + 1, (j - 1) * 2 + 5);
+                    break;
+                case HexTileCorner.UperRight:
+                    index = new Point(i + 1, isEven ? j * 2 + 2 : (j - 1) * 2 + 4);
+                    break;
+                case HexTileCorner.LowerRight:
+                    index = new Point(i + 1, isEven ? j * 2 + 1 : (j - 1) * 2 + 3);
+                    break;
+                case HexTileCorner.Down:
+                    index = isEven ? new Point(i, j * 2) : new Point(i + 1, (j - 1) * 2 + 2);
+                    break;
+                case HexTileCorner.LowerLeft:
+                    index = new Point(i, isEven ? j * 2 + 1 : (j - 1) * 2 + 3);
+                    break;
+                case HexTileCorner.UperLeft:
+                    index = new Point(i, isEven ? j * 2 + 2 : (j - 1) * 2 + 4);
+                    break;
+                default:
+                    throw new ArgumentException("Invalid corner");
             }
         }
 
-        internal void OnBeginTurn(HexCell cell)
+        public bool IsSiblingTo(HexTerrainTile tile)
         {
-            if (Desc is CapturableHexTerrainTileDesc)
-            {
-                ((CapturableHexTerrainTileDesc)Desc).OnBeginTurn(cell);
-            }
+            int i = Index.X;
+            int j = Index.Y;
+
+            int i2 = tile.Index.X;
+            int j2 = tile.Index.Y;
+
+            return (i2 == i - 1 && j2 == j) ||
+                    (i2 == i + 1 && j2 == j) ||
+                    ((0 != (j & 1)) && ((i2 == i && j2 == j - 1) || (i2 == i + 1 && j2 == j - 1) || (i2 == i && j2 == j + 1) || (i2 == i + 1 && j2 == j + 1))) ||
+                    ((0 == (j & 1)) && ((i2 == i - 1 && j2 == j - 1) || (i2 == i && j2 == j - 1) || (i2 == i - 1 && j2 == j + 1) || (i2 == i && j2 == j + 1)));
         }
 
-        protected override void OnAddToSceneImpl(BaseScene scene)
+        internal void OnCaptured()
         {
-            GameScene hexScene = (GameScene)scene;
+            throw new NotImplementedException();
+            //todo
+            //if (Desc is CapturableHexTerrainTileDesc)
+            //{
+            //    if (null == mHexCellCapturedMark)
+            //    {
+            //        InitHexCellCapturedMark(cell);
+            //    }
+            //    mHexCellCapturedMark.Color = cell.OwningPlayer.Color;
 
-            Desc.GroundGraphicModel.Position = CenterPos;
-            mStaticGeometryIds.Add(hexScene.StaticGeomtery.AddGraphicModel(Desc.GroundGraphicModel));
+            //    ((CapturableHexTerrainTileDesc)Desc).OnCaptured(cell);
+            //}
+        }
 
-            if (HasWall)
-            {
-                Desc.WallGraphicModel.Position = CenterPos;
-                mStaticGeometryIds.Add(hexScene.StaticGeomtery.AddGraphicModel(Desc.WallGraphicModel));
-            }
+        internal void OnLost(BattlePlayer newPlayer)
+        {
+            throw new NotImplementedException();
+            //todo    
+            //if (Desc is CapturableHexTerrainTileDesc)
+            //{
+            //    ((CapturableHexTerrainTileDesc)Desc).OnLost(cell);
 
+            //    if (null == newPlayer && null != mHexCellCapturedMark)
+            //    {
+            //        ((BattleScene)Scene).Octree.DestroyObject(mHexCellCapturedMark);
+            //        mHexCellCapturedMark = null;
+            //    }
+            //}
+        }
+
+        internal void OnBeginTurn()
+        {
+            //todo
+            //if (Desc is CapturableHexTerrainTileDesc)
+            //{
+            //    ((CapturableHexTerrainTileDesc)Desc).OnOwningPlayerBeginTurn(cell);
+            //}
+        }
+
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Adds renderables to scene
+        /// Called by HexTerrain after creating all hex terrain tiles. Or after changing a specified tile.
+        /// </summary>
+        internal void Init()
+        {
             if (null != Desc.StaticGraphicModels)
             {
                 foreach (GraphicModel gm in Desc.StaticGraphicModels)
                 {
-                    gm.Position = CenterPos;
-                    mStaticGeometryIds.Add(hexScene.StaticGeomtery.AddGraphicModel(gm));
+                    Vector3 oldPos = gm.Position;
+                    gm.Position += CenterPos;
+                    mStaticGeometryIds.Add(Scene.StaticGeomtery.AddGraphicModel(gm));
+                    gm.Position = oldPos;
                 }
             }
 
-            if (null != Desc.GraphicModels)
+            if (null != Desc.NonStaticGraphicModels)
             {
                 mGraphicModels = new List<GraphicModel>();
 
-                foreach (GraphicModelDesc gmDesc in Desc.GraphicModels)
+                foreach (GraphicModelDesc gmDesc in Desc.NonStaticGraphicModels)
                 {
-                    GraphicModel gm = new GraphicModel(gmDesc, scene.RenderableProvider, scene.Content);
+                    GraphicModel gm = new GraphicModel(gmDesc, Scene.RenderableProvider, Scene.Content);
                     //   gm.Position = pos + gmDesc.Position;
-                    gm.Position = mCenterPos;
-                    hexScene.Octree.AddObject(gm);
+                    gm.Position += mCenterPos;
+                    Scene.Octree.AddObject(gm);
 
                     if (null != gmDesc.Mesh.SkeletalAnimations)
                     {
@@ -173,48 +221,79 @@ namespace Conquera
                 }
             }
 
-            if (null != Desc.StaticGmConnectionPointAssigments)
+            if (null != Desc.StaticGraphicModelsConnectionPointAssigments)
             {
                 mStaticCpRenderables = new List<Renderable>();
-                foreach (var cpa in Desc.StaticGmConnectionPointAssigments)
+                foreach (var cpa in Desc.StaticGraphicModelsConnectionPointAssigments)
                 {
-                    Renderable renderable = hexScene.RenderableProvider.CreateRenderable(cpa.ConnectionPoint.RenderableFactory, cpa.ConnectionPoint.Renderable,
-                        scene.Content);
+                    Renderable renderable = Scene.RenderableProvider.CreateRenderable(cpa.ConnectionPoint.RenderableFactory, cpa.ConnectionPoint.Renderable,
+                        Scene.Content);
                     var cp = cpa.GraphicModelDesc.Mesh.ConnectionPoints[cpa.ConnectionPoint.ConnectionPoint];
                     renderable.SetTransformation(mCenterPos + cp.LocPosition, cp.LocOrientation);
                     mStaticCpRenderables.Add(renderable);
-                    hexScene.Octree.AddObject(renderable);
+                    Scene.Octree.AddObject(renderable);
                 }
             }
 
-            if (null != Desc.ActiveGraphicModel)
-            {
-                mActiveGraphicModel = new GraphicModel(Desc.ActiveGraphicModel, hexScene.RenderableProvider, scene.Content);
-                mActiveGraphicModel.IsVisible = false;
-                mActiveGraphicModel.Position = CenterPos;
-                hexScene.Octree.AddObject(mActiveGraphicModel);
-            }
-            if (null != Desc.InactiveGraphicModel)
-            {
-                mInactiveGraphicModel = new GraphicModel(Desc.InactiveGraphicModel, hexScene.RenderableProvider, scene.Content);
-                mInactiveGraphicModel.Position = CenterPos;
-                hexScene.Octree.AddObject(mInactiveGraphicModel);
-            }
-        } 
+            OnInit();
+        }
 
-        protected override void OnDispose()
+        /// <summary>
+        /// Called by HexTerrrain to notify that a tile's sibling has been changed
+        /// </summary>
+        /// <param name="siblingIndex"></param>
+        internal void OnSiblingChanged(Point siblingIndex)
         {
-            GameScene hexScene = (GameScene)Scene;
+            OnSiblingChangedImpl(siblingIndex);
+        }
+        
+        /// <summary>
+        /// Called by HexTerrrain to notify that a tile's sibling has been changed
+        /// </summary>
+        /// <param name="siblingIndex"></param>
+        protected virtual void OnSiblingChangedImpl(Point siblingIndex)
+        {
+        }
+
+        protected virtual void OnInit()
+        {
+        }
+        protected virtual void OnDispose()
+        {
+        }
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (!mIsDisposed)
+            {
+                if (isDisposing)
+                {
+                    RemoveFromScene();
+                }
+                mIsDisposed = true;
+            }
+        }
+
+        private void InitHexCellCapturedMark()
+        {
+            mHexCellCapturedMark = new HexTileCapturedMark(Scene.Content);
+            mHexCellCapturedMark.Position = CenterPos;
+            ((BattleScene)Scene).Octree.AddObject(mHexCellCapturedMark);
+        }
+
+        private void RemoveFromScene()
+        {
+            OnDispose();
+
             foreach (var id in mStaticGeometryIds)
             {
-                hexScene.StaticGeomtery.RemoveGraphicModel(id);
+                Scene.StaticGeomtery.RemoveGraphicModel(id);
             }
 
             if (null != mGraphicModels)
             {
                 foreach (var gm in mGraphicModels)
                 {
-                    hexScene.Octree.DestroyObject(gm);
+                    Scene.Octree.DestroyObject(gm);
                 }
             }
 
@@ -222,41 +301,95 @@ namespace Conquera
             {
                 foreach (var r in mStaticCpRenderables)
                 {
-                    hexScene.Octree.DestroyObject(r);
+                    Scene.Octree.DestroyObject(r);
                 }
             }
-
-            if (null != mActiveGraphicModel)
-            {
-                hexScene.Octree.DestroyObject(mActiveGraphicModel);
-            }
-            if (null != mInactiveGraphicModel)
-            {
-                hexScene.Octree.DestroyObject(mInactiveGraphicModel);
-            }
         }
+     }
 
-        protected override bool IsSceneValid(BaseScene scene)
+
+    public class GapHexTerrainTile : HexTerrainTile
+    {
+        List<BatchedModelIdentifier> mWalls;
+
+        protected override void OnInit()
         {
-            return scene is GameScene;
+            AddToScene();
+
+            base.OnInit();
         }
 
-        private void InitHexCellCapturedMark(HexCell cell)
+        protected override void OnSiblingChangedImpl(Point siblingIndex)
         {
-            mHexCellCapturedMark = new HexCellCapturedMark(Scene.Content);
-            mHexCellCapturedMark.Position = cell.CenterPos;
-            ((GameScene)Scene).Octree.AddObject(mHexCellCapturedMark);
+            //slightly ineffective but should be used only in editor
+            RemoveFromScene();
+            AddToScene();
+
+            base.OnSiblingChangedImpl(siblingIndex);
         }
+
+        private void AddToScene()
+        {
+            GapHexTerrainTileDesc gapDesc = (GapHexTerrainTileDesc)Desc;
+            GraphicModel wallGm = gapDesc.WallGraphicModel;
+            Vector3 oldPos = wallGm.Position;
+            Quaternion oldRot = wallGm.Orientation;
+
+            wallGm.Position = oldPos + CenterPos;
+
+            HexTerrain terrain = Scene.Terrain;
+
+            for (int i = 0; i < 6; ++i)
+            {
+                var sibling = terrain.GetSibling(Index, (HexDirection)i);
+                if (null != sibling && !(sibling is GapHexTerrainTile))
+                {
+                    if (null == mWalls)
+                    {
+                        mWalls = new List<BatchedModelIdentifier>();
+                    }
+                    wallGm.Orientation = oldRot * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.ToRadians(i * (-60) + 60));
+                    mWalls.Add(Scene.StaticGeomtery.AddGraphicModel(gapDesc.WallGraphicModel));
+                }
+            }
+            wallGm.SetTransformation(oldPos, oldRot);
+        }
+
+        protected override void OnDispose()
+        {
+            RemoveFromScene();
+            base.OnDispose();
+        }
+
+        private void RemoveFromScene()
+        {
+            if (null != mWalls)
+            {
+                foreach (var wall in mWalls)
+                {
+                    Scene.StaticGeomtery.RemoveGraphicModel(wall);
+                }
+            }
+            mWalls = null;
+        }
+
+        public GapHexTerrainTile(BattleScene scene, Point index, HexTerrainTileDesc desc)
+            :base(scene, index, desc)
+        {
+        }
+
     }
 
-    class HexCellCapturedMark : GraphicModel, IMaterialEffectParametersUpdater
+
+
+    class HexTileCapturedMark : GraphicModel, IMaterialEffectParametersUpdater
     {
         private Vector3MaterialEffectParam mColorParam;
 
         public Vector3 Color { get; set; }
 
-        public HexCellCapturedMark(ContentGroup content)
-            :base(CreateMesh(content), CreateMaterial(content))
+        public HexTileCapturedMark(ContentGroup content)
+            : base(CreateMesh(content), CreateMaterial(content))
         {
             if (1 != GraphicModelParts.Count)
             {

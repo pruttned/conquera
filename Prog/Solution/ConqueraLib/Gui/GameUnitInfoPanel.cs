@@ -37,13 +37,13 @@ namespace Conquera.Gui
             mStatText = new TextElement((int)Size.Width, (int)Size.Height, ConqueraFonts.SpriteFontSmall, true, Color.Black);
         }
 
-        public void Update(GameUnit gameUnit)
+        public void Update(BattleUnit gameUnit)
         {
             //Statistics.
             mStatText.Color = new Color(gameUnit.OwningPlayer.Color);
             mStatText.Text = string.Format("{0}/{1}", gameUnit.Hp, gameUnit.GameUnitDesc.MaxHp);
             
-            if (gameUnit.OwningPlayer == gameUnit.GameScene.CurrentPlayer)
+            if (gameUnit.OwningPlayer == gameUnit.BattleScene.CurrentPlayer)
             {
                 mStatText.AppendLine(string.Format("Ready: {0}", !gameUnit.HasMovedThisTurn));
             }

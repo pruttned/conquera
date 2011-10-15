@@ -78,18 +78,15 @@ VsOutput mainVS(float4 pos: POSITION, float2 normalizedUv: TEXCOORD0, float lerp
     float3 side = normalize(cross(eyeVector, cWorldUp));
     float3 up  = normalize(cross(side, eyeVector));
    
-    float2 centeredUv = normalizedUv - float2(0.5, 0.5);
+    float2 centeredUv = normalizedUv - 0.5;
 centeredUv*=size; //nastavovanie velkosti
 	
-    //output.pos = mul(float4(pos, gWorld) + ((centeredUv.x * cosRot - centeredUv.y * sinRot) * side - (centeredUv.x * sinRot + centeredUv.y  * cosRot) * up), 1), gViewProj);
-    
    
     output.pos = mul(float4(pos + ((centeredUv.x * cosRot - centeredUv.y * sinRot) * side - (centeredUv.x * sinRot + centeredUv.y  * cosRot) * up), 1), gViewProj);
    
-   // output.pos = mul(float4(mul(pos, gWorld) + (centeredUv.x * cosRot - centeredUv.y * sinRot) * side - (centeredUv.x * sinRot + centeredUv.y  * cosRot) * up, 1), gViewProj);
    
    //abs(sin(gTime))*
-    output.uv = normalizedUv/2 + gUvs[seed*4];
+    output.uv = normalizedUv/2 + gUvs[round(seed*4)];
    
    
   //  output.vColor = lerp(gStartColor, gEndColor, lerpV);

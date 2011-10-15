@@ -26,7 +26,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Ale.Graphics
 {
     /// <summary>
-    /// Read-only array of short indices
+    /// Read-only array of ushort indices
     /// </summary>
     internal class ShortIndexReadOnlyArray : ReadOnlyArray<ushort>
     {

@@ -43,7 +43,7 @@ namespace Conquera
         private static Vector3[] ZoomLevels = new Vector3[] { new Vector3(20, -1.5f, 0.0f), new Vector3(15, -1.5f, 0.0f), new Vector3(10, -1.1f, 0.0f), new Vector3(5, -0.9f, 0.0f) };
 
         private Camera mCamera;
-        private GameScene mGameScene;
+        private BattleScene mGameScene;
         private bool mIsDisposed = false;
 
 
@@ -146,7 +146,7 @@ namespace Conquera
             }
         }
 
-        public GameCamera(GameScene gameScene)
+        public GameCamera(BattleScene gameScene)
         {
             if (null == gameScene) throw new ArgumentNullException("gameScene");
 
@@ -179,20 +179,20 @@ namespace Conquera
             }
         }
 
-        public void CenterCameraOnCell(HexCell cell)
+        public void CenterCameraOnTile(HexTerrainTile tile)
         {
-            if (null == cell) throw new ArgumentNullException("cell");
+            if (null == tile) throw new ArgumentNullException("tile");
 
-            mCamera.TargetWorldPosition = cell.CenterPos;
+            mCamera.TargetWorldPosition = tile.CenterPos;
         }
 
-        public void MoveCameraToCell(HexCell cell)
+        public void MoveCameraToTile(HexTerrainTile tile)
         {
-            if (null == cell) throw new ArgumentNullException("cell");
+            if (null == tile) throw new ArgumentNullException("tile");
 
             SetCameraAnimationGameSceneState();
 
-            mPositionAnimator.Animate(20, mCamera.TargetWorldPosition, cell.CenterPos);
+            mPositionAnimator.Animate(20, mCamera.TargetWorldPosition, tile.CenterPos);
         }
 
         public void MoveCameraTo(Vector3 target)

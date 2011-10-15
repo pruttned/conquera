@@ -30,18 +30,18 @@ namespace Conquera.Editor
 {
     public partial class NewMapDlg : Form
     {
-        public NewMapInfo NewMapInfo
-        {
-            get
-            {
-                NewMapInfo inf = new NewMapInfo();
-                inf.Name = mMapNameTextBox.Text;
-                inf.Width = (int)mWidthNumericUpDown.Value;
-                inf.Height = (int)mHeightNumericUpDown.Value;
+        //public NewMapInfo NewMapInfo
+        //{
+        //    get
+        //    {
+        //        NewMapInfo inf = new NewMapInfo();
+        //        inf.Name = mMapNameTextBox.Text;
+        //        inf.Width = (int)mWidthNumericUpDown.Value;
+        //        inf.Height = (int)mHeightNumericUpDown.Value;
 
-                return inf;
-            }
-        }
+        //        return inf;
+        //    }
+        //}
         public NewMapDlg()
         {
             InitializeComponent();
@@ -49,15 +49,15 @@ namespace Conquera.Editor
 
         private void mCreateButton_Click(object sender, EventArgs e)
         {
-            string fileName = Path.Combine(GameScene.GetMapDirName("HotSeat"), mMapNameTextBox.Text + ".map");
-            if (File.Exists(fileName))
-            {
-                MessageBox.Show("Map with a same name already exists", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else
-            {
-                DialogResult = DialogResult.OK;
-            }
+            //string fileName = Path.Combine(BattleScene.GetMapDirName("HotSeat"), mMapNameTextBox.Text + ".map");
+            //if (File.Exists(fileName))
+            //{
+            //    MessageBox.Show("Map with a same name already exists", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
+            //else
+            //{
+            //    DialogResult = DialogResult.OK;
+            //}
         }
     }
 }
