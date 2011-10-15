@@ -39,10 +39,10 @@ namespace Conquera
         public abstract string Description { get; }
         public abstract int Cost { get; }
 
-        protected GameUnit Caster { get; private set; }
-        protected GameUnit Target { get; private set; }
+        protected BattleUnit Caster { get; private set; }
+        protected BattleUnit Target { get; private set; }
 
-        public void BeforeAttackCast(GameUnit caster, GameUnit target)
+        public void BeforeAttackCast(BattleUnit caster, BattleUnit target)
         {
             if (null == caster) throw new ArgumentNullException("caster");
             if (null == target) throw new ArgumentNullException("target");

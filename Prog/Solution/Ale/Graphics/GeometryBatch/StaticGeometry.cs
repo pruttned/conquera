@@ -30,8 +30,8 @@ namespace Ale.Graphics
         ICamera MainCamera { get; set; }
         bool ShowWorldBounds { get; set; }
 
-        BathcedModelIdentifier AddGraphicModel(GraphicModel model);
-        void RemoveGraphicModel(BathcedModelIdentifier model);
+        BatchedModelIdentifier AddGraphicModel(GraphicModel model);
+        void RemoveGraphicModel(BatchedModelIdentifier model);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ namespace Ale.Graphics
         /// </summary>
         /// <param name="model"></param>
         /// <returns>Id</returns>
-        public BathcedModelIdentifier AddGraphicModel(GraphicModel model)
+        public BatchedModelIdentifier AddGraphicModel(GraphicModel model)
         {
         	if (model == null) throw new ArgumentNullException("model");
 
@@ -143,7 +143,7 @@ namespace Ale.Graphics
 
             int idInBatch = batch.AddGraphicModel(model);
 
-            BathcedModelIdentifier modelIdentifier = new BathcedModelIdentifier(this, batch, idInBatch);
+            BatchedModelIdentifier modelIdentifier = new BatchedModelIdentifier(this, batch, idInBatch);
 
             return modelIdentifier;
         }
@@ -155,7 +155,7 @@ namespace Ale.Graphics
         /// edit the geometry, then make many changes at once before drawing the geometry.
         /// </summary>
         /// <param name="model"></param>
-        public void RemoveGraphicModel(BathcedModelIdentifier model)
+        public void RemoveGraphicModel(BatchedModelIdentifier model)
         {
         	if (model == null) throw new ArgumentNullException("model");
     

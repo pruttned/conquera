@@ -22,16 +22,20 @@ using System.Text;
 using SimpleOrmFramework;
 using Microsoft.Xna.Framework;
 using Ale.Content;
+using Ale.Scene;
 
 namespace Conquera
 {
     [DataObject(MaxCachedCnt = 0)]
     public class HexTerrain : BaseDataObject, IDisposable
     {
+        //promoted collections
+        private static List<HexTerrainTile> Siblings = new List<HexTerrainTile>(6);
+
         public static float GroundHeight = 0;
 
         private HexTerrainTile[,] mTiles;
-        private GameScene mScene;
+        private BattleScene mScene;
         private bool mIsDisposed = false;
 
         private string mDefaultTile;
@@ -44,12 +48,26 @@ namespace Conquera
         public Vector3 LowerLeftTileCenter { get; private set; }
         public Vector3 UpperRightTileCenter { get; private set; }
 
+        public HexTerrainTile this[int i, int j]
+        {
+            get
+            {
+                return mTiles[i, j];
+            }
+        }
+        public HexTerrainTile this[Point index]
+        {
+            get
+            {
+                return mTiles[index.X, index.Y];
+            }
+        }
         private ContentGroup Content
         {
             get { return mScene.Content; }
         }
 
-        internal HexTerrain(int width, int height, string defaultTile, GameScene scene)
+        public HexTerrain(int width, int height, string defaultTile, BattleScene scene)
         {
             if (string.IsNullOrEmpty(defaultTile)) throw new ArgumentNullException("defaultTile");
 
@@ -61,7 +79,7 @@ namespace Conquera
             InitFromDefaultTile(scene);
         }
 
-        internal void InitAfterLoad(GameScene scene, OrmManager ormManager)
+        internal void InitAfterLoad(BattleScene scene, OrmManager ormManager)
         {
             CommonInit(scene);
 
@@ -71,108 +89,69 @@ namespace Conquera
             {
                 throw new ArgumentOutOfRangeException("Blob data has a wrong size");
             }
-            long[,] tiles = new long[Width, Height];
+
+            mTiles = new HexTerrainTile[Width, Height];
             int k = 0;
             for (int i = 0; i < Width; ++i)
             {
                 for (int j = 0; j < Height; ++j)
                 {
-                    tiles[i, j] = BitConverter.ToInt64(data, k);
+                    long tileDescId = BitConverter.ToInt64(data, k);
+                    HexTerrainTileDesc tileDesc = scene.Content.Load<HexTerrainTileDesc>(tileDescId);
+                    mTiles[i, j] = tileDesc.CreateHexTerrainTile(mScene, new Point(i, j));
+
                     k += 8;
                 }
             }
 
-            mTiles = new HexTerrainTile[Width, Height];
             for (int i = 0; i < Width; ++i)
             {
                 for (int j = 0; j < Height; ++j)
                 {
-                    long tileDescId = tiles[i, j];
-                    if (0 < tileDescId)
-                    {
-                        HexTerrainTileDesc tileDesc = scene.Content.Load<HexTerrainTileDesc>(tileDescId);
-                        HexTerrainTile tile = new HexTerrainTile(tileDesc, TileNeedWall(i, j, tiles), HexHelper.Get3DPosFromIndex(new Point(i, j), GroundHeight));
-                        mTiles[i, j] = tile;
-                        tile.OnAddToScene(scene);
-                    }
+                    mTiles[i, j].Init();
                 }
             }
         }
 
-
         /// <summary>
-        /// Tile or null for a gap
+        /// Gets tile at a given index
         /// </summary>
         /// <param name="i"></param>
         /// <param name="j"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        internal HexTerrainTile GetTile(Point index)
+        public HexTerrainTile GetTile(Point index)
         {
-            return mTiles[index.X, index.Y];
-        }
-
-        public bool IsTilePassable(Point index)
-        {
-            var tile = GetTile(index);
-            if (null == tile)
-            {
-                return false;
-            }
-            return tile.Desc.IsPassable;
+            return this[index.X, index.Y];
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="tile">Null = gap</param>
-        /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        internal HexTerrainTile SetTile(Point index, string tile)
+        /// <param name="tile"></param>
+        public HexTerrainTile SetTile(Point index, string tile)
         {
+            //todo
+        //    throw new NotImplementedException("Treba preniest aj jednotku, ownera a tak");
+            if (string.IsNullOrEmpty(tile)) throw new ArgumentNullException("tile");
+
             HexTerrainTile oldHexTerrainTile = mTiles[index.X, index.Y];
-            if (string.IsNullOrEmpty(tile))
+
+            HexTerrainTileDesc tileDesc = Content.Load<HexTerrainTileDesc>(tile);
+            if (oldHexTerrainTile.Desc != tileDesc)
             {
-                if (null != oldHexTerrainTile)
+                oldHexTerrainTile.Dispose();
+                
+                mTiles[index.X, index.Y] = tileDesc.CreateHexTerrainTile(mScene, index);
+                mTiles[index.X, index.Y].Init();
+
+                //Notify siblings
+                Siblings.Clear();
+                GetSiblings(index, Siblings);
+                foreach (var sibling in Siblings)
                 {
-                    HexTerrainTileDesc oldDesc = oldHexTerrainTile.Desc;
-                    oldHexTerrainTile.Dispose();
-
-                    mTiles[index.X, index.Y] = null;
-
-                    //update siblings
-                    foreach (Point pos in GetSiblings(index, false))
-                    {
-                        SetTileWall(pos.X, pos.Y, true);
-                    }
-                }
-            }
-            else
-            {
-                HexTerrainTileDesc tileDesc = Content.Load<HexTerrainTileDesc>(tile);
-                if (null == oldHexTerrainTile || oldHexTerrainTile.Desc != tileDesc)
-                {
-                    bool wall = TileNeedWall(index.X, index.Y);
-                    HexTerrainTile hexTerrainTile = new HexTerrainTile(tileDesc, wall, HexHelper.Get3DPosFromIndex(index, GroundHeight));
-                    mTiles[index.X, index.Y] = hexTerrainTile;
-
-                    HexTerrainTileDesc oldDesc = null;
-
-                    if (null != oldHexTerrainTile)
-                    {
-                        oldDesc = oldHexTerrainTile.Desc;
-                        oldHexTerrainTile.Dispose();
-                    }
-                    else
-                    {
-                        //update siblings
-                        foreach (Point pos in GetSiblings(index, false))
-                        {
-                            SetTileWall(pos.X, pos.Y, TileNeedWall(pos.X, pos.Y));
-                        }
-                    }
-
-                    hexTerrainTile.OnAddToScene(mScene);
+                    sibling.OnSiblingChanged(index);
                 }
             }
 
@@ -180,64 +159,61 @@ namespace Conquera
         }
 
         /// <summary>
-        /// 
+        /// Gets a tile sibling in a given direction (or null in case of terrain end)
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="includeGaps"></param>
         /// <param name="direction"></param>
         /// <param name="sibling"></param>
         /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        public bool GetSibling(Point index, bool includeGaps, HexDirection direction, out Point sibling)
+        public HexTerrainTile GetSibling(Point index, HexDirection direction)
         {
-            sibling = HexHelper.GetSibling(index, direction);
-            if (IsInTerrain(sibling))
+            Point siblingIndex = HexHelper.GetSibling(index, direction);
+            if (IsInTerrain(siblingIndex))
             {
-                return (includeGaps || null != mTiles[index.X, index.Y]);
+                return mTiles[siblingIndex.X, siblingIndex.Y];
             }
-            return false;
+            return null;
         }
 
         /// <summary>
-        /// 
+        /// Gets all siblings of a given tile
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="includeGaps"></param>
         /// <param name="siblings"></param>
         /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        public void GetSiblings(Point index, bool includeGaps, IList<Point> siblings)
+        public void GetSiblings(Point index, IList<HexTerrainTile> siblings)
         {
             int i = index.X;
             int j = index.Y;
 
-            TryAddSiblingPos(i - 1, j, includeGaps, siblings);
-            TryAddSiblingPos(i + 1, j, includeGaps, siblings);
+            TryAddSibling(i - 1, j, siblings);
+            TryAddSibling(i + 1, j, siblings);
             if (0 != (j & 1))
             {
-                TryAddSiblingPos(i, j - 1, includeGaps, siblings);
-                TryAddSiblingPos(i + 1, j - 1, includeGaps, siblings);
-                TryAddSiblingPos(i, j + 1, includeGaps, siblings);
-                TryAddSiblingPos(i + 1, j + 1, includeGaps, siblings);
+                TryAddSibling(i, j - 1, siblings);
+                TryAddSibling(i + 1, j - 1, siblings);
+                TryAddSibling(i, j + 1, siblings);
+                TryAddSibling(i + 1, j + 1, siblings);
             }
             else
             {
-                TryAddSiblingPos(i - 1, j - 1, includeGaps, siblings);
-                TryAddSiblingPos(i, j - 1, includeGaps, siblings);
-                TryAddSiblingPos(i - 1, j + 1, includeGaps, siblings);
-                TryAddSiblingPos(i, j + 1, includeGaps, siblings);
+                TryAddSibling(i - 1, j - 1, siblings);
+                TryAddSibling(i, j - 1, siblings);
+                TryAddSibling(i - 1, j + 1, siblings);
+                TryAddSibling(i, j + 1, siblings);
             }
         }
 
         /// <summary>
-        /// 
+        /// Gets all siblings of a given tile
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="includeGaps"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        public IList<Point> GetSiblings(Point index, bool includeGaps)
+        public IList<HexTerrainTile> GetSiblings(Point index)
         {
-            List<Point> siblings = new List<Point>();
-            GetSiblings(index, includeGaps, siblings);
+            List<HexTerrainTile> siblings = new List<HexTerrainTile>();
+            GetSiblings(index, siblings);
             return siblings;
         }
 
@@ -272,10 +248,7 @@ namespace Conquera
                         {
                             for (int j = 0; j < Height; ++j)
                             {
-                                if (null != mTiles[i, j])
-                                {
-                                    mTiles[i, j].Dispose();
-                                }
+                                mTiles[i, j].Dispose();
                             }
                         }
                     }
@@ -298,16 +271,13 @@ namespace Conquera
             {
                 for (int j = 0; j < Height; ++j)
                 {
-                    if (null != mTiles[i, j])
+                    long descId = mTiles[i, j].Desc.Id;
+                    if (descId <= 0)
                     {
-                        long descId = mTiles[i, j].Desc.Id;
-                        if (descId <= 0)
-                        {
-                            throw new ArgumentException(string.Format("Tile [{0},{1}] has a wrong desc id {2}", i, j, descId));
-                        }
-                        byte[] descIdBytes = BitConverter.GetBytes(descId);
-                        Array.Copy(descIdBytes, 0, data, k, descIdBytes.Length);
+                        throw new ArgumentException(string.Format("Tile [{0},{1}] has a wrong desc id {2}", i, j, descId));
                     }
+                    byte[] descIdBytes = BitConverter.GetBytes(descId);
+                    Array.Copy(descIdBytes, 0, data, k, descIdBytes.Length);
                     k += 8;
                 }
             }
@@ -319,82 +289,22 @@ namespace Conquera
         private HexTerrain()
         { }
 
-        private void CommonInit(GameScene scene)
+        private void CommonInit(BattleScene scene)
         {
             mScene = scene;
             LowerLeftTileCenter = HexHelper.Get3DPosFromIndex(new Point(0, 0), GroundHeight);
             UpperRightTileCenter = HexHelper.Get3DPosFromIndex(new Point(Width, Height), GroundHeight);
         }
 
-
-        private void TryAddSiblingPos(int i, int j, bool includeGaps, IList<Point> siblings)
+        private void TryAddSibling(int i, int j, IList<HexTerrainTile> siblings)
         {
             if (i >= 0 && i < Width && j >= 0 && j < Height)
             {
-                if (includeGaps || null != mTiles[i, j])
-                {
-                    siblings.Add(new Point(i, j));
-                }
+                siblings.Add(this[i, j]);
             }
         }
 
-        private void SetTileWall(int i, int j, bool wall)
-        {
-            HexTerrainTile oldHexTerrainTile = mTiles[i, j];
-            if (null != oldHexTerrainTile && oldHexTerrainTile.HasWall != wall)
-            {
-                HexTerrainTile hexTerrainTile = new HexTerrainTile(oldHexTerrainTile.Desc, wall, HexHelper.Get3DPosFromIndex(new Point(i, j), GroundHeight));
-                oldHexTerrainTile.Dispose();
-                mTiles[i, j] = hexTerrainTile;
-                hexTerrainTile.OnAddToScene(mScene);
-            }
-        }
-
-        private bool IsGap(int i, int j)
-        {
-            return (i < 0 || i >= Width || j < 0 || j >= Height || null == mTiles[i, j]);
-        }
-
-        private bool TileNeedWall(int i, int j)
-        {
-            return (IsGap(i - 1, j) ||
-                    IsGap(i + 1, j) ||
-                    ((0 != (j & 1)) && (
-                        IsGap(i, j - 1) ||
-                        IsGap(i + 1, j - 1) ||
-                        IsGap(i, j + 1) ||
-                        IsGap(i + 1, j + 1))) ||
-                    ((0 == (j & 1)) && (
-                        IsGap(i - 1, j - 1) ||
-                        IsGap(i, j - 1) ||
-                        IsGap(i - 1, j + 1) ||
-                        IsGap(i, j + 1)
-                    )));
-        }
-
-        private bool IsGap(int i, int j, long[,] tiles)
-        {
-            return (i < 0 || i >= Width || j < 0 || j >= Height || 0 >= tiles[i, j]);
-        }
-
-        private bool TileNeedWall(int i, int j, long[,] tiles)
-        {
-            return (IsGap(i - 1, j, tiles) ||
-                    IsGap(i + 1, j, tiles) ||
-                    ((0 != (j & 1)) && (
-                        IsGap(i, j - 1, tiles) ||
-                        IsGap(i + 1, j - 1, tiles) ||
-                        IsGap(i, j + 1, tiles) ||
-                        IsGap(i + 1, j + 1, tiles))) ||
-                    ((0 == (j & 1)) && (
-                        IsGap(i - 1, j - 1, tiles) ||
-                        IsGap(i, j - 1, tiles) ||
-                        IsGap(i - 1, j + 1, tiles) ||
-                        IsGap(i, j + 1, tiles)
-                    )));
-        }
-
-        private void InitFromDefaultTile(GameScene scene)
+        private void InitFromDefaultTile(BattleScene scene)
         {
             HexTerrainTileDesc tileDesc = scene.Content.Load<HexTerrainTileDesc>(mDefaultTile);
             mTiles = new HexTerrainTile[Width, Height];
@@ -402,13 +312,18 @@ namespace Conquera
             {
                 for (int j = 0; j < Height; ++j)
                 {
-                    bool wall = (i == 0 || j == 0 || i == Width - 1 || j == Height - 1);
-                    HexTerrainTile tile = new HexTerrainTile(tileDesc, wall, HexHelper.Get3DPosFromIndex(new Point(i, j), GroundHeight));
-                    mTiles[i, j] = tile;
-                    tile.OnAddToScene(scene);
+                    mTiles[i, j] = tileDesc.CreateHexTerrainTile(mScene, new Point(i, j));
+                }
+            }
+            for (int i = 0; i < Width; ++i)
+            {
+                for (int j = 0; j < Height; ++j)
+                {
+                    mTiles[i, j].Init();
                 }
             }
         }
+
         private string GetBlobDataName()
         {
             return string.Format("HexTerrain_{0}", Id);

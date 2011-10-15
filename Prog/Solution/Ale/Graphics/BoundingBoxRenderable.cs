@@ -164,7 +164,7 @@ namespace Ale.Graphics
             mVertexBuffer = new VertexBuffer(graphicsDevice, 12 * 8, BufferUsage.WriteOnly);
             mVertexBuffer.SetData<Vector3>(vertices);
 
-            short[] indices = new short[]
+            ushort[] indices = new ushort[]
             {
                 0, 1,
                 1, 2,
@@ -183,7 +183,7 @@ namespace Ale.Graphics
             };
 
             mIndexBuffer = new IndexBuffer(graphicsDevice, 2 * 24, BufferUsage.WriteOnly, IndexElementSize.SixteenBits);
-            mIndexBuffer.SetData<short>(indices);
+            mIndexBuffer.SetData<ushort>(indices);
         }
 
         /// <summary>

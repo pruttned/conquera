@@ -35,19 +35,15 @@ using Ale;
 
 namespace Conquera
 {
-    public abstract class GameScene : OctreeScene
+    public abstract class BattleScene : OctreeScene
     {
         //TODO !!! Doplnit co treba do Dispose
         
         public event EventHandler ActiveSpellChanged;
 
-        //promoted collections
-        private static List<HexCell> Siblings = new List<HexCell>(6);
-
-        private GameSceneSettings mSettings;
+        private BattleSceneHeader mHeader;
         private Vector3 mLightDir = new Vector3(-0.3333333f, -0.5f, 1f);
-        private HexCell[,] mCells;
-        private GameUnit mSelectedUnit = null;
+        private BattleUnit mSelectedUnit = null;
         private ParticleSystemDesc mCaptureParticleSystemDesc;
         private ParticleSystemDesc mUnitDeathParticleSystemDesc;
 
@@ -59,7 +55,7 @@ namespace Conquera
 
         private bool mShow3dCursor = true;
 
-        private HexCell mSelectedCell = null;
+        private HexTerrainTile mSelectedTile = null;
 
         SoundEmitter2d mSoundEmitter = new SoundEmitter2d();
         private GameGuiScene mGuiScene;
@@ -75,7 +71,7 @@ namespace Conquera
 
         public string Name 
         {
-            get { return mSettings.Name; }
+            get { return mHeader.Name; }
         }
 
         public bool Show3dCursor
@@ -88,12 +84,13 @@ namespace Conquera
             }
         }
 
-        public SpellSlotCollection Spells
-        {
-            get { return mSettings.Spells; }
-        }
+        //todo
+        public int TurnNum { get; private set; }
 
-        public GameSceneContextState GameSceneContextState { get; private set; }
+        //public SpellSlotCollection Spells
+        //{
+        //    get { return mHeader.Spells; }
+        //}
 
         public IGameSceneState State
         {
@@ -132,30 +129,28 @@ namespace Conquera
 
         public HexTerrain Terrain { get; private set; }
 
-        public GamePlayer CurrentPlayer
-        {
-            get { return GameSceneContextState.CurrentPlayer; }
-        }
+        //temp
+        public BattlePlayer CurrentPlayer { get; private set; }
 
         public GameCamera GameCamera
         {
             get { return (GameCamera)MainCamera; }
         }
 
-        public HexCell SelectedCell
+        public HexTerrainTile SelectedTile
         {
-            get { return mSelectedCell; }
+            get { return mSelectedTile; }
             set
             {
-                if (mSelectedCell != value)
+                if (mSelectedTile != value)
                 {
-                    mSelectedCell = value;                    
+                    mSelectedTile = value;                    
                     RefreshSelectedCell();
                 }
             }
         }
 
-        public GameUnit SelectedUnit
+        public BattleUnit SelectedUnit
         {
             get { return mSelectedUnit; }
             private set
@@ -169,18 +164,18 @@ namespace Conquera
 
         public bool EnableMouseCameraControl { get; set; }
 
-        public SpellSlot ActiveSpellSlot
-        {
-            get { return mActiveSpell; }
-            set
-            {
-                if (value != mActiveSpell)
-                {
-                    mActiveSpell = value;
-                    EventHelper.RaiseEvent(ActiveSpellChanged, this);
-                }
-            }
-        }
+        //public SpellSlot ActiveSpellSlot
+        //{
+        //    get { return mActiveSpell; }
+        //    set
+        //    {
+        //        if (value != mActiveSpell)
+        //        {
+        //            mActiveSpell = value;
+        //            EventHelper.RaiseEvent(ActiveSpellChanged, this);
+        //        }
+        //    }
+        //}
 
         public Viewport Viewport { get; private set; }
 
@@ -190,16 +185,15 @@ namespace Conquera
         public abstract string GameType { get; }
 
 
-
-        public GameScene(string name, SceneManager sceneManager, int width, int height, string defaultTile, ContentGroup content)
+        public BattleScene(string name, SceneManager sceneManager, int width, int height, string defaultTile, ContentGroup content)
             : base(sceneManager, content, GetBoundsFromSize(width, height))
         {
             Terrain = new HexTerrain(width, height, defaultTile, this);
-            mSettings = CreateGameSettings();
-            mSettings.Name = name;
-            mSettings.Spells = new SpellSlotCollection();
-            GameSceneContextState = new GameSceneContextState();
-            GameSceneContextState.GameMap = name;
+            mHeader = CreateGameSettings();
+            mHeader.Name = name;
+            //mHeader.Spells = new SpellSlotCollection();
+            //GameSceneContextState = new GameSceneContextState();
+            //GameSceneContextState.GameMap = name;
 
             CreatePlayers();
 
@@ -225,29 +219,29 @@ namespace Conquera
             return maps;
         }
 
-        public static GameScene Load(string mapName, string gameType, SceneManager sceneManager, ContentGroup content)
+        public static BattleScene Load(string mapName, string gameType, SceneManager sceneManager, ContentGroup content)
         {
             string mapFile = GetMapFileName(mapName, gameType);
 
             return Load(mapFile, sceneManager, content);
         }
 
-        public static GameScene Load(string mapFile, SceneManager sceneManager, ContentGroup content)
+        public static BattleScene Load(string mapFile, SceneManager sceneManager, ContentGroup content)
         {
             if (!File.Exists(mapFile))
             {
                 throw new ArgumentException(string.Format("Map '{0}' doesn't exists", mapFile));
             }
 
-            GameScene scene;
+            BattleScene scene;
 
             using (OrmManager ormManager = new OrmManager(OrmManager.CreateDefaultConnectionString(mapFile)))
             {
-                var settings = ormManager.LoadObjects<GameSceneSettings>()[0];
+                var settings = ormManager.LoadObjects<BattleSceneHeader>()[0];
                 var terrain = ormManager.LoadObject<HexTerrain>(settings.TerrainId);
-                var gameSceneState = ormManager.LoadObjects<GameSceneContextState>()[0];
+                //var gameSceneState = ormManager.LoadObjects<GameSceneContextState>()[0];
                 
-                scene = settings.CreateScene(sceneManager, content, ormManager, settings, terrain, gameSceneState);
+                scene = settings.CreateScene(sceneManager, content, ormManager, settings, terrain);
             }
 
             return scene;
@@ -273,7 +267,7 @@ namespace Conquera
                 Directory.CreateDirectory(mapDir);
             }
 
-            if (0 >= mSettings.Id) //not loaded
+            if (0 >= mHeader.Id) //not loaded
             {
                 File.Delete(mapFile);
             }
@@ -282,114 +276,73 @@ namespace Conquera
             {
                 using (SofTransaction transaction = ormManager.BeginTransaction())
                 {
-                    mSettings.TerrainId = ormManager.SaveObject(Terrain);
-                    ormManager.SaveObject(mSettings);
-
-                    SaveState(ormManager);
+                    mHeader.TerrainId = ormManager.SaveObject(Terrain);
+                    ormManager.SaveObject(mHeader);
 
                     transaction.Commit();
                 }
             }
         }
 
-        public string SaveGame()
+        public BattleUnit AddGameUnit(BattlePlayer gamePlayer, string desc, Point index, bool isReady)
         {
-            string dateTime = DateTime.Now.ToString("MM-dd-yy_HH-mm-ss");
-            string dir = Path.Combine(MainSettings.Instance.UserDir, string.Format("Saves\\{0}", GameType));
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
+            throw new NotImplementedException();
+            //var tile = Terrain[index];
+            //if (null != tile.GameUnit)
+            //{
+            //    throw new ArgumentException(string.Format("Tile {0} already contains a game unit", index));
+            //}
 
-            string saveFile = Path.Combine(dir, string.Format("{0}_{1}.sav", Name, dateTime));
-            using (OrmManager ormManager = new OrmManager(OrmManager.CreateDefaultConnectionString(saveFile)))
-            {
-                using (SofTransaction transaction = ormManager.BeginTransaction())
-                {
-                    SaveState(ormManager);
+            //tile.OwningPlayer = gamePlayer;
+            //long descId = Content.ParentContentManager.OrmManager.FindObject(typeof(GameUnitSettings), string.Format("Name='{0}'", desc));
+            //if (0 >= descId)
+            //{
+            //    throw new ArgumentException(string.Format("Unit desc '{0}' doesn't exists", desc));
+            //}
+            //BattleUnit unit = new BattleUnit(descId, gamePlayer, isReady);
+            //unit.CellIndex = index;
+            //unit.CellIndexChanged += new BattleUnit.CellIndexChangedHandler(unit_CellIndexChanged);
 
-                    transaction.Commit();
-                }
-            }
-            return saveFile;
-        }
+            //tile.GameUnit = unit;
+            //gamePlayer.AddGameUnit(unit);
+            //AddSceneObject(unit);
 
-        public GameUnit AddGameUnit(GamePlayer gamePlayer, string desc, Point index, bool isReady)
-        {
-            var cell = GetCell(index);
-            if (null != cell.GameUnit)
-            {
-                throw new ArgumentException(string.Format("Cell {0} already contains a game unit", index));
-            }
+            //RefreshSelectedCell();
 
-            cell.OwningPlayer = gamePlayer;
-            long descId = Content.ParentContentManager.OrmManager.FindObject(typeof(GameUnitSettings), string.Format("Name='{0}'", desc));
-            if (0 >= descId)
-            {
-                throw new ArgumentException(string.Format("Unit desc '{0}' doesn't exists", desc));
-            }
-            GameUnit unit = new GameUnit(descId, gamePlayer, isReady);
-            unit.CellIndex = index;
-            unit.CellIndexChanged += new GameUnit.CellIndexChangedHandler(unit_CellIndexChanged);
+            //if (SelectedUnit == unit && SelectedUnit.OwningPlayer == CurrentPlayer)
+            //{
+            //    State = GetGameSceneState(GameSceneStates.ReadyGameUnitSelected);
+            //}
 
-            cell.GameUnit = unit;
-            gamePlayer.AddGameUnit(unit);
-            AddSceneObject(unit);
-
-            RefreshSelectedCell();
-
-            if (SelectedUnit == unit && SelectedUnit.OwningPlayer == CurrentPlayer)
-            {
-                State = GetGameSceneState(GameSceneStates.ReadyGameUnitSelected);
-            }
-
-            return unit;
-        }
-
-        internal GameUnit AddGameUnit(GameUnit unit)
-        {
-            Point index = unit.CellIndex;
-            GamePlayer gamePlayer = unit.OwningPlayer;
-
-            var cell = GetCell(index);
-            if (null != cell.GameUnit)
-            {
-                throw new ArgumentException(string.Format("Cell {0} already contains a game unit", index));
-            }
-
-            //SetCellOwner(index, gamePlayer); - robi problem s load ... je to tak blbe riesenie  a preto je to internal
-            unit.CellIndexChanged += new GameUnit.CellIndexChangedHandler(unit_CellIndexChanged);
-
-            cell.GameUnit = unit;
-            AddSceneObject(unit);
-
-            return unit;
+            //return unit;
         }
 
         public void EndTurn()
         {
-            SelectedCell = null;
-            ActiveSpellSlot = null;
-			GamePlayer oldPlayer = CurrentPlayer;
-            CurrentPlayer.OnEndTurn();
+            //todo
 
-            GameSceneContextState.EndTurn();
+            //SelectedTile = null;
+            //ActiveSpellSlot = null;
+            //BattlePlayer oldPlayer = CurrentPlayer;
+            //CurrentPlayer.OnEndTurn();
 
-            CurrentPlayer.OnBeginTurn();
+            //GameSceneContextState.EndTurn();
 
-            //todo: store capured cells in player?
-            for (int i = 0; i < Terrain.Width; ++i)
-            {
-                for (int j = 0; j < Terrain.Height; ++j)
-                {
-                    if (mCells[i, j].BelongsToCurrentPlayer)
-                    {
-                        mCells[i, j].OnBeginTurn();
-                    }
-                }
-            }
+            //CurrentPlayer.OnBeginTurn();
+
+            ////todo: store capured cells in player?
+            //for (int i = 0; i < Terrain.Width; ++i)
+            //{
+            //    for (int j = 0; j < Terrain.Height; ++j)
+            //    {
+            //        if (mCells[i, j].BelongsToCurrentPlayer)
+            //        {
+            //            mCells[i, j].OnBeginTurn();
+            //        }
+            //    }
+            //}
             
-			mGuiScene.HandleEndTurn(oldPlayer);
+            //mGuiScene.HandleEndTurn(oldPlayer);
         }
 
 
@@ -406,15 +359,15 @@ namespace Conquera
 
             Update3dCursor();
 
-            mGuiScene.DebugText = State.GetType().ToString();
+            //todo
+            //mGuiScene.DebugText = State.GetType().ToString();
         }
         public void Update3dCursor()
         {
-            var cellUnderCur = GetCellUnderCur();
+            var cellUnderCur = GetTileUnderCur();
             //3d cursor
             if (null != cellUnderCur && !GuiManager.Instance.HandlesMouse)
             {
-                Point index = cellUnderCur.Index;
                 mCursor3d.Position = cellUnderCur.CenterPos;
 
 
@@ -464,7 +417,7 @@ namespace Conquera
 
         }
 
-        public HexCell GetCellUnderCur()
+        public HexTerrainTile GetTileUnderCur()
         {
             Plane plane = new Plane(Vector3.UnitZ, 0);
 
@@ -479,16 +432,11 @@ namespace Conquera
                 Point index;
                 if (HexHelper.GetIndexFromPos(new Vector2(intPoint.X, intPoint.Y), Terrain.Width, Terrain.Height, out index))
                 {
-                    return GetCell(index);
+                    return Terrain[index];
                 }
             }
 
             return null;
-        }
-
-        public HexCell GetCell(Point index)
-        {
-            return mCells[index.X, index.Y];
         }
 
         /// <summary>
@@ -498,9 +446,9 @@ namespace Conquera
         /// <param name="icon">Use CellNotificationIcons</param>
         /// <param name="textColor"></param>
         /// <param name="cell"></param>
-        public void FireCellNotificationLabel(string text, string icon, Color textColor, Point cell)
+        public void FireTileNotificationLabel(string text, string icon, Color textColor, Point tileIndex)
         {
-            mCellLabelManager.AddLabel(text, icon, textColor, GetCell(cell).CenterPos);
+            mCellLabelManager.AddLabel(text, icon, textColor, Terrain[tileIndex].CenterPos);
         }
 
         public void FireCellNotificationLabel(string text, string icon, Color textColor, Vector3 pos )
@@ -508,7 +456,7 @@ namespace Conquera
             mCellLabelManager.AddLabel(text, icon, textColor, pos);
         }
 
-        public virtual void OnVictory(GamePlayer player)
+        public virtual void OnVictory(BattlePlayer player)
         {
             mVictoryMessageBox = new ConqueraMessageBox(string.Format("Player {0} has won", player.Name));
             mVictoryMessageBox.Closed += new EventHandler(msg_Closed);
@@ -530,11 +478,7 @@ namespace Conquera
         }
 
         protected abstract void CreatePlayers();
-        protected abstract GameSceneSettings CreateGameSettings();
-
-        protected internal virtual void HexCellTileChanged(HexCell tile, HexTerrainTileDesc oldDesc)
-        {
-        }
+        protected abstract BattleSceneHeader CreateGameSettings();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -602,7 +546,8 @@ namespace Conquera
             SceneManager.MouseManager.MouseButtonUp += new MouseButtonEventHandler(MouseManager_MouseButtonUp);
             SceneManager.MouseManager.MouseButtonDown += new MouseButtonEventHandler(MouseManager_MouseButtonDown);
             
-            GuiManager.Instance.ActiveScene = mGuiScene;
+            //todo
+            //GuiManager.Instance.ActiveScene = mGuiScene;
         }
 
         protected override void OnDeactivateImpl()
@@ -612,40 +557,24 @@ namespace Conquera
             SceneManager.MouseManager.MouseButtonUp -= MouseManager_MouseButtonUp;
             SceneManager.MouseManager.MouseButtonDown -= MouseManager_MouseButtonDown;
 
-            GuiManager.Instance.ActiveScene = DefaultGuiScene.Instance;
+            //todo
+           // GuiManager.Instance.ActiveScene = DefaultGuiScene.Instance;
         }
 
-        protected GameScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState)
+        protected BattleScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, BattleSceneHeader settings, HexTerrain terrain)
             : base(sceneManager, content, GetBoundsFromSize(terrain.Width, terrain.Height))
         {
-            mSettings = settings;
+            mHeader = settings;
             Terrain = terrain;
-            GameSceneContextState = gameSceneState;
 
             terrain.InitAfterLoad(this, ormManager);
 
             Init();
-
-            // cells ownership
-            byte[] data = ormManager.GetBlobData("CellsOwnership");
-            if (data.Length != Terrain.Width * Terrain.Height)
-            {
-                throw new ArgumentOutOfRangeException("CellsOwnership blob data has a wrong size");
-            }
-            int k = 0;
-            for (int i = 0; i < Terrain.Width; ++i)
-            {
-                for (int j = 0; j < Terrain.Height; ++j)
-                {
-                    byte owner = data[k++];
-                    mCells[i, j].SetOwningPlayerDuringLoad(255 > owner ? GameSceneContextState.Players[owner] : null);
-                }
-            }
         }
 
         private void RefreshSelectedCell()
         {
-            if (null == mSelectedCell || mSelectedCell.IsGap)
+            if (null == mSelectedTile)
             {
                 mCursor3dCellSel.IsVisible = false;
                 SelectedUnit = null;
@@ -653,10 +582,12 @@ namespace Conquera
             else
             {
                 mCursor3dCellSel.IsVisible = true;
-                mCursor3dCellSel.Position = mSelectedCell.CenterPos;
-                SelectedUnit = mSelectedCell.GameUnit;
+                mCursor3dCellSel.Position = mSelectedTile.CenterPos;
+                //todo !! 
+              //  SelectedUnit = mSelectedTile.GameUnit;
             }
-            //mGuiScene.UpdateHexCell(mSelectedCell);
+            //todo
+          //  mGuiScene.UpdateHexTile(mSelectedTile);
         }
 
 
@@ -770,6 +701,10 @@ namespace Conquera
             {
                 ExitToMainMenu();
             }
+            if (key == Microsoft.Xna.Framework.Input.Keys.G)
+            {
+                mGuiScene.SidePanelsVisible = !mGuiScene.SidePanelsVisible;
+            }
             if (key == Microsoft.Xna.Framework.Input.Keys.T)
             {
                 mGuiScene.DebugTextVisible = !mGuiScene.DebugTextVisible;
@@ -782,32 +717,32 @@ namespace Conquera
             {
                 SaveMap();
             }
-            if (key == Microsoft.Xna.Framework.Input.Keys.F1)
-            {
-                if (null != SelectedUnit)
-                {
-                    KillUnit(SelectedUnit);
-                }
-            }
+            //if (key == Microsoft.Xna.Framework.Input.Keys.F1)
+            //{
+            //    if (null != SelectedUnit)
+            //    {
+            //        KillUnit(SelectedUnit);
+            //    }
+            //}
 
-            if (key == Microsoft.Xna.Framework.Input.Keys.U)
-            {
-                if (null != SelectedCell && null == SelectedCell.GameUnit)
-                {
-                    AddGameUnit(CurrentPlayer, "GameUnit1", SelectedCell.Index, true);
-                }
-            }
-            if (key == Microsoft.Xna.Framework.Input.Keys.B)
-            {
-                if (null != SelectedCell && null == SelectedCell.GameUnit)
-                {
-                    if (CurrentPlayer.HasEnoughManaForUnit("GameUnit1"))
-                    {
-                        CurrentPlayer.BuyUnit("GameUnit1", SelectedCell.Index);
-                    }
-                    Console.WriteLine(CurrentPlayer.Mana);
-                }
-            }
+            //if (key == Microsoft.Xna.Framework.Input.Keys.U)
+            //{
+            //    if (null != SelectedCell && null == SelectedCell.GameUnit)
+            //    {
+            //        AddGameUnit(CurrentPlayer, "GameUnit1", SelectedCell.Index, true);
+            //    }
+            //}
+            //if (key == Microsoft.Xna.Framework.Input.Keys.B)
+            //{
+            //    if (null != SelectedCell && null == SelectedCell.GameUnit)
+            //    {
+            //        if (CurrentPlayer.HasEnoughManaForUnit("GameUnit1"))
+            //        {
+            //            CurrentPlayer.BuyUnit("GameUnit1", SelectedCell.Index);
+            //        }
+            //        Console.WriteLine(CurrentPlayer.Mana);
+            //    }
+            //}
 
             if (key == Microsoft.Xna.Framework.Input.Keys.O)
             {
@@ -821,17 +756,13 @@ namespace Conquera
             GuiManager.Instance.HandleKeyUp(key);
         }
 
-        public void KillUnit(GameUnit unit)
+        public void KillUnit(BattleUnit unit)
         {
             if (null == unit) throw new ArgumentNullException("unit");
 
             ParticleSystemManager.CreateFireAndForgetParticleSystem(mUnitDeathParticleSystemDesc, unit.Position);
-            RemoveUnit(unit);
-        }
 
-        public void RemoveUnit(GameUnit unit)
-        {
-            GetCell(unit.CellIndex).GameUnit = null;
+            //   GetCell(unit.CellIndex).GameUnit = null;
             unit.OwningPlayer.RemoveGameUnit(unit);
             DestroySceneObject(unit);
             RefreshSelectedCell();
@@ -876,7 +807,7 @@ namespace Conquera
         {
             if (!GuiManager.Instance.HandleMouseUp(button) && !GuiManager.Instance.HandlesMouse)
             {
-                State.OnClickOnCell(GetCellUnderCur(), button);
+                State.OnClickOnTile(GetTileUnderCur(), button);
             }
         }
 
@@ -885,39 +816,39 @@ namespace Conquera
             GuiManager.Instance.HandleMouseDown(button);
         }
 
-        private void unit_CellIndexChanged(GameUnit obj, Point oldValue)
+        private void unit_CellIndexChanged(BattleUnit obj, Point oldValue)
         {
-            HexCell cell = GetCell(obj.CellIndex);
-            if (cell.OwningPlayer != obj.OwningPlayer) //has captured
-            {
-                ParticleSystemManager.CreateFireAndForgetParticleSystem(mCaptureParticleSystemDesc, cell.CenterPos);
-                cell.OwningPlayer = obj.OwningPlayer;
-            }
-            GetCell(oldValue).GameUnit = null;
-            cell.GameUnit = obj;
+            //todo
+            //HexCell cell = GetCell(obj.CellIndex);
+            //if (cell.OwningPlayer != obj.OwningPlayer) //has captured
+            //{
+            //    ParticleSystemManager.CreateFireAndForgetParticleSystem(mCaptureParticleSystemDesc, cell.CenterPos);
+            //    cell.OwningPlayer = obj.OwningPlayer;
+            //}
+            //GetCell(oldValue).GameUnit = null;
+            //cell.GameUnit = obj;
         }
 
         private void Init()
         {
+            //temp!!!!!!!!!!!!!!
+            Terrain.SetTile(new Point(0, 0), "LavaHexTile");
+            Terrain.SetTile(new Point(0, 1), "LavaHexTile");
+            Terrain.SetTile(new Point(1, 2), "LavaHexTile");
+            Terrain.SetTile(new Point(1, 1), "LavaHexTile");
+            Terrain.SetTile(new Point(2, 2), "LavaHexTile");
+
+
+            //temp!!!!!!!!!!!!!!
+            CurrentPlayer = new HumanBattlePlayer(this, "ja", Color.Blue.ToVector3());
+
+
+
             AppSettingsManager.Default.AppSettingsCommitted += new AppSettingsManager.CommittedHandler(Default_AppSettingsCommitted);
 
             Viewport = GraphicsDeviceManager.GraphicsDevice.Viewport;
             mGameSettings = AppSettingsManager.Default.GetSettings<GameSettings>();
 
-            mCells = new HexCell[Terrain.Width, Terrain.Height];
-
-            for (int i = 0; i < Terrain.Width; ++i)
-            {
-                for (int j = 0; j < Terrain.Height; ++j)
-                {
-                    mCells[i, j] = new HexCell(this, new Point(i, j));
-                }
-            }
-
-            foreach (var player in GameSceneContextState.Players)
-            {
-                player.Init(this, Content);
-            }
 
             PostProcessEffectManager.PostProcessEffects.Add(new BloomProcessEffect(GraphicsDeviceManager, RenderTargetManager, Content));
             //PostProcessEffectManager.PostProcessEffects.Add(new InvertProcessEffect(GraphicsDeviceManager, RenderTargetManager, Content));
@@ -941,7 +872,8 @@ namespace Conquera
             RegisterFrameListener(GameCamera);
 
             //gui
-            mGuiScene = new GameGuiScene(this);
+            //todo
+         //   mGuiScene = new GameGuiScene(this);
             State = GetGameSceneState(GameSceneStates.Idle);
 
             mCursor3dCellSel.IsVisible = false;
@@ -949,6 +881,7 @@ namespace Conquera
             mMovementArrow.IsVisible = false;
 
             mLavaRenderable = new LavaRenderable(GraphicsDeviceManager.GraphicsDevice, Content, Octree.Bounds);
+            mLavaRenderable.IsVisible = false;
             Octree.AddObject(mLavaRenderable);
 
             Material lightMat = Content.Load<Material>("PointLightMat");
@@ -986,6 +919,18 @@ namespace Conquera
 
 
                 Octree.AddObject(light);
+
+
+                //GraphicModel gapWall = new GraphicModel(Content.Load<Mesh>("LavaGapWall"), new List<Material>()
+                //{
+                //    Content.Load<Material>("WallMat"),
+                //    Content.Load<Material>("WallLavaGlowMat")
+                //});
+                //for (int j = 0; j < 6; ++j)
+                //{
+                //    gapWall.Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.ToRadians(60 * j));
+                //    StaticGeomtery.AddGraphicModel(gapWall);
+                //}
             }
 
             cursorLight = new PointLight(Content, lightMat);
@@ -1027,31 +972,6 @@ namespace Conquera
                     mGameSettings = ((GameSettings)settings);
                 }
             }
-        }
-
-        private void SaveState(OrmManager ormManager)
-        {
-            ormManager.SaveObject(GameSceneContextState);
-
-            // cells ownership
-            Dictionary<GamePlayer, byte> playerNums = new Dictionary<GamePlayer, byte>();
-            for (byte i = 0; i < GameSceneContextState.Players.Count; ++i)
-            {
-                playerNums.Add(GameSceneContextState.Players[i], i);
-            }
-
-            byte[] data = new byte[Terrain.Width * Terrain.Height];
-            int k = 0;
-            for (int i = 0; i < Terrain.Width; ++i)
-            {
-                for (int j = 0; j < Terrain.Height; ++j)
-                {
-                    var player = mCells[i, j].OwningPlayer;
-                    data[k++] = (null != player ? playerNums[player] : (byte)255);
-                }
-            }
-
-            ormManager.SetBlobData("CellsOwnership", data);
         }
     }
 
@@ -1119,7 +1039,6 @@ namespace Conquera
             settings.Params.Add(new Texture2DMaterialParamSettings("gLavaColdMap", "LavaColdTex"));
             settings.Params.Add(new Texture2DMaterialParamSettings("gNoiseMap", "bwNoise"));
             return new Material(settings, content);
-            
         }
     }
 }

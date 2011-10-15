@@ -62,9 +62,11 @@ namespace Conquera.Gui
             }
         }
 
-        public SpellPanel(GameScene gameScene)
+        public SpellPanel(BattleScene gameScene)
         {
-            mButtons = new SpellSlotButton[gameScene.Spells.Count];
+            //todo
+//            mButtons = new SpellSlotButton[gameScene.Spells.Count];
+            mButtons = new SpellSlotButton[7];
             for (int i = 0; i < mButtons.Length; i++)
             {
                 mButtons[i] = new SpellSlotButton(gameScene);

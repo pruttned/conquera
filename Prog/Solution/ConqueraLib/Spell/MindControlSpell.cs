@@ -75,7 +75,7 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
-            Target.GameScene.FireCellNotificationLabel("", CellNotificationIcons.MindControl, Color.Red, Target.CellIndex);
+            Target.BattleScene.FireTileNotificationLabel("", CellNotificationIcons.MindControl, Color.Red, Target.TileIndex);
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)

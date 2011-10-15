@@ -30,60 +30,28 @@ using Ale.Tools;
 
 namespace Conquera
 {
-    [DataObject(MaxCachedCnt = 0)]
-    [CustomBasicTypeProvider(typeof(Vector3), typeof(FieldCustomBasicTypeProvider<Vector3>))]
-    public abstract class GamePlayer : BaseDataObject
+    public abstract class BattlePlayer
     {
         public event EventHandler ManaChanged;
-        public event EventHandler MaxUnitCntChanged;
         public event EventHandler UnitsChanged;
 
-        private List<GameUnit> mUnits = new List<GameUnit>();
-        private List<HexCell> mCells = new List<HexCell>();
+        private List<BattleUnit> mUnits = new List<BattleUnit>();
 
-        private GameScene mScene;
         private int mMana;
-        private int mMaxUnitCnt;
 
         private Dictionary<string, IGameSceneState> mGameSceneStates = new Dictionary<string, IGameSceneState>();
 
-        public ReadOnlyCollection<HexCell> Cells { get; private set; }
+        public ReadOnlyCollection<HexTerrainTile> Tiles { get; private set; }
 
         /// <summary>
         /// Changed by CastleTileDesc
         /// </summary>
         public int CastleCnt { get; set; }
 
-        //Computed - not saved
-        public int MaxUnitCnt
-        {
-            get { return mMaxUnitCnt; }
-            set
-            {
-                if (value != mMaxUnitCnt)
-                {
-                    mMaxUnitCnt = value;
-
-                    if (MaxUnitCntChanged != null)
-                    {
-                        MaxUnitCntChanged(this, EventArgs.Empty);
-                    }
-                }
-            }
-        }
-
-        public GameScene Scene
-        {
-            get
-            {
-                CheckInit();
-                return mScene;
-            }
-        }
+        public BattleScene Scene {get; private set;}
 
         public abstract bool IsHuman { get; }
 
-        [DataProperty(NotNull = true)]
         public int Mana
         {
             get { return mMana; }
@@ -101,23 +69,22 @@ namespace Conquera
             }
         }
 
-        [DataProperty(NotNull = true, Unique=true)]
         public string Name { get; set; }
 
-        [DataProperty(NotNull = true)]
         public Vector3 Color { get; private set; }
-        [DataListProperty(NotNull = true)]
-        internal List<GameUnit> Units
+        internal List<BattleUnit> Units
         {
             get { return mUnits; }
             set { mUnits = value; }
         }
 
-        public GamePlayer(string name, Vector3 color)
-            : this()
+        public BattlePlayer(BattleScene scene, string name, Vector3 color)
         {
+            Scene = scene;
             Name = name;
             Color = color;
+
+            CreateGameSceneStates(scene, mGameSceneStates);
         }
 
         public IGameSceneState GetGameSceneState(string name)
@@ -125,28 +92,13 @@ namespace Conquera
             return mGameSceneStates[name];
         }
 
-        internal void AddCell(HexCell cell)
+        internal void AddGameUnit(BattleUnit unit)
         {
-            mCells.Add(cell);
-        }
-
-        internal bool RemoveCell(HexCell cell)
-        {
-            return mCells.Remove(cell);
-        }
-
-        internal void AddGameUnit(GameUnit unit)
-        {
-            //if (mUnits.Count >= MaxUnitCnt)
-            //{
-            //    throw new InvalidOperationException("MaxUnitCnt already reached.");
-            //}
-
             mUnits.Add(unit);
             RaiseUnitsChanged();
         }
 
-        internal bool RemoveGameUnit(GameUnit unit)
+        internal bool RemoveGameUnit(BattleUnit unit)
         {
             bool removed = mUnits.Remove(unit);
             RaiseUnitsChanged();
@@ -155,23 +107,9 @@ namespace Conquera
 
         public virtual void OnBeginTurn()
         {
-            Mana = 0;
         }
 
         public abstract void OnEndTurn();
-
-        internal void Init(GameScene scene, ContentGroup content)
-        {
-            mScene = scene;
-
-            foreach (var unit in Units)
-            {
-                unit.OwningPlayer = this;
-                scene.AddGameUnit(unit);
-            }
-
-            CreateGameSceneStates(mScene, mGameSceneStates);
-        }
 
         /// <summary>
         /// Whether has enough mana
@@ -179,16 +117,12 @@ namespace Conquera
         /// <param name="descName"></param>
         public bool HasEnoughManaForUnit(string descName)
         {
-            CheckInit();
-
             var desc = Scene.Content.Load<GameUnitDesc>(descName);
             return (desc.Cost <= Mana);
         }
 
-        public GameUnit BuyUnit(string descName, Point cell)
+        public BattleUnit BuyUnit(string descName, Point cell)
         {
-            CheckInit();
-
             var desc = Scene.Content.Load<GameUnitDesc>(descName);
             if (desc.Cost > Mana)
             {
@@ -207,18 +141,8 @@ namespace Conquera
             return Name;
         }
 
-        protected GamePlayer()
-        {
-            Cells = new ReadOnlyCollection<HexCell>(mCells);
-            MaxUnitCnt = 3;
-        }
-
-        protected abstract void CreateGameSceneStates(GameScene scene, Dictionary<string, IGameSceneState> gameSceneStates);
-
-        private void CheckInit()
-        {
-            if (null == mScene) { throw new InvalidOperationException("Init has not yet been called"); }
-        }
+        protected abstract void CreateGameSceneStates(BattleScene scene, Dictionary<string, IGameSceneState> gameSceneStates);
+        
         private void RaiseUnitsChanged()
         {
             if (UnitsChanged != null)
@@ -230,7 +154,7 @@ namespace Conquera
 
     [DataObject(MaxCachedCnt = 0)]
     [CustomBasicTypeProvider(typeof(Vector3), typeof(FieldCustomBasicTypeProvider<Vector3>))]
-    public class HumanPlayer : GamePlayer
+    public class HumanBattlePlayer : BattlePlayer
     {
         [DataProperty(NotNull = true)]
         public Vector3 CameraTargetPos { get; set; }
@@ -240,8 +164,8 @@ namespace Conquera
             get { return true; }
         }
 
-        public HumanPlayer(string name, Vector3 color)
-            : base(name, color)
+        public HumanBattlePlayer(BattleScene scene, string name, Vector3 color)
+            : base(scene, name, color)
         {
             CameraTargetPos = new Vector3(-10000, -10000, -10000);
         }
@@ -254,13 +178,13 @@ namespace Conquera
             {
                 if (0 < Units.Count)
                 {
-                    CameraTargetPos = Units[0].Cell.CenterPos;
+                    CameraTargetPos = Units[0].Tile.CenterPos;
                 }
                 else
                 {
-                    if (0 < Cells.Count)
+                    if (0 < Tiles.Count)
                     {
-                        CameraTargetPos = Cells[0].CenterPos;
+                        CameraTargetPos = Tiles[0].CenterPos;
                     }
                     else
                     {
@@ -280,14 +204,7 @@ namespace Conquera
             CameraTargetPos = Scene.GameCamera.TargetWorldPosition;
         }
 
-        /// <summary>
-        /// Ctor only for Sof
-        /// </summary>
-        protected HumanPlayer()
-        {
-        }
-
-        protected override void CreateGameSceneStates(GameScene scene, Dictionary<string, IGameSceneState> gameSceneStates)
+        protected override void CreateGameSceneStates(BattleScene scene, Dictionary<string, IGameSceneState> gameSceneStates)
         {
             gameSceneStates.Add(GameSceneStates.Idle, new IdleGameSceneState(scene));
             gameSceneStates.Add(GameSceneStates.UnitMoving, new UnitMovingGameSceneState(scene));

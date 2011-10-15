@@ -27,7 +27,7 @@ using Ale.Scene;
 namespace Conquera
 {
     [DataObject(MaxCachedCnt = 0)]
-    public abstract class GameSceneSettings : BaseDataObject
+    public abstract class BattleSceneHeader : BaseDataObject
     {
         [DataProperty(NotNull = true)]
         public string Name { get; set; }
@@ -35,18 +35,15 @@ namespace Conquera
         [DataProperty(NotNull = true)]
         public long TerrainId { get; set; }
 
-        [DataProperty(NotNull = true)]
-        public SpellSlotCollection Spells { get; set; }
-
-        public abstract GameScene CreateScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState);
+        public abstract BattleScene CreateScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, BattleSceneHeader settings, HexTerrain terrain);
     }
 
     [DataObject(MaxCachedCnt = 0)]
-    public class HotseatGameSceneSettings : GameSceneSettings
+    public class HotseatGameSceneSettings : BattleSceneHeader
     {
-        public override GameScene CreateScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, GameSceneSettings settings, HexTerrain terrain, GameSceneContextState gameSceneState)
+        public override BattleScene CreateScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, BattleSceneHeader settings, HexTerrain terrain)
         {
-            return new HotseatGameScene(sceneManager, content, ormManager, settings, terrain, gameSceneState);
+            return new HotseatGameScene(sceneManager, content, ormManager, settings, terrain);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Conquera.Gui
         private SpellSlot mSpellSlot = null;
         private TextElement mCountLabel;
         private GraphicElementContainer mCountLabelContainer;
-        private GameScene mGameScene;
+        private BattleScene mGameScene;
         private GraphicElementContainer mIsActiveLabelContainer;
 
         public override System.Drawing.SizeF Size
@@ -68,7 +68,7 @@ namespace Conquera.Gui
             }
         }
 
-        public SpellSlotButton(GameScene gameScene)
+        public SpellSlotButton(BattleScene gameScene)
         {
             mGameScene = gameScene;
 
@@ -87,17 +87,17 @@ namespace Conquera.Gui
 
         public void Toggle()
         {
-            mGameScene.ActiveSpellSlot = mGameScene.ActiveSpellSlot != SpellSlot ? SpellSlot : null;
+           // mGameScene.ActiveSpellSlot = mGameScene.ActiveSpellSlot != SpellSlot ? SpellSlot : null;
         }
 
         protected override void OnDrawForeground()
         {
             mCountLabelContainer.Draw(this);
 
-            if (SpellSlot == mGameScene.ActiveSpellSlot)
-            {
-                mIsActiveLabelContainer.Draw(this);
-            }
+            //if (SpellSlot == mGameScene.ActiveSpellSlot)
+            //{
+            //    mIsActiveLabelContainer.Draw(this);
+            //}
         }
 
         //private void mSpellSlot_TotalCountChanged(object sender, EventArgs e)

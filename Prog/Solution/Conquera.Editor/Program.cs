@@ -32,58 +32,58 @@ namespace Conquera.Editor
         [STAThreadAttribute]
         static void Main(string[] args)
         {
-            InitDefaultsettings();
+            //InitDefaultsettings();
 
-            NewMapInfo newMapInfo = null;
-            using (NewMapDlg newMapDlg = new NewMapDlg())
-            {
-                if (DialogResult.OK == newMapDlg.ShowDialog())
-                {
-                    newMapInfo = newMapDlg.NewMapInfo;
-                }
-                else
-                {
-                    return;
-                }
-            }
+            //NewMapInfo newMapInfo = null;
+            //using (NewMapDlg newMapDlg = new NewMapDlg())
+            //{
+            //    if (DialogResult.OK == newMapDlg.ShowDialog())
+            //    {
+            //        newMapInfo = newMapDlg.NewMapInfo;
+            //    }
+            //    else
+            //    {
+            //        return;
+            //    }
+            //}
 
-            using (EditorApplication app = new EditorApplication(newMapInfo))
-            {
-                //try
-                //{
-                    app.Run();
-                //}
-                //catch (Exception ex)
-                //{
-                //    Tracer.WriteError(ex.ToString());
-                //    throw;
-                //}
-            }
+            //using (EditorApplication app = new EditorApplication(newMapInfo))
+            //{
+            //    //try
+            //    //{
+            //        app.Run();
+            //    //}
+            //    //catch (Exception ex)
+            //    //{
+            //    //    Tracer.WriteError(ex.ToString());
+            //    //    throw;
+            //    //}
+            //}
         }
 
 
-        /// <summary>
-        /// Copies default editor settings to the editor's user dir
-        /// </summary>
-        private static void InitDefaultsettings()
-        {
-            string srcDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EditorDefaultCfg");
-            string destDir = MainSettings.Instance.UserDir;
+        ///// <summary>
+        ///// Copies default editor settings to the editor's user dir
+        ///// </summary>
+        //private static void InitDefaultsettings()
+        //{
+        //    string srcDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EditorDefaultCfg");
+        //    string destDir = MainSettings.Instance.UserDir;
 
-            if (!Directory.Exists(destDir))
-            {
-                Directory.CreateDirectory(destDir);
-            }
+        //    if (!Directory.Exists(destDir))
+        //    {
+        //        Directory.CreateDirectory(destDir);
+        //    }
 
-            foreach (string srcFile in Directory.GetFiles(srcDir, "*.ini"))
-            {
-                string destFile = Path.Combine(destDir, Path.GetFileName(srcFile));
-                if (!File.Exists(destFile))
-                {
-                    File.Copy(srcFile, destFile);
-                }
-            }
-        }
+        //    foreach (string srcFile in Directory.GetFiles(srcDir, "*.ini"))
+        //    {
+        //        string destFile = Path.Combine(destDir, Path.GetFileName(srcFile));
+        //        if (!File.Exists(destFile))
+        //        {
+        //            File.Copy(srcFile, destFile);
+        //        }
+        //    }
+        //}
     }
 }
 

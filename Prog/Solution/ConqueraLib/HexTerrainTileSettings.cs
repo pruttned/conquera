@@ -31,35 +31,52 @@ namespace Conquera
     [CustomBasicTypeProvider(typeof(Vector3), typeof(FieldCustomBasicTypeProvider<Vector3>))]
     abstract public class HexTerrainTileSettings : BaseDataObject
     {
-        [DataProperty(NotNull = true, Unique=true)]
+        [DataProperty(NotNull = true, Unique = true)]
         public string Name { get; set; }
 
         [DataProperty(NotNull = true)]
         public string DisplayName { get; set; }
 
-        [DataProperty(NotNull = true, WeakReference=true)]
-        public StringResource Description { get; set; }
-
-        [DataProperty(NotNull = true)]
-        public bool IsPassable { get; set; }
-
-        [DataProperty(NotNull = true)]
-        public long WallGraphicModel { get; set; }
-
         [DataListProperty(NotNull = true)]
         public List<long> GraphicModels { get; private set; }
 
-        /// <summary>
-        /// This graphic model will be never placed into the static geometry
-        /// </summary>
-        [DataProperty(NotNull = false)]
-        public long ActiveGraphicModel { get; set; }
+        public HexTerrainTileSettings()
+        {
+            GraphicModels = new List<long>();
+        }
 
-        /// <summary>
-        /// This graphic model will be never placed into the static geometry
-        /// </summary>
-        [DataProperty(NotNull = false)]
-        public long InactiveGraphicModel { get; set; }
+        public abstract HexTerrainTileDesc CreateDesc(ContentGroup content);
+    }
+
+    [DataObject(MaxCachedCnt = 5)]
+    public class GapWallSettings : BaseDataObject
+    {
+        [DataProperty(NotNull = true, Unique = true)]
+        public string Name { get; set; }
+
+        [DataProperty(NotNull = true)]
+        public List<long> GraphicModelSamples { get; set; }
+    }
+
+    [DataObject(MaxCachedCnt = 5)]
+    public class GapHexTerrainTileSettings : HexTerrainTileSettings
+    {
+        [DataProperty(NotNull = true)]
+        public long GapWallGraphicModel { get; set; }
+
+        public override HexTerrainTileDesc CreateDesc(ContentGroup content)
+        {
+            return new GapHexTerrainTileDesc(this, content);
+        }
+    }
+
+    [DataObject(MaxCachedCnt = 5)]
+    [CustomBasicTypeProvider(typeof(Point), typeof(FieldCustomBasicTypeProvider<Point>))]
+    [CustomBasicTypeProvider(typeof(Vector3), typeof(FieldCustomBasicTypeProvider<Vector3>))]
+    abstract public class GroundHexTerrainTileSettings : HexTerrainTileSettings
+    {
+        [DataProperty(NotNull = true)]
+        public bool IsPassable { get; set; }
 
         [DataProperty(NotNull = true)]
         public long HexTerrainTileAtlas { get; set; }
@@ -73,18 +90,13 @@ namespace Conquera
         [DataProperty(NotNull = true)]
         public string Icon { get; set; }
 
-        public HexTerrainTileSettings()
+        public GroundHexTerrainTileSettings()
         {
-            GraphicModels = new List<long>();
-            InactiveGraphicModel = -1;
-            ActiveGraphicModel = -1;
         }
-          
-        public abstract HexTerrainTileDesc CreateDesc(ContentGroup content);
     }
 
     [DataObject(MaxCachedCnt = 5)]
-    public class CastleTileSettings : HexTerrainTileSettings
+    public class CastleTileSettings : GroundHexTerrainTileSettings
     {
         public override HexTerrainTileDesc CreateDesc(ContentGroup content)
         {
@@ -93,26 +105,7 @@ namespace Conquera
     }
 
     [DataObject(MaxCachedCnt = 5)]
-    public class SpellTowerTileSettings : HexTerrainTileSettings
-    {
-        [DataProperty(NotNull = true)]
-        public string Spell { get; set; }
-        [DataProperty(NotNull = true)]
-        public int SpellCnt { get; set; }
-
-        public SpellTowerTileSettings()
-        {
-        }
-
-        public override HexTerrainTileDesc CreateDesc(ContentGroup content)
-        {
-            return null;
-            //return new SpellTowerTileDesc(this, content);
-        }
-    }
-
-    [DataObject(MaxCachedCnt = 5)]
-    public class ManaMineTileSettings : HexTerrainTileSettings
+    public class ManaMineTileSettings : GroundHexTerrainTileSettings
     {
         [DataProperty(NotNull = true)]
         public int ManaIncrement { get; set; }
@@ -124,7 +117,7 @@ namespace Conquera
     }
 
     [DataObject(MaxCachedCnt = 5)]
-    public class LandTileSettings : HexTerrainTileSettings
+    public class LandTileSettings : GroundHexTerrainTileSettings
     {
         [DataProperty]
         public string HpIncNegatingTemple { get; set; }
@@ -132,18 +125,6 @@ namespace Conquera
         public override HexTerrainTileDesc CreateDesc(ContentGroup content)
         {
             return new LandTileDesc(this, content);
-        }
-    }
-
-    [DataObject(MaxCachedCnt = 5)]
-    public class VillageTileSettings : HexTerrainTileSettings
-    {
-        [DataProperty(NotNull = true)]
-        public int MaxUnitCntIncrement { get; set; }
-        
-        public override HexTerrainTileDesc CreateDesc(ContentGroup content)
-        {
-            return new VillageTileDesc(this, content);
         }
     }
 }

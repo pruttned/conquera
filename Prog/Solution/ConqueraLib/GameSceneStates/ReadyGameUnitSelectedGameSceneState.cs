@@ -33,8 +33,8 @@ namespace Conquera
 {
     public class ReadyGameUnitSelectedGameSceneState : IGameSceneState
     {
-        private GameScene mScene;
-        private GameUnit SelectedUnit
+        private BattleScene mScene;
+        private BattleUnit SelectedUnit
         {
             get { return mScene.SelectedUnit; }
         }
@@ -43,7 +43,7 @@ namespace Conquera
             get { return mScene.MovementArrow; }
         }
 
-        public ReadyGameUnitSelectedGameSceneState(GameScene scene)
+        public ReadyGameUnitSelectedGameSceneState(BattleScene scene)
         {
             mScene = scene;
         }
@@ -59,7 +59,7 @@ namespace Conquera
             mScene.UnitActionAreaRenderable.Show(SelectedUnit);
 
             mScene.EnableMouseCameraControl = true;
-            MovementArrow.StartCell = mScene.GetCell(SelectedUnit.CellIndex);
+            MovementArrow.StartCell = mScene.Terrain[SelectedUnit.TileIndex];
         }
 
         public void OnEnd()
@@ -70,19 +70,19 @@ namespace Conquera
             MovementArrow.IsVisible = false;
         }
 
-        public void OnClickOnCell(HexCell cellUnderCur, MouseButton button)
+        public void OnClickOnTile(HexTerrainTile tileUnderCur, MouseButton button)
         {
             if (MouseButton.Right == button)
             {
-                if (null != cellUnderCur)
+                if (null != tileUnderCur)
                 {
-                    if (SelectedUnit.MoveTo(cellUnderCur.Index))
+                    if (SelectedUnit.MoveTo(tileUnderCur.Index))
                     {
                         mScene.State = mScene.GetGameSceneState(GameSceneStates.UnitMoving);
                     }
                     else
                     {
-                        if (SelectedUnit.Attack(cellUnderCur.Index))
+                        if (SelectedUnit.Attack(tileUnderCur.Index))
                         {
                             mScene.State = mScene.GetGameSceneState(GameSceneStates.Battle);
                         }
@@ -93,7 +93,7 @@ namespace Conquera
             {
                 if (MouseButton.Left == button)
                 {
-                    mScene.SelectedCell = cellUnderCur;
+                    mScene.SelectedTile = tileUnderCur;
                     var selectedUnit = mScene.SelectedUnit;
                     mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
                 }
@@ -103,49 +103,52 @@ namespace Conquera
 
         public void Update(AleGameTime gameTime)
         {
-            if (null == mScene.SelectedUnit) //e.g. unit has died
-            {
-                mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
-            }
-            else
-            {
-                var cellUnderCur = mScene.GetCellUnderCur();
+            //todo
+            throw new NotImplementedException();
 
-                if (null != cellUnderCur && !GuiManager.Instance.HandlesMouse)
-                {
-                    MovementArrow.EndCell = cellUnderCur;
-                    if (SelectedUnit.HasMovedThisTurn || !SelectedUnit.CanMoveTo(cellUnderCur.Index))
-                    {
-                        if (!SelectedUnit.HasAttackedThisTurn && SelectedUnit.CanAttackTo(cellUnderCur.Index))
-                        {
-                            mScene.UnitAttackAreaRenderable.Show(SelectedUnit, cellUnderCur.GameUnit);
+            //if (null == mScene.SelectedUnit) //e.g. unit has died
+            //{
+            //    mScene.State = mScene.GetGameSceneState(GameSceneStates.Idle);
+            //}
+            //else
+            //{
+            //    var cellUnderCur = mScene.GetTileUnderCur();
 
-                            MovementArrow.IsVisible = true;
-                            Ale.Gui.GuiManager.Instance.Cursor = AlCursors.Attack;
-                            MovementArrow.Color = new Vector3(1, 0.1f, 0.1f);
-                        }
-                        else
-                        {
-                            mScene.UnitAttackAreaRenderable.Hide();
-                            MovementArrow.IsVisible = false;
-                            Ale.Gui.GuiManager.Instance.Cursor = AlCursors.MoveDisabled;
-                        }
-                    }
-                    else
-                    {
-                        mScene.UnitAttackAreaRenderable.Hide();
-                        MovementArrow.IsVisible = true;
-                        Ale.Gui.GuiManager.Instance.Cursor = AlCursors.Move;
-                        MovementArrow.Color = Vector3.One;
-                    }
-                }
-                else
-                {
-                    mScene.UnitAttackAreaRenderable.Hide();
-                    MovementArrow.IsVisible = false;
-                    Ale.Gui.GuiManager.Instance.Cursor = AlCursors.Default;
-                }
-            }
+            //    if (null != cellUnderCur && !GuiManager.Instance.HandlesMouse)
+            //    {
+            //        MovementArrow.EndCell = cellUnderCur;
+            //        if (SelectedUnit.HasMovedThisTurn || !SelectedUnit.CanMoveTo(cellUnderCur.Index))
+            //        {
+            //            if (!SelectedUnit.HasAttackedThisTurn && SelectedUnit.CanAttackTo(cellUnderCur.Index))
+            //            {
+            //                mScene.UnitAttackAreaRenderable.Show(SelectedUnit, cellUnderCur.GameUnit);
+
+            //                MovementArrow.IsVisible = true;
+            //                Ale.Gui.GuiManager.Instance.Cursor = AlCursors.Attack;
+            //                MovementArrow.Color = new Vector3(1, 0.1f, 0.1f);
+            //            }
+            //            else
+            //            {
+            //                mScene.UnitAttackAreaRenderable.Hide();
+            //                MovementArrow.IsVisible = false;
+            //                Ale.Gui.GuiManager.Instance.Cursor = AlCursors.MoveDisabled;
+            //            }
+            //        }
+            //        else
+            //        {
+            //            mScene.UnitAttackAreaRenderable.Hide();
+            //            MovementArrow.IsVisible = true;
+            //            Ale.Gui.GuiManager.Instance.Cursor = AlCursors.Move;
+            //            MovementArrow.Color = Vector3.One;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        mScene.UnitAttackAreaRenderable.Hide();
+            //        MovementArrow.IsVisible = false;
+            //        Ale.Gui.GuiManager.Instance.Cursor = AlCursors.Default;
+            //    }
+            //}
         }
     }
 }
