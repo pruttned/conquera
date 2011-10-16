@@ -103,7 +103,7 @@ PsOutput mainPS(float2 uv: TEXCOORD0)
 	float3 normal = 2.0f * normalData.xyz - 1.0f;
     float3 lightVector = normalize(float3(-0.2857143, -0.4285714, 0.8571429)); //todo: param
 	float NdL = max(0,dot(normal,lightVector));
-    float3 dirDiffuseLight = NdL * float3(0.6,0.4,0.2); //todo: param
+    float3 dirDiffuseLight = NdL * float3(0.3,0.3,0.4); //todo: param
 
 	diffuseLight += dirDiffuseLight;
 

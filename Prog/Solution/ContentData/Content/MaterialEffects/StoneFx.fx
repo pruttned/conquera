@@ -79,12 +79,6 @@ PsOut mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01, float2 depth : TE
 }
 
 
-float4 ShadowCasterPs(float2 uv: TEXCOORD0) : COLOR 
-{
-	//return tex2D(gDiffuseMapSampler, uv);   
-	return float4(0.6f ,0.6f ,0.6f , tex2D(gDiffuseMapSampler, uv).a);
-}
-
 technique Default
 {
 	pass p0 
@@ -108,4 +102,3 @@ technique Default
 		PixelShader = compile ps_2_0 mainPS();
 	}
 }
-

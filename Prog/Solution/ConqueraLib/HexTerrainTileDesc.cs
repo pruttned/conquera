@@ -393,11 +393,26 @@ namespace Conquera
         }
     }
 
+    public class GapWallSampleDesc
+    {
+        public GraphicModel GraphicModel {get; private set;}
+        public int Priority {get; private set;}
+
+        public GapWallSampleDesc(int priority, GraphicModel graphicModel)
+        {
+            GraphicModel = graphicModel;
+            Priority = priority;
+        }
+    }
+
     public class GapHexTerrainTileDesc : HexTerrainTileDesc
     {
         private bool mIsDisposed = false;
 
-        public GraphicModel WallGraphicModel { get; private set; }
+        public int WallSamplePrioritySum { get; private set; }
+
+        public ReadOnlyCollection<GapWallSampleDesc> WallSamples { get; private set; }
+
 
         public override bool IsPassable
         {
@@ -412,7 +427,14 @@ namespace Conquera
         public GapHexTerrainTileDesc(GapHexTerrainTileSettings settings, ContentGroup content)
             : base(settings, content)
         {
-            WallGraphicModel = new GraphicModel(content.Load<GraphicModelDesc>(settings.GapWallGraphicModel), content);
+            List<GapWallSampleDesc> wallSamples = new List<GapWallSampleDesc>();
+            WallSamples = new ReadOnlyCollection<GapWallSampleDesc>(wallSamples);
+            WallSamplePrioritySum = 0;
+            foreach (var wallSampleSettings in settings.GapWallGraphicModelSamples)
+            {
+                WallSamplePrioritySum += wallSampleSettings.Priority;
+                wallSamples.Add(new GapWallSampleDesc(wallSampleSettings.Priority, new GraphicModel(content.Load<GraphicModelDesc>(wallSampleSettings.GraphicModel), content)));
+            }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -421,7 +443,10 @@ namespace Conquera
             {
                 if (isDisposing)
                 {
-                    WallGraphicModel.Dispose();
+                    foreach(var wallSample in WallSamples)
+                    {
+                        wallSample.GraphicModel.Dispose();
+                    }
                 }
                 mIsDisposed = true;
             } 
@@ -432,7 +457,5 @@ namespace Conquera
         {
             return new GapHexTerrainTile(scene, index, this);
         }
-     
     }
-
 }

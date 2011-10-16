@@ -311,6 +311,11 @@ namespace Conquera
     public class GapHexTerrainTile : HexTerrainTile
     {
         List<BatchedModelIdentifier> mWalls;
+        
+        public GapHexTerrainTile(BattleScene scene, Point index, HexTerrainTileDesc desc)
+            :base(scene, index, desc)
+        {
+        }
 
         protected override void OnInit()
         {
@@ -331,11 +336,6 @@ namespace Conquera
         private void AddToScene()
         {
             GapHexTerrainTileDesc gapDesc = (GapHexTerrainTileDesc)Desc;
-            GraphicModel wallGm = gapDesc.WallGraphicModel;
-            Vector3 oldPos = wallGm.Position;
-            Quaternion oldRot = wallGm.Orientation;
-
-            wallGm.Position = oldPos + CenterPos;
 
             HexTerrain terrain = Scene.Terrain;
 
@@ -348,11 +348,16 @@ namespace Conquera
                     {
                         mWalls = new List<BatchedModelIdentifier>();
                     }
+                    GraphicModel wallGm = GetRandomWallGraphicModelSample(i);
+                    Vector3 oldPos = wallGm.Position;
+                    Quaternion oldRot = wallGm.Orientation;
+                    wallGm.Position = oldPos + CenterPos;
+
                     wallGm.Orientation = oldRot * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.ToRadians(i * (-60) + 60));
-                    mWalls.Add(Scene.StaticGeomtery.AddGraphicModel(gapDesc.WallGraphicModel));
+                    mWalls.Add(Scene.StaticGeomtery.AddGraphicModel(wallGm));
+                    wallGm.SetTransformation(oldPos, oldRot);
                 }
             }
-            wallGm.SetTransformation(oldPos, oldRot);
         }
 
         protected override void OnDispose()
@@ -373,9 +378,19 @@ namespace Conquera
             mWalls = null;
         }
 
-        public GapHexTerrainTile(BattleScene scene, Point index, HexTerrainTileDesc desc)
-            :base(scene, index, desc)
+        Random rand = new Random();
+
+
+        private GraphicModel GetRandomWallGraphicModelSample(int direction)
         {
+            GapHexTerrainTileDesc gapDesc = (GapHexTerrainTileDesc)Desc;
+
+            //Console.WriteLine());
+            int rnd =(int)Math.Pow((float)(Index.X + Index.Y + direction)*12.2364f, 2) % gapDesc.WallSamplePrioritySum;
+            //int rnd = rand.Next(gapDesc.WallSamplePrioritySum);
+            int index = 0;
+            for (index = 0; rnd >= 0; rnd -= gapDesc.WallSamples[index++].Priority);
+            return gapDesc.WallSamples[index-1].GraphicModel;
         }
 
     }
