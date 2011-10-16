@@ -684,6 +684,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\HexTileMesh.alm">
+      <Name>HexTileMesh</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Models\LavaGapWallMesh.alm">
       <Name>LavaGapWallMesh</Name>
       <Importer>MeshImporter</Importer>
@@ -691,10 +698,64 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\HexTileMesh.alm">
-      <Name>HexTileMesh</Name>
+    <Compile Include="Models\LavaGapWall2Mesh.alm">
+      <Name>LavaGapWall2Mesh</Name>
       <Importer>MeshImporter</Importer>
       <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\LavaGapWallCageDif.png">
+      <Name>LavaGapWallCageDif</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\MushroomDif.png">
+      <Name>MushroomDif</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\StoneDif.png">
+      <Name>StoneDif</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\MushroomFx.fx">
+      <Name>MushroomFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+    <Compile Include="MaterialEffects\StoneFx.fx">
+      <Name>StoneFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\StoneMesh.alm">
+      <Name>StoneMesh</Name>
+      <Importer>MeshImporter</Importer>
+      <Processor>MeshProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MaterialEffects\AboveLavaObjectFx.fx">
+      <Name>AboveLavaObjectFx</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>MaterialEffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\LavaGapWallCageLight.png">
+      <Name>LavaGapWallCageLight</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

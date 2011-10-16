@@ -58,15 +58,71 @@ namespace Conquera
         public List<long> GraphicModelSamples { get; set; }
     }
 
+    public struct GapWallSampleSettings
+    {
+        private long mGraphicModel;
+        private int mPriority;
+
+        public long GraphicModel
+        {
+            get
+            {
+                return mGraphicModel;
+            }
+            set
+            {
+                mGraphicModel = value;
+            }
+        }
+        public int Priority
+        {
+            get
+            {
+                return mPriority;
+            }
+            set
+            {
+                mPriority = value;
+            }
+        }
+
+        public GapWallSampleSettings(int priority, long graphicModel)
+        {
+            mGraphicModel = graphicModel;
+            mPriority = priority;
+        }
+    }
+
     [DataObject(MaxCachedCnt = 5)]
+    [CustomBasicTypeProvider(typeof(GapWallSampleSettings), typeof(PropertyCustomBasicTypeProvider<GapWallSampleSettings>))]
     public class GapHexTerrainTileSettings : HexTerrainTileSettings
     {
-        [DataProperty(NotNull = true)]
-        public long GapWallGraphicModel { get; set; }
+        [DataListProperty(NotNull = true)]
+        public List<GapWallSampleSettings> GapWallGraphicModelSamples { get; set; }
+
+        public GapHexTerrainTileSettings()
+        {
+            GapWallGraphicModelSamples = new List<GapWallSampleSettings>();
+        }
 
         public override HexTerrainTileDesc CreateDesc(ContentGroup content)
         {
             return new GapHexTerrainTileDesc(this, content);
+        }
+
+
+        protected override void AfterLoadImpl(OrmManager ormManager)
+        {
+            GapWallGraphicModelSamples.Sort((x, y) => -Comparer<int>.Default.Compare(x.Priority, y.Priority)); //sort from greatest priority to lowest
+            base.AfterLoadImpl(ormManager);
+        }
+        protected override void BeforeSaveImpl(OrmManager ormManager)
+        {
+            if (0 == GapWallGraphicModelSamples.Count)
+            {
+                throw new ArgumentException("At least one GapWallGraphicModelSample must be specified");
+            }
+            base.BeforeSaveImpl(ormManager);
         }
     }
 

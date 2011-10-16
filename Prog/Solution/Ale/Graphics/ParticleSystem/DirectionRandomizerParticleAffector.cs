@@ -30,14 +30,14 @@ namespace Ale.Graphics
         private float mDirectionVariation;
         private float mSquaredBounceDistanceFromPsys;
         private float mSquaredMaxDistanceFromPsys;
-        private float mDirectionCahngeProbability;
+        private float mDirectionChangeProbability;
 
         public DirectionRandomizerParticleAffector(DirectionRandomizerParticleAffectorSettings settings)
         {
             mDirectionVariation = settings.DirectionVariation;
             mSquaredBounceDistanceFromPsys = settings.BounceDistanceFromPsys * settings.BounceDistanceFromPsys;
             mSquaredMaxDistanceFromPsys = settings.MaxDistanceFromPsys * settings.MaxDistanceFromPsys;
-            mDirectionCahngeProbability = settings.DirectionCahngeProbability;
+            mDirectionChangeProbability = settings.DirectionCahngeProbability;
         }
 
         public void AffectParticles(ParticleEmitter pSys, ref Vector3 emitterWorldPosition, float totalTime, float elapsedTime)
@@ -52,7 +52,7 @@ namespace Ale.Graphics
                 }
                 else
                 {
-                    if (AleMathUtils.Random.NextDouble() < mDirectionCahngeProbability)
+                    if (AleMathUtils.Random.NextDouble() < mDirectionChangeProbability)
                     {
                         //if (AleMathUtils.Random.NextDouble() < 0.9f)
                         //{

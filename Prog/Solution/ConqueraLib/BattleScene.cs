@@ -837,8 +837,21 @@ namespace Conquera
             Terrain.SetTile(new Point(1, 2), "LavaHexTile");
             Terrain.SetTile(new Point(1, 1), "LavaHexTile");
             Terrain.SetTile(new Point(2, 2), "LavaHexTile");
-
-
+            Terrain.SetTile(new Point(1, 3), "StoneTile");
+            Terrain.SetTile(new Point(3, 2), "StoneTile");
+            Terrain.SetTile(new Point(3, 1), "StoneTile2");
+            //for (int i = 1; i < 30; ++i)
+            //{
+            //    Terrain.SetTile(new Point(3, i), "LavaHexTile");
+            //}
+            //for (int i = 1; i < 30; ++i)
+            //{
+            //    Terrain.SetTile(new Point(5, i), "LavaHexTile");
+            //}
+            //for (int i = 1; i < 30; ++i)
+            //{
+            //    Terrain.SetTile(new Point(8, i), "LavaHexTile");
+            //}
             //temp!!!!!!!!!!!!!!
             CurrentPlayer = new HumanBattlePlayer(this, "ja", Color.Blue.ToVector3());
 
@@ -885,53 +898,53 @@ namespace Conquera
             Octree.AddObject(mLavaRenderable);
 
             Material lightMat = Content.Load<Material>("PointLightMat");
-            int cnt = 15;
-            for (int i = 0; i < cnt; ++i)
-            {
-                Vector3 v = new Vector3(0.5f, 0.5f, 0.5f);
-                Vector3 c = AleMathUtils.GetRandomVector3(ref v, 0.5f);
-                //  c = new Vector3(1,0.1f,0.1f);
-                if (i < (float)cnt / 3.0f)
-                {
-                    c = new Vector3(2, 0, 0);
-                }
-                else
-                {
-                    if (i < 2.0f * (float)cnt / 3.0f)
-                    {
-                        c = new Vector3(0.0f, 2.0f, 0.0f);
-                    }
-                    else
-                    {
-                        c = new Vector3(0.0f, 0.0f, 2.0f);
-                    }
-                }
+            //int cnt = 15;
+            //for (int i = 0; i < cnt; ++i)
+            //{
+            //    Vector3 v = new Vector3(0.5f, 0.5f, 0.5f);
+            //    Vector3 c = AleMathUtils.GetRandomVector3(ref v, 0.5f);
+            //    //  c = new Vector3(1,0.1f,0.1f);
+            //    if (i < (float)cnt / 3.0f)
+            //    {
+            //        c = new Vector3(2, 0, 0);
+            //    }
+            //    else
+            //    {
+            //        if (i < 2.0f * (float)cnt / 3.0f)
+            //        {
+            //            c = new Vector3(0.0f, 2.0f, 0.0f);
+            //        }
+            //        else
+            //        {
+            //            c = new Vector3(0.0f, 0.0f, 2.0f);
+            //        }
+            //    }
 
-                PointLight light = new PointLight(Content, lightMat);
-                light.Color = c;
-                light.Scale = 2.0f;
-                var sss = HexHelper.Get3DPosFromIndex(new Point(Terrain.Height, Terrain.Width), HexTerrain.GroundHeight);
-                light.Position = new Vector3((float)AleMathUtils.Random.NextDouble() * sss.X
-                    , (float)AleMathUtils.Random.NextDouble() * sss.Y, 0.5f);
+            //    PointLight light = new PointLight(Content, lightMat);
+            //    light.Color = c;
+            //    light.Scale = 2.0f;
+            //    var sss = HexHelper.Get3DPosFromIndex(new Point(Terrain.Height, Terrain.Width), HexTerrain.GroundHeight);
+            //    light.Position = new Vector3((float)AleMathUtils.Random.NextDouble() * sss.X
+            //        , (float)AleMathUtils.Random.NextDouble() * sss.Y, 0.5f);
 
-                //light.Position = new Vector3(10, 10, 1);
-
-
-
-                Octree.AddObject(light);
+            //    //light.Position = new Vector3(10, 10, 1);
 
 
-                //GraphicModel gapWall = new GraphicModel(Content.Load<Mesh>("LavaGapWall"), new List<Material>()
-                //{
-                //    Content.Load<Material>("WallMat"),
-                //    Content.Load<Material>("WallLavaGlowMat")
-                //});
-                //for (int j = 0; j < 6; ++j)
-                //{
-                //    gapWall.Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.ToRadians(60 * j));
-                //    StaticGeomtery.AddGraphicModel(gapWall);
-                //}
-            }
+
+            //    Octree.AddObject(light);
+
+
+            //    //GraphicModel gapWall = new GraphicModel(Content.Load<Mesh>("LavaGapWall"), new List<Material>()
+            //    //{
+            //    //    Content.Load<Material>("WallMat"),
+            //    //    Content.Load<Material>("WallLavaGlowMat")
+            //    //});
+            //    //for (int j = 0; j < 6; ++j)
+            //    //{
+            //    //    gapWall.Orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.ToRadians(60 * j));
+            //    //    StaticGeomtery.AddGraphicModel(gapWall);
+            //    //}
+            //}
 
             cursorLight = new PointLight(Content, lightMat);
             cursorLight.Color = new Vector3(2.0f, 2.0f, 2.0f);

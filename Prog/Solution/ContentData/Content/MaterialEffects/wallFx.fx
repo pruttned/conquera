@@ -95,7 +95,7 @@ PsOut mainPS(float2 uv: TEXCOORD0, float4 posWorld : TEXCOORD1, float3 normal : 
 */
 
 	float4 diffColor = tex2D(gDiffuseMapSampler, uv);
-	float3 light = tex2D(gWallLightMapSampler, float2(1-posWorld.z/5+1, 0)).xyz * (sin(gTime+posWorld.x*2)*0.2+0.8);
+	float3 light = tex2D(gWallLightMapSampler, float2(1-posWorld.z/3+1, 0)).xyz * (sin(gTime+posWorld.x*2)*0.2+0.8);
 	diffColor.rgb += light*(light * float3(1, 1, 0)+float3(0.8, 0.1, 0.1) ) ;
 
 	output.Color  = diffColor; //tex2D(gDiffuseMapSampler, uv);

@@ -22,6 +22,8 @@ float4x4 gWorld : World;
 //float3 gSunLightDirection  = float3(-0.2310634, 0.06931902, 0.9704662);  //treba spravit SunLightDirection auto param  - to budu vlastne s polu s kamerami per scene auto params
 float3 gSunLightDirection  = float3(-0.2857143, -0.4285714, 0.8571429);  //treba spravit SunLightDirection auto param  - to budu vlastne s polu s kamerami per scene auto params
 
+float3 gColor;
+
 texture2D gDiffuseMap;
 sampler2D gDiffuseMapSampler = sampler_state 
 	{
@@ -45,7 +47,6 @@ struct VsOutput
     float4 Position : POSITION;
     float2 Uv : TEXCOORD0;
     float3 Normal : TEXCOORD1;
-    float2 Depth : TEXCOORD2;
 };	
 	
 VsOutput mainVS(VsInput input)
@@ -53,59 +54,41 @@ VsOutput mainVS(VsInput input)
     VsOutput output;
     
     output.Position = mul(input.Position, gWorldViewProj);
+
     output.Normal = normalize(mul(input.Normal, gWorld));
-	output.Depth = float2(output.Position.z, output.Position.w);
+    
     output.Uv = input.Uv;
     
     return output;
 }
 
-struct PsOut
+float4 mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01) : COLOR 
 {
-    half4 Color : COLOR0;
-    half4 Normal : COLOR1;
-    half4 Depth : COLOR2;
-};
-
-PsOut mainPS(float2 uv: TEXCOORD0, float3 normal : TEXCOORD01, float2 depth : TEXCOORD02) : COLOR 
-{
-	PsOut output;
-
-	output.Color  = tex2D(gDiffuseMapSampler, uv);
-    output.Normal = float4(0.5f * (normalize(normal) + 1.0f), 0); //a = diff color power
-    output.Depth = depth.x / depth.y;
-	
-	return output;
-}
-
-
-float4 ShadowCasterPs(float2 uv: TEXCOORD0) : COLOR 
-{
-	//return tex2D(gDiffuseMapSampler, uv);   
-	return float4(0.6f ,0.6f ,0.6f , tex2D(gDiffuseMapSampler, uv).a);
+	float4 color  = tex2D(gDiffuseMapSampler, uv) + float4(gColor, 0);//float4(0.8,0.1,0.5,1);
+	color.rgb =  saturate(color.rgb * (dot(gSunLightDirection, normal)+0.5) );
+	return color;   
 }
 
 technique Default
 {
 	pass p0 
 	<
-		bool IsTransparent = false;
-		bool ReceivesLight = true;
+		bool IsTransparent=false;
 		string MainTexture = "gDiffuseMap";  
 	>
 	{
 		AlphaTestEnable = true;
 		AlphaBlendEnable = false;
 		AlphaFunc = Greater; 
-		AlphaRef = 0x000001;
+		AlphaRef = 0x000080;
 		
 		ZEnable = true;
 		ZWriteEnable = true;
 		CullMode = CCW;
 		ZFUNC = lessequal;
 		
+		
 		VertexShader = compile vs_2_0 mainVS();
 		PixelShader = compile ps_2_0 mainPS();
 	}
 }
-
