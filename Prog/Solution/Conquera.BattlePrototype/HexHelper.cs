@@ -29,29 +29,30 @@ namespace Conquera
         /// <summary>
         /// Corners around 0,0
         /// </summary>
-        private static Vector3[] Corners;
+        private static Vector2[] Corners;
 
         /// <summary>
         /// Corners around 0,0 with unit R
         /// </summary>
-        private static Vector3[] UnitCorners;
+        private static Vector2[] UnitCorners;
 
         public static float TileR = 50f;
         public static float HalfTileR = 0.5f * TileR;
         public static float HalfTileW = (float)Math.Cos(MathHelper.ToRadians(30)) * TileR;
         public static float TileW = 2 * HalfTileW;
         public static float TileH = 1.5f * TileR;
+        public static float HalfTileH = 0.5f * TileH;
 
         static HexHelper()
         {
-            UnitCorners = new Vector3[6];
-            Vector3 baseVec = new Vector3(0, 1, 0);
+            UnitCorners = new Vector2[6];
+            Vector2 baseVec = new Vector2(0, 1);
             for (int i = 0; i < 6; ++i)
             {
                 Quaternion rotQuat = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, -MathHelper.ToRadians(i * 60));
-                Vector3.Transform(ref baseVec, ref rotQuat, out UnitCorners[i]);
+                Vector2.Transform(ref baseVec, ref rotQuat, out UnitCorners[i]);
             }
-            Corners = new Vector3[6];
+            Corners = new Vector2[6];
             for (int i = 0; i < 6; ++i)
             {
                 Corners[i] = TileR * UnitCorners[i];
@@ -89,34 +90,7 @@ namespace Conquera
             }
         }
 
-        /// <summary>
-        /// Gets the center of the cell given by its index
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="groundHeight"></param>
-        /// <returns></returns>
-        public static Vector3 Get3DPosFromIndex(Point index, float groundHeight)
-        {
-            Vector3 pos;
-            Get3DPosFromIndex(index, groundHeight, out pos);
-            return pos;
-        }
 
-        /// <summary>
-        /// Gets the center of the tile given by its index
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="groundHeight"></param>
-        /// <param name="pos"></param>
-        public static void Get3DPosFromIndex(Point index, float groundHeight, out Vector3 pos)
-        {
-            //http://www.gamedev.net/reference/articles/article747.asp
-            //PlotX=MapX*Width+(MapY AND 1)*(Width/2)
-            //HeightOverLapping=)*0.75
-            pos = new Vector3(
-                index.X * TileW + (index.Y & 1) * HalfTileW,
-                index.Y * TileH, groundHeight);
-        }
 
         /// <summary>
         /// Gets the center of the tile given by its index
@@ -141,8 +115,8 @@ namespace Conquera
             //PlotX=MapX*Width+(MapY AND 1)*(Width/2)
             //HeightOverLapping=)*0.75
             pos = new Vector2(
-                index.X * TileW + (index.Y & 1) * HalfTileW,
-                index.Y * TileH);
+                index.X * TileW + (index.Y & 1) * HalfTileW ,
+                index.Y * TileH );
         }
 
         /// <summary>
@@ -231,9 +205,9 @@ namespace Conquera
         /// Gets the positions of hex tile corners around 0,0
         /// </summary>
         /// <returns></returns>
-        public static Vector3[] GetHexTileCorners()
+        public static Vector2[] GetHexTileCorners()
         {
-            Vector3[] corners = new Vector3[6];
+            Vector2[] corners = new Vector2[6];
             Corners.CopyTo(corners, 0);
             return corners;
         }
@@ -241,7 +215,7 @@ namespace Conquera
         /// <summary>
         /// Gets the position of a given hex tile corner around 0,0
         /// </summary>
-        public static void GetHexTileCornerPos3D(HexTileCorner corner, out Vector3 pos)
+        public static void GetHexTileCornerPos2D(HexTileCorner corner, out Vector2 pos)
         {
             pos = Corners[(int)corner];
         }
@@ -249,7 +223,7 @@ namespace Conquera
         /// <summary>
         /// Gets the position of a given hex tile corner around 0,0
         /// </summary>
-        public static Vector3 GetHexTileCornerPos3D(HexTileCorner corner)
+        public static Vector2 GetHexTileCornerPos2D(HexTileCorner corner)
         {
             return Corners[(int)corner];
         }
@@ -258,9 +232,9 @@ namespace Conquera
         /// Gets the positions of hex tile corners around 0,0 with R = 1
         /// </summary>
         /// <returns></returns>
-        public static Vector3[] GetUnitHexTileCorners()
+        public static Vector2[] GetUnitHexTileCorners()
         {
-            Vector3[] corners = new Vector3[6];
+            Vector2[] corners = new Vector2[6];
             UnitCorners.CopyTo(corners, 0);
             return corners;
         }
@@ -268,7 +242,7 @@ namespace Conquera
         /// <summary>
         /// Gets the position of a given hex tile corner around 0,0 with R = 1
         /// </summary>
-        public static void GetUnitHexTileCornerPos3D(HexTileCorner corner, out Vector3 pos)
+        public static void GetUnitHexTileCornerPos2D(HexTileCorner corner, out Vector2 pos)
         {
             pos = UnitCorners[(int)corner];
         }
@@ -276,7 +250,7 @@ namespace Conquera
         /// <summary>
         /// Gets the position of a given hex tile corner around 0,0 with R = 1
         /// </summary>
-        public static Vector3 GetUnitHexTileCornerPos3D(HexTileCorner corner)
+        public static Vector2 GetUnitHexTileCornerPos2D(HexTileCorner corner)
         {
             return UnitCorners[(int)corner];
         }
