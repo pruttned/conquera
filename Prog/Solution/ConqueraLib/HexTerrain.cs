@@ -281,7 +281,7 @@ namespace Conquera
         {
             mScene = scene;
             LowerLeftTileCenter = HexHelper.Get3DPosFromIndex(new Point(0, 0), GroundHeight);
-            UpperRightTileCenter = HexHelper.Get3DPosFromIndex(new Point(Width, Height), GroundHeight);
+            UpperRightTileCenter = HexHelper.Get3DPosFromIndex(new Point(Width-1, Height-1), GroundHeight);
         }
 
         private void TryAddSibling(int i, int j, IList<HexTerrainTile> siblings)
