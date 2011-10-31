@@ -44,7 +44,7 @@ namespace Conquera.BattlePrototype
             InitializeComponent();
             LoadTerrain();
 
-            mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1,2), "Outpost");
+         //   mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1,2), "Outpost");
             //mTerrain = new HexTerrain("aaa.xml", new BattlePlayer[]{
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Blue, 0),
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Red, 1)});
@@ -52,8 +52,13 @@ namespace Conquera.BattlePrototype
 
         private void LoadTerrain()
         {
-            mMainCanvas.Width = HexHelper.TileW * mTerrain.Width;
-            mMainCanvas.Height = HexHelper.TileH * mTerrain.Height;
+            Microsoft.Xna.Framework.Vector2 lastTilePos = HexHelper.Get2DPosFromIndex(new Microsoft.Xna.Framework.Point(mTerrain.Width -1 , mTerrain.Height - 1));
+            mMainCanvas.Width = lastTilePos.X + HexHelper.TileW;
+            if (mTerrain.Height > 1 && 0 != mTerrain.Height % 2)
+            {
+                mMainCanvas.Width += HexHelper.HalfTileW;
+            }
+            mMainCanvas.Height = lastTilePos.Y + 2*HexHelper.TileR;
 
             for (int i = 0; i < mTerrain.Width; i++)
             {

@@ -29,8 +29,7 @@ namespace Conquera.BattlePrototype
     public abstract class HexTerrainTile : Grid
     {
         public Point Index { get; private set; }
-
-        public Vector2 CenterPos { get; private set; }
+        
         public System.Windows.Point TopLeftPos { get; private set; }
 
         public abstract bool IsPassable { get; }
@@ -40,8 +39,8 @@ namespace Conquera.BattlePrototype
         public HexTerrainTile(Point index)
         {
             Index = index;
-            CenterPos = HexHelper.Get2DPosFromIndex(index);
-            TopLeftPos = new System.Windows.Point(CenterPos.X - HexHelper.TileW / 2.0, CenterPos.Y - HexHelper.TileH / 2.0);
+            Vector2 topLeftPosAsVector = HexHelper.Get2DPosFromIndex(index);
+            TopLeftPos = new System.Windows.Point(topLeftPosAsVector.X, topLeftPosAsVector.Y);
 
             Polygon polygon = new Polygon();
             polygon.Stroke = Brushes.Black;
@@ -60,10 +59,10 @@ namespace Conquera.BattlePrototype
         
         private System.Windows.Point GetCornerPosition(HexTileCorner corner)
         {
-            double centerX = HexHelper.TileW / 2.0;
-            double centerY = HexHelper.TileH / 2.0;
+            double centerX = HexHelper.HalfTileW;
+            double centerY = HexHelper.TileR;
 
-            Vector3 cornerBasePosition = HexHelper.GetHexTileCornerPos3D(corner);
+            Vector2 cornerBasePosition = HexHelper.GetHexTileCornerPos2D(corner);
             return new System.Windows.Point(centerX + cornerBasePosition.X, centerY + cornerBasePosition.Y);
         }
 
