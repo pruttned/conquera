@@ -114,18 +114,6 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Gets tile at a given index
-        /// </summary>
-        /// <param name="i"></param>
-        /// <param name="j"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        public HexTerrainTile GetTile(Point index)
-        {
-            return this[index.X, index.Y];
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="index"></param>
