@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BattlePlayer.cs" />
+    <Compile Include="BattleUnit.cs" />
     <Compile Include="HexHelper.cs" />
     <Compile Include="HexTerrain.cs" />
     <Compile Include="HexTerrainTile.cs" />

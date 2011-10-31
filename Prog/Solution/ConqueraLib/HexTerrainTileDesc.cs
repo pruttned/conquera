@@ -245,9 +245,9 @@ namespace Conquera
 
             Settings = settings;
 
-            float baseCellSize = 1.0f / (float)atlas.Size;
-            float textureCellSpacing = atlas.TextureCellSpacing * baseCellSize;
-            float textureCellSize = baseCellSize - textureCellSpacing;
+            float baseUvCellSize = 1.0f / (float)atlas.Size;
+            float textureCellSpacing = atlas.TextureCellSpacing * baseUvCellSize;
+            float textureCellSize = baseUvCellSize - textureCellSpacing;
             Point textureCellIndex = settings.TileIndex;
 
             MeshBuilder meshBuilder = new MeshBuilder(graphicsDevice);
@@ -256,27 +256,29 @@ namespace Conquera
             SimpleVertex vert = new SimpleVertex(new Vector3(0, 0, 0), Vector3.UnitZ, Vector2.Zero);
 
             vert.Uv = new Vector2(
-                   textureCellSize * (vert.Position.X / 2.0f + 0.5f) + baseCellSize * (float)(textureCellIndex.X),
-                   (textureCellSize * (1 - (vert.Position.Y / 2.0f + 0.5f)) + baseCellSize * (float)(textureCellIndex.Y))
+                   textureCellSize * (vert.Position.X / 2.0f + 0.5f) + baseUvCellSize * (float)(textureCellIndex.X),
+                   (textureCellSize * (1 - (vert.Position.Y / 2.0f + 0.5f)) + baseUvCellSize * (float)(textureCellIndex.Y))
                    );
 
             int vcI = meshBuilder.AddVertex(ref vert);
-            vert.Position = HexHelper.GetHexCellCornerPos3D(HexTileCorner.Top); //0
+            vert.Position = HexHelper.GetHexTileCornerPos3D(HexTileCorner.Top); //0
+            Vector3 unitCornerPos =  HexHelper.GetUnitHexTileCornerPos3D(HexTileCorner.Top); //0
 
             vert.Uv = new Vector2(
-                   textureCellSize * (vert.Position.X / 2.0f + 0.5f) + baseCellSize * (float)(textureCellIndex.X),
-                   (textureCellSize * (1 - (vert.Position.Y / 2.0f + 0.5f)) + baseCellSize * (float)(textureCellIndex.Y))
+                   textureCellSize * (unitCornerPos.X / 2.0f + 0.5f) + baseUvCellSize * (float)(textureCellIndex.X),
+                   (textureCellSize * (1 - (unitCornerPos.Y / 2.0f + 0.5f)) + baseUvCellSize * (float)(textureCellIndex.Y))
                    );
 
             int vOldI = meshBuilder.AddVertex(ref vert);
             int vFirstI = vOldI;
             for (int i = 1; i < 6; ++i)
             {
-                vert.Position = HexHelper.GetHexCellCornerPos3D((HexTileCorner)i);
+                vert.Position = HexHelper.GetHexTileCornerPos3D((HexTileCorner)i);
+                unitCornerPos = HexHelper.GetUnitHexTileCornerPos3D((HexTileCorner)i); 
 
                 vert.Uv = new Vector2(
-                    textureCellSize * (vert.Position.X / 2.0f + 0.5f) + baseCellSize * (float)(textureCellIndex.X),
-                    (textureCellSize * (1 - (vert.Position.Y / 2.0f + 0.5f)) + baseCellSize * (float)(textureCellIndex.Y))
+                    textureCellSize * (unitCornerPos.X / 2.0f + 0.5f) + baseUvCellSize * (float)(textureCellIndex.X),
+                    (textureCellSize * (1 - (unitCornerPos.Y / 2.0f + 0.5f)) + baseUvCellSize * (float)(textureCellIndex.Y))
                 );
 
                 int vI = meshBuilder.AddVertex(ref vert);

@@ -59,7 +59,7 @@ namespace Conquera
 
         static HexAreaRenderable()
         {
-            Corners = HexHelper.GetHexCellCorners();
+            Corners = HexHelper.GetHexTileCorners();
             for (int i = 0; i < Corners.Length; ++i)
             {
                 Vector3 vec = Corners[i];
