@@ -81,6 +81,28 @@ namespace Conquera.BattlePrototype
 
     public abstract class CapturableHexTerrainTile : HexTerrainTile
     {
+        BattlePlayer mOwningPlayer = null;
+        
+        public BattlePlayer OwningPlayer
+        {
+            get { return mOwningPlayer; }
+            set 
+            {
+                if (value != mOwningPlayer)
+                {
+                    if (null != mOwningPlayer)
+                    {
+                        OnLost(mOwningPlayer);
+                    }
+                    mOwningPlayer = value;
+                    if (null != mOwningPlayer)
+                    {
+                        OnCaptured(mOwningPlayer);
+                    }
+                }
+            }
+        }
+
         public override bool IsPassable
         {
             get { return true; }
@@ -91,11 +113,11 @@ namespace Conquera.BattlePrototype
         {
         }
 
-        public virtual void OnCaptured()
+        public virtual void OnCaptured(BattlePlayer newPlayer)
         {
         }
 
-        public virtual void OnLost(BattlePlayer newPlayer)
+        public virtual void OnLost(BattlePlayer oldPlayer)
         {
         }
 

@@ -31,20 +31,30 @@ namespace Conquera
         /// </summary>
         private static Vector3[] Corners;
 
-        public static float TileR = 1.0f;
-        public static float TileW = 1.73205f; // mHalfW * 2
-        public static float TileH = 1.5f;//1.5*r
-        public static float HalfTileR = 0.5f;
-        public static float HalfTileW = 0.866025f; // cos30*r
+        /// <summary>
+        /// Corners around 0,0 with unit R
+        /// </summary>
+        private static Vector3[] UnitCorners;
+
+        public static float TileR = 50f;
+        public static float HalfTileR = 0.5f * TileR;
+        public static float HalfTileW = (float)Math.Cos(MathHelper.ToRadians(30)) * TileR;
+        public static float TileW = 2 * HalfTileW;
+        public static float TileH = 1.5f * TileR;
 
         static HexHelper()
         {
-            Corners = new Vector3[6];
+            UnitCorners = new Vector3[6];
             Vector3 baseVec = new Vector3(0, 1, 0);
             for (int i = 0; i < 6; ++i)
             {
                 Quaternion rotQuat = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, -MathHelper.ToRadians(i * 60));
-                Vector3.Transform(ref baseVec, ref rotQuat, out Corners[i]);
+                Vector3.Transform(ref baseVec, ref rotQuat, out UnitCorners[i]);
+            }
+            Corners = new Vector3[6];
+            for (int i = 0; i < 6; ++i)
+            {
+                Corners[i] = TileR * UnitCorners[i];
             }
         }
 
@@ -93,7 +103,7 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Gets the center of the cell given by its index
+        /// Gets the center of the tile given by its index
         /// </summary>
         /// <param name="index"></param>
         /// <param name="groundHeight"></param>
@@ -109,7 +119,7 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Gets the center of the cell given by its index
+        /// Gets the center of the tile given by its index
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
@@ -121,7 +131,7 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Gets the center of the cell given by its index
+        /// Gets the center of the tile given by its index
         /// </summary>
         /// <param name="index"></param>
         /// <param name="pos"></param>
@@ -136,7 +146,7 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Gets the cell index from a 2D position on the hex terrain
+        /// Gets the tile index from a 2D position on the hex terrain
         /// </summary>
         /// <param name="pos"></param>
         /// <param name="terrainWidth"></param>
@@ -218,10 +228,10 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Gets the positions of hex cell corners around 0,0
+        /// Gets the positions of hex tile corners around 0,0
         /// </summary>
         /// <returns></returns>
-        public static Vector3[] GetHexCellCorners()
+        public static Vector3[] GetHexTileCorners()
         {
             Vector3[] corners = new Vector3[6];
             Corners.CopyTo(corners, 0);
@@ -229,23 +239,50 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Gets the position of a given hex cell corner around 0,0
+        /// Gets the position of a given hex tile corner around 0,0
         /// </summary>
-        public static void GetHexCellCornerPos3D(HexTileCorner corner, out Vector3 pos)
+        public static void GetHexTileCornerPos3D(HexTileCorner corner, out Vector3 pos)
         {
             pos = Corners[(int)corner];
         }
 
         /// <summary>
-        /// Gets the position of a given hex cell corner around 0,0
+        /// Gets the position of a given hex tile corner around 0,0
         /// </summary>
-        public static Vector3 GetHexCellCornerPos3D(HexTileCorner corner)
+        public static Vector3 GetHexTileCornerPos3D(HexTileCorner corner)
         {
             return Corners[(int)corner];
         }
 
         /// <summary>
-        /// Gets the index of a hex cell's sibling
+        /// Gets the positions of hex tile corners around 0,0 with R = 1
+        /// </summary>
+        /// <returns></returns>
+        public static Vector3[] GetUnitHexTileCorners()
+        {
+            Vector3[] corners = new Vector3[6];
+            UnitCorners.CopyTo(corners, 0);
+            return corners;
+        }
+
+        /// <summary>
+        /// Gets the position of a given hex tile corner around 0,0 with R = 1
+        /// </summary>
+        public static void GetUnitHexTileCornerPos3D(HexTileCorner corner, out Vector3 pos)
+        {
+            pos = UnitCorners[(int)corner];
+        }
+
+        /// <summary>
+        /// Gets the position of a given hex tile corner around 0,0 with R = 1
+        /// </summary>
+        public static Vector3 GetUnitHexTileCornerPos3D(HexTileCorner corner)
+        {
+            return UnitCorners[(int)corner];
+        }
+
+        /// <summary>
+        /// Gets the index of a hex tile's sibling
         /// </summary>
         /// <param name="index"></param>
         /// <param name="direction"></param>
@@ -275,7 +312,7 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Gets the direction to a sibling hex cell
+        /// Gets the direction to a sibling hex tile
         /// </summary>
         /// <param name="src"></param>
         /// <param name="desc"></param>
@@ -314,7 +351,7 @@ namespace Conquera
                 }
             }
 
-            throw new ArgumentException("Hex cells are not siblings");
+            throw new ArgumentException("Hex tiles are not siblings");
         }
 
         /// <summary>

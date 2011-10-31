@@ -37,35 +37,34 @@ namespace Conquera
         private static List<HexTerrainTile> Siblings = new List<HexTerrainTile>(6);
 
         public delegate void CellIndexChangedHandler(BattleUnit obj, Point oldValue);
-        public event CellIndexChangedHandler CellIndexChanged;
+        public event CellIndexChangedHandler TileIndexChanged;
 
-        private Point mCellIndex;
+        private Point mTileIndex;
         private IGameUnitState mState;
         private Dictionary<string, IGameUnitState> mStates = new Dictionary<string, IGameUnitState>();
         
         public BattlePlayer OwningPlayer { get; internal set; }
 
-        [DataProperty(NotNull = true)]
         public Point TileIndex
         {
-            get { return mCellIndex; }
+            get { return mTileIndex; }
             set
             {
-                if (mCellIndex != value)
+                if (mTileIndex != value)
                 {
-                    Point oldValue = mCellIndex;
-                    mCellIndex = value;
+                    Point oldValue = mTileIndex;
+                    mTileIndex = value;
 
                     if (IsInScene)
                     {
                         UpdatePositionFromIndex();
                     }
 
-                    OnCellIndexChanged(oldValue);
+                    OnTileIndexChanged(oldValue);
 
-                    if (null != CellIndexChanged)
+                    if (null != TileIndexChanged)
                     {
-                        CellIndexChanged.Invoke(this, oldValue);
+                        TileIndexChanged.Invoke(this, oldValue);
                     }
                 }
             }
@@ -440,7 +439,7 @@ namespace Conquera
             }
         }
 
-        protected virtual void OnCellIndexChanged(Point oldValue)
+        protected virtual void OnTileIndexChanged(Point oldValue)
         {
         }
 
@@ -451,7 +450,7 @@ namespace Conquera
 
         private void UpdatePositionFromIndex()
         {
-            Position = GetPositionFromIndex(mCellIndex);
+            Position = GetPositionFromIndex(mTileIndex);
         }
 
         private void CheckIdle()

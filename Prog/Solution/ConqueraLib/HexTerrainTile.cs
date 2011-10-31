@@ -61,65 +61,6 @@ namespace Conquera
             mCenterPos = HexHelper.Get3DPosFromIndex(index, HexTerrain.GroundHeight);
         }
 
-        public void GetCornerPos(HexTileCorner corner, out Vector3 pos)
-        {
-            HexHelper.GetHexCellCornerPos3D(corner, out pos);
-            Vector3 centerPos = CenterPos;
-            Vector3.Add(ref centerPos, ref pos, out pos);
-        }
-
-        public Vector3 GetCornerPos(HexTileCorner corner)
-        {
-            Vector3 pos;
-            GetCornerPos(corner, out pos);
-            return pos;
-        }
-
-        public void GetCorner2DPos(HexTileCorner corner, out Vector2 pos)
-        {
-            Vector3 pos3D;
-            GetCornerPos(corner, out pos3D);
-            pos = new Vector2(pos3D.X, pos3D.Y);
-        }
-
-        public Vector2 GetCorner2DPos(HexTileCorner corner)
-        {
-            Vector2 pos;
-            GetCorner2DPos(corner, out pos);
-            return pos;
-        }
-
-        public void GetCornerIndex(HexTileCorner corner, out Point index)
-        {
-            int i = Index.X;
-            int j = Index.Y;
-            bool isEven = (0 == (j & 1));
-
-            switch (corner)
-            {
-                case HexTileCorner.Top:
-                    index = isEven ? new Point(i, j * 2 + 3) : new Point(i + 1, (j - 1) * 2 + 5);
-                    break;
-                case HexTileCorner.UperRight:
-                    index = new Point(i + 1, isEven ? j * 2 + 2 : (j - 1) * 2 + 4);
-                    break;
-                case HexTileCorner.LowerRight:
-                    index = new Point(i + 1, isEven ? j * 2 + 1 : (j - 1) * 2 + 3);
-                    break;
-                case HexTileCorner.Down:
-                    index = isEven ? new Point(i, j * 2) : new Point(i + 1, (j - 1) * 2 + 2);
-                    break;
-                case HexTileCorner.LowerLeft:
-                    index = new Point(i, isEven ? j * 2 + 1 : (j - 1) * 2 + 3);
-                    break;
-                case HexTileCorner.UperLeft:
-                    index = new Point(i, isEven ? j * 2 + 2 : (j - 1) * 2 + 4);
-                    break;
-                default:
-                    throw new ArgumentException("Invalid corner");
-            }
-        }
-
         public bool IsSiblingTo(HexTerrainTile tile)
         {
             if (null == tile) throw new ArgumentNullException("tile");
