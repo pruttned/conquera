@@ -66,7 +66,8 @@ namespace Conquera.BattlePrototype
                     ((0 == (j & 1)) && ((i2 == i - 1 && j2 == j - 1) || (i2 == i && j2 == j - 1) || (i2 == i - 1 && j2 == j + 1) || (i2 == i && j2 == j + 1)));
         }
     }
-
+    
+    [HexTerrainTile("Gap")]
     public class GapHexTerrainTile : HexTerrainTile
     {
         public override bool IsPassable
@@ -87,6 +88,7 @@ namespace Conquera.BattlePrototype
         }
     }
 
+    [HexTerrainTile("Land")]
     public class LandHexTerrainTile : HexTerrainTile
     {
         public override bool IsPassable
@@ -150,6 +152,20 @@ namespace Conquera.BattlePrototype
         }
 
         public virtual void OnBeginTurn()
+        {
+        }
+    }
+
+    [HexTerrainTile("Outpost")]
+    public class OutpostHexTerrainTile : CapturableHexTerrainTile
+    {
+        public override System.Windows.Controls.Image Image
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public OutpostHexTerrainTile(Point index)
+            : base(index)
         {
         }
     }

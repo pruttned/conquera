@@ -107,6 +107,7 @@
     <Compile Include="HexHelper.cs" />
     <Compile Include="HexTerrain.cs" />
     <Compile Include="HexTerrainTile.cs" />
+    <Compile Include="HexTerrainTileFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

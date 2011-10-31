@@ -25,6 +25,11 @@ namespace Conquera.BattlePrototype
         {
             InitializeComponent();
             LoadTerrain();
+
+            mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1,2), "Outpost");
+            //mTerrain = new HexTerrain("aaa.xml", new BattlePlayer[]{
+            //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Blue, 0),
+            //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Red, 1)});
         }
 
         private void LoadTerrain()
