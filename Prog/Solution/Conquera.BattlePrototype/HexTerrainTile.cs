@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using System.Windows.Controls;
+using System.Windows.Shapes;
+using System.Windows.Media;
 
 namespace Conquera.BattlePrototype
 {
-    public abstract class HexTerrainTile
+    public abstract class HexTerrainTile : Grid
     {
         public Point Index { get; private set; }
 
         public Vector2 CenterPos { get; private set; }
+        public System.Windows.Point TopLeftPos { get; private set; }
 
         public abstract bool IsPassable { get; }
 
@@ -20,6 +24,30 @@ namespace Conquera.BattlePrototype
         {
             Index = index;
             CenterPos = HexHelper.Get2DPosFromIndex(index);
+            TopLeftPos = new System.Windows.Point(CenterPos.X - HexHelper.TileW / 2.0, CenterPos.Y - HexHelper.TileH / 2.0);
+
+            Polygon polygon = new Polygon();
+            polygon.Stroke = Brushes.Black;
+            polygon.Fill = Brushes.Silver;
+            polygon.StrokeThickness = 1.0;
+
+            polygon.Points.Add(GetCornerPosition(HexTileCorner.Top));
+            polygon.Points.Add(GetCornerPosition(HexTileCorner.UperRight));
+            polygon.Points.Add(GetCornerPosition(HexTileCorner.LowerRight));
+            polygon.Points.Add(GetCornerPosition(HexTileCorner.Down));
+            polygon.Points.Add(GetCornerPosition(HexTileCorner.LowerLeft));
+            polygon.Points.Add(GetCornerPosition(HexTileCorner.UperLeft));
+            
+            Children.Add(polygon);
+        }
+        
+        private System.Windows.Point GetCornerPosition(HexTileCorner corner)
+        {
+            double centerX = HexHelper.TileW / 2.0;
+            double centerY = HexHelper.TileH / 2.0;
+
+            Vector3 cornerBasePosition = HexHelper.GetHexTileCornerPos3D(corner);
+            return new System.Windows.Point(centerX + cornerBasePosition.X, centerY + cornerBasePosition.Y);
         }
 
         public bool IsSiblingTo(HexTerrainTile tile)

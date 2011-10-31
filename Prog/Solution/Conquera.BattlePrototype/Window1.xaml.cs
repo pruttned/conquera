@@ -20,14 +20,29 @@ namespace Conquera.BattlePrototype
     public partial class Window1 : Window
     {
         HexTerrain mTerrain = new HexTerrain(20, 20);
+
         public Window1()
         {
             InitializeComponent();
+            LoadTerrain();
         }
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void LoadTerrain()
         {
-           // mTerrain.Save("aaa.xml");
+            mMainCanvas.Width = HexHelper.TileW * mTerrain.Width;
+            mMainCanvas.Height = HexHelper.TileH * mTerrain.Height;
+
+            for (int i = 0; i < mTerrain.Width; i++)
+            {
+                for (int j = 0; j < mTerrain.Height; j++)
+                {
+                    HexTerrainTile tile = mTerrain[i,j];
+                    Canvas.SetLeft(tile, tile.TopLeftPos.X);
+                    Canvas.SetTop(tile, tile.TopLeftPos.Y);
+
+                    mMainCanvas.Children.Add(tile);
+                }
+            }
         }
     }
 }
