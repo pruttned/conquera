@@ -49,7 +49,7 @@ namespace Conquera
 
         public bool IsPassable
         {
-            //todo - unit
+            //todo - unit .. or no?? - (Unit property will be used ??)
             get { return Desc.IsPassable; }
         }
 
@@ -122,6 +122,8 @@ namespace Conquera
 
         public bool IsSiblingTo(HexTerrainTile tile)
         {
+            if (null == tile) throw new ArgumentNullException("tile");
+
             int i = Index.X;
             int j = Index.Y;
 
