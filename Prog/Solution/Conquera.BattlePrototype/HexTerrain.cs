@@ -11,8 +11,6 @@ namespace Conquera.BattlePrototype
 {
     class HexTerrain
     {
-        static XmlSerializer XmlSerializer = new XmlSerializer(typeof(HexTerrain));
-
         private HexTerrainTile[,] mTiles;
 
         public int Width { get; private set; }

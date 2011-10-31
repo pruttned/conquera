@@ -3,6 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Window1" Height="594" Width="783">
     <Grid>
-        <Button Height="68" Margin="88,117,0,0" Name="button1" VerticalAlignment="Top" HorizontalAlignment="Left" Width="116" Click="button1_Click">Button</Button>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <Canvas x:Name="mMainCanvas"/>
+        </ScrollViewer>
     </Grid>
 </Window>
