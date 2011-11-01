@@ -28,7 +28,7 @@ using System.Xml.Linq;
 
 namespace Conquera.BattlePrototype
 {
-    class HexTerrain
+    public class HexTerrain
     {
         public event EventHandler<ValueChangeEventArgs<HexTerrainTile>> TileSet;
 
@@ -158,6 +158,83 @@ namespace Conquera.BattlePrototype
             }
 
             terrainElm.Save(file);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public bool IsInTerrain(Point index)
+        {
+            return (index.X >= 0 && index.X < Width && index.Y >= 0 & index.Y < Height);
+        }
+
+        /// <summary>
+        /// Gets a tile sibling in a given direction (or null in case of terrain end)
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="direction"></param>
+        /// <param name="sibling"></param>
+        /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
+        public HexTerrainTile GetSibling(Point index, HexDirection direction)
+        {
+            Point siblingIndex = HexHelper.GetSibling(index, direction);
+            if (IsInTerrain(siblingIndex))
+            {
+                return mTiles[siblingIndex.X, siblingIndex.Y];
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets all siblings of a given tile
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="siblings"></param>
+        /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
+        public void GetSiblings(Point index, IList<HexTerrainTile> siblings)
+        {
+            int i = index.X;
+            int j = index.Y;
+
+            TryAddSibling(i - 1, j, siblings);
+            TryAddSibling(i + 1, j, siblings);
+            if (0 != (j & 1))
+            {
+                TryAddSibling(i, j - 1, siblings);
+                TryAddSibling(i + 1, j - 1, siblings);
+                TryAddSibling(i, j + 1, siblings);
+                TryAddSibling(i + 1, j + 1, siblings);
+            }
+            else
+            {
+                TryAddSibling(i - 1, j - 1, siblings);
+                TryAddSibling(i, j - 1, siblings);
+                TryAddSibling(i - 1, j + 1, siblings);
+                TryAddSibling(i, j + 1, siblings);
+            }
+        }
+
+        /// <summary>
+        /// Gets all siblings of a given tile
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
+        public IList<HexTerrainTile> GetSiblings(Point index)
+        {
+            List<HexTerrainTile> siblings = new List<HexTerrainTile>();
+            GetSiblings(index, siblings);
+            return siblings;
+        }
+
+        private void TryAddSibling(int i, int j, IList<HexTerrainTile> siblings)
+        {
+            if (i >= 0 && i < Width && j >= 0 && j < Height)
+            {
+                siblings.Add(this[i, j]);
+            }
         }
     }
 }

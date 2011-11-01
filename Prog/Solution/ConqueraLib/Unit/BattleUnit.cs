@@ -33,11 +33,27 @@ namespace Conquera
 {
     public class BattleUnit : OctreeSceneObject
     {
-        //promoted collections
-        private static List<HexTerrainTile> Siblings = new List<HexTerrainTile>(6);
+        #region Types
+        struct HexTileSeed
+        {
+            public HexTerrainTile Tile;
+            public int Live;
+
+            public HexTileSeed(HexTerrainTile tile, int live)
+            {
+                Tile = tile;
+                Live = live;
+            }
+        }
+        #endregion Types
 
         public delegate void CellIndexChangedHandler(BattleUnit obj, Point oldValue);
         public event CellIndexChangedHandler TileIndexChanged;
+
+        //promoted collections
+        private static List<HexTerrainTile> Siblings = new List<HexTerrainTile>(6);
+        private static HashSet<Point> CheckedPoints = new HashSet<Point>();
+        private static Queue<HexTileSeed> Seeds = new Queue<HexTileSeed>();
 
         private Point mTileIndex;
         private IGameUnitState mState;
@@ -156,21 +172,7 @@ namespace Conquera
             mState.Update(gameTime);
         }
 
-        struct Seed
-        {
-            public HexTerrainTile Tile;
-            public int Live;
-
-            public Seed(HexTerrainTile tile, int live)
-            {
-                Tile = tile;
-                Live = live;
-            }
-        }
-
-        private static HashSet<Point> CheckedPoints = new HashSet<Point>();
-        private static Queue<Seed> Seeds = new Queue<Seed>();
-        
+      
         public List<AdditionalAttackTarget> GetAdditionalAttackTargets(BattleUnit target)
         {
             return GameUnitDesc.GetAdditionalAttackTargets(TileIndex, target.TileIndex);
@@ -182,7 +184,7 @@ namespace Conquera
         }
 
         /// <summary>
-        /// Gets all poitions where can unit move
+        /// Gets all poitions where is possible for unit to move
         /// </summary>
         /// <param name="points"></param>
         public void GetPossibleMoves(List<Point> points)
@@ -190,7 +192,7 @@ namespace Conquera
             Seeds.Clear();
             CheckedPoints.Clear();
 
-            Seeds.Enqueue(new Seed(Tile, GameUnitDesc.MovementDistance));
+            Seeds.Enqueue(new HexTileSeed(Tile, GameUnitDesc.MovementDistance));
             while (0 < Seeds.Count)
             {
                 var seed = Seeds.Dequeue();
@@ -206,7 +208,7 @@ namespace Conquera
                         CheckedPoints.Add(index);
                         if (0 < seed.Live - 1)
                         {
-                            Seeds.Enqueue(new Seed(sibling, seed.Live - 1));
+                            Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
                         }
                     }
                 }
@@ -233,10 +235,12 @@ namespace Conquera
 
                 //temp
 
+                throw new NotImplementedException("OPTIMIZE!!!");
+
                 Seeds.Clear();
                 CheckedPoints.Clear();
 
-                Seeds.Enqueue(new Seed(Tile, GameUnitDesc.MovementDistance));
+                Seeds.Enqueue(new HexTileSeed(Tile, GameUnitDesc.MovementDistance));
                 while (0 < Seeds.Count)
                 {
                     var seed = Seeds.Dequeue();
@@ -255,7 +259,7 @@ namespace Conquera
                             CheckedPoints.Add(siblingIndex);
                             if (0 < seed.Live - 1)
                             {
-                                Seeds.Enqueue(new Seed(sibling, seed.Live - 1));
+                                Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
                             }
                         }
                     }

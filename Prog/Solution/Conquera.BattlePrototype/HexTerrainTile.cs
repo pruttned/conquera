@@ -34,16 +34,23 @@ namespace Conquera.BattlePrototype
         public System.Windows.Point TopLeftPos { get; private set; }
 
         public abstract bool IsPassable { get; }
-
+        
+        public BattleUnit Unit {get; set;}
         public virtual string ImageName
         {
             get { return null; }
+        }
+        
+        public bool IsPassableAndEmpty
+        {
+            get { return IsPassable && null == Unit; }
         }
 
         public virtual Brush Fill        
         {
             get { return Brushes.Green; }
         }
+
 
         public HexTerrainTile(Point index)
         {
