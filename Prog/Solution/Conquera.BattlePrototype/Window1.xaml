@@ -1,7 +1,13 @@
 ﻿<Window x:Class="Conquera.BattlePrototype.Window1"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:proto="clr-namespace:Conquera.BattlePrototype"
     Title="Window1" Height="594" Width="783">
+    
+    <Window.Resources>
+        <proto:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+    </Window.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -14,9 +20,27 @@
         
         <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="2" />
         
-        <StackPanel Grid.Row="1" Margin="0,2,0,0">
-            <RadioButton x:Name="mSetTilesOptionBox" IsChecked="True"/>
-            <ListBox x:Name="mSetTilesListBox" />
+        <StackPanel Orientation="Horizontal" Margin="0,2,0,0" Grid.Row="1">
+
+            <!--Players-->
+            <StackPanel Margin="2,2,2,2">
+                <TextBlock Text="Players" Foreground="White" Background="{Binding SelectedItem.Color, ElementName=mPlayersListBox, Converter={StaticResource ColorToBrushConverter}}" />
+                
+                <ListBox x:Name="mPlayersListBox">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="mPlayerBorder" Width="30" Height="16" Background="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+
+            <!--Set tile-->
+            <StackPanel Margin="2,2,2,2">
+                <RadioButton x:Name="mSetTilesOptionBox" GroupName="Editor" IsChecked="True">Tile</RadioButton>
+                <ListBox x:Name="mSetTilesListBox" />
+            </StackPanel>
+            
         </StackPanel>
     </Grid>
 </Window>

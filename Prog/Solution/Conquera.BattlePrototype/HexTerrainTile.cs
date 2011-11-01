@@ -29,13 +29,36 @@ namespace Conquera.BattlePrototype
 {
     public abstract class HexTerrainTile : Grid
     {
+        private BattleUnit mUnit = null;
+
         public Point Index { get; private set; }
         
         public System.Windows.Point TopLeftPos { get; private set; }
 
         public abstract bool IsPassable { get; }
-        
-        public BattleUnit Unit {get; set;}
+
+        public BattleUnit Unit
+        {
+            get { return mUnit; }
+            set
+            {
+                if (mUnit != value)
+                {
+                    if (mUnit != null) //old
+                    {
+                        Children.Remove(mUnit);
+                    }
+
+                    mUnit = value;
+
+                    if (mUnit != null) //new
+                    {
+                        Children.Add(mUnit);
+                    }
+                }
+            }
+        }
+
         public virtual string ImageName
         {
             get { return null; }
