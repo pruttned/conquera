@@ -85,7 +85,6 @@ namespace Conquera.BattlePrototype
             card.Cast(this, tile, terrain);
         }
 
-        //todo: call it
         public void OnTurnStart(int turnNum)
         {
             foreach (var unit in Units)
