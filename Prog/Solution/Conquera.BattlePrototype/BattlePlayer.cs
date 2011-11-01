@@ -20,13 +20,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using System.Reflection;
 
 namespace Conquera.BattlePrototype
 {
     public class BattlePlayer
     {
+        public const int MaxCardsInHandCnt = 7;
+
+        private int mMana;
+        private int mMaxMana;
+
         public Color Color { get; private set; }
         public int Index { get; private set; }
+
+        /// <summary>
+        /// Also clamps to 0,MaxMana interval
+        /// </summary>
+        public int Mana
+        {
+            get { return mMana; }
+            set { mMana = MathExt.Clamp(value, 0, MaxMana);}
+        }
+
+        public int MaxMana
+        {
+            get { return mMaxMana; }
+            set 
+            { 
+                mMaxMana = value;
+                Mana = Mana; //clamp
+            }
+        }
+
+        public List<SpellCard> CardDeck { get; set; }
+        
+        public List<SpellCard> CardsInHand { get; set; }
 
         public List<BattleUnit> Units { get; private set; }
 
@@ -36,6 +66,37 @@ namespace Conquera.BattlePrototype
             Index = index;
 
             Units = new List<BattleUnit>();
+            CardDeck = new List<SpellCard>();
+            CardsInHand = new List<SpellCard>();
+        }
+
+        public void CastSpellCard(int indexInHand, HexTerrainTile tile, HexTerrain terrain)
+        {
+            if (null == tile) throw new ArgumentNullException("tile");
+            if (null == terrain) throw new ArgumentNullException("terrain");
+
+            var card = CardsInHand[indexInHand];
+            if (Mana < card.Cost)
+            {
+                throw new ArgumentException("Not enough mana for a specified card");
+            }
+            Mana -= card.Cost;
+            CardsInHand.RemoveAt(indexInHand);
+            card.Cast(this, tile, terrain);
+        }
+
+        //todo: call it
+        public void OnTurnStart(int turnNum)
+        {
+            foreach (var unit in Units)
+            {
+                unit.HasMovedThisTurn = false;
+            }
+
+            while (CardsInHand.Count < MaxCardsInHandCnt)
+            {
+                CardsInHand.Add(CardDeck[MathExt.Random.Next(CardDeck.Count)]);
+            }
         }
     }
 }
