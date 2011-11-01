@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
+using Microsoft.Xna.Framework;
 
 namespace Conquera.BattlePrototype
 {
@@ -18,7 +20,7 @@ namespace Conquera.BattlePrototype
         public abstract void Cast(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain);
     }
 
-    public class AddManaSpellCard
+    public class AddManaSpellCard : SpellCard
     {
         private int mManaInc;
 
@@ -52,7 +54,7 @@ namespace Conquera.BattlePrototype
         }
     }
 
-    public class SummonUnitSpellCard
+    public class SummonUnitSpellCard : SpellCard
     {
         private static Type[] mUnitCtorArgTypes = new Type[] { typeof(BattlePlayer), typeof(HexTerrain), typeof(Point) };
         private ConstructorInfo mUnitCtor;
