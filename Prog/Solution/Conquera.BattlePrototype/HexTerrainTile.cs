@@ -33,6 +33,13 @@ namespace Conquera.BattlePrototype
         public System.Windows.Point TopLeftPos { get; private set; }
 
         public abstract bool IsPassable { get; }
+        
+        public BattleUnit Unit {get; set;}
+        
+        public bool IsPassableAndEmpty
+        {
+            get { return IsPassable && null == Unit; }
+        }
 
         public abstract System.Windows.Controls.Image Image { get; }
 
