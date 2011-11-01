@@ -10,37 +10,57 @@
     
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="18" />
             <RowDefinition Height="*" />
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
         
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <!--Header-->
+        <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding ActivePlayer.Color, Source={StaticResource This}, Converter={StaticResource ColorToBrushConverter}}" />
+        
+        <!--Main canvas-->
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Grid.Row="1">
             <Canvas x:Name="mMainCanvas" PreviewMouseDown="mMainCanvas_PreviewMouseDown"/>
         </ScrollViewer>
         
-        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="2" />
-        
-        <StackPanel Orientation="Horizontal" Margin="0,2,0,0" Grid.Row="1">
+        <!--Splitter-->
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="2" />
 
-            <!--Players-->
-            <StackPanel Margin="2,2,2,2">
-                <TextBlock Text="Players" Foreground="White" Background="{Binding SelectedItem.Color, ElementName=mPlayersListBox, Converter={StaticResource ColorToBrushConverter}}" />
-                
-                <ListBox x:Name="mPlayersListBox">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Border x:Name="mPlayerBorder" Width="30" Height="16" Background="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
-
-            <!--Set tile-->
-            <StackPanel Margin="2,2,2,2">
-                <RadioButton x:Name="mSetTilesOptionBox" GroupName="Editor" IsChecked="True">Tile</RadioButton>
-                <ListBox x:Name="mSetTilesListBox" />
-            </StackPanel>
+        <!--GUI-->
+        <TabControl Margin="0,2,0,0" Grid.Row="2" x:Name="mTabControl" SelectionChanged="mTabControl_SelectionChanged">
             
-        </StackPanel>
+            <!--Editor GUI-->
+            <TabItem Header="Editor" x:Name="mEditorTabItem">
+                <StackPanel Orientation="Horizontal" >
+
+                    <!--Players-->
+                    <StackPanel Margin="2,2,2,2">
+                        <TextBlock Text="Players" Foreground="White" Background="{Binding SelectedItem.Color, ElementName=mPlayersListBox, Converter={StaticResource ColorToBrushConverter}}" />
+
+                        <ListBox x:Name="mPlayersListBox">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border x:Name="mPlayerBorder" Width="30" Height="16" Background="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                    <!--Set tile-->
+                    <StackPanel Margin="2,2,2,2">
+                        <RadioButton x:Name="mSetTilesOptionBox" GroupName="Editor" IsChecked="True">Tile</RadioButton>
+                        <ListBox x:Name="mSetTilesListBox" />
+                    </StackPanel>
+
+                </StackPanel>
+            </TabItem>
+
+            <!--Game GUI-->
+            <TabItem Header="Game" x:Name="mGameTabItem">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="EndTurn" Click="Button_Click"/>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

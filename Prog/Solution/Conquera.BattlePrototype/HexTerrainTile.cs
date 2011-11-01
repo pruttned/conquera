@@ -30,6 +30,8 @@ namespace Conquera.BattlePrototype
     public abstract class HexTerrainTile : Grid
     {
         private BattleUnit mUnit = null;
+        private Border mMoveIndicator;
+        private bool mIsMoveIndicatorVisible = false;
 
         public Point Index { get; private set; }
         
@@ -78,6 +80,26 @@ namespace Conquera.BattlePrototype
             get { return Brushes.Green; }
         }
 
+        public bool IsMoveIndicatorVisible
+        {
+            get { return mIsMoveIndicatorVisible; }
+            set 
+            {
+                if (value != mIsMoveIndicatorVisible)
+                {
+                    mIsMoveIndicatorVisible = value;
+
+                    if (mIsMoveIndicatorVisible)
+                    {
+                        Children.Add(mMoveIndicator);
+                    }
+                    else
+                    {
+                        Children.Remove(mMoveIndicator);
+                    }
+                }
+            }
+        }
 
         public HexTerrainTile(Point index)
         {
@@ -107,6 +129,13 @@ namespace Conquera.BattlePrototype
                 image.Height = 60;
                 Children.Add(image);
             }
+
+            mMoveIndicator = new Border()
+            {
+                Width = 16,
+                Height = 16,
+                Background = Brushes.Yellow
+            };
         }
 
         public bool IsSiblingTo(HexTerrainTile tile)

@@ -29,26 +29,44 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace Conquera.BattlePrototype
 {
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class Window1 : Window
+    public partial class Window1 : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         HexTerrain mTerrain = new HexTerrain(20, 20);
         BattlePlayer[] mPlayers = new BattlePlayer[]{
             new BattlePlayer(Colors.Blue, 0),
-            new BattlePlayer(Colors.Red, 1)};
+            new BattlePlayer(Colors.Red, 1)};        
+        private BattlePlayer mActivePlayer;
 
-        public BattlePlayer ActivePlayer { get; private set; }
+        public BattlePlayer ActivePlayer
+        {
+            get { return mActivePlayer; }
+            private set 
+            {
+                if (mActivePlayer != value)
+                {
+                    mActivePlayer = value;
+                    EventHelper.RaisePropertyChanged(PropertyChanged, this, "ActivePlayer");
+                }
+            }
+        }
+
+        public BattleUnit SelectedUnit {get; private set; }
 
         int mTurnNum = 0;
 
         public Window1()
         {
             ActivePlayer = mPlayers[0];
+            Resources.Add("This", this);
 
             InitializeComponent();
             
@@ -59,7 +77,10 @@ namespace Conquera.BattlePrototype
             mPlayersListBox.SelectedIndex = 0;
             mSetTilesListBox.ItemsSource = HexTerrainTileFactory.TemplateNames;
 
-            BattleUnit unit1 = new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1,2));
+            BattleUnit unit1 = new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 2));
+            BattleUnit unit2 = new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 3));
+            BattleUnit unit3 = new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(1, 4));
+
             //unit1.Kill();
             //mTerrain = new HexTerrain("aaa.xml", new BattlePlayer[]{
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Blue, 0),
@@ -71,6 +92,51 @@ namespace Conquera.BattlePrototype
             mTurnNum++;
             ActivePlayer = mPlayers[mTurnNum % 2];
             ActivePlayer.OnTurnStart(mTurnNum);
+            SelectUnit(null);
+        }
+
+        private void SelectUnit(BattleUnit unit)
+        {
+            if (unit != SelectedUnit)
+            {
+                if (!CanSelectUnit(unit))
+                {
+                    throw new ArgumentException("Unit does not belong to the active player.");
+                }
+
+                if (SelectedUnit != null)
+                {
+                    SelectedUnit.IsSelected = false;
+                    SetMoveIndicatorsVisibility(false);
+                }
+
+                SelectedUnit = unit;
+
+                if (SelectedUnit != null)
+                {
+                    SelectedUnit.IsSelected = true;
+                    SetMoveIndicatorsVisibility(true);
+                }
+            }
+        }
+
+        private bool CanSelectUnit(BattleUnit unit)
+        {
+            return unit == null || unit.Player == ActivePlayer;
+        }
+
+        private void SetMoveIndicatorsVisibility(bool isVisible)
+        {
+            if (!isVisible || !SelectedUnit.HasMovedThisTurn)
+            {
+                List<Microsoft.Xna.Framework.Point> indices = new List<Microsoft.Xna.Framework.Point>();
+                SelectedUnit.GetPossibleMoves(indices);
+
+                foreach (Microsoft.Xna.Framework.Point index in indices)
+                {
+                    mTerrain[index].IsMoveIndicatorVisible = isVisible;
+                }
+            }
         }
 
         private void LoadTerrain()
@@ -119,12 +185,40 @@ namespace Conquera.BattlePrototype
         {
             HexTerrainTile tile = GetParent<HexTerrainTile>(e.Source as DependencyObject);
             if (tile != null)
-            {
-                //Set tile
-                string tileName = (string)mSetTilesListBox.SelectedItem;
-                if ((bool)mSetTilesOptionBox.IsChecked && tileName != null)
+            {                
+                if (mTabControl.SelectedItem == mEditorTabItem) //EDITOR
                 {
-                    mTerrain.SetTile(tile.Index, tileName);
+                    //Set tile
+                    string tileName = (string)mSetTilesListBox.SelectedItem;
+                    if ((bool)mSetTilesOptionBox.IsChecked && tileName != null)
+                    {
+                        mTerrain.SetTile(tile.Index, tileName);
+                    }
+                }
+                else if (mTabControl.SelectedItem == mGameTabItem) //GAME
+                {                    
+                    if (e.LeftButton == MouseButtonState.Pressed)
+                    {
+                        //Select / deselect unit
+                        BattleUnit unit = GetParent<BattleUnit>(e.Source as DependencyObject);
+                        if (unit != null && CanSelectUnit(unit))
+                        {
+                            SelectUnit(unit);
+                        }
+                        else if (unit == null)
+                        {
+                            SelectUnit(null);
+                        }
+                    }
+                    else if (e.RightButton == MouseButtonState.Pressed)
+                    {
+                        //Move unit
+                        if (tile.IsMoveIndicatorVisible)
+                        {
+                            SetMoveIndicatorsVisibility(false);
+                            SelectedUnit.Move(tile.Index);                            
+                        }
+                    }
                 }
             }
         }
@@ -142,6 +236,16 @@ namespace Conquera.BattlePrototype
                 return parent as T;
             }
             return GetParent<T>(parent);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            EndTurn();
+        }
+
+        private void mTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SelectUnit(null);
         }
     }
 

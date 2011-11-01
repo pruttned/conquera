@@ -92,9 +92,12 @@ namespace Conquera.BattlePrototype
                 unit.HasMovedThisTurn = false;
             }
 
-            while (CardsInHand.Count < MaxCardsInHandCnt)
+            if (CardDeck.Count > 0)
             {
-                CardsInHand.Add(CardDeck[MathExt.Random.Next(CardDeck.Count)]);
+                while (CardsInHand.Count < MaxCardsInHandCnt)
+                {
+                    CardsInHand.Add(CardDeck[MathExt.Random.Next(CardDeck.Count)]);
+                }
             }
         }
     }

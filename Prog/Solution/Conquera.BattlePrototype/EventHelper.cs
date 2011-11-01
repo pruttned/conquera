@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.ComponentModel;
 
 namespace Conquera.BattlePrototype
 {
@@ -35,6 +36,14 @@ namespace Conquera.BattlePrototype
             if (handler != null)
             {
                 handler(sender, eventArgs);
+            }
+        }
+
+        public static void RaisePropertyChanged(PropertyChangedEventHandler handler, object sender, string propertyName)
+        {
+            if (handler != null)
+            {
+                handler(sender, new PropertyChangedEventArgs(propertyName));
             }
         }
     }

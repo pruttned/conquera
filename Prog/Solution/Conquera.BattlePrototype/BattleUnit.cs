@@ -22,6 +22,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.ComponentModel;
 
 namespace Conquera.BattlePrototype
 {
@@ -55,6 +56,8 @@ namespace Conquera.BattlePrototype
 
         private TextBlock mPropertiesTextBlock;
         private Border mBorder;
+        private bool mHasMovedThisTurn;
+        private bool mIsSelected = false;
 
         public BattlePlayer Player { get; private set; }
 
@@ -71,7 +74,18 @@ namespace Conquera.BattlePrototype
         public int Defense { get { return BaseDefense; } }
         public int MovementDistance { get { return BaseMovementDistance; } }
 
-        public bool HasMovedThisTurn { get; set; }
+        public bool HasMovedThisTurn
+        {
+            get { return mHasMovedThisTurn; }
+            set
+            {
+                if (value != mHasMovedThisTurn)
+                {
+                    mHasMovedThisTurn = value;
+                    UpdateGraphics();
+                }
+            }
+        }
 
         public abstract string Name { get; }
 
@@ -101,6 +115,19 @@ namespace Conquera.BattlePrototype
                     {
                         TileIndexChanged.Invoke(this, oldValue);
                     }
+                }
+            }
+        }
+
+        public bool IsSelected
+        {
+            get { return mIsSelected; }
+            internal set
+            {
+                if (value != mIsSelected)
+                {
+                    mIsSelected = value;
+                    UpdateGraphics();
                 }
             }
         }
@@ -254,9 +281,10 @@ namespace Conquera.BattlePrototype
         }
 
         private void UpdateGraphics()
-        {            
-            mPropertiesTextBlock.Text = string.Format("A = {0}\nD = {1}\nM = {2}", Attack, Defense, MovementDistance);
-            mBorder.BorderThickness = new System.Windows.Thickness(HasMovedThisTurn ? 0.0 : 5.0);
+        {
+            mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : string.Empty;
+            mPropertiesTextBlock.Text += string.Format("A = {0}\nD = {1}\nM = {2}", Attack, Defense, MovementDistance);
+            mBorder.BorderThickness = new System.Windows.Thickness(HasMovedThisTurn ? 0.0 : 5.0);            
         }
     }
 
