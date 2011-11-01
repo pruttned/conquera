@@ -42,10 +42,14 @@ namespace Conquera.BattlePrototype
             new BattlePlayer(Colors.Blue, 0),
             new BattlePlayer(Colors.Red, 1)};
 
+        public BattlePlayer ActivePlayer { get; private set; }
+
         int mTurnNum = 0;
 
         public Window1()
         {
+            ActivePlayer = mPlayers[0];
+
             InitializeComponent();
             
             LoadTerrain();
@@ -60,6 +64,13 @@ namespace Conquera.BattlePrototype
             //mTerrain = new HexTerrain("aaa.xml", new BattlePlayer[]{
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Blue, 0),
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Red, 1)});
+        }
+
+        private void EndTurn()
+        {
+            mTurnNum++;
+            ActivePlayer = mPlayers[mTurnNum % 2];
+            ActivePlayer.OnTurnStart(mTurnNum);
         }
 
         private void LoadTerrain()

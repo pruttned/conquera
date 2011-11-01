@@ -122,6 +122,9 @@ namespace Conquera.BattlePrototype
                 {
                     newTileAsCapturable.OwningPlayer = owningPlayer;
                 }
+
+                newTile.Unit = oldTile.Unit;
+
                 EventHelper.RaiseValueChange<HexTerrainTile>(TileSet, this, oldTile, newTile);
             }
         }

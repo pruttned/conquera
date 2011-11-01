@@ -53,6 +53,10 @@ namespace Conquera.BattlePrototype
 
                     if (mUnit != null) //new
                     {
+                        if (null != mUnit.Parent)
+                        {
+                            ((HexTerrainTile)mUnit.Parent).Children.Remove(mUnit);
+                        }
                         Children.Add(mUnit);
                     }
                 }
