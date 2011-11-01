@@ -38,6 +38,11 @@ namespace Conquera.BattlePrototype
     public partial class Window1 : Window
     {
         HexTerrain mTerrain = new HexTerrain(20, 20);
+        BattlePlayer[] mPlayers = new BattlePlayer[]{
+            new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Blue, 0),
+            new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Red, 1)};
+
+        int mTurnNum = 0;
 
         public Window1()
         {
@@ -48,6 +53,8 @@ namespace Conquera.BattlePrototype
 
             mSetTilesListBox.ItemsSource = HexTerrainTileFactory.TemplateNames;
 
+            BattleUnit unit1 = new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1,2));
+            //unit1.Kill();
             //mTerrain = new HexTerrain("aaa.xml", new BattlePlayer[]{
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Blue, 0),
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Red, 1)});

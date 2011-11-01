@@ -28,10 +28,14 @@ namespace Conquera.BattlePrototype
         public Color Color { get; private set; }
         public int Index { get; private set; }
 
+        public List<BattleUnit> Units { get; private set; }
+
         public BattlePlayer(Color color, int index)
         {
             Color = color;
             Index = index;
+
+            Units = new List<BattleUnit>();
         }
     }
 }
