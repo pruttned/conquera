@@ -25,8 +25,6 @@ namespace Conquera.BattlePrototype
 {
     public abstract class BattleUnit
     {
-
-
         #region Types
         struct HexTileSeed
         {
@@ -44,14 +42,12 @@ namespace Conquera.BattlePrototype
         public delegate void CellIndexChangedHandler(BattleUnit obj, Point oldValue);
         public event CellIndexChangedHandler TileIndexChanged;
 
-
         //promoted collections
         private static List<HexTerrainTile> Siblings = new List<HexTerrainTile>(6);
         private static HashSet<Point> CheckedPoints = new HashSet<Point>();
         private static Queue<HexTileSeed> Seeds = new Queue<HexTileSeed>();
 
         private HexTerrain mTerrain;
-
 
         private Point mTileIndex;
 
@@ -72,18 +68,29 @@ namespace Conquera.BattlePrototype
 
         public bool HasMovedThisTurn { get; set; }
 
+        public abstract string Name { get; }
+
         public Point TileIndex
         {
             get { return mTileIndex; }
             set
             {
-                if (mTileIndex != value)
+
+                if (value != mTileIndex)
                 {
+                    if (null != mTerrain[value.X, value.Y].Unit)
+                    {
+                        throw new ArgumentException("Destination tile already contains a unit");
+                    }
+
                     Point oldValue = mTileIndex;
+                    mTerrain[oldValue.X, oldValue.Y].Unit = null;
+
                     mTileIndex = value;
 
                     //todo
                     //UpdatePositionFromIndex();
+                    mTerrain[mTileIndex.X, mTileIndex.Y].Unit = this;
 
                     if (null != TileIndexChanged)
                     {
@@ -93,13 +100,31 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        public BattleUnit(BattlePlayer player, HexTerrain terrain)
+        public BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
         {
             if (null == player) throw new ArgumentNullException("player");
             if (null == terrain) throw new ArgumentNullException("terrain");
 
             Player = player;
             mTerrain = terrain;
+            mTileIndex = tileIndex;
+
+            if(null != terrain[tileIndex.X, tileIndex.Y].Unit)
+            {
+                throw new ArgumentException("Destination tile already contains a unit");
+            }
+
+            terrain[tileIndex.X, tileIndex.Y].Unit = this;
+
+            player.Units.Add(this);
+        }
+
+        public void Kill()
+        {
+            if (Player.Units.Remove(this))
+            {
+                mTerrain[mTileIndex.X, mTileIndex.Y].Unit = null;
+            }
         }
 
         /// <summary>
@@ -206,6 +231,11 @@ namespace Conquera.BattlePrototype
 
     public class SkeletonLv1BattleUnit : BattleUnit
     {
+        public override string Name
+        {
+            get { return "SkeletonLv1"; }
+        }
+
         public override int BaseAttack
         {
             get { return 1; }
@@ -221,8 +251,8 @@ namespace Conquera.BattlePrototype
             get { return 3; }
         }
 
-        public SkeletonLv1BattleUnit(BattlePlayer player, HexTerrain terrain)
-            :base(player, terrain)
+        public SkeletonLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            :base(player, terrain, tileIndex)
         {
         }
     }
