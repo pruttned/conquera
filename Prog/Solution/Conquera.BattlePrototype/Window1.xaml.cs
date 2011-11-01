@@ -39,8 +39,8 @@ namespace Conquera.BattlePrototype
     {
         HexTerrain mTerrain = new HexTerrain(20, 20);
         BattlePlayer[] mPlayers = new BattlePlayer[]{
-            new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Blue, 0),
-            new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Red, 1)};
+            new BattlePlayer(Colors.Blue, 0),
+            new BattlePlayer(Colors.Red, 1)};
 
         int mTurnNum = 0;
 
@@ -51,6 +51,8 @@ namespace Conquera.BattlePrototype
             LoadTerrain();
             mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1, 2), "Outpost");
 
+            mPlayersListBox.ItemsSource = mPlayers;
+            mPlayersListBox.SelectedIndex = 0;
             mSetTilesListBox.ItemsSource = HexTerrainTileFactory.TemplateNames;
 
             BattleUnit unit1 = new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1,2));
@@ -105,11 +107,14 @@ namespace Conquera.BattlePrototype
         private void mMainCanvas_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             HexTerrainTile tile = GetParent<HexTerrainTile>(e.Source as DependencyObject);
-            string tileName = (string)mSetTilesListBox.SelectedItem;
-
-            if ((bool)mSetTilesOptionBox.IsChecked && tileName != null && tile != null)
+            if (tile != null)
             {
-                mTerrain.SetTile(tile.Index, tileName);
+                //Set tile
+                string tileName = (string)mSetTilesListBox.SelectedItem;
+                if ((bool)mSetTilesOptionBox.IsChecked && tileName != null)
+                {
+                    mTerrain.SetTile(tile.Index, tileName);
+                }
             }
         }
 
@@ -126,6 +131,19 @@ namespace Conquera.BattlePrototype
                 return parent as T;
             }
             return GetParent<T>(parent);
+        }
+    }
+
+    public class ColorToBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return new SolidColorBrush((Color)value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

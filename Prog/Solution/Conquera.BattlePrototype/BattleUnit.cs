@@ -20,10 +20,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Conquera.BattlePrototype
 {
-    public abstract class BattleUnit
+    public abstract class BattleUnit : Grid
     {
         #region Types
         struct HexTileSeed
@@ -50,6 +52,9 @@ namespace Conquera.BattlePrototype
         private HexTerrain mTerrain;
 
         private Point mTileIndex;
+
+        private TextBlock mPropertiesTextBlock;
+        private Border mBorder;
 
         public BattlePlayer Player { get; private set; }
 
@@ -117,6 +122,20 @@ namespace Conquera.BattlePrototype
             terrain[tileIndex.X, tileIndex.Y].Unit = this;
 
             player.Units.Add(this);
+
+            //Graphics
+            VerticalAlignment = System.Windows.VerticalAlignment.Center;
+            HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+
+            mBorder = new Border();
+            mBorder.BorderBrush = Brushes.Yellow;
+            mPropertiesTextBlock = new TextBlock();            
+            mPropertiesTextBlock.Background = new SolidColorBrush(Color.FromArgb(255, player.Color.R, player.Color.G, player.Color.B));
+            mPropertiesTextBlock.Foreground = Brushes.White;
+            mPropertiesTextBlock.FontSize = 10;
+            mBorder.Child = mPropertiesTextBlock;
+            Children.Add(mBorder);
+            UpdateGraphics();
         }
 
         public void Kill()
@@ -226,6 +245,18 @@ namespace Conquera.BattlePrototype
             }
 
             return damage;
+        }
+
+        public void Move(Point tileIndex)
+        {
+            HasMovedThisTurn = true;
+            TileIndex = tileIndex;
+        }
+
+        private void UpdateGraphics()
+        {            
+            mPropertiesTextBlock.Text = string.Format("A = {0}\nD = {1}\nM = {2}", Attack, Defense, MovementDistance);
+            mBorder.BorderThickness = new System.Windows.Thickness(HasMovedThisTurn ? 0.0 : 5.0);
         }
     }
 
