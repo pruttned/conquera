@@ -23,6 +23,7 @@ using Microsoft.Xna.Framework;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Conquera.BattlePrototype
 {
@@ -34,7 +35,15 @@ namespace Conquera.BattlePrototype
 
         public abstract bool IsPassable { get; }
 
-        public abstract System.Windows.Controls.Image Image { get; }
+        public virtual string ImageName
+        {
+            get { return null; }
+        }
+
+        public virtual Brush Fill        
+        {
+            get { return Brushes.Green; }
+        }
 
         public HexTerrainTile(Point index)
         {
@@ -44,7 +53,7 @@ namespace Conquera.BattlePrototype
 
             Polygon polygon = new Polygon();
             polygon.Stroke = Brushes.Black;
-            polygon.Fill = Brushes.Silver;
+            polygon.Fill = Fill;
             polygon.StrokeThickness = 1.0;
 
             polygon.Points.Add(GetCornerPosition(HexTileCorner.Top));
@@ -55,15 +64,15 @@ namespace Conquera.BattlePrototype
             polygon.Points.Add(GetCornerPosition(HexTileCorner.UperLeft));
             
             Children.Add(polygon);
-        }
-        
-        private System.Windows.Point GetCornerPosition(HexTileCorner corner)
-        {
-            double centerX = HexHelper.HalfTileW;
-            double centerY = HexHelper.TileR;
 
-            Vector2 cornerBasePosition = HexHelper.GetHexTileCornerPos2D(corner);
-            return new System.Windows.Point(centerX + cornerBasePosition.X, centerY + cornerBasePosition.Y);
+            if (ImageName != null)
+            {
+                Image image = new Image();
+                image.Source = new BitmapImage(new Uri(string.Format("Images/{0}", ImageName), UriKind.Relative));
+                image.Width = 60;
+                image.Height = 60;
+                Children.Add(image);
+            }
         }
 
         public bool IsSiblingTo(HexTerrainTile tile)
@@ -81,6 +90,15 @@ namespace Conquera.BattlePrototype
                     ((0 != (j & 1)) && ((i2 == i && j2 == j - 1) || (i2 == i + 1 && j2 == j - 1) || (i2 == i && j2 == j + 1) || (i2 == i + 1 && j2 == j + 1))) ||
                     ((0 == (j & 1)) && ((i2 == i - 1 && j2 == j - 1) || (i2 == i && j2 == j - 1) || (i2 == i - 1 && j2 == j + 1) || (i2 == i && j2 == j + 1)));
         }
+
+        private System.Windows.Point GetCornerPosition(HexTileCorner corner)
+        {
+            double centerX = HexHelper.HalfTileW;
+            double centerY = HexHelper.TileR;
+
+            Vector2 cornerBasePosition = HexHelper.GetHexTileCornerPos2D(corner);
+            return new System.Windows.Point(centerX + cornerBasePosition.X, centerY + cornerBasePosition.Y);
+        }
     }
     
     [HexTerrainTile("Gap")]
@@ -91,16 +109,14 @@ namespace Conquera.BattlePrototype
             get { return false; }
         }
 
+        public override Brush Fill
+        {
+            get { return Brushes.DarkGray; }
+        }
+
         public GapHexTerrainTile(Point index)
             : base(index)
         {
-            //todo - load image
-            //Image = ...;
-        }
-
-        public override System.Windows.Controls.Image Image
-        {
-            get { throw new NotImplementedException(); }
         }
     }
 
@@ -115,13 +131,6 @@ namespace Conquera.BattlePrototype
         public LandHexTerrainTile(Point index)
             : base(index)
         {
-            //todo - load image
-            //Image = ...;
-        }
-
-        public override System.Windows.Controls.Image Image
-        {
-            get { throw new NotImplementedException(); }
         }
     }
 
@@ -175,9 +184,9 @@ namespace Conquera.BattlePrototype
     [HexTerrainTile("Outpost")]
     public class OutpostHexTerrainTile : CapturableHexTerrainTile
     {
-        public override System.Windows.Controls.Image Image
+        public override string ImageName
         {
-            get { throw new NotImplementedException(); }
+            get { return "Outpost.bmp"; }
         }
 
         public OutpostHexTerrainTile(Point index)
@@ -185,6 +194,4 @@ namespace Conquera.BattlePrototype
         {
         }
     }
-
-
 }

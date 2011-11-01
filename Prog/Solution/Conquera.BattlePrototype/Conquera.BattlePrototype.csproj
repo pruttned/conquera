@@ -104,6 +104,7 @@
   <ItemGroup>
     <Compile Include="BattlePlayer.cs" />
     <Compile Include="BattleUnit.cs" />
+    <Compile Include="EventHelper.cs" />
     <Compile Include="HexHelper.cs" />
     <Compile Include="HexTerrain.cs" />
     <Compile Include="HexTerrainTile.cs" />
@@ -162,6 +163,11 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Outpost.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

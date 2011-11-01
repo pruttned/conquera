@@ -3,8 +3,20 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Window1" Height="594" Width="783">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+        
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <Canvas x:Name="mMainCanvas"/>
+            <Canvas x:Name="mMainCanvas" PreviewMouseDown="mMainCanvas_PreviewMouseDown"/>
         </ScrollViewer>
+        
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="2" />
+        
+        <StackPanel Grid.Row="1" Margin="0,2,0,0">
+            <RadioButton x:Name="mSetTilesOptionBox" IsChecked="True"/>
+            <ListBox x:Name="mSetTilesListBox" />
+        </StackPanel>
     </Grid>
 </Window>

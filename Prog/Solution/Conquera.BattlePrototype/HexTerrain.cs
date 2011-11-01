@@ -30,6 +30,8 @@ namespace Conquera.BattlePrototype
 {
     class HexTerrain
     {
+        public event EventHandler<ValueChangeEventArgs<HexTerrainTile>> TileSet;
+
         private HexTerrainTile[,] mTiles;
 
         public int Width { get; private set; }
@@ -120,6 +122,7 @@ namespace Conquera.BattlePrototype
                 {
                     newTileAsCapturable.OwningPlayer = owningPlayer;
                 }
+                EventHelper.RaiseValueChange<HexTerrainTile>(TileSet, this, oldTile, newTile);
             }
         }
 

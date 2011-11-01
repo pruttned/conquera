@@ -42,9 +42,12 @@ namespace Conquera.BattlePrototype
         public Window1()
         {
             InitializeComponent();
+            
             LoadTerrain();
+            mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1, 2), "Outpost");
 
-         //   mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1,2), "Outpost");
+            mSetTilesListBox.ItemsSource = HexTerrainTileFactory.TemplateNames;
+
             //mTerrain = new HexTerrain("aaa.xml", new BattlePlayer[]{
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Blue, 0),
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Red, 1)});
@@ -52,6 +55,7 @@ namespace Conquera.BattlePrototype
 
         private void LoadTerrain()
         {
+            //Canvas size
             Microsoft.Xna.Framework.Vector2 lastTilePos = HexHelper.Get2DPosFromIndex(new Microsoft.Xna.Framework.Point(mTerrain.Width -1 , mTerrain.Height - 1));
             mMainCanvas.Width = lastTilePos.X + HexHelper.TileW;
             if (mTerrain.Height > 1 && 0 != mTerrain.Height % 2)
@@ -60,17 +64,61 @@ namespace Conquera.BattlePrototype
             }
             mMainCanvas.Height = lastTilePos.Y + 2*HexHelper.TileR;
 
+            //Adding tiles
             for (int i = 0; i < mTerrain.Width; i++)
             {
                 for (int j = 0; j < mTerrain.Height; j++)
                 {
-                    HexTerrainTile tile = mTerrain[i,j];
-                    Canvas.SetLeft(tile, tile.TopLeftPos.X);
-                    Canvas.SetTop(tile, tile.TopLeftPos.Y);
-
-                    mMainCanvas.Children.Add(tile);
+                    AddTile(mTerrain[i, j]);
                 }
             }
+
+            //Tile set event
+            mTerrain.TileSet += new EventHandler<ValueChangeEventArgs<HexTerrainTile>>(mTerrain_TileSet);
+        }
+
+        private void mTerrain_TileSet(object sender, ValueChangeEventArgs<HexTerrainTile> e)
+        {
+            RemoveTile(e.OldValue);
+            AddTile(e.NewValue);
+        }
+
+        private void AddTile(HexTerrainTile tile)
+        {
+            Canvas.SetLeft(tile, tile.TopLeftPos.X);
+            Canvas.SetTop(tile, tile.TopLeftPos.Y);
+            mMainCanvas.Children.Add(tile);
+        }
+
+        private void RemoveTile(HexTerrainTile tile)
+        {
+            mMainCanvas.Children.Remove(tile);
+        }
+
+        private void mMainCanvas_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            HexTerrainTile tile = GetParent<HexTerrainTile>(e.Source as DependencyObject);
+            string tileName = (string)mSetTilesListBox.SelectedItem;
+
+            if ((bool)mSetTilesOptionBox.IsChecked && tileName != null && tile != null)
+            {
+                mTerrain.SetTile(tile.Index, tileName);
+            }
+        }
+
+        private T GetParent<T>(DependencyObject element) where T : DependencyObject
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(element);
+
+            if (parent == null)
+            {
+                return null;
+            }
+            if (parent is T)
+            {
+                return parent as T;
+            }
+            return GetParent<T>(parent);
         }
     }
 }

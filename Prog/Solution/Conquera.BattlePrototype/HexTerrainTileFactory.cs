@@ -43,6 +43,11 @@ namespace Conquera.BattlePrototype
 
         private static Type[] mCtorArgTypes = new Type[] { typeof(Point) };
 
+        public static ICollection<string> TemplateNames
+        {
+            get { return mTemplateNames.Values; }
+        }
+
         static HexTerrainTileFactory()
         {
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
@@ -77,5 +82,6 @@ namespace Conquera.BattlePrototype
 
             return mTemplateNames[type];
         }
+
     }
 }
