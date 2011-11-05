@@ -96,7 +96,7 @@ namespace Conquera.BattlePrototype
             {
                 for (int j = 0; j < Height; ++j)
                 {
-                    mTiles[i, j] = new GapHexTerrainTile(new Point(i, j));
+                    mTiles[i, j] = new LandHexTerrainTile(new Point(i, j));
                 }
             }
         }
@@ -170,7 +170,17 @@ namespace Conquera.BattlePrototype
         /// <returns></returns>
         public bool IsInTerrain(Point index)
         {
-            return (index.X >= 0 && index.X < Width && index.Y >= 0 & index.Y < Height);
+            return IsInTerrain(index.X, index.Y);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public bool IsInTerrain(int x, int y)
+        {
+            return (x >= 0 && x < Width && y >= 0 & y < Height);
         }
 
         /// <summary>
@@ -190,6 +200,29 @@ namespace Conquera.BattlePrototype
             return null;
         }
 
+        public void ForEachSibling(Point index, Action<HexTerrainTile> fun)
+        {
+            int i = index.X;
+            int j = index.Y;
+
+            ForValidSibling(i - 1, j, fun);
+            ForValidSibling(i + 1, j, fun);
+            if (0 != (j & 1))
+            {
+                ForValidSibling(i, j - 1, fun);
+                ForValidSibling(i + 1, j - 1, fun);
+                ForValidSibling(i, j + 1, fun);
+                ForValidSibling(i + 1, j + 1, fun);
+            }
+            else
+            {
+                ForValidSibling(i - 1, j - 1, fun);
+                ForValidSibling(i, j - 1, fun);
+                ForValidSibling(i - 1, j + 1, fun);
+                ForValidSibling(i, j + 1, fun);
+            }
+        }
+
         /// <summary>
         /// Gets all siblings of a given tile
         /// </summary>
@@ -198,25 +231,7 @@ namespace Conquera.BattlePrototype
         /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
         public void GetSiblings(Point index, IList<HexTerrainTile> siblings)
         {
-            int i = index.X;
-            int j = index.Y;
-
-            TryAddSibling(i - 1, j, siblings);
-            TryAddSibling(i + 1, j, siblings);
-            if (0 != (j & 1))
-            {
-                TryAddSibling(i, j - 1, siblings);
-                TryAddSibling(i + 1, j - 1, siblings);
-                TryAddSibling(i, j + 1, siblings);
-                TryAddSibling(i + 1, j + 1, siblings);
-            }
-            else
-            {
-                TryAddSibling(i - 1, j - 1, siblings);
-                TryAddSibling(i, j - 1, siblings);
-                TryAddSibling(i - 1, j + 1, siblings);
-                TryAddSibling(i, j + 1, siblings);
-            }
+            ForEachSibling(index, point => siblings.Add(point));
         }
 
         /// <summary>
@@ -232,11 +247,11 @@ namespace Conquera.BattlePrototype
             return siblings;
         }
 
-        private void TryAddSibling(int i, int j, IList<HexTerrainTile> siblings)
+        private void ForValidSibling(int i, int j, Action<HexTerrainTile> fun)
         {
-            if (i >= 0 && i < Width && j >= 0 && j < Height)
+            if (IsInTerrain(i, j))
             {
-                siblings.Add(this[i, j]);
+                fun(mTiles[i, j]);
             }
         }
     }
