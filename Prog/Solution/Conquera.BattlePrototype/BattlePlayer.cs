@@ -35,6 +35,8 @@ namespace Conquera.BattlePrototype
         public Color Color { get; private set; }
         public int Index { get; private set; }
 
+        public Point StartPos { get; set; }
+
         /// <summary>
         /// Also clamps to 0,MaxMana interval
         /// </summary>
