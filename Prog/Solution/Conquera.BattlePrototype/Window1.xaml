@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
         
         <!--Header-->
-        <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding ActivePlayer.Color, Source={StaticResource This}, Converter={StaticResource ColorToBrushConverter}}" />
+        <!--<Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding ActivePlayer.Color, Source={StaticResource This}, Converter={StaticResource ColorToBrushConverter}}" />-->
         
         <!--Main canvas-->
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Grid.Row="1">
@@ -58,7 +58,7 @@
                         <RadioButton x:Name="mSetTilesOptionBox" GroupName="Editor" IsChecked="True">Tile</RadioButton>
                         <ListBox x:Name="mSetTilesListBox" />
                     </StackPanel>
-
+                    <Button Height="35" Name="button1" Width="140" Click="button1_Click">Button</Button>
                 </StackPanel>
             </TabItem>
 

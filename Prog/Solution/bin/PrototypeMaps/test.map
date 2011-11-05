@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<map>
+  <player index="0">
+    <startPos x="0" y="0" />
+  </player>
+  <player index="1">
+    <startPos x="0" y="0" />
+  </player>
+  <terrain width="20" height="20">
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Outpost" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Gap" />
+      <tile template="Gap" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+  </terrain>
+</map>

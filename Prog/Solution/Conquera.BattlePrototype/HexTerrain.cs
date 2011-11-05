@@ -53,12 +53,12 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        public HexTerrain(string file, IList<BattlePlayer> players)
+        public HexTerrain(XElement parentElm, IList<BattlePlayer> players)
         {
-            if (string.IsNullOrEmpty(file)) throw new ArgumentNullException("file");
+            if (null == parentElm) throw new ArgumentNullException("parentElm");
             if (null == players) throw new ArgumentNullException("players");
 
-            var terrainElm = XElement.Load(file);
+            var terrainElm = parentElm.Element("terrain");
             Width = (int)terrainElm.Attribute("width");
             Height = (int)terrainElm.Attribute("height");
 
@@ -129,13 +129,12 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        public void Save(string file)
+        public void Save(XElement parentElm)
         {
-            if (string.IsNullOrEmpty(file)) throw new ArgumentNullException("file");
-
             XElement terrainElm = new XElement("terrain",
                 new XAttribute("width", Width),
                 new XAttribute("height", Height));
+            parentElm.Add(terrainElm);
 
             for (int i = 0; i < Width; ++i)
             {
@@ -159,8 +158,6 @@ namespace Conquera.BattlePrototype
                     columnElement.Add(tileElm);
                 }
             }
-
-            terrainElm.Save(file);
         }
 
         /// <summary>

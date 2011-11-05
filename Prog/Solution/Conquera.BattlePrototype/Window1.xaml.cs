@@ -30,6 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using System.Xml.Linq;
 
 namespace Conquera.BattlePrototype
 {
@@ -39,6 +40,9 @@ namespace Conquera.BattlePrototype
     public partial class Window1 : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+
+        static readonly string mMapsDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PrototypeMaps");
 
         HexTerrain mTerrain = new HexTerrain(20, 20);
         BattlePlayer[] mPlayers = new BattlePlayer[]{
@@ -65,6 +69,12 @@ namespace Conquera.BattlePrototype
 
         public Window1()
         {
+            if (!System.IO.Directory.Exists(mMapsDir))
+            {
+                System.IO.Directory.CreateDirectory(mMapsDir);
+            }
+            LoadMap("test");
+                
             ActivePlayer = mPlayers[0];
             Resources.Add("This", this);
 
@@ -204,6 +214,44 @@ namespace Conquera.BattlePrototype
             AddTile(e.NewValue);
         }
 
+        private void SaveMap(string name)
+        {
+            XElement mapElm = new XElement("map");
+            for (int i = 0; i < mPlayers.Length; ++i)
+            {
+                mapElm.Add(new XElement("player", 
+                    new XAttribute("index", i),
+                    new XElement("startPos",
+                        new XAttribute("x", mPlayers[i].StartPos.X),
+                        new XAttribute("y", mPlayers[i].StartPos.Y))));
+            }
+            mTerrain.Save(mapElm);
+
+            mapElm.Save(GetMapFileName(name));
+        }
+
+
+        private void LoadMap(string name)
+        {
+            XElement mapElm = XElement.Load(GetMapFileName(name));
+
+            foreach (var playerElm in mapElm.Elements("player"))
+            {
+                int index = (int)playerElm.Attribute("index");
+                var startPosElm = playerElm.Element("startPos");
+                mPlayers[index].StartPos = new Microsoft.Xna.Framework.Point((int)startPosElm.Attribute("x"), (int)startPosElm.Attribute("y"));
+            }
+            mTerrain = new HexTerrain(mapElm, mPlayers);
+
+            mapElm.Save(GetMapFileName(name));
+        }
+
+        private static string GetMapFileName(string name)
+        {
+            if (string.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
+            return System.IO.Path.Combine(mMapsDir, name + ".map");
+        }
+
         private void AddTile(HexTerrainTile tile)
         {
             Canvas.SetLeft(tile, tile.TopLeftPos.X);
@@ -281,6 +329,12 @@ namespace Conquera.BattlePrototype
         private void mTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             SelectUnit(null);
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            SaveMap("test");
+            //LoadMap("test");
         }
     }
 
