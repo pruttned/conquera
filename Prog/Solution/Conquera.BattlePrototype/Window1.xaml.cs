@@ -77,9 +77,12 @@ namespace Conquera.BattlePrototype
             mPlayersListBox.SelectedIndex = 0;
             mSetTilesListBox.ItemsSource = HexTerrainTileFactory.TemplateNames;
 
-            BattleUnit unit1 = new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 2));
-            BattleUnit unit2 = new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 3));
-            BattleUnit unit3 = new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(1, 4));
+            new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 2));
+            new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 3));
+            new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 5));
+            new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 2));
+            new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 3));
+            new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 5));
 
             //unit1.Kill();
             //mTerrain = new HexTerrain("aaa.xml", new BattlePlayer[]{
@@ -89,6 +92,38 @@ namespace Conquera.BattlePrototype
 
         private void EndTurn()
         {
+            //Resolve battle
+            List<BattleUnit> unitsToKill = new List<BattleUnit>();
+            foreach (var player in mPlayers)
+            {
+
+                //if (player != ActivePlayer)
+                {
+                    foreach (var unit in player.Units)
+                    {
+                        //todo defense from allies
+                        if (unit.ComputeDamageFromEnemies() >= unit.Defense)
+                        {
+                            unitsToKill.Add(unit);
+                        }
+                    }
+                }
+            }
+            //kill units
+            foreach (var unit in unitsToKill)
+            {
+                unit.Kill();
+            }
+
+            //Update defenses
+            foreach (var player in mPlayers)
+            {
+                foreach (var unit in player.Units)
+                {
+                    unit.UpdateDefenseFromAlies();
+                }
+            }
+
             mTurnNum++;
             ActivePlayer = mPlayers[mTurnNum % 2];
             ActivePlayer.OnTurnStart(mTurnNum);

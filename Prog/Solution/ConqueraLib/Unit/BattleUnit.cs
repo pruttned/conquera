@@ -51,7 +51,6 @@ namespace Conquera
         public event CellIndexChangedHandler TileIndexChanged;
 
         //promoted collections
-        private static List<HexTerrainTile> Siblings = new List<HexTerrainTile>(6);
         private static HashSet<Point> CheckedPoints = new HashSet<Point>();
         private static Queue<HexTileSeed> Seeds = new Queue<HexTileSeed>();
 
@@ -196,22 +195,21 @@ namespace Conquera
             while (0 < Seeds.Count)
             {
                 var seed = Seeds.Dequeue();
-                Siblings.Clear();
 
-                BattleScene.Terrain.GetSiblings(seed.Tile.Index, Siblings);
-                foreach (var sibling in Siblings)
-                {
-                    Point index = sibling.Index;
-                    if (sibling.IsPassable && !CheckedPoints.Contains(index))
+                BattleScene.Terrain.ForEachSibling(seed.Tile.Index,
+                    sibling =>
                     {
-                        points.Add(index);
-                        CheckedPoints.Add(index);
-                        if (0 < seed.Live - 1)
+                        Point index = sibling.Index;
+                        if (sibling.IsPassable && !CheckedPoints.Contains(index))
                         {
-                            Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
+                            points.Add(index);
+                            CheckedPoints.Add(index);
+                            if (0 < seed.Live - 1)
+                            {
+                                Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
+                            }
                         }
-                    }
-                }
+                    });
             }
         }
 
@@ -237,31 +235,36 @@ namespace Conquera
 
                 throw new NotImplementedException("OPTIMIZE!!!");
 
-                Seeds.Clear();
                 CheckedPoints.Clear();
 
                 Seeds.Enqueue(new HexTileSeed(Tile, GameUnitDesc.MovementDistance));
                 while (0 < Seeds.Count)
                 {
+                    bool found = false;
                     var seed = Seeds.Dequeue();
-                    Siblings.Clear();
-                    BattleScene.Terrain.GetSiblings(seed.Tile.Index, Siblings);
-                    foreach (var sibling in Siblings)
-                    {
-                        if (sibling.Index == targetIndex)
+                    BattleScene.Terrain.ForEachSibling(seed.Tile.Index,
+                        sibling =>
                         {
-                            return true;
-                        }
-
-                        Point siblingIndex = sibling.Index;
-                        if (sibling.IsPassable && !CheckedPoints.Contains(siblingIndex))
-                        {
-                            CheckedPoints.Add(siblingIndex);
-                            if (0 < seed.Live - 1)
+                            if (sibling.Index == targetIndex)
                             {
-                                Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
+                                found = true;
                             }
-                        }
+                            else
+                            {
+                                Point siblingIndex = sibling.Index;
+                                if (sibling.IsPassable && !CheckedPoints.Contains(siblingIndex))
+                                {
+                                    CheckedPoints.Add(siblingIndex);
+                                    if (0 < seed.Live - 1)
+                                    {
+                                        Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
+                                    }
+                                }
+                            }
+                        });
+                    if (found)
+                    {
+                        return true;
                     }
                 }
             }

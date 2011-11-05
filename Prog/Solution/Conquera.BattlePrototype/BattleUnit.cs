@@ -46,7 +46,6 @@ namespace Conquera.BattlePrototype
         public event CellIndexChangedHandler TileIndexChanged;
 
         //promoted collections
-        private static List<HexTerrainTile> Siblings = new List<HexTerrainTile>(6);
         private static HashSet<Point> CheckedPoints = new HashSet<Point>();
         private static Queue<HexTileSeed> Seeds = new Queue<HexTileSeed>();
 
@@ -71,7 +70,7 @@ namespace Conquera.BattlePrototype
 
         //temp
         public int Attack { get { return BaseAttack; } }
-        public int Defense { get { return BaseDefense; } }
+        public int Defense { get; private set; }
         public int MovementDistance { get { return BaseMovementDistance; } }
 
         public bool HasMovedThisTurn
@@ -110,6 +109,10 @@ namespace Conquera.BattlePrototype
                     //todo
                     //UpdatePositionFromIndex();
                     mTerrain[mTileIndex.X, mTileIndex.Y].Unit = this;
+
+                    UpdateSiblingsDefenses(oldValue);
+                    UpdateSiblingsDefenses(mTileIndex);
+                    UpdateDefenseFromAlies();
 
                     if (null != TileIndexChanged)
                     {
@@ -163,6 +166,9 @@ namespace Conquera.BattlePrototype
             mBorder.Child = mPropertiesTextBlock;
             Children.Add(mBorder);
             UpdateGraphics();
+
+            UpdateDefenseFromAlies();
+            UpdateSiblingsDefenses(mTileIndex);
         }
 
         public void Kill()
@@ -186,22 +192,21 @@ namespace Conquera.BattlePrototype
             while (0 < Seeds.Count)
             {
                 var seed = Seeds.Dequeue();
-                Siblings.Clear();
 
-                mTerrain.GetSiblings(seed.Tile.Index, Siblings);
-                foreach (var sibling in Siblings)
-                {
-                    Point index = sibling.Index;
-                    if (sibling.IsPassableAndEmpty && !CheckedPoints.Contains(index))
+                mTerrain.ForEachSibling(seed.Tile.Index,
+                    sibling =>
                     {
-                        points.Add(index);
-                        CheckedPoints.Add(index);
-                        if (0 < seed.Live - 1)
+                        Point index = sibling.Index;
+                        if (sibling.IsPassableAndEmpty && !CheckedPoints.Contains(index))
                         {
-                            Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
+                            points.Add(index);
+                            CheckedPoints.Add(index);
+                            if (0 < seed.Live - 1)
+                            {
+                                Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
+                            }
                         }
-                    }
-                }
+                    });
             }
         }
 
@@ -229,25 +234,31 @@ namespace Conquera.BattlePrototype
                 Seeds.Enqueue(new HexTileSeed(srcCell, MovementDistance));
                 while (0 < Seeds.Count)
                 {
+                    bool found = false;
                     var seed = Seeds.Dequeue();
-                    Siblings.Clear();
-                    mTerrain.GetSiblings(seed.Tile.Index, Siblings);
-                    foreach (var sibling in Siblings)
-                    {
-                        if (sibling.Index == targetIndex)
+                    mTerrain.ForEachSibling(seed.Tile.Index,
+                        sibling =>
                         {
-                            return true;
-                        }
-
-                        Point siblingIndex = sibling.Index;
-                        if (sibling.IsPassable && !CheckedPoints.Contains(siblingIndex))
-                        {
-                            CheckedPoints.Add(siblingIndex);
-                            if (0 < seed.Live - 1)
+                            if (sibling.Index == targetIndex)
                             {
-                                Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
+                                found = true;
                             }
-                        }
+                            else
+                            {
+                                Point siblingIndex = sibling.Index;
+                                if (sibling.IsPassable && !CheckedPoints.Contains(siblingIndex))
+                                {
+                                    CheckedPoints.Add(siblingIndex);
+                                    if (0 < seed.Live - 1)
+                                    {
+                                        Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
+                                    }
+                                }
+                            }
+                        });
+                    if (found)
+                    {
+                        return true;
                     }
                 }
             }
@@ -261,17 +272,34 @@ namespace Conquera.BattlePrototype
         public int ComputeDamageFromEnemies()
         {
             int damage = 0;
-            Siblings.Clear();
-            mTerrain.GetSiblings(TileIndex, Siblings);
-            foreach (var tile in Siblings)
-            {
-                if (null != tile.Unit && tile.Unit.Player != Player)
+            mTerrain.ForEachSibling(TileIndex,
+                sibling =>
                 {
-                    damage += tile.Unit.Attack;
-                }
-            }
+                    if (null != sibling.Unit && sibling.Unit.Player != Player)
+                    {
+                        damage += sibling.Unit.Attack;
+                    }
+                });
 
             return damage;
+        }
+
+        public void UpdateDefenseFromAlies()
+        {
+            int defense = 0;
+            mTerrain.ForEachSibling(TileIndex,
+                sibling =>
+                {
+                    if (null != sibling.Unit && sibling.Unit.Player == Player)
+                    {
+                        defense++;
+                    }
+                });
+
+            //todo: spell effectss
+            Defense = BaseDefense + defense;
+
+            UpdateGraphics();
         }
 
         public void Move(Point tileIndex)
@@ -286,6 +314,19 @@ namespace Conquera.BattlePrototype
             mPropertiesTextBlock.Text += string.Format("A = {0}\nD = {1}\nM = {2}", Attack, Defense, MovementDistance);
             mBorder.BorderThickness = new System.Windows.Thickness(HasMovedThisTurn ? 0.0 : 5.0);            
         }
+
+        private void UpdateSiblingsDefenses(Point pos)
+        {
+            mTerrain.ForEachSibling(pos,
+                sibling =>
+                {
+                    if (null != sibling.Unit && sibling.Unit.Player == Player)
+                    {
+                        sibling.Unit.UpdateDefenseFromAlies();
+                    }
+                });
+        }
+
     }
 
     public class SkeletonLv1BattleUnit : BattleUnit
