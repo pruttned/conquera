@@ -56,9 +56,17 @@
                     <!--Set tile-->
                     <StackPanel Margin="2,2,2,2">
                         <RadioButton x:Name="mSetTilesOptionBox" GroupName="Editor" IsChecked="True">Tile</RadioButton>
-                        <ListBox x:Name="mSetTilesListBox" />
+                        <ListBox x:Name="mSetTilesListBox" SelectedIndex="0"/>
                     </StackPanel>
-                    <Button Height="35" Name="button1" Width="140" Click="button1_Click">Button</Button>
+                    
+                    <!--Save/load map-->
+                    <StackPanel Margin="2,2,2,2" Orientation="Horizontal">
+                        <ListBox x:Name="mMapsListBox" MouseDoubleClick="mMapsListBox_MouseDoubleClick" />
+                        <StackPanel Width="108">
+                            <TextBox x:Name="mSaveMapTextBox" />
+                            <Button Content="SaveMap" Click="button1_Click" />                        
+                        </StackPanel>
+                    </StackPanel>                    
                 </StackPanel>
             </TabItem>
 
