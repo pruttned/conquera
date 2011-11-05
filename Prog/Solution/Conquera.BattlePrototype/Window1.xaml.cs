@@ -69,6 +69,9 @@ namespace Conquera.BattlePrototype
 
         public Window1()
         {
+            Resources.Add("This", this);
+            InitializeComponent();
+
             if (!System.IO.Directory.Exists(mMapsDir))
             {
                 System.IO.Directory.CreateDirectory(mMapsDir);
@@ -76,11 +79,8 @@ namespace Conquera.BattlePrototype
             LoadMap("test");
                 
             ActivePlayer = mPlayers[0];
-            Resources.Add("This", this);
-
-            InitializeComponent();
             
-            LoadTerrain();
+            //LoadTerrain();
             mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1, 2), "Outpost");
 
             mPlayersListBox.ItemsSource = mPlayers;
@@ -93,11 +93,24 @@ namespace Conquera.BattlePrototype
             new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 2));
             new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 3));
             new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 5));
+            new ZombieLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(4, 5));
+
+            UpdateMapsListBox();
 
             //unit1.Kill();
             //mTerrain = new HexTerrain("aaa.xml", new BattlePlayer[]{
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Blue, 0),
             //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Red, 1)});
+        }
+
+        private void UpdateMapsListBox()
+        {
+            List<string> mapNames = new List<string>();            
+            foreach(string mapName in System.IO.Directory.GetFiles(mMapsDir, "*.map"))
+            {
+                mapNames.Add(System.IO.Path.GetFileNameWithoutExtension(mapName));
+            }
+            mMapsListBox.ItemsSource = mapNames;
         }
 
         private void EndTurn()
@@ -208,6 +221,16 @@ namespace Conquera.BattlePrototype
             mTerrain.TileSet += new EventHandler<ValueChangeEventArgs<HexTerrainTile>>(mTerrain_TileSet);
         }
 
+        private void UnloadTerrain()
+        {
+            if (mTerrain != null)
+            {
+                mMainCanvas.Children.Clear();
+                mTerrain.TileSet -= mTerrain_TileSet;
+                SelectUnit(null);
+            }
+        }
+
         private void mTerrain_TileSet(object sender, ValueChangeEventArgs<HexTerrainTile> e)
         {
             RemoveTile(e.OldValue);
@@ -233,6 +256,8 @@ namespace Conquera.BattlePrototype
 
         private void LoadMap(string name)
         {
+            UnloadTerrain();
+
             XElement mapElm = XElement.Load(GetMapFileName(name));
 
             foreach (var playerElm in mapElm.Elements("player"))
@@ -243,7 +268,7 @@ namespace Conquera.BattlePrototype
             }
             mTerrain = new HexTerrain(mapElm, mPlayers);
 
-            mapElm.Save(GetMapFileName(name));
+            LoadTerrain();
         }
 
         private static string GetMapFileName(string name)
@@ -333,8 +358,25 @@ namespace Conquera.BattlePrototype
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            SaveMap("test");
+            if (string.IsNullOrEmpty(mSaveMapTextBox.Text))
+            {
+                MessageBox.Show("Enter map name");
+            }
+            else
+            {
+                SaveMap(mSaveMapTextBox.Text);
+                UpdateMapsListBox();
+            }
             //LoadMap("test");
+        }
+
+        private void mMapsListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            string mapName = (string)mMapsListBox.SelectedItem;
+            if (!string.IsNullOrEmpty(mapName))
+            {
+                LoadMap(mapName);
+            }
         }
     }
 

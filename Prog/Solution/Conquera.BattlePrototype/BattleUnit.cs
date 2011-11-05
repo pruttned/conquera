@@ -23,6 +23,7 @@ using Microsoft.Xna.Framework;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.ComponentModel;
+using System.Windows.Media.Imaging;
 
 namespace Conquera.BattlePrototype
 {
@@ -44,6 +45,8 @@ namespace Conquera.BattlePrototype
 
         public delegate void CellIndexChangedHandler(BattleUnit obj, Point oldValue);
         public event CellIndexChangedHandler TileIndexChanged;
+
+        protected static readonly string mBattleUnitImagesDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BattleUnitImages");
 
         //promoted collections
         private static HashSet<Point> CheckedPoints = new HashSet<Point>();
@@ -85,8 +88,6 @@ namespace Conquera.BattlePrototype
                 }
             }
         }
-
-        public abstract string Name { get; }
 
         public Point TileIndex
         {
@@ -159,13 +160,21 @@ namespace Conquera.BattlePrototype
 
             mBorder = new Border();
             mBorder.BorderBrush = Brushes.Yellow;
-            mPropertiesTextBlock = new TextBlock();            
+            mPropertiesTextBlock = new TextBlock();
             mPropertiesTextBlock.Background = new SolidColorBrush(Color.FromArgb(255, player.Color.R, player.Color.G, player.Color.B));
             mPropertiesTextBlock.Foreground = Brushes.White;
             mPropertiesTextBlock.FontSize = 10;
             mBorder.Child = mPropertiesTextBlock;
             Children.Add(mBorder);
             UpdateGraphics();
+
+            Image image = new Image();
+            image.Source = new BitmapImage(new Uri(System.IO.Path.Combine(mBattleUnitImagesDirectory, GetImageFileName())));
+            image.Width = 22;
+            image.Height = 22;
+            image.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            image.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            Children.Add(image);
 
             UpdateDefenseFromAlies();
             UpdateSiblingsDefenses(mTileIndex);
@@ -308,9 +317,11 @@ namespace Conquera.BattlePrototype
             TileIndex = tileIndex;
         }
 
+        protected abstract string GetImageFileName();
+
         private void UpdateGraphics()
         {
-            mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : string.Empty;
+            mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "\n";
             mPropertiesTextBlock.Text += string.Format("A = {0}\nD = {1}\nM = {2}", Attack, Defense, MovementDistance);
             mBorder.BorderThickness = new System.Windows.Thickness(HasMovedThisTurn ? 0.0 : 5.0);            
         }
@@ -331,11 +342,6 @@ namespace Conquera.BattlePrototype
 
     public class SkeletonLv1BattleUnit : BattleUnit
     {
-        public override string Name
-        {
-            get { return "SkeletonLv1"; }
-        }
-
         public override int BaseAttack
         {
             get { return 1; }
@@ -354,6 +360,39 @@ namespace Conquera.BattlePrototype
         public SkeletonLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             :base(player, terrain, tileIndex)
         {
+        }
+
+        protected override string GetImageFileName()
+        {
+            return "SlayerIcon.png";
+        }
+    }
+
+    public class ZombieLv1BattleUnit : BattleUnit
+    {
+        public override int BaseAttack
+        {
+            get { return 2; }
+        }
+
+        public override int BaseDefense
+        {
+            get { return 2; }
+        }
+
+        public override int BaseMovementDistance
+        {
+            get { return 2; }
+        }
+
+        public ZombieLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(player, terrain, tileIndex)
+        {
+        }
+
+        protected override string GetImageFileName()
+        {
+            return "PlagueIcon.png";
         }
     }
 }
