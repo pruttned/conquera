@@ -4,7 +4,7 @@
     <startPos x="0" y="0" />
   </player>
   <player index="1">
-    <startPos x="0" y="0" />
+    <startPos x="1" y="0" />
   </player>
   <terrain width="20" height="20">
     <column>
