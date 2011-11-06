@@ -227,6 +227,10 @@ namespace Conquera.BattlePrototype
                 }
             }
 
+            //Starting pos
+            mTerrain[mPlayers[0].StartPos].IsStartPosIndicatorVisible = true;
+            mTerrain[mPlayers[1].StartPos].IsStartPosIndicatorVisible = true;
+
             //Tile set event
             mTerrain.TileSet += new EventHandler<ValueChangeEventArgs<HexTerrainTile>>(mTerrain_TileSet);
         }
