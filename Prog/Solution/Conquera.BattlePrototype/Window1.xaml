@@ -12,7 +12,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="18" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="100" />
+            <RowDefinition Height="150" />
         </Grid.RowDefinitions>
         
         <!--Header-->
@@ -51,6 +51,7 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+                        <Button Content="None" x:Name="mSelectNonePlayerButton" Click="mSelectNonePlayerButton_Click"/>
                     </StackPanel>
 
                     <!--Set tile-->
@@ -59,10 +60,13 @@
                         <ListBox x:Name="mSetTilesListBox" SelectedIndex="0"/>
                     </StackPanel>
                     
+                    <!--Capture-->
+                    <RadioButton Margin="2,2,2,2" x:Name="mCaptureOptionBox" GroupName="Editor">Capture</RadioButton>
+                    
                     <!--Save/load map-->
                     <StackPanel Margin="2,2,2,2" Orientation="Horizontal">
                         <ListBox x:Name="mMapsListBox" MouseDoubleClick="mMapsListBox_MouseDoubleClick" />
-                        <StackPanel Width="108">
+                        <StackPanel Width="108" Margin="2,0,2,0">
                             <TextBox x:Name="mSaveMapTextBox" />
                             <Button Content="SaveMap" Click="button1_Click" />                        
                         </StackPanel>
