@@ -1,0 +1,78 @@
+﻿<Window x:Class="Conquera.BattlePrototype.Window1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:proto="clr-namespace:Conquera.BattlePrototype"
+    Title="Window1" Height="594" Width="783" WindowState="Maximized">
+    
+    <Window.Resources>
+        <proto:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="18" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+        
+        <!--Header-->
+        <!--<Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding ActivePlayer.Color, Source={StaticResource This}, Converter={StaticResource ColorToBrushConverter}}" />-->
+        
+        <!--Main canvas-->
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Grid.Row="1">
+            <Canvas x:Name="mMainCanvas" PreviewMouseDown="mMainCanvas_PreviewMouseDown"/>
+        </ScrollViewer>
+        
+        <!--Splitter-->
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="2" />
+
+        <!--GUI-->
+        <TabControl Margin="0,2,0,0" Grid.Row="2" x:Name="mTabControl" SelectionChanged="mTabControl_SelectionChanged">
+
+
+            <!--Game GUI-->
+            <TabItem Header="Game" x:Name="mGameTabItem">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="EndTurn" Click="Button_Click"/>
+                </StackPanel>
+            </TabItem>
+            <!--Editor GUI-->
+            <TabItem Header="Editor" x:Name="mEditorTabItem">
+                <StackPanel Orientation="Horizontal" >
+
+                    <!--Players-->
+                    <StackPanel Margin="2,2,2,2">
+                        <TextBlock Text="Players" Foreground="White" Background="{Binding SelectedItem.Color, ElementName=mPlayersListBox, Converter={StaticResource ColorToBrushConverter}}" />
+
+                        <ListBox x:Name="mPlayersListBox">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border x:Name="mPlayerBorder" Width="30" Height="16" Background="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                    <!--Set tile-->
+                    <StackPanel Margin="2,2,2,2">
+                        <RadioButton x:Name="mSetTilesOptionBox" GroupName="Editor" IsChecked="True">Tile</RadioButton>
+                        <ListBox x:Name="mSetTilesListBox" SelectedIndex="0"/>
+                    </StackPanel>
+                    
+                    <!--Save/load map-->
+                    <StackPanel Margin="2,2,2,2" Orientation="Horizontal">
+                        <ListBox x:Name="mMapsListBox" MouseDoubleClick="mMapsListBox_MouseDoubleClick" />
+                        <StackPanel Width="108">
+                            <TextBox x:Name="mSaveMapTextBox" />
+                            <Button Content="SaveMap" Click="button1_Click" />                        
+                        </StackPanel>
+                    </StackPanel>                    
+                </StackPanel>
+            </TabItem>
+
+
+
+
+        </TabControl>
+    </Grid>
+</Window>
