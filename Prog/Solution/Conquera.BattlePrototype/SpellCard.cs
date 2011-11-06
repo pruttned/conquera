@@ -104,4 +104,107 @@ namespace Conquera.BattlePrototype
         }
     }
 
+
+
+    #region ManaCards
+
+    public class Add2ManaCard : AddManaSpellCard
+    {
+        public Add2ManaCard()
+            :base(2)
+        {
+        }
+    }
+    public class Add5ManaCard : AddManaSpellCard
+    {
+        public Add5ManaCard()
+            : base(5)
+        {
+        }
+    }
+    public class Add7ManaCard : AddManaSpellCard
+    {
+        public Add7ManaCard()
+            : base(7)
+        {
+        }
+    }
+    public class Add10ManaCard : AddManaSpellCard
+    {
+        public Add10ManaCard()
+            : base(10)
+        {
+        }
+    }
+    public class Add15ManaCard : AddManaSpellCard
+    {
+        public Add15ManaCard()
+            : base(15)
+        {
+        }
+    }
+    #endregion ManaCards
+
+    #region UnitCards
+
+    public class SummonSkeletonLv1UnitSpellCard : SummonUnitSpellCard
+    {
+        public SummonSkeletonLv1UnitSpellCard()
+            :base(typeof(SkeletonLv1BattleUnit), 3)
+        {
+        }
+    }
+    public class SummonZombieLv1UnitSpellCard : SummonUnitSpellCard
+    {
+        public SummonZombieLv1UnitSpellCard()
+            : base(typeof(ZombieLv1BattleUnit), 3)
+        {
+        }
+    }
+    public class SummonBansheeLv1UnitSpellCard : SummonUnitSpellCard
+    {
+        public SummonBansheeLv1UnitSpellCard()
+            : base(typeof(BansheeLv1BattleUnit), 3)
+        {
+        }
+    }
+    public class SummonSpectreLv1UnitSpellCard : SummonUnitSpellCard
+    {
+        public SummonSpectreLv1UnitSpellCard()
+            : base(typeof(SpectreLv1BattleUnit), 3)
+        {
+        }
+    }
+
+    public class SummonSkeletonLv2UnitSpellCard : SummonUnitSpellCard
+    {
+        public SummonSkeletonLv2UnitSpellCard()
+            : base(typeof(SkeletonLv2BattleUnit), 5)
+        {
+        }
+    }
+    public class SummonZombieLv2UnitSpellCard : SummonUnitSpellCard
+    {
+        public SummonZombieLv2UnitSpellCard()
+            : base(typeof(ZombieLv2BattleUnit), 5)
+        {
+        }
+    }
+    public class SummonBansheeLv2UnitSpellCard : SummonUnitSpellCard
+    {
+        public SummonBansheeLv2UnitSpellCard()
+            : base(typeof(BansheeLv2BattleUnit), 5)
+        {
+        }
+    }
+    public class SummonSpectreLv2UnitSpellCard : SummonUnitSpellCard
+    {
+        public SummonSpectreLv2UnitSpellCard()
+            : base(typeof(SpectreLv2BattleUnit), 5)
+        {
+        }
+    }
+
+    #endregion UnitCards
+
 }

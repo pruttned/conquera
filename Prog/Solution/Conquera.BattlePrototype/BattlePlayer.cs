@@ -94,6 +94,11 @@ namespace Conquera.BattlePrototype
                 unit.HasMovedThisTurn = false;
             }
 
+            FillCardsInHand();
+        }
+
+        public void FillCardsInHand()
+        {
             if (CardDeck.Count > 0)
             {
                 while (CardsInHand.Count < MaxCardsInHandCnt)

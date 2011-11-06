@@ -340,6 +340,36 @@ namespace Conquera.BattlePrototype
 
     }
 
+    public class GeneralBattleUnit : BattleUnit
+    {
+        public override int BaseAttack
+        {
+            get { return 3; }
+        }
+
+        public override int BaseDefense
+        {
+            get { return 10; }
+        }
+
+        public override int BaseMovementDistance
+        {
+            get { return 1; }
+        }
+
+        public GeneralBattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(player, terrain, tileIndex)
+        {
+        }
+
+        protected override string GetImageFileName()
+        {
+            return "SpikesIcon.png";
+        }
+    }
+
+
+
     public class SkeletonLv1BattleUnit : BattleUnit
     {
         public override int BaseAttack
@@ -393,6 +423,176 @@ namespace Conquera.BattlePrototype
         protected override string GetImageFileName()
         {
             return "PlagueIcon.png";
+        }
+    }
+
+    public class BansheeLv1BattleUnit : BattleUnit
+    {
+        public override int BaseAttack
+        {
+            get { return 3; }
+        }
+
+        public override int BaseDefense
+        {
+            get { return 1; }
+        }
+
+        public override int BaseMovementDistance
+        {
+            get { return 2; }
+        }
+
+        public BansheeLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(player, terrain, tileIndex)
+        {
+        }
+
+        protected override string GetImageFileName()
+        {
+            return "BloodMadnessIcon.png";
+        }
+    }
+
+    public class SpectreLv1BattleUnit : BattleUnit
+    {
+        public override int BaseAttack
+        {
+            get { return 1; }
+        }
+
+        public override int BaseDefense
+        {
+            get { return 3; }
+        }
+
+        public override int BaseMovementDistance
+        {
+            get { return 3; }
+        }
+
+        public SpectreLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(player, terrain, tileIndex)
+        {
+        }
+
+        protected override string GetImageFileName()
+        {
+            return "VampiricTouchIcon.png";
+        }
+    }
+
+
+
+    public class SkeletonLv2BattleUnit : BattleUnit
+    {
+        public override int BaseAttack
+        {
+            get { return 2; }
+        }
+
+        public override int BaseDefense
+        {
+            get { return 2; }
+        }
+
+        public override int BaseMovementDistance
+        {
+            get { return 3; }
+        }
+
+        public SkeletonLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(player, terrain, tileIndex)
+        {
+        }
+
+        protected override string GetImageFileName()
+        {
+            return "SlayerIcon.png";
+        }
+    }
+
+    public class ZombieLv2BattleUnit : BattleUnit
+    {
+        public override int BaseAttack
+        {
+            get { return 3; }
+        }
+
+        public override int BaseDefense
+        {
+            get { return 3; }
+        }
+
+        public override int BaseMovementDistance
+        {
+            get { return 2; }
+        }
+
+        public ZombieLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(player, terrain, tileIndex)
+        {
+        }
+
+        protected override string GetImageFileName()
+        {
+            return "PlagueIcon.png";
+        }
+    }
+
+    public class BansheeLv2BattleUnit : BattleUnit
+    {
+        public override int BaseAttack
+        {
+            get { return 4; }
+        }
+
+        public override int BaseDefense
+        {
+            get { return 2; }
+        }
+
+        public override int BaseMovementDistance
+        {
+            get { return 2; }
+        }
+
+        public BansheeLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(player, terrain, tileIndex)
+        {
+        }
+
+        protected override string GetImageFileName()
+        {
+            return "BloodMadnessIcon.png";
+        }
+    }
+
+    public class SpectreLv2BattleUnit : BattleUnit
+    {
+        public override int BaseAttack
+        {
+            get { return 2; }
+        }
+
+        public override int BaseDefense
+        {
+            get { return 4; }
+        }
+
+        public override int BaseMovementDistance
+        {
+            get { return 3; }
+        }
+
+        public SpectreLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(player, terrain, tileIndex)
+        {
+        }
+
+        protected override string GetImageFileName()
+        {
+            return "VampiricTouchIcon.png";
         }
     }
 }
