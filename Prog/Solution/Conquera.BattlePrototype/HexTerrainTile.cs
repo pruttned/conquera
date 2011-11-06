@@ -60,6 +60,8 @@ namespace Conquera.BattlePrototype
                             ((HexTerrainTile)mUnit.Parent).Children.Remove(mUnit);
                         }
                         Children.Add(mUnit);
+
+                        OnUnitEnter(mUnit);
                     }
                 }
             }
@@ -154,6 +156,9 @@ namespace Conquera.BattlePrototype
                     ((0 == (j & 1)) && ((i2 == i - 1 && j2 == j - 1) || (i2 == i && j2 == j - 1) || (i2 == i - 1 && j2 == j + 1) || (i2 == i && j2 == j + 1)));
         }
 
+        protected virtual void OnUnitEnter(BattleUnit unit)
+        {}
+
         private System.Windows.Point GetCornerPosition(HexTileCorner corner)
         {
             double centerX = HexHelper.HalfTileW;
@@ -241,6 +246,11 @@ namespace Conquera.BattlePrototype
 
         public virtual void OnBeginTurn()
         {
+        }
+
+        protected override void OnUnitEnter(BattleUnit unit)
+        {
+            OwningPlayer = unit.Player;
         }
     }
 
