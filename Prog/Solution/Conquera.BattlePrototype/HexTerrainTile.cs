@@ -32,6 +32,7 @@ namespace Conquera.BattlePrototype
         private BattleUnit mUnit = null;
         private Border mMoveIndicator;
         private bool mIsMoveIndicatorVisible = false;
+        protected Polygon mHexPolygon;
 
         public Point Index { get; private set; }
         
@@ -109,19 +110,19 @@ namespace Conquera.BattlePrototype
             Vector2 topLeftPosAsVector = HexHelper.Get2DPosFromIndex(index);
             TopLeftPos = new System.Windows.Point(topLeftPosAsVector.X, topLeftPosAsVector.Y);
 
-            Polygon polygon = new Polygon();
-            polygon.Stroke = Brushes.Black;
-            polygon.Fill = Fill;
-            polygon.StrokeThickness = 1.0;
+            mHexPolygon = new Polygon();
+            mHexPolygon.Stroke = Brushes.Black;
+            mHexPolygon.Fill = Fill;
+            mHexPolygon.StrokeThickness = 1.0;
 
-            polygon.Points.Add(GetCornerPosition(HexTileCorner.Top));
-            polygon.Points.Add(GetCornerPosition(HexTileCorner.UperRight));
-            polygon.Points.Add(GetCornerPosition(HexTileCorner.LowerRight));
-            polygon.Points.Add(GetCornerPosition(HexTileCorner.Down));
-            polygon.Points.Add(GetCornerPosition(HexTileCorner.LowerLeft));
-            polygon.Points.Add(GetCornerPosition(HexTileCorner.UperLeft));
-            
-            Children.Add(polygon);
+            mHexPolygon.Points.Add(GetCornerPosition(HexTileCorner.Top));
+            mHexPolygon.Points.Add(GetCornerPosition(HexTileCorner.UperRight));
+            mHexPolygon.Points.Add(GetCornerPosition(HexTileCorner.LowerRight));
+            mHexPolygon.Points.Add(GetCornerPosition(HexTileCorner.Down));
+            mHexPolygon.Points.Add(GetCornerPosition(HexTileCorner.LowerLeft));
+            mHexPolygon.Points.Add(GetCornerPosition(HexTileCorner.UperLeft));
+
+            Children.Add(mHexPolygon);
 
             if (ImageName != null)
             {
@@ -179,7 +180,7 @@ namespace Conquera.BattlePrototype
 
         public override Brush Fill
         {
-            get { return Brushes.DarkGray; }
+            get { return new SolidColorBrush(Color.FromArgb(255, 40, 40, 40)); }
         }
 
         public GapHexTerrainTile(Point index)
@@ -222,6 +223,17 @@ namespace Conquera.BattlePrototype
                     {
                         OnCaptured(mOwningPlayer);
                     }
+
+                    if (mOwningPlayer != null)
+                    {
+                        mHexPolygon.StrokeThickness = 5.0;
+                        mHexPolygon.Stroke = new SolidColorBrush(mOwningPlayer.Color);
+                    }
+                    else
+                    {
+                        mHexPolygon.StrokeThickness = 1.0;
+                        mHexPolygon.Stroke = Brushes.Black;
+                    }
                 }
             }
         }
@@ -260,6 +272,11 @@ namespace Conquera.BattlePrototype
         public override string ImageName
         {
             get { return "Outpost.bmp"; }
+        }
+
+        public override Brush Fill
+        {
+            get { return Brushes.Brown; }
         }
 
         public OutpostHexTerrainTile(Point index)
