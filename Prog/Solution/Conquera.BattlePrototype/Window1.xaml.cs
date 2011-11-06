@@ -311,6 +311,22 @@ namespace Conquera.BattlePrototype
                     if ((bool)mSetTilesOptionBox.IsChecked && tileName != null)
                     {
                         mTerrain.SetTile(tile.Index, tileName);
+
+                        CapturableHexTerrainTile capturableTile = mTerrain[tile.Index] as CapturableHexTerrainTile;
+                        if (capturableTile != null)
+                        {
+                            capturableTile.OwningPlayer = (BattlePlayer)mPlayersListBox.SelectedItem;
+                        }
+                    }
+
+                    //Capture
+                    if ((bool)mCaptureOptionBox.IsChecked)
+                    {
+                        CapturableHexTerrainTile capturableTile = tile as CapturableHexTerrainTile;
+                        if (capturableTile != null)
+                        {
+                            capturableTile.OwningPlayer = (BattlePlayer)mPlayersListBox.SelectedItem;
+                        }
                     }
                 }
                 else if (mTabControl.SelectedItem == mGameTabItem) //GAME
@@ -387,6 +403,11 @@ namespace Conquera.BattlePrototype
             {
                 LoadMap(mapName);
             }
+        }
+
+        private void mSelectNonePlayerButton_Click(object sender, RoutedEventArgs e)
+        {
+            mPlayersListBox.SelectedItem = null;
         }
     }
 
