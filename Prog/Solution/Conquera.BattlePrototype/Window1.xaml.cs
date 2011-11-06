@@ -82,6 +82,7 @@ namespace Conquera.BattlePrototype
             
             //LoadTerrain();
             mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1, 2), "Outpost");
+            mTerrain.SetTile(new Microsoft.Xna.Framework.Point(0, 2), "Outpost");
 
             mPlayersListBox.ItemsSource = mPlayers;
             mPlayersListBox.SelectedIndex = 0;
