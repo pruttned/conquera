@@ -69,6 +69,15 @@ namespace Conquera.BattlePrototype
 
         public Window1()
         {
+            mPlayers[0].CardDeck = SpellCardDecks.FullDeck;
+            mPlayers[1].CardDeck = SpellCardDecks.FullDeck;
+            mPlayers[0].FillCardsInHand();
+            mPlayers[1].FillCardsInHand();
+            mPlayers[0].Mana = 5;
+            mPlayers[1].Mana = 5;
+
+
+
             Resources.Add("This", this);
             InitializeComponent();
 
