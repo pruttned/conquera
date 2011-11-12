@@ -335,7 +335,8 @@ namespace Conquera.BattlePrototype
         public void UpdateGraphics()
         {
             mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
-            mPropertiesTextBlock.Text += string.Format("A = {0}\nD = {1}\nM = {2}\nHp = {3}/{4}", Attack, Defense, MovementDistance, Hp, MaxHp);
+            mPropertiesTextBlock.Text += string.Format("A = {0}+{5}\nD = {1}+{6}\nM = {2}+{7}\nHp = {3}/{4}", BaseAttack, BaseDefense, BaseMovementDistance, Hp, MaxHp,
+                Attack - BaseAttack, Defense - BaseDefense, MovementDistance-BaseMovementDistance);
             mBorder.BorderBrush = (!HasMovedThisTurn && Player.IsActive ? Brushes.Yellow : Brushes.Black);
         }
 
