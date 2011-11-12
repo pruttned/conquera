@@ -472,14 +472,19 @@ namespace Conquera.BattlePrototype
             mPlayers[0].Mana = 5;
             mPlayers[1].Mana = 5;
 
-            UnloadTerrain();
-            mTerrain = new HexTerrain(20, 20);
-            LoadTerrain();
+            mPlayers[0].StartPos = new Microsoft.Xna.Framework.Point(0, 0);
+            mPlayers[1].StartPos = new Microsoft.Xna.Framework.Point(1, 0);
 
             ActivePlayer = mPlayers[0];
 
-            mPlayers[0].StartPos = new Microsoft.Xna.Framework.Point(0, 0);
-            mPlayers[1].StartPos = new Microsoft.Xna.Framework.Point(0, 0);
+            UnloadTerrain();
+            mTerrain = new HexTerrain(20, 20);
+            LoadTerrain();
+        }
+
+        private void mSetTilesListBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            mSetTilesOptionBox.IsChecked = true;
         }
     }
 
