@@ -289,6 +289,7 @@ namespace Conquera.BattlePrototype
                 mPlayers[index].StartPos = new Microsoft.Xna.Framework.Point((int)startPosElm.Attribute("x"), (int)startPosElm.Attribute("y"));
             }
             mTerrain = new HexTerrain(mapElm, mPlayers);
+            mTurnNum = 0;
 
             LoadTerrain();
         }
@@ -311,70 +312,73 @@ namespace Conquera.BattlePrototype
             mMainCanvas.Children.Remove(tile);
         }
 
-        private void mMainCanvas_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void mMainCanvas_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            HexTerrainTile tile = GetParent<HexTerrainTile>(e.Source as DependencyObject);
-            if (tile != null)
-            {                
-                if (mTabControl.SelectedItem == mEditorTabItem) //EDITOR
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                HexTerrainTile tile = GetParent<HexTerrainTile>(e.Source as DependencyObject);
+                if (tile != null)
                 {
-                    //Set tile
-                    string tileName = (string)mSetTilesListBox.SelectedItem;
-                    if ((bool)mSetTilesOptionBox.IsChecked && tileName != null)
+                    if (mTabControl.SelectedItem == mEditorTabItem) //EDITOR
                     {
-                        mTerrain.SetTile(tile.Index, tileName);
+                        //Set tile
+                        string tileName = (string)mSetTilesListBox.SelectedItem;
+                        if ((bool)mSetTilesOptionBox.IsChecked && tileName != null)
+                        {
+                            mTerrain.SetTile(tile.Index, tileName);
 
-                        CapturableHexTerrainTile capturableTile = mTerrain[tile.Index] as CapturableHexTerrainTile;
-                        if (capturableTile != null)
-                        {
-                            capturableTile.OwningPlayer = (BattlePlayer)mPlayersListBox.SelectedItem;
+                            CapturableHexTerrainTile capturableTile = mTerrain[tile.Index] as CapturableHexTerrainTile;
+                            if (capturableTile != null)
+                            {
+                                capturableTile.OwningPlayer = (BattlePlayer)mPlayersListBox.SelectedItem;
+                            }
                         }
-                    }
 
-                    //Capture
-                    if ((bool)mCaptureOptionBox.IsChecked)
-                    {
-                        CapturableHexTerrainTile capturableTile = tile as CapturableHexTerrainTile;
-                        if (capturableTile != null)
+                        //Capture
+                        if ((bool)mCaptureOptionBox.IsChecked)
                         {
-                            capturableTile.OwningPlayer = (BattlePlayer)mPlayersListBox.SelectedItem;
+                            CapturableHexTerrainTile capturableTile = tile as CapturableHexTerrainTile;
+                            if (capturableTile != null)
+                            {
+                                capturableTile.OwningPlayer = (BattlePlayer)mPlayersListBox.SelectedItem;
+                            }
                         }
-                    }
 
-                    //Start pos
-                    if ((bool)mStartPosOptionBox.IsChecked)
-                    {
-                        BattlePlayer player = (BattlePlayer)mPlayersListBox.SelectedItem;
-                        if (player != null)
+                        //Start pos
+                        if ((bool)mStartPosOptionBox.IsChecked)
                         {
-                            mTerrain[player.StartPos].SetStartPosIndicator(null);
-                            player.StartPos = tile.Index;
+                            BattlePlayer player = (BattlePlayer)mPlayersListBox.SelectedItem;
+                            if (player != null)
+                            {
+                                mTerrain[player.StartPos].SetStartPosIndicator(null);
+                                player.StartPos = tile.Index;
+                            }
                         }
+                        SetStartPosIndicatorsVisibility(true);
                     }
-                    SetStartPosIndicatorsVisibility(true);
-                }
-                else if (mTabControl.SelectedItem == mGameTabItem) //GAME
-                {                    
-                    if (e.LeftButton == MouseButtonState.Pressed)
+                    else if (mTabControl.SelectedItem == mGameTabItem) //GAME
                     {
-                        //Select / deselect unit
-                        BattleUnit unit = GetParent<BattleUnit>(e.Source as DependencyObject);
-                        if (unit != null && CanSelectUnit(unit))
+                        if (e.LeftButton == MouseButtonState.Pressed)
                         {
-                            SelectUnit(unit);
+                            //Select / deselect unit
+                            BattleUnit unit = GetParent<BattleUnit>(e.Source as DependencyObject);
+                            if (unit != null && CanSelectUnit(unit))
+                            {
+                                SelectUnit(unit);
+                            }
+                            else if (unit == null)
+                            {
+                                SelectUnit(null);
+                            }
                         }
-                        else if (unit == null)
+                        else if (e.RightButton == MouseButtonState.Pressed)
                         {
-                            SelectUnit(null);
-                        }
-                    }
-                    else if (e.RightButton == MouseButtonState.Pressed)
-                    {
-                        //Move unit
-                        if (tile.IsMoveIndicatorVisible)
-                        {
-                            SetMoveIndicatorsVisibility(false);
-                            SelectedUnit.Move(tile.Index);                            
+                            //Move unit
+                            if (tile.IsMoveIndicatorVisible)
+                            {
+                                SetMoveIndicatorsVisibility(false);
+                                SelectedUnit.Move(tile.Index);
+                            }
                         }
                     }
                 }
@@ -447,6 +451,35 @@ namespace Conquera.BattlePrototype
         private void mSelectNonePlayerButton_Click(object sender, RoutedEventArgs e)
         {
             mPlayersListBox.SelectedItem = null;
+        }
+
+        private void mSetTilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void mResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            ResetMap();
+        }
+
+        private void ResetMap()
+        {
+            mPlayers[0].CardDeck = SpellCardDecks.FullDeck;
+            mPlayers[1].CardDeck = SpellCardDecks.FullDeck;
+            mPlayers[0].FillCardsInHand();
+            mPlayers[1].FillCardsInHand();
+            mPlayers[0].Mana = 5;
+            mPlayers[1].Mana = 5;
+
+            UnloadTerrain();
+            mTerrain = new HexTerrain(20, 20);
+            LoadTerrain();
+
+            ActivePlayer = mPlayers[0];
+
+            mPlayers[0].StartPos = new Microsoft.Xna.Framework.Point(0, 0);
+            mPlayers[1].StartPos = new Microsoft.Xna.Framework.Point(0, 0);
         }
     }
 
