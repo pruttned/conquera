@@ -22,11 +22,14 @@ using System.Text;
 using System.Windows.Media;
 using Microsoft.Xna.Framework;
 using System.Reflection;
+using System.Collections.ObjectModel;
 
 namespace Conquera.BattlePrototype
 {
     public class BattlePlayer
     {
+        public event EventHandler ManaChanged;
+
         public const int MaxCardsInHandCnt = 7;
 
         private int mMana;
@@ -43,7 +46,11 @@ namespace Conquera.BattlePrototype
         public int Mana
         {
             get { return mMana; }
-            set { mMana = MathExt.Clamp(value, 0, MaxMana);}
+            set
+            {
+                mMana = MathExt.Clamp(value, 0, MaxMana);
+                EventHelper.RaiseEvent(ManaChanged, this);
+            }
         }
 
         public int MaxMana
@@ -60,7 +67,7 @@ namespace Conquera.BattlePrototype
 
         public List<SpellCard> CardDeck { get; set; }
         
-        public List<SpellCard> CardsInHand { get; set; }
+        public ObservableCollection<SpellCard> CardsInHand { get; set; }
 
         public List<BattleUnit> Units { get; private set; }
 
@@ -71,7 +78,7 @@ namespace Conquera.BattlePrototype
 
             Units = new List<BattleUnit>();
             CardDeck = new List<SpellCard>();
-            CardsInHand = new List<SpellCard>();
+            CardsInHand = new ObservableCollection<SpellCard>();
         }
 
         public void CastSpellCard(int indexInHand, HexTerrainTile tile, HexTerrain terrain)
