@@ -39,8 +39,22 @@ namespace Conquera.BattlePrototype
     /// </summary>
     public partial class Window1 : Window, INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        private class SpellCardListBoxItem
+        {
+            public SpellCard Card { get; private set; }
 
+            public SpellCardListBoxItem(SpellCard card)
+            {
+                Card = card;
+            }
+
+            public override string ToString()
+            {
+                return Card.ToString();
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         static readonly string mMapsDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PrototypeMaps");
 
@@ -64,6 +78,7 @@ namespace Conquera.BattlePrototype
                     }
                     mActivePlayer = value;
                     mActivePlayer.IsActive = true;
+                    UpdateCardsListBox();
                     EventHelper.RaisePropertyChanged(PropertyChanged, this, "ActivePlayer");
                 }
             }
@@ -118,6 +133,23 @@ namespace Conquera.BattlePrototype
             UpdateManaTextBlock();
             mPlayers[0].ManaChanged += new EventHandler(Player_ManaChanged);
             mPlayers[1].ManaChanged += new EventHandler(Player_ManaChanged);
+
+            mPlayers[0].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
+            mPlayers[1].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
+        }
+
+        private void mPlayerCardsInHand_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            UpdateCardsListBox();
+        }
+
+        private void UpdateCardsListBox()
+        {
+            mCardsListBox.Items.Clear();
+            foreach (SpellCard card in ActivePlayer.CardsInHand)
+            {
+                mCardsListBox.Items.Add(new SpellCardListBoxItem(card));                
+            }
         }
 
         private void Player_ManaChanged(object sender, EventArgs e)
@@ -185,8 +217,7 @@ namespace Conquera.BattlePrototype
 
             ActivePlayer.OnTurnStart(mTurnNum);
             SelectUnit(null);
-
-
+            mCardsListBox.IsEnabled = true;
         }
 
         private void SelectUnit(BattleUnit unit)
@@ -329,7 +360,17 @@ namespace Conquera.BattlePrototype
             mMainCanvas.Children.Remove(tile);
         }
 
+        private void mMainCanvas_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DoMouseAction(e);
+        }
+
         private void mMainCanvas_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            DoMouseAction(e);
+        }
+
+        private void DoMouseAction(MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed)
             {
@@ -377,15 +418,29 @@ namespace Conquera.BattlePrototype
                     {
                         if (e.LeftButton == MouseButtonState.Pressed)
                         {
-                            //Select / deselect unit
-                            BattleUnit unit = GetParent<BattleUnit>(e.Source as DependencyObject);
-                            if (unit != null && CanSelectUnit(unit))
+                            //Cast card
+                            SpellCardListBoxItem cardListBoxItem = (SpellCardListBoxItem)mCardsListBox.SelectedItem;
+                            if (cardListBoxItem != null)
                             {
-                                SelectUnit(unit);
+                                SpellCard card = cardListBoxItem.Card;
+                                if (card.Cost <= ActivePlayer.Mana && card.IsValidTarget(ActivePlayer, tile, mTerrain))
+                                {
+                                    ActivePlayer.CastSpellCard(mCardsListBox.SelectedIndex, tile, mTerrain);
+                                    mCardsListBox.IsEnabled = false;
+                                }
                             }
-                            else if (unit == null)
+                            else
                             {
-                                SelectUnit(null);
+                                //Select / deselect unit
+                                BattleUnit unit = GetParent<BattleUnit>(e.Source as DependencyObject);
+                                if (unit != null && CanSelectUnit(unit))
+                                {
+                                    SelectUnit(unit);
+                                }
+                                else if (unit == null)
+                                {
+                                    SelectUnit(null);
+                                }
                             }
                         }
                         else if (e.RightButton == MouseButtonState.Pressed)
@@ -509,6 +564,11 @@ namespace Conquera.BattlePrototype
             {
                 mSetTilesLeftButtonTextBlock.Text = (string)mSetTilesListBox.SelectedItem;
             }
+        }
+
+        private void mUnselectCardButton_Click(object sender, RoutedEventArgs e)
+        {
+            mCardsListBox.SelectedIndex = -1;
         }
     }
 

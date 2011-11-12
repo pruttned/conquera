@@ -112,7 +112,8 @@ namespace Conquera.BattlePrototype
         public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
         {
             //todo: cast on existing unit
-            return (null == tile.Unit && tile is OutpostHexTerrainTile);
+            OutpostHexTerrainTile outpost = tile as OutpostHexTerrainTile;
+            return (outpost != null && outpost.OwningPlayer == player && null == tile.Unit);
         }
 
         public override void Cast(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
@@ -123,7 +124,7 @@ namespace Conquera.BattlePrototype
 
             //todo: cast on existing unit
 
-            mUnitCtor.Invoke(new object[] { player, terrain, tile });
+            mUnitCtor.Invoke(new object[] { player, terrain, tile.Index });
         }
     }
 
