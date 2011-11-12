@@ -56,6 +56,8 @@ namespace Conquera.BattlePrototype
 
         private Point mTileIndex;
 
+        public int mHp;
+
         private TextBlock mPropertiesTextBlock;
         private Border mBorder;
         private bool mHasMovedThisTurn;
@@ -66,6 +68,17 @@ namespace Conquera.BattlePrototype
         public abstract int BaseAttack { get; }
         public abstract int BaseDefense { get; }
         public abstract int BaseMovementDistance { get; }
+        public abstract int MaxHp { get; }
+
+        public int Hp
+        {
+            get { return mHp; }
+            set 
+            { 
+                mHp = MathExt.Clamp(value, 0, MaxHp);
+                UpdateGraphics();
+            }
+        }
 
         //public int Attack { get; private set; }
         //public int Defense { get; private set; }
@@ -159,11 +172,11 @@ namespace Conquera.BattlePrototype
             HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
 
             mBorder = new Border();
-            mBorder.BorderBrush = Brushes.Yellow;
             mPropertiesTextBlock = new TextBlock();
             mPropertiesTextBlock.Background = new SolidColorBrush(Color.FromArgb(255, player.Color.R, player.Color.G, player.Color.B));
             mPropertiesTextBlock.Foreground = Brushes.White;
             mPropertiesTextBlock.FontSize = 10;
+            mBorder.BorderThickness = new System.Windows.Thickness(5);
             mBorder.Child = mPropertiesTextBlock;
             Children.Add(mBorder);
             UpdateGraphics();
@@ -178,6 +191,8 @@ namespace Conquera.BattlePrototype
 
             UpdateDefenseFromAlies();
             UpdateSiblingsDefenses(mTileIndex);
+
+            Hp = MaxHp;
         }
 
         public void Kill()
@@ -317,14 +332,16 @@ namespace Conquera.BattlePrototype
             TileIndex = tileIndex;
         }
 
+        public void UpdateGraphics()
+        {
+            mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
+            mPropertiesTextBlock.Text += string.Format("A = {0}\nD = {1}\nM = {2}\nHp = {3}/{4}", Attack, Defense, MovementDistance, Hp, MaxHp);
+            mBorder.BorderBrush = (!HasMovedThisTurn && Player.IsActive ? Brushes.Yellow : Brushes.Black);
+        }
+
         protected abstract string GetImageFileName();
 
-        private void UpdateGraphics()
-        {
-            mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "\n";
-            mPropertiesTextBlock.Text += string.Format("A = {0}\nD = {1}\nM = {2}", Attack, Defense, MovementDistance);
-            mBorder.BorderThickness = new System.Windows.Thickness(HasMovedThisTurn ? 0.0 : 5.0);            
-        }
+
 
         private void UpdateSiblingsDefenses(Point pos)
         {
@@ -337,7 +354,6 @@ namespace Conquera.BattlePrototype
                     }
                 });
         }
-
     }
 
     public class GeneralBattleUnit : BattleUnit
@@ -357,6 +373,10 @@ namespace Conquera.BattlePrototype
             get { return 1; }
         }
 
+        public override int MaxHp
+        {
+            get { return 10; }
+        }
         public GeneralBattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
         {
@@ -383,6 +403,11 @@ namespace Conquera.BattlePrototype
         }
 
         public override int BaseMovementDistance
+        {
+            get { return 3; }
+        }
+
+        public override int MaxHp
         {
             get { return 3; }
         }
@@ -415,6 +440,11 @@ namespace Conquera.BattlePrototype
             get { return 2; }
         }
 
+        public override int MaxHp
+        {
+            get { return 3; }
+        }
+
         public ZombieLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
         {
@@ -443,6 +473,11 @@ namespace Conquera.BattlePrototype
             get { return 2; }
         }
 
+        public override int MaxHp
+        {
+            get { return 3; }
+        }
+
         public BansheeLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
         {
@@ -467,6 +502,11 @@ namespace Conquera.BattlePrototype
         }
 
         public override int BaseMovementDistance
+        {
+            get { return 3; }
+        }
+
+        public override int MaxHp
         {
             get { return 3; }
         }
@@ -501,6 +541,11 @@ namespace Conquera.BattlePrototype
             get { return 3; }
         }
 
+        public override int MaxHp
+        {
+            get { return 4; }
+        }
+
         public SkeletonLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
         {
@@ -529,6 +574,11 @@ namespace Conquera.BattlePrototype
             get { return 2; }
         }
 
+        public override int MaxHp
+        {
+            get { return 4; }
+        }
+        
         public ZombieLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
         {
@@ -557,6 +607,12 @@ namespace Conquera.BattlePrototype
             get { return 2; }
         }
 
+        public override int MaxHp
+        {
+            get { return 4; }
+        }
+
+
         public BansheeLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
         {
@@ -583,6 +639,11 @@ namespace Conquera.BattlePrototype
         public override int BaseMovementDistance
         {
             get { return 3; }
+        }
+
+        public override int MaxHp
+        {
+            get { return 4; }
         }
 
         public SpectreLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)

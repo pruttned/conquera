@@ -56,6 +56,8 @@ namespace Conquera.BattlePrototype
             }
         }
 
+        public bool IsActive { get; set; }
+
         public List<SpellCard> CardDeck { get; set; }
         
         public List<SpellCard> CardsInHand { get; set; }

@@ -55,9 +55,15 @@ namespace Conquera.BattlePrototype
             get { return mActivePlayer; }
             private set 
             {
+                if (null == value) throw new ArgumentNullException("ActivePlayer");
                 if (mActivePlayer != value)
                 {
+                    if (null != mActivePlayer)
+                    {
+                        mActivePlayer.IsActive = false;
+                    }
                     mActivePlayer = value;
+                    mActivePlayer.IsActive = true;
                     EventHelper.RaisePropertyChanged(PropertyChanged, this, "ActivePlayer");
                 }
             }
@@ -106,11 +112,6 @@ namespace Conquera.BattlePrototype
             new ZombieLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(4, 5));
 
             UpdateMapsListBox();
-
-            //unit1.Kill();
-            //mTerrain = new HexTerrain("aaa.xml", new BattlePlayer[]{
-            //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Blue, 0),
-            //    new BattlePlayer(Microsoft.Xna.Framework.Graphics.Color.Red, 1)});
         }
 
         private void UpdateMapsListBox()
@@ -134,10 +135,14 @@ namespace Conquera.BattlePrototype
                 {
                     foreach (var unit in player.Units)
                     {
-                        //todo defense from allies
                         if (unit.ComputeDamageFromEnemies() >= unit.Defense)
                         {
-                            unitsToKill.Add(unit);
+                            int damage = Math.Max(0, unit.ComputeDamageFromEnemies() - unit.Defense );
+                            unit.Hp -= damage;
+                            if (unit.Hp <= 0)
+                            {
+                                unitsToKill.Add(unit);
+                            }
                         }
                     }
                 }
@@ -148,19 +153,23 @@ namespace Conquera.BattlePrototype
                 unit.Kill();
             }
 
+            mTurnNum++;
+            ActivePlayer = mPlayers[mTurnNum % 2];
+
             //Update defenses
             foreach (var player in mPlayers)
             {
                 foreach (var unit in player.Units)
                 {
                     unit.UpdateDefenseFromAlies();
+                    unit.UpdateGraphics();
                 }
             }
 
-            mTurnNum++;
-            ActivePlayer = mPlayers[mTurnNum % 2];
             ActivePlayer.OnTurnStart(mTurnNum);
             SelectUnit(null);
+
+
         }
 
         private void SelectUnit(BattleUnit unit)
