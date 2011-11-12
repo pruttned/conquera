@@ -79,12 +79,11 @@ namespace Conquera.BattlePrototype
             mPlayers[1].CardDeck = SpellCardDecks.FullDeck;
             mPlayers[0].FillCardsInHand();
             mPlayers[1].FillCardsInHand();
+            mPlayers[0].MaxMana = 15;
+            mPlayers[1].MaxMana = 15;
             mPlayers[0].Mana = 5;
             mPlayers[1].Mana = 5;
 
-
-
-            Resources.Add("This", this);
             InitializeComponent();
 
             if (!System.IO.Directory.Exists(mMapsDir))
@@ -115,6 +114,21 @@ namespace Conquera.BattlePrototype
 
             mSetTilesLeftButtonTextBlock.Text = "Land";
             mSetTilesRightButtonTextBlock.Text = "Gap";
+
+            UpdateManaTextBlock();
+            mPlayers[0].ManaChanged += new EventHandler(Player_ManaChanged);
+            mPlayers[1].ManaChanged += new EventHandler(Player_ManaChanged);
+        }
+
+        private void Player_ManaChanged(object sender, EventArgs e)
+        {
+            UpdateManaTextBlock();
+        }
+
+        private void UpdateManaTextBlock()
+        {
+            mBlueManaTextBlock.Text = string.Format("{0}/{1}", mPlayers[0].Mana, mPlayers[0].MaxMana);
+            mRedManaTextBlock.Text = string.Format("{0}/{1}", mPlayers[1].Mana, mPlayers[1].MaxMana);
         }
 
         private void UpdateMapsListBox()

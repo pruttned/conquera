@@ -36,6 +36,11 @@ namespace Conquera.BattlePrototype
         public abstract bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain);
 
         public abstract void Cast(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain);
+
+        public override string ToString()
+        {
+            return string.Format("{0}: {1}", Cost, Name);
+        }
     }
 
     public class AddManaSpellCard : SpellCard

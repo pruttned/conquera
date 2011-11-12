@@ -39,6 +39,14 @@ namespace Conquera.BattlePrototype
             }
         }
 
+        public static void RaiseEvent(EventHandler handler, object sender)
+        {
+            if (handler != null)
+            {
+                handler(sender, EventArgs.Empty);
+            }
+        }
+
         public static void RaisePropertyChanged(PropertyChangedEventHandler handler, object sender, string propertyName)
         {
             if (handler != null)
