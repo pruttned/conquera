@@ -237,8 +237,8 @@ namespace Conquera.BattlePrototype
             }
 
             //Starting pos
-            mTerrain[mPlayers[0].StartPos].IsStartPosIndicatorVisible = true;
-            mTerrain[mPlayers[1].StartPos].IsStartPosIndicatorVisible = true;
+            mTerrain[mPlayers[0].StartPos].SetStartPosIndicator(mPlayers[0]);
+            mTerrain[mPlayers[1].StartPos].SetStartPosIndicator(mPlayers[1]);
 
             //Tile set event
             mTerrain.TileSet += new EventHandler<ValueChangeEventArgs<HexTerrainTile>>(mTerrain_TileSet);
@@ -341,6 +341,18 @@ namespace Conquera.BattlePrototype
                             capturableTile.OwningPlayer = (BattlePlayer)mPlayersListBox.SelectedItem;
                         }
                     }
+
+                    //Start pos
+                    if ((bool)mStartPosOptionBox.IsChecked)
+                    {
+                        BattlePlayer player = (BattlePlayer)mPlayersListBox.SelectedItem;
+                        if (player != null)
+                        {
+                            mTerrain[player.StartPos].SetStartPosIndicator(null);
+                            player.StartPos = tile.Index;
+                            mTerrain[player.StartPos].SetStartPosIndicator(player);
+                        }
+                    }
                 }
                 else if (mTabControl.SelectedItem == mGameTabItem) //GAME
                 {                    
@@ -393,6 +405,17 @@ namespace Conquera.BattlePrototype
         private void mTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             SelectUnit(null);
+
+            if (mTabControl.SelectedItem == mGameTabItem)
+            {
+                mTerrain[mPlayers[0].StartPos].SetStartPosIndicator(null);
+                mTerrain[mPlayers[1].StartPos].SetStartPosIndicator(null);
+            }
+            else
+            {
+                mTerrain[mPlayers[0].StartPos].SetStartPosIndicator(mPlayers[0]);
+                mTerrain[mPlayers[1].StartPos].SetStartPosIndicator(mPlayers[1]);
+            }
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)

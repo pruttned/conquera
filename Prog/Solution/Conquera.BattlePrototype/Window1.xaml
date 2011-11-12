@@ -60,8 +60,11 @@
                         <ListBox x:Name="mSetTilesListBox" SelectedIndex="0"/>
                     </StackPanel>
                     
-                    <!--Capture-->
-                    <RadioButton Margin="2,2,2,2" x:Name="mCaptureOptionBox" GroupName="Editor">Capture</RadioButton>
+                    <!--Capture, StartPos-->
+                    <StackPanel Margin="2,2,2,2">
+                        <RadioButton x:Name="mCaptureOptionBox" GroupName="Editor">Capture</RadioButton>
+                        <RadioButton x:Name="mStartPosOptionBox" GroupName="Editor">StartPos</RadioButton>
+                    </StackPanel>
                     
                     <!--Save/load map-->
                     <StackPanel Margin="2,2,2,2" Orientation="Horizontal">

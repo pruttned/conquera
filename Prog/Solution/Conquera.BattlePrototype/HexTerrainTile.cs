@@ -32,8 +32,7 @@ namespace Conquera.BattlePrototype
         protected Polygon mHexPolygon;
         private BattleUnit mUnit = null;
         private Border mMoveIndicator;
-        private bool mIsMoveIndicatorVisible = false;        
-        private bool mIsStartPosIndicatorVisible = false;
+        private bool mIsMoveIndicatorVisible = false;
         private Line mStartPosIndicator;
 
         public Point Index { get; private set; }
@@ -106,27 +105,6 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        public bool IsStartPosIndicatorVisible
-        {
-            get { return mIsStartPosIndicatorVisible; }
-            set
-            {
-                if (mIsStartPosIndicatorVisible != value)
-                {
-                    mIsStartPosIndicatorVisible = value;
-
-                    if (mIsStartPosIndicatorVisible)
-                    {
-                        Children.Add(mStartPosIndicator);
-                    }
-                    else
-                    {
-                        Children.Remove(mStartPosIndicator);
-                    }
-                }
-            }
-        }
-
         public HexTerrainTile(Point index)
         {
             Index = index;
@@ -167,13 +145,26 @@ namespace Conquera.BattlePrototype
             System.Windows.Point lowerRightCornerPosition = GetCornerPosition(HexTileCorner.LowerRight);
             mStartPosIndicator = new Line()            
             {
-                Stroke = Brushes.Black,
+                Stroke = Brushes.Transparent,
                 StrokeThickness = 10,
                 X1 = upperLeftCornerPosition.X,
                 Y1 = upperLeftCornerPosition.Y,
                 X2 = lowerRightCornerPosition.X,
                 Y2 = lowerRightCornerPosition.Y
             };
+            Children.Add(mStartPosIndicator);
+        }
+
+        public void SetStartPosIndicator(BattlePlayer player)
+        {
+            if (player == null)
+            {
+                mStartPosIndicator.Stroke = Brushes.Transparent;
+            }
+            else
+            {
+                mStartPosIndicator.Stroke = new SolidColorBrush(player.Color);
+            }
         }
 
         public bool IsSiblingTo(HexTerrainTile tile)
