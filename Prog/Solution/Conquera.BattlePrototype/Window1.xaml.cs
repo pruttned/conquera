@@ -237,8 +237,7 @@ namespace Conquera.BattlePrototype
             }
 
             //Starting pos
-            mTerrain[mPlayers[0].StartPos].SetStartPosIndicator(mPlayers[0]);
-            mTerrain[mPlayers[1].StartPos].SetStartPosIndicator(mPlayers[1]);
+            SetStartPosIndicatorsVisibility(true);
 
             //Tile set event
             mTerrain.TileSet += new EventHandler<ValueChangeEventArgs<HexTerrainTile>>(mTerrain_TileSet);
@@ -350,9 +349,9 @@ namespace Conquera.BattlePrototype
                         {
                             mTerrain[player.StartPos].SetStartPosIndicator(null);
                             player.StartPos = tile.Index;
-                            mTerrain[player.StartPos].SetStartPosIndicator(player);
                         }
                     }
+                    SetStartPosIndicatorsVisibility(true);
                 }
                 else if (mTabControl.SelectedItem == mGameTabItem) //GAME
                 {                    
@@ -382,6 +381,20 @@ namespace Conquera.BattlePrototype
             }
         }
 
+        private void SetStartPosIndicatorsVisibility(bool visible)
+        {            
+            if (visible)
+            {
+                mTerrain[mPlayers[0].StartPos].SetStartPosIndicator(mPlayers[0]);
+                mTerrain[mPlayers[1].StartPos].SetStartPosIndicator(mPlayers[1]);
+            }
+            else
+            {
+                mTerrain[mPlayers[0].StartPos].SetStartPosIndicator(null);
+                mTerrain[mPlayers[1].StartPos].SetStartPosIndicator(null);
+            }
+        }
+
         private T GetParent<T>(DependencyObject element) where T : DependencyObject
         {
             DependencyObject parent = VisualTreeHelper.GetParent(element);
@@ -405,17 +418,7 @@ namespace Conquera.BattlePrototype
         private void mTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             SelectUnit(null);
-
-            if (mTabControl.SelectedItem == mGameTabItem)
-            {
-                mTerrain[mPlayers[0].StartPos].SetStartPosIndicator(null);
-                mTerrain[mPlayers[1].StartPos].SetStartPosIndicator(null);
-            }
-            else
-            {
-                mTerrain[mPlayers[0].StartPos].SetStartPosIndicator(mPlayers[0]);
-                mTerrain[mPlayers[1].StartPos].SetStartPosIndicator(mPlayers[1]);
-            }
+            SetStartPosIndicatorsVisibility(mTabControl.SelectedItem == mEditorTabItem);
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
