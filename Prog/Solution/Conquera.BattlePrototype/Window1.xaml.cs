@@ -112,6 +112,9 @@ namespace Conquera.BattlePrototype
             new ZombieLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(4, 5));
 
             UpdateMapsListBox();
+
+            mSetTilesLeftButtonTextBlock.Text = "Land";
+            mSetTilesRightButtonTextBlock.Text = "Gap";
         }
 
         private void UpdateMapsListBox()
@@ -314,7 +317,7 @@ namespace Conquera.BattlePrototype
 
         private void mMainCanvas_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed)
             {
                 HexTerrainTile tile = GetParent<HexTerrainTile>(e.Source as DependencyObject);
                 if (tile != null)
@@ -322,7 +325,7 @@ namespace Conquera.BattlePrototype
                     if (mTabControl.SelectedItem == mEditorTabItem) //EDITOR
                     {
                         //Set tile
-                        string tileName = (string)mSetTilesListBox.SelectedItem;
+                        string tileName = e.LeftButton == MouseButtonState.Pressed ? mSetTilesLeftButtonTextBlock.Text : mSetTilesRightButtonTextBlock.Text;
                         if ((bool)mSetTilesOptionBox.IsChecked && tileName != null)
                         {
                             mTerrain.SetTile(tile.Index, tileName);
@@ -453,11 +456,6 @@ namespace Conquera.BattlePrototype
             mPlayersListBox.SelectedItem = null;
         }
 
-        private void mSetTilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
         private void mResetButton_Click(object sender, RoutedEventArgs e)
         {
             ResetMap();
@@ -485,6 +483,18 @@ namespace Conquera.BattlePrototype
         private void mSetTilesListBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             mSetTilesOptionBox.IsChecked = true;
+        }
+
+        private void mSetTilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {            
+            if (Mouse.RightButton == MouseButtonState.Pressed)
+            {
+                mSetTilesRightButtonTextBlock.Text = (string)mSetTilesListBox.SelectedItem;
+            }
+            else
+            {
+                mSetTilesLeftButtonTextBlock.Text = (string)mSetTilesListBox.SelectedItem;
+            }
         }
     }
 
