@@ -20,7 +20,7 @@
         
         <!--Main canvas-->
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Grid.Row="1">
-            <Canvas x:Name="mMainCanvas" PreviewMouseDown="mMainCanvas_PreviewMouseDown"/>
+            <Canvas x:Name="mMainCanvas" PreviewMouseMove="mMainCanvas_PreviewMouseMove"/>
         </ScrollViewer>
         
         <!--Splitter-->
@@ -57,7 +57,7 @@
                     <!--Set tile-->
                     <StackPanel Margin="2,2,2,2">
                         <RadioButton x:Name="mSetTilesOptionBox" GroupName="Editor" IsChecked="True">Tile</RadioButton>
-                        <ListBox x:Name="mSetTilesListBox" SelectedIndex="0"/>
+                        <ListBox x:Name="mSetTilesListBox" SelectedIndex="0" />
                     </StackPanel>
                     
                     <!--Capture, StartPos-->
@@ -73,7 +73,10 @@
                             <TextBox x:Name="mSaveMapTextBox" />
                             <Button Content="SaveMap" Click="button1_Click" />                        
                         </StackPanel>
-                    </StackPanel>                    
+                    </StackPanel>
+                    
+                    <!--Reset map-->
+                    <Button Content="Reset" Click="mResetButton_Click" />
                 </StackPanel>
             </TabItem>
 
