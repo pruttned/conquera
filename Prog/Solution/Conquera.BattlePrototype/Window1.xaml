@@ -57,7 +57,9 @@
                     <!--Set tile-->
                     <StackPanel Margin="2,2,2,2">
                         <RadioButton x:Name="mSetTilesOptionBox" GroupName="Editor" IsChecked="True">Tile</RadioButton>
-                        <ListBox x:Name="mSetTilesListBox" SelectedIndex="0" />
+                        <ListBox x:Name="mSetTilesListBox" SelectedIndex="0" PreviewMouseDown="mSetTilesListBox_PreviewMouseDown" />
+                        <TextBlock x:Name="mSetTilesLeftButtonTextBlock" />
+                        <TextBlock x:Name="mSetTilesRightButtonTextBlock" />
                     </StackPanel>
                     
                     <!--Capture, StartPos-->
