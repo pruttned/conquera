@@ -58,10 +58,19 @@ namespace Conquera.BattlePrototype
 
         public int mHp;
 
+        private List<IBattleUnitDefenseModifier> mDefenseModifiers = new List<IBattleUnitDefenseModifier>();
+        private List<IBattleUnitAttackModifier> mAttackModifiers = new List<IBattleUnitAttackModifier>();
+        private List<IBattleUnitMovementDistanceModifier> mMovementDistanceModifiers = new List<IBattleUnitMovementDistanceModifier>();
+
+
         private TextBlock mPropertiesTextBlock;
         private Border mBorder;
         private bool mHasMovedThisTurn;
         private bool mIsSelected = false;
+
+
+        public int mDefense;
+
 
         public BattlePlayer Player { get; private set; }
 
@@ -86,7 +95,11 @@ namespace Conquera.BattlePrototype
 
         //temp
         public int Attack { get { return BaseAttack; } }
-        public int Defense { get; private set; }
+        public int Defense
+        {
+            get { return mDefense; }
+            private set { mDefense = Math.Max(0, value); }
+        }
         public int MovementDistance { get { return BaseMovementDistance; } }
 
         public bool HasMovedThisTurn
@@ -124,9 +137,9 @@ namespace Conquera.BattlePrototype
                     //UpdatePositionFromIndex();
                     mTerrain[mTileIndex.X, mTileIndex.Y].Unit = this;
 
-                    UpdateSiblingsDefenses(oldValue);
-                    UpdateSiblingsDefenses(mTileIndex);
-                    UpdateDefenseFromAlies();
+                    NotifySiblingsAfterDeparture(oldValue);
+                    NotifySiblingsAfterArrival();
+                    UpdateDefense();
 
                     if (null != TileIndexChanged)
                     {
@@ -189,10 +202,21 @@ namespace Conquera.BattlePrototype
             image.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             Children.Add(image);
 
-            UpdateDefenseFromAlies();
-            UpdateSiblingsDefenses(mTileIndex);
+            UpdateDefense();
+            NotifySiblingsAfterArrival();
 
             Hp = MaxHp;
+        }
+
+        public void AddDefenseModifier(IBattleUnitDefenseModifier modifier)
+        {
+            if (null == modifier) throw new ArgumentNullException("modifier");
+            mDefenseModifiers.Add(modifier);
+        }
+        public bool RemoveDefenseModifier(IBattleUnitDefenseModifier modifier)
+        {
+            if (null == modifier) throw new ArgumentNullException("modifier");
+            return mDefenseModifiers.Remove(modifier);
         }
 
         public void Kill()
@@ -201,6 +225,7 @@ namespace Conquera.BattlePrototype
             {
                 mTerrain[mTileIndex.X, mTileIndex.Y].Unit = null;
             }
+            NotifySiblingsAfterDeparture(mTileIndex);
         }
 
         /// <summary>
@@ -308,24 +333,6 @@ namespace Conquera.BattlePrototype
             return damage;
         }
 
-        public void UpdateDefenseFromAlies()
-        {
-            int defense = 0;
-            mTerrain.ForEachSibling(TileIndex,
-                sibling =>
-                {
-                    if (null != sibling.Unit && sibling.Unit.Player == Player)
-                    {
-                        defense++;
-                    }
-                });
-
-            //todo: spell effectss
-            Defense = BaseDefense + defense;
-
-            UpdateGraphics();
-        }
-
         public void Move(Point tileIndex)
         {
             HasMovedThisTurn = true;
@@ -342,18 +349,89 @@ namespace Conquera.BattlePrototype
 
         protected abstract string GetImageFileName();
 
-
-
-        private void UpdateSiblingsDefenses(Point pos)
+        private void AfterSiblingArrival(BattleUnit battleUnit)
         {
-            mTerrain.ForEachSibling(pos,
+            UpdateDefense();
+        }
+        private void AfterSiblingDeparture(BattleUnit battleUnit)
+        {
+            UpdateDefense();
+        }
+
+        private void UpdateDefense()
+        {
+            int defenseFromAllies = 0;
+            mTerrain.ForEachSibling(TileIndex,
                 sibling =>
                 {
                     if (null != sibling.Unit && sibling.Unit.Player == Player)
                     {
-                        sibling.Unit.UpdateDefenseFromAlies();
+                        defenseFromAllies++;
                     }
                 });
+
+            //todo: spell effectss
+            Defense = BaseDefense + defenseFromAllies + GetDefenseModifier();
+
+            UpdateGraphics();
+        }
+
+        private void NotifySiblingsAfterArrival()
+        {
+            mTerrain.ForEachSibling(TileIndex,
+                sibling =>
+                {
+                    if (null != sibling.Unit && sibling.Unit.Player == Player)
+                    {
+                        sibling.Unit.AfterSiblingArrival(this);
+                    }
+                });
+        }
+
+
+        private void NotifySiblingsAfterDeparture(Point oldPos)
+        {
+            mTerrain.ForEachSibling(oldPos,
+                sibling =>
+                {
+                    if (null != sibling.Unit && sibling.Unit.Player == Player)
+                    {
+                        sibling.Unit.AfterSiblingDeparture(this);
+                    }
+                });
+        }
+
+
+        private int GetDefenseModifier()
+        {
+            int sum = 0;
+            foreach (var modif in mDefenseModifiers)
+            {
+                sum += modif.GetModifier(this);
+            }
+            return sum;
+        }
+        private int GetAttackModifier()
+        {
+            int sum = 0;
+            foreach (var modif in mAttackModifiers)
+            {
+                sum += modif.GetModifier(this);
+            }
+            return sum;
+        }
+        private int GetMovementDistanceModifier()
+        {
+            int sum = 0;
+            foreach (var modif in mMovementDistanceModifiers)
+            {
+                sum += modif.GetModifier(this);
+            }
+            return sum;
+        }
+
+        internal void AfterBattle()
+        {
         }
     }
 

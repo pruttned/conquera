@@ -205,13 +205,12 @@ namespace Conquera.BattlePrototype
             mTurnNum++;
             ActivePlayer = mPlayers[mTurnNum % 2];
 
-            //Update defenses
+            //Notify units after battle
             foreach (var player in mPlayers)
             {
                 foreach (var unit in player.Units)
                 {
-                    unit.UpdateDefenseFromAlies();
-                    unit.UpdateGraphics();
+                    unit.AfterBattle();
                 }
             }
 
