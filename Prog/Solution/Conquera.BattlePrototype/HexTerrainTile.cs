@@ -34,6 +34,7 @@ namespace Conquera.BattlePrototype
         private Border mMoveIndicator;
         private bool mIsMoveIndicatorVisible = false;
         private Line mStartPosIndicator;
+        private Polygon mCanCasCardIndicator;
 
         public Point Index { get; private set; }
         
@@ -153,6 +154,30 @@ namespace Conquera.BattlePrototype
                 Y2 = lowerRightCornerPosition.Y
             };
             Children.Add(mStartPosIndicator);
+
+            mCanCasCardIndicator = new Polygon();
+            mCanCasCardIndicator.Points.Add(GetCornerPosition(HexTileCorner.Top));
+            mCanCasCardIndicator.Points.Add(GetCornerPosition(HexTileCorner.UperRight));
+            mCanCasCardIndicator.Points.Add(GetCornerPosition(HexTileCorner.LowerRight));
+            mCanCasCardIndicator.Points.Add(GetCornerPosition(HexTileCorner.Down));
+            mCanCasCardIndicator.Points.Add(GetCornerPosition(HexTileCorner.LowerLeft));
+            mCanCasCardIndicator.Points.Add(GetCornerPosition(HexTileCorner.UperLeft));
+            mCanCasCardIndicator.Visibility = System.Windows.Visibility.Hidden;
+            mCanCasCardIndicator.Opacity = 0.8;
+            mCanCasCardIndicator.StrokeThickness = 1.0;
+            Children.Add(mCanCasCardIndicator);
+        }
+
+        public void ShowCanCastCardIndicator(bool canCast)
+        {
+            mCanCasCardIndicator.Fill = canCast ? Brushes.Blue : Brushes.Red;
+            mCanCasCardIndicator.Stroke = mCanCasCardIndicator.Fill;
+            mCanCasCardIndicator.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        public void HideCanCastCardIndicator()
+        {
+            mCanCasCardIndicator.Visibility = System.Windows.Visibility.Hidden;
         }
 
         public void SetStartPosIndicator(BattlePlayer player)

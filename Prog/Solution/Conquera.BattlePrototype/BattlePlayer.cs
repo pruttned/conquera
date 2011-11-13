@@ -23,11 +23,13 @@ using System.Windows.Media;
 using Microsoft.Xna.Framework;
 using System.Reflection;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace Conquera.BattlePrototype
 {
-    public class BattlePlayer
+    public class BattlePlayer : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler ManaChanged;
 
         public const int MaxCardsInHandCnt = 7;
@@ -50,6 +52,7 @@ namespace Conquera.BattlePrototype
             {
                 mMana = MathExt.Clamp(value, 0, MaxMana);
                 EventHelper.RaiseEvent(ManaChanged, this);
+                EventHelper.RaisePropertyChanged(PropertyChanged, this, "Mana");
             }
         }
 
