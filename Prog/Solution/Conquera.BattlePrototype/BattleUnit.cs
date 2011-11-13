@@ -68,7 +68,6 @@ namespace Conquera.BattlePrototype
         private bool mHasMovedThisTurn;
         private bool mIsSelected = false;
 
-
         public int mDefense;
 
 
@@ -162,6 +161,11 @@ namespace Conquera.BattlePrototype
             }
         }
 
+        public virtual int Level
+        {
+            get { return 1; }
+        }
+
         public BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
         {
             if (null == player) throw new ArgumentNullException("player");
@@ -206,6 +210,14 @@ namespace Conquera.BattlePrototype
             NotifySiblingsAfterArrival();
 
             Hp = MaxHp;
+
+            TextBlock levelTextBlock = new TextBlock();
+            levelTextBlock.Text = Level.ToString();
+            levelTextBlock.Foreground = Brushes.Yellow;
+            levelTextBlock.Background = Brushes.Black;
+            levelTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
+            levelTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            Children.Add(levelTextBlock);
         }
 
         public void AddDefenseModifier(IBattleUnitDefenseModifier modifier)
@@ -625,6 +637,11 @@ namespace Conquera.BattlePrototype
             get { return 4; }
         }
 
+        public override int Level
+        {
+            get { return 2; }
+        }
+
         public SkeletonLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
         {
@@ -657,7 +674,12 @@ namespace Conquera.BattlePrototype
         {
             get { return 4; }
         }
-        
+
+        public override int Level
+        {
+            get { return 2; }
+        }
+
         public ZombieLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
         {
@@ -691,6 +713,10 @@ namespace Conquera.BattlePrototype
             get { return 4; }
         }
 
+        public override int Level
+        {
+            get { return 2; }
+        }
 
         public BansheeLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
@@ -723,6 +749,11 @@ namespace Conquera.BattlePrototype
         public override int MaxHp
         {
             get { return 4; }
+        }
+
+        public override int Level
+        {
+            get { return 2; }
         }
 
         public SpectreLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)

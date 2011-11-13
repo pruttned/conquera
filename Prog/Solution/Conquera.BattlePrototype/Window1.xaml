@@ -39,7 +39,25 @@
                 <StackPanel Orientation="Horizontal">
                     <Button Content="EndTurn" Click="Button_Click"/>
                     <!--<ListBox ItemsSource="{Binding ActivePlayer.CardsInHand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />-->
-                    <ListBox x:Name="mCardsListBox" />
+                    
+                    <ListBox x:Name="mCardsListBox" SelectionChanged="mCardsListBox_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}">
+                                    <TextBlock.Background>
+                                        <MultiBinding>
+                                            <MultiBinding.Converter>
+                                                <proto:CanCastCardConverter />
+                                            </MultiBinding.Converter>
+                                            <Binding Path="Card.Cost" />
+                                            <Binding Path="ActivePlayer.Mana" RelativeSource="{RelativeSource AncestorType={x:Type Window}}" />
+                                        </MultiBinding>
+                                    </TextBlock.Background>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    
                     <Button Click="mUnselectCardButton_Click" Content="Deselect Card"/>
                 </StackPanel>
             </TabItem>

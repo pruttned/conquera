@@ -494,6 +494,7 @@ namespace Conquera.BattlePrototype
         {
             SelectUnit(null);
             SetStartPosIndicatorsVisibility(mTabControl.SelectedItem == mEditorTabItem);
+            mCardsListBox.SelectedIndex = -1;
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
@@ -569,6 +570,40 @@ namespace Conquera.BattlePrototype
         {
             mCardsListBox.SelectedIndex = -1;
         }
+
+        private void mCardsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateCanCastCardIndicators();
+            e.Handled = true;
+        }
+
+        public void UpdateCanCastCardIndicators()
+        {
+            SpellCardListBoxItem cardItem = (SpellCardListBoxItem)mCardsListBox.SelectedItem;
+            if (cardItem == null)
+            {
+                for (int i = 0; i < mTerrain.Width; i++)
+                {
+                    for (int j = 0; j < mTerrain.Height; j++)
+                    {
+                        mTerrain[i, j].HideCanCastCardIndicator();
+                    }
+                }
+            }
+            else
+            {
+                SpellCard card = cardItem.Card;
+
+                for (int i = 0; i < mTerrain.Width; i++)
+                {
+                    for (int j = 0; j < mTerrain.Height; j++)
+                    {
+                        HexTerrainTile tile = mTerrain[i, j];
+                        tile.ShowCanCastCardIndicator(card.IsValidTarget(ActivePlayer, tile, mTerrain));
+                    }
+                }
+            }
+        }
     }
 
     public class ColorToBrushConverter : IValueConverter
@@ -583,4 +618,27 @@ namespace Conquera.BattlePrototype
             throw new NotImplementedException();
         }
     }
+
+    public class CanCastCardConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            try
+            {
+                int cost = (int)values[0];
+                int playerMana = (int)values[1];
+                return cost <= playerMana ? Brushes.Transparent : Brushes.Red;
+            }
+            catch //Some error in designer...
+            {
+                return Brushes.Transparent;
+            }
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 }
