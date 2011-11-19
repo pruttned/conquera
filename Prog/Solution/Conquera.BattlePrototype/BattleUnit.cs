@@ -81,6 +81,8 @@ namespace Conquera.BattlePrototype
         public abstract int BaseMovementDistance { get; }
         public abstract int MaxHp { get; }
 
+        public bool IsKilled { get; private set; }
+
         public int Hp
         {
             get { return mHp; }
@@ -173,6 +175,7 @@ namespace Conquera.BattlePrototype
             if (null == player) throw new ArgumentNullException("player");
             if (null == terrain) throw new ArgumentNullException("terrain");
 
+            IsKilled = false;
             Player = player;
             mTerrain = terrain;
             mTileIndex = tileIndex;
@@ -236,23 +239,27 @@ namespace Conquera.BattlePrototype
             return removed;
         }
 
-        public void OnTurnStart(int turnNum, BattlePlayer playerOnTurn)
+        public void OnTurnStart(int turnNum)
         {
             //update spell effects
-            for (int i = mSpellEffects.Count - 1; i >= 0; --i)
+            for (int i = mSpellEffects.Count - 1; i >= 0 && !IsKilled; --i)
             {
-                if (!mSpellEffects[i].OnStartTurn(turnNum, playerOnTurn))
+                if (!mSpellEffects[i].OnStartTurn(turnNum))
                 {
                     mSpellEffects[i].OnEnd();
                     mSpellEffects.RemoveAt(i);
                 }
             }
 
-            UpdateGraphics();
+            if (!IsKilled)
+            {
+                UpdateGraphics();
+            }
         }
 
         public void Kill()
         {
+            IsKilled = true;
             if (Player.Units.Remove(this))
             {
                 mTerrain[mTileIndex.X, mTileIndex.Y].Unit = null;
