@@ -37,11 +37,21 @@ namespace Conquera.BattlePrototype
             new SummonBansheeLv2UnitSpellCard(),
             new SummonSpectreLv2UnitSpellCard(),
 
-            new Add2ManaCard(),
-            new Add5ManaCard(),
-            new Add7ManaCard(),
-            new Add10ManaCard(),
-            new Add15ManaCard()
+
+            new AddDefenseSpellCard(3,1,2),
+            new AddDefenseSpellCard(4,1,3),
+            new AddDefenseSpellCard(3,2,1)
+
+            //new Add2ManaCard(),
+            //new Add5ManaCard(),
+            //new Add7ManaCard(),
+            //new Add10ManaCard(),
+            //new Add15ManaCard()
         };
+
+        //public static List<SpellCard> FullDeck = new List<SpellCard>()
+        //{
+        //    new AddDefenseSpellCard(1,1,2)
+        //};
     }
 }

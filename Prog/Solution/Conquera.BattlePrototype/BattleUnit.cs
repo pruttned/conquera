@@ -68,7 +68,10 @@ namespace Conquera.BattlePrototype
         private bool mHasMovedThisTurn;
         private bool mIsSelected = false;
 
-        public int mDefense;
+        private int mDefense;
+
+        private List<IBattleUnitSpellEffect> mSpellEffects = new List<IBattleUnitSpellEffect>();
+
 
 
         public BattlePlayer Player { get; private set; }
@@ -119,7 +122,6 @@ namespace Conquera.BattlePrototype
             get { return mTileIndex; }
             set
             {
-
                 if (value != mTileIndex)
                 {
                     if (null != mTerrain[value.X, value.Y].Unit)
@@ -224,11 +226,29 @@ namespace Conquera.BattlePrototype
         {
             if (null == modifier) throw new ArgumentNullException("modifier");
             mDefenseModifiers.Add(modifier);
+            UpdateDefense();
         }
         public bool RemoveDefenseModifier(IBattleUnitDefenseModifier modifier)
         {
             if (null == modifier) throw new ArgumentNullException("modifier");
-            return mDefenseModifiers.Remove(modifier);
+            bool removed = mDefenseModifiers.Remove(modifier);
+            UpdateDefense();
+            return removed;
+        }
+
+        public void OnTurnStart(int turnNum, BattlePlayer playerOnTurn)
+        {
+            //update spell effects
+            for (int i = mSpellEffects.Count - 1; i >= 0; --i)
+            {
+                if (!mSpellEffects[i].OnStartTurn(turnNum, playerOnTurn))
+                {
+                    mSpellEffects[i].OnEnd();
+                    mSpellEffects.RemoveAt(i);
+                }
+            }
+
+            UpdateGraphics();
         }
 
         public void Kill()
@@ -359,6 +379,12 @@ namespace Conquera.BattlePrototype
             mBorder.BorderBrush = (!HasMovedThisTurn && Player.IsActive ? Brushes.Yellow : Brushes.Black);
         }
 
+        public void AddSpellEffect(int turnNum, IBattleUnitSpellEffect spellEffect)
+        {
+            mSpellEffects.Add(spellEffect);
+            spellEffect.OnCast(turnNum, this);
+        }
+
         protected abstract string GetImageFileName();
 
         private void AfterSiblingArrival(BattleUnit battleUnit)
@@ -442,9 +468,6 @@ namespace Conquera.BattlePrototype
             return sum;
         }
 
-        internal void AfterBattle()
-        {
-        }
     }
 
     public class GeneralBattleUnit : BattleUnit
