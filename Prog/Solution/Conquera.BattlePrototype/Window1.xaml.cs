@@ -605,6 +605,16 @@ namespace Conquera.BattlePrototype
                 }
             }
         }
+
+        private void CardItem_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.RightButton == MouseButtonState.Pressed)
+            {                
+                SpellCardListBoxItem cardItem = (SpellCardListBoxItem)((TextBlock)sender).DataContext;
+                ActivePlayer.DiscardSpellCard(mTurnNum, mCardsListBox.Items.IndexOf(cardItem));
+                mCardsListBox.IsEnabled = false;
+            }
+        }
     }
 
     public class ColorToBrushConverter : IValueConverter
