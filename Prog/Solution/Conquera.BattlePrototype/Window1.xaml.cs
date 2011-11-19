@@ -571,6 +571,7 @@ namespace Conquera.BattlePrototype
         private void mCardsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UpdateCanCastCardIndicators();
+            SelectUnit(null);
             e.Handled = true;
         }
 

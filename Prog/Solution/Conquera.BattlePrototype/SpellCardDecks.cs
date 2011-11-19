@@ -40,7 +40,16 @@ namespace Conquera.BattlePrototype
 
             new AddDefenseSpellCard(3,1,2),
             new AddDefenseSpellCard(4,1,3),
-            new AddDefenseSpellCard(3,2,1)
+            new AddDefenseSpellCard(3,2,1),
+
+            new AddAttackSpellCard(3,1,2),
+            new AddAttackSpellCard(4,1,3),
+            new AddAttackSpellCard(3,2,1),
+
+            new AddMovementDistanceSpellCard(3,1,2),
+            new AddMovementDistanceSpellCard(4,1,4),
+            new AddMovementDistanceSpellCard(3,2,1)
+
 
             //new Add2ManaCard(),
             //new Add5ManaCard(),

@@ -104,6 +104,7 @@
   <ItemGroup>
     <Compile Include="BattlePlayer.cs" />
     <Compile Include="BattleUnit.cs" />
+    <Compile Include="BattleUnitSpellEffect.cs" />
     <Compile Include="EventHelper.cs" />
     <Compile Include="HexHelper.cs" />
     <Compile Include="HexTerrain.cs" />
