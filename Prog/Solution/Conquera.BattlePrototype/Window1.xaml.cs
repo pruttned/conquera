@@ -205,18 +205,19 @@ namespace Conquera.BattlePrototype
             mTurnNum++;
             ActivePlayer = mPlayers[mTurnNum % 2];
 
-            //Notify units after battle
-            foreach (var player in mPlayers)
-            {
-                foreach (var unit in player.Units)
-                {
-                    unit.AfterBattle();
-                }
-            }
 
             ActivePlayer.OnTurnStart(mTurnNum);
             SelectUnit(null);
             mCardsListBox.IsEnabled = true;
+
+
+            foreach (var player in mPlayers)
+            {
+                foreach (var unit in player.Units)
+                {
+                    unit.OnTurnStart(mTurnNum, ActivePlayer);
+                }
+            }
         }
 
         private void SelectUnit(BattleUnit unit)
@@ -424,7 +425,7 @@ namespace Conquera.BattlePrototype
                                 SpellCard card = cardListBoxItem.Card;
                                 if (card.Cost <= ActivePlayer.Mana && card.IsValidTarget(ActivePlayer, tile, mTerrain))
                                 {
-                                    ActivePlayer.CastSpellCard(mCardsListBox.SelectedIndex, tile, mTerrain);
+                                    ActivePlayer.CastSpellCard(mTurnNum, mCardsListBox.SelectedIndex, tile, mTerrain);
                                     mCardsListBox.IsEnabled = false;
                                 }
                             }

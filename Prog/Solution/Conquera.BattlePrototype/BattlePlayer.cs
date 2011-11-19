@@ -84,7 +84,7 @@ namespace Conquera.BattlePrototype
             CardsInHand = new ObservableCollection<SpellCard>();
         }
 
-        public void CastSpellCard(int indexInHand, HexTerrainTile tile, HexTerrain terrain)
+        public void CastSpellCard(int turnNum, int indexInHand, HexTerrainTile tile, HexTerrain terrain)
         {
             if (null == tile) throw new ArgumentNullException("tile");
             if (null == terrain) throw new ArgumentNullException("terrain");
@@ -96,7 +96,15 @@ namespace Conquera.BattlePrototype
             }
             Mana -= card.Cost;
             CardsInHand.RemoveAt(indexInHand);
-            card.Cast(this, tile, terrain);
+            card.Cast(turnNum, this, tile, terrain);
+        }
+
+
+        public void DiscardSpellCard(int turnNum, int indexInHand)
+        {
+            var card = CardsInHand[indexInHand];
+            CardsInHand.RemoveAt(indexInHand);
+            card.Discard(turnNum, this);
         }
 
         public void OnTurnStart(int turnNum)
