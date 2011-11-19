@@ -206,17 +206,13 @@ namespace Conquera.BattlePrototype
             ActivePlayer = mPlayers[mTurnNum % 2];
 
 
-            ActivePlayer.OnTurnStart(mTurnNum);
             SelectUnit(null);
             mCardsListBox.IsEnabled = true;
 
 
             foreach (var player in mPlayers)
             {
-                foreach (var unit in player.Units)
-                {
-                    unit.OnTurnStart(mTurnNum, ActivePlayer);
-                }
+                player.OnTurnStart(mTurnNum, (ActivePlayer == player));
             }
         }
 

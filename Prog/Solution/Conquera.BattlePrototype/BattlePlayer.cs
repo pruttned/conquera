@@ -72,14 +72,14 @@ namespace Conquera.BattlePrototype
         
         public ObservableCollection<SpellCard> CardsInHand { get; set; }
 
-        public List<BattleUnit> Units { get; private set; }
+        public SafeModifiableIterableCollection<BattleUnit> Units { get; private set; }
 
         public BattlePlayer(Color color, int index)
         {
             Color = color;
             Index = index;
 
-            Units = new List<BattleUnit>();
+            Units = new SafeModifiableIterableCollection<BattleUnit>();
             CardDeck = new List<SpellCard>();
             CardsInHand = new ObservableCollection<SpellCard>();
         }
@@ -107,13 +107,18 @@ namespace Conquera.BattlePrototype
             card.Discard(turnNum, this);
         }
 
-        public void OnTurnStart(int turnNum)
+        public void OnTurnStart(int turnNum, bool isActive)
         {
             foreach (var unit in Units)
             {
                 unit.HasMovedThisTurn = false;
             }
 
+            foreach (var unit in Units)
+            {
+                unit.OnTurnStart(turnNum);
+            }
+            Units.Tidy();
             FillCardsInHand();
         }
 

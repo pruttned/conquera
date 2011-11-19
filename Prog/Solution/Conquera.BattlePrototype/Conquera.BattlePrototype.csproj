@@ -123,6 +123,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="SafeModifiableIterableCollection.cs" />
     <Compile Include="SpellCard.cs" />
     <Compile Include="SpellCardDecks.cs" />
     <Compile Include="SpellEffect.cs" />

@@ -9,7 +9,7 @@ namespace Conquera.BattlePrototype
     {
         void OnCast(int turnNum, BattleUnit unit);
         void OnEnd();
-        bool OnStartTurn(int turnNum, BattlePlayer playerOnTurn);
+        bool OnStartTurn(int turnNum);
     }
 
     public interface IBattlePlayerSpellEffect
@@ -48,21 +48,21 @@ namespace Conquera.BattlePrototype
             OnCastImpl(turnNum, unit);
         }
 
-        public bool OnStartTurn(int turnNum, BattlePlayer playerOnTurn)
+        public bool OnStartTurn(int turnNum)
         {
             if (mEndTurn <= turnNum)
             {
                 return false;
             }
 
-            return OnStartTurnImpl(turnNum, playerOnTurn);
+            return OnStartTurnImpl(turnNum);
         }
 
         public abstract void OnEnd();
 
         protected abstract void OnCastImpl(int turnNum, BattleUnit unit);
 
-        protected abstract bool OnStartTurnImpl(int turnNum, BattlePlayer playerOnTurn);
+        protected abstract bool OnStartTurnImpl(int turnNum);
 
         #region IBattleUnitSpellEffect Members
 
@@ -96,7 +96,7 @@ namespace Conquera.BattlePrototype
             mUnit = unit;
         }
 
-        protected override bool OnStartTurnImpl(int turnNum, BattlePlayer playerOnTurn)
+        protected override bool OnStartTurnImpl(int turnNum)
         {
             return true;
         }
