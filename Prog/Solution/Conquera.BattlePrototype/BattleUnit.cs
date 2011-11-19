@@ -69,6 +69,8 @@ namespace Conquera.BattlePrototype
         private bool mIsSelected = false;
 
         private int mDefense;
+        private int mAttack;
+        private int mMovementDistance;
 
         private List<IBattleUnitSpellEffect> mSpellEffects = new List<IBattleUnitSpellEffect>();
 
@@ -98,13 +100,21 @@ namespace Conquera.BattlePrototype
         //public int MovementDistance { get; private set; }
 
         //temp
-        public int Attack { get { return BaseAttack; } }
+        public int Attack
+        {
+            get { return mAttack; }
+            private set { mAttack = Math.Max(0, value); }
+        }
         public int Defense
         {
             get { return mDefense; }
             private set { mDefense = Math.Max(0, value); }
         }
-        public int MovementDistance { get { return BaseMovementDistance; } }
+        public int MovementDistance
+        {
+            get { return mMovementDistance; }
+            private set { mMovementDistance = Math.Max(0, value); }
+        }
 
         public bool HasMovedThisTurn
         {
@@ -212,6 +222,8 @@ namespace Conquera.BattlePrototype
             Children.Add(image);
 
             UpdateDefense();
+            UpdateAttack();
+            UpdateMovementDistance();
             NotifySiblingsAfterArrival();
 
             Hp = MaxHp;
@@ -238,6 +250,35 @@ namespace Conquera.BattlePrototype
             UpdateDefense();
             return removed;
         }
+        public void AddAttackModifier(IBattleUnitAttackModifier modifier)
+        {
+            if (null == modifier) throw new ArgumentNullException("modifier");
+            mAttackModifiers.Add(modifier);
+            UpdateAttack();
+        }
+        public bool RemoveAttackModifier(IBattleUnitAttackModifier modifier)
+        {
+            if (null == modifier) throw new ArgumentNullException("modifier");
+            bool removed = mAttackModifiers.Remove(modifier);
+            UpdateAttack();
+            return removed;
+        }
+        public void AddMovementDistanceModifier(IBattleUnitMovementDistanceModifier modifier)
+        {
+            if (null == modifier) throw new ArgumentNullException("modifier");
+            mMovementDistanceModifiers.Add(modifier);
+            UpdateMovementDistance();
+        }
+        public bool RemoveMovementDistanceModifier(IBattleUnitMovementDistanceModifier modifier)
+        {
+            if (null == modifier) throw new ArgumentNullException("modifier");
+            bool removed = mMovementDistanceModifiers.Remove(modifier);
+            UpdateMovementDistance();
+            return removed;
+        }
+
+
+
 
         public void OnTurnStart(int turnNum)
         {
@@ -256,7 +297,7 @@ namespace Conquera.BattlePrototype
                 UpdateGraphics();
             }
         }
-
+        
         public void Kill()
         {
             IsKilled = true;
@@ -415,8 +456,19 @@ namespace Conquera.BattlePrototype
                     }
                 });
 
-            //todo: spell effectss
             Defense = BaseDefense + defenseFromAllies + GetDefenseModifier();
+
+            UpdateGraphics();
+        }
+        private void UpdateAttack()
+        {
+            Attack = BaseAttack + GetAttackModifier();
+
+            UpdateGraphics();
+        }
+        private void UpdateMovementDistance()
+        {
+            MovementDistance = BaseMovementDistance + GetMovementDistanceModifier();
 
             UpdateGraphics();
         }
@@ -433,7 +485,6 @@ namespace Conquera.BattlePrototype
                 });
         }
 
-
         private void NotifySiblingsAfterDeparture(Point oldPos)
         {
             mTerrain.ForEachSibling(oldPos,
@@ -445,7 +496,6 @@ namespace Conquera.BattlePrototype
                     }
                 });
         }
-
 
         private int GetDefenseModifier()
         {

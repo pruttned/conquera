@@ -277,6 +277,82 @@ namespace Conquera.BattlePrototype
             tile.Unit.AddSpellEffect(turnNum, new ConstIncDefenseBattleUnitSpellEffect(DefenseInc, Duration));
         }
     }
+    public class AddAttackSpellCard : SpellCard
+    {
+        protected int mCost;
 
+        public override string Name
+        {
+            get { return string.Format("Attack {0} for {1} turns", AttackInc, Duration); }
+        }
 
+        public override string Description
+        {
+            get { return string.Format("Attack {0} for {1} turns", AttackInc, Duration); }
+        }
+
+        public override int Cost
+        {
+            get { return mCost; }
+        }
+
+        public int Duration { get; private set; }
+        public int AttackInc { get; private set; }
+
+        public AddAttackSpellCard(int cost, int duration, int attackInc)
+        {
+            mCost = cost;
+            Duration = duration;
+            AttackInc = attackInc;
+        }
+
+        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            return (null != tile.Unit && player == tile.Unit.Player);
+        }
+
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            tile.Unit.AddSpellEffect(turnNum, new ConstIncAttackBattleUnitSpellEffect(AttackInc, Duration));
+        }
+    }
+    public class AddMovementDistanceSpellCard : SpellCard
+    {
+        protected int mCost;
+
+        public override string Name
+        {
+            get { return string.Format("MovementDistance {0} for {1} turns", MovementDistanceInc, Duration); }
+        }
+
+        public override string Description
+        {
+            get { return string.Format("MovementDistance {0} for {1} turns", MovementDistanceInc, Duration); }
+        }
+
+        public override int Cost
+        {
+            get { return mCost; }
+        }
+
+        public int Duration { get; private set; }
+        public int MovementDistanceInc { get; private set; }
+
+        public AddMovementDistanceSpellCard(int cost, int duration, int movementDistanceInc)
+        {
+            mCost = cost;
+            Duration = duration;
+            MovementDistanceInc = movementDistanceInc;
+        }
+
+        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            return (null != tile.Unit && player == tile.Unit.Player);
+        }
+
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            tile.Unit.AddSpellEffect(turnNum, new ConstIncMovementDistanceBattleUnitSpellEffect(MovementDistanceInc, Duration));
+        }
+    }
 }
