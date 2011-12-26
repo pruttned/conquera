@@ -49,9 +49,9 @@ namespace Ale.Graphics
         private static ShortIndexList mIndices = new ShortIndexList(1000);
 
         /// <summary>
-        /// Batched model parts sorted by render layer and material
+        /// Batched model parts sorted by material
         /// </summary>
-        private Dictionary<int, Dictionary<Material, List<BatchedGraphicModelPart>>> mBatchedGraphicModelParts = new Dictionary<int, Dictionary<Material, List<BatchedGraphicModelPart>>>();
+        private Dictionary<Material, List<BatchedGraphicModelPart>> mBatchedGraphicModelParts = new Dictionary<Material, List<BatchedGraphicModelPart>>();
 
         /// <summary>
         /// Batched graphic models sorted by Id
@@ -197,20 +197,13 @@ namespace Ale.Graphics
             for (int i = 0; i < batchedGraphicModel.Parts.Count; ++i)
             {
                 BatchedGraphicModelPart part = batchedGraphicModel.Parts[i];
-                //Get Material-Geometry Dictionary
-                Dictionary<Material, List<BatchedGraphicModelPart>> materialPartDict;
-                if (!mBatchedGraphicModelParts.TryGetValue(part.Material.RenderLayer, out materialPartDict))
-                {
-                    materialPartDict = new Dictionary<Material, List<BatchedGraphicModelPart>>();
-                    mBatchedGraphicModelParts.Add(part.Material.RenderLayer, materialPartDict);
-                }
 
-                //Get Geometry list
+                //Get material bucket
                 List<BatchedGraphicModelPart> partList;
-                if (!materialPartDict.TryGetValue(part.Material, out partList))
+                if (!mBatchedGraphicModelParts.TryGetValue(part.Material, out partList))
                 {
                     partList = new List<BatchedGraphicModelPart>();
-                    materialPartDict.Add(part.Material, partList);
+                    mBatchedGraphicModelParts.Add(part.Material, partList);
                 }
 
                 partList.Add(part);
@@ -232,37 +225,45 @@ namespace Ale.Graphics
             BatchedGraphicModel removedModel = mBatchedGraphicModels.Remove(id);
             if (null != removedModel)
             {
-                int mehVertCnt = removedModel.Mesh.Vertices.Count;
-                mVertCnt -= mehVertCnt;
-
                 Unload(); //release built geometry
-
+                mVertCnt -= removedModel.Mesh.Vertices.Count;
                 //parts
-                for(int i = 0; i< removedModel.Parts.Count; ++i)
+                for (int i = 0; i < removedModel.Parts.Count; ++i)
                 {
                     BatchedGraphicModelPart part = removedModel.Parts[i];
-                    mBatchedGraphicModelParts[part.Material.RenderLayer][part.Material].Remove(part);
+                    var partList = mBatchedGraphicModelParts[part.Material];
+                    partList.Remove(part);
+                    if (0 == partList.Count) // remove empty material bucket
+                    {
+                        mBatchedGraphicModelParts.Remove(part.Material); //remove empty render layer bucket
+                    }
                 }
 
-                //bounds (BoundingBox -> BoundingSphere produces better results then BoundingSphere.CreateMerged or BoundingSphereBoundingSphere.CreateFromPoints)
-                bool first = true;
-                foreach (BatchedGraphicModel model in mBatchedGraphicModels)
+                if (0 == mBatchedGraphicModels.Count)
                 {
-                    BoundingSphere worldBounds;
-                    model.ComputeWorldBounds(out worldBounds);
+                    mBoundingBox = new BoundingBox();
+                }
+                else
+                {
+                    //bounds (BoundingBox -> BoundingSphere produces better results then BoundingSphere.CreateMerged or BoundingSphereBoundingSphere.CreateFromPoints)
+                    bool first = true;
+                    foreach (BatchedGraphicModel model in mBatchedGraphicModels)
+                    {
+                        BoundingSphere worldBounds;
+                        model.ComputeWorldBounds(out worldBounds);
 
-                    if (first)
-                    {
-                        mBoundingBox = BoundingBox.CreateFromSphere(worldBounds);
-                        first = false;
-                    }
-                    else
-                    {
-                        BoundingBox renderableBb = BoundingBox.CreateFromSphere(worldBounds);
-                        BoundingBox.CreateMerged(ref mBoundingBox, ref renderableBb, out mBoundingBox);
+                        if (first)
+                        {
+                            mBoundingBox = BoundingBox.CreateFromSphere(worldBounds);
+                            first = false;
+                        }
+                        else
+                        {
+                            BoundingBox renderableBb = BoundingBox.CreateFromSphere(worldBounds);
+                            BoundingBox.CreateMerged(ref mBoundingBox, ref renderableBb, out mBoundingBox);
+                        }
                     }
                 }
-
                 return true;
             }
             return false;
@@ -278,58 +279,55 @@ namespace Ale.Graphics
             {
                 if (!IsLoaded)
                 {
-                    foreach (Dictionary<Material, List<BatchedGraphicModelPart>> materialPartDict in mBatchedGraphicModelParts.Values)
+                    foreach (List<BatchedGraphicModelPart> renderableUnitList in mBatchedGraphicModelParts.Values)
                     {
-                        foreach (List<BatchedGraphicModelPart> renderableUnitList in materialPartDict.Values)
+                        if (0 < renderableUnitList.Count)
                         {
-                            if (0 < renderableUnitList.Count)
+                            int baseVertex = mVertices.Count;
+                            int baseIndex = mIndices.Count;
+                            Material material = renderableUnitList[0].Material;
+
+                            int indicesCnt = 0;
+                            int verticesCnt = 0;
+
+                            //int unitBaseIndex = 0;
+
+                            int renderableUnitCnt = renderableUnitList.Count;
+                            for (int i = 0; i < renderableUnitCnt; ++i)
                             {
-                                int baseVertex = mVertices.Count;
-                                int baseIndex = mIndices.Count;
-                                Material material = renderableUnitList[0].Material;
-
-                                int indicesCnt = 0;
-                                int verticesCnt = 0;
-
-                                //int unitBaseIndex = 0;
-
-                                int renderableUnitCnt = renderableUnitList.Count;
-                                for (int i = 0; i < renderableUnitCnt; ++i)
+                                BatchedGraphicModelPart part = renderableUnitList[i];
+                                if (part.BatchedGraphicModel.OnlyTranslation)
                                 {
-                                    BatchedGraphicModelPart part = renderableUnitList[i];
-                                    if (part.BatchedGraphicModel.OnlyTranslation)
-                                    {
-                                        mVertices.AddRange(part.BatchedGraphicModel.Mesh.Vertices.Items, part.MeshPart.BaseVertex, part.MeshPart.NumVertices, part.BatchedGraphicModel.WorldTranslation);
-                                    }
-                                    else
-                                    {
-                                        Matrix worldTransformation;
-                                        part.BatchedGraphicModel.ComputeWorldTransformation(out worldTransformation);
-                                        mVertices.AddRange(part.BatchedGraphicModel.Mesh.Vertices.Items, part.MeshPart.BaseVertex, part.MeshPart.NumVertices, ref worldTransformation);
-                                    }
-
-                                    mIndices.AddRange(part.BatchedGraphicModel.Mesh.Indices.Items, part.MeshPart.StartIndex, part.MeshPart.PrimitiveCnt * 3, verticesCnt);
-
-                                    indicesCnt += part.MeshPart.PrimitiveCnt * 3;
-                                    verticesCnt += part.MeshPart.NumVertices;
+                                    mVertices.AddRange(part.BatchedGraphicModel.Mesh.Vertices.Items, part.MeshPart.BaseVertex, part.MeshPart.NumVertices, part.BatchedGraphicModel.WorldTranslation);
+                                }
+                                else
+                                {
+                                    Matrix worldTransformation;
+                                    part.BatchedGraphicModel.ComputeWorldTransformation(out worldTransformation);
+                                    mVertices.AddRange(part.BatchedGraphicModel.Mesh.Vertices.Items, part.MeshPart.BaseVertex, part.MeshPart.NumVertices, ref worldTransformation);
                                 }
 
-                                mGeometryBatches.Add(new GeometryBatchUnit(this, material, baseVertex,
-                                        verticesCnt, indicesCnt / 3, baseIndex));
+                                mIndices.AddRange(part.BatchedGraphicModel.Mesh.Indices.Items, part.MeshPart.StartIndex, part.MeshPart.PrimitiveCnt * 3, verticesCnt);
+
+                                indicesCnt += part.MeshPart.PrimitiveCnt * 3;
+                                verticesCnt += part.MeshPart.NumVertices;
                             }
+
+                            mGeometryBatches.Add(new GeometryBatchUnit(this, material, baseVertex,
+                                    verticesCnt, indicesCnt / 3, baseIndex));
                         }
                     }
+                }
 
-                    mVertexBuffer = mVertices.CreateVertexBuffer(GraphicsDevice, true);
-                    mIndexBuffer = mIndices.CreateIndexBuffer(GraphicsDevice, true);
+                mVertexBuffer = mVertices.CreateVertexBuffer(GraphicsDevice, true);
+                mIndexBuffer = mIndices.CreateIndexBuffer(GraphicsDevice, true);
 
-                    mVertices.Clear();
-                    mIndices.Clear();
+                mVertices.Clear();
+                mIndices.Clear();
 
-                    if (null != AfterLoad)
-                    {
-                        AfterLoad.Invoke(this);
-                    }
+                if (null != AfterLoad)
+                {
+                    AfterLoad.Invoke(this);
                 }
             }
         }
