@@ -433,7 +433,7 @@ namespace Conquera.BattlePrototype
                                 if (card.Cost <= ActivePlayer.Mana && card.IsValidTarget(ActivePlayer, tile, mTerrain))
                                 {
                                     ActivePlayer.CastSpellCard(mTurnNum, mCardsListBox.SelectedIndex, tile, mTerrain);
-                                    mCardsListBox.IsEnabled = false;
+                                    //mCardsListBox.IsEnabled = false;
                                 }
                             }
                             else
@@ -613,7 +613,7 @@ namespace Conquera.BattlePrototype
             {                
                 SpellCardListBoxItem cardItem = (SpellCardListBoxItem)((TextBlock)sender).DataContext;
                 ActivePlayer.DiscardSpellCard(mTurnNum, mCardsListBox.Items.IndexOf(cardItem));
-                mCardsListBox.IsEnabled = false;
+                //mCardsListBox.IsEnabled = false;
             }
         }
     }

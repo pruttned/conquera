@@ -118,15 +118,19 @@ namespace Conquera.BattlePrototype
 
         public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
         {
-            //todo: cast on existing unit
-            OutpostHexTerrainTile outpost = tile as OutpostHexTerrainTile;
-            if (outpost != null && outpost.OwningPlayer == player && null == tile.Unit)
+            if (tile.IsPassableAndEmpty)
             {
-                return true;
+                //todo: cast on existing unit
+                OutpostHexTerrainTile outpost = tile as OutpostHexTerrainTile;
+                if (outpost != null && outpost.OwningPlayer == player && null == tile.Unit)
+                {
+                    return true;
+                }
+                mSiblings.Clear();
+                terrain.GetSiblings(tile.Index, mSiblings);
+                return (from s in mSiblings where s.Unit is HeroBattleUnit && s.Unit.Player == player select 1).Any();
             }
-            mSiblings.Clear();
-            terrain.GetSiblings(tile.Index, mSiblings);
-            return (from s in mSiblings where s.Unit is HeroBattleUnit && s.Unit.Player == player select 1).Any();
+            return false;
         }
 
         public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
