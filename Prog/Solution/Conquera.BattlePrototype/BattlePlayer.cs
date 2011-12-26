@@ -119,7 +119,12 @@ namespace Conquera.BattlePrototype
                 unit.OnTurnStart(turnNum);
             }
             Units.Tidy();
-            FillCardsInHand();
+            
+            //FillCardsInHand();
+            if (isActive)
+            {
+                AddRandomCard();
+            }
         }
 
         public void FillCardsInHand()
@@ -130,6 +135,14 @@ namespace Conquera.BattlePrototype
                 {
                     CardsInHand.Add(CardDeck[MathExt.Random.Next(CardDeck.Count)]);
                 }
+            }
+        }
+
+        private void AddRandomCard()
+        {
+            if (CardDeck.Count > 0)
+            {
+                CardsInHand.Add(CardDeck[MathExt.Random.Next(CardDeck.Count)]);
             }
         }
     }
