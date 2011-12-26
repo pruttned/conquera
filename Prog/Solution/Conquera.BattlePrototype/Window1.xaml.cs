@@ -39,6 +39,9 @@ namespace Conquera.BattlePrototype
     /// </summary>
     public partial class Window1 : Window, INotifyPropertyChanged
     {
+        int mInitMana = 15;
+        int mMaxMana = 30;
+
         private class SpellCardListBoxItem
         {
             public SpellCard Card { get; private set; }
@@ -88,17 +91,9 @@ namespace Conquera.BattlePrototype
 
         int mTurnNum = 0;
 
+
         public Window1()
         {
-            mPlayers[0].CardDeck = SpellCardDecks.FullDeck;
-            mPlayers[1].CardDeck = SpellCardDecks.FullDeck;
-            mPlayers[0].FillCardsInHand();
-            mPlayers[1].FillCardsInHand();
-            mPlayers[0].MaxMana = 15;
-            mPlayers[1].MaxMana = 15;
-            mPlayers[0].Mana = 5;
-            mPlayers[1].Mana = 5;
-
             InitializeComponent();
 
             if (!System.IO.Directory.Exists(mMapsDir))
@@ -109,21 +104,21 @@ namespace Conquera.BattlePrototype
                 
             ActivePlayer = mPlayers[0];
             
-            //LoadTerrain();
-            mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1, 2), "Outpost");
-            mTerrain.SetTile(new Microsoft.Xna.Framework.Point(0, 2), "Outpost");
+            ////LoadTerrain();
+            //mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1, 2), "Outpost");
+            //mTerrain.SetTile(new Microsoft.Xna.Framework.Point(0, 2), "Outpost");
 
             mPlayersListBox.ItemsSource = mPlayers;
             mPlayersListBox.SelectedIndex = 0;
             mSetTilesListBox.ItemsSource = HexTerrainTileFactory.TemplateNames;
 
-            new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 2));
-            new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 3));
-            new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 5));
-            new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 2));
-            new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 3));
-            new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 5));
-            new ZombieLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(4, 5));
+            //new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 2));
+            //new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 3));
+            //new SkeletonLv1BattleUnit(mPlayers[0], mTerrain, new Microsoft.Xna.Framework.Point(1, 5));
+            //new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 2));
+            //new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 3));
+            //new SkeletonLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(3, 5));
+            //new ZombieLv1BattleUnit(mPlayers[1], mTerrain, new Microsoft.Xna.Framework.Point(4, 5));
 
             UpdateMapsListBox();
 
@@ -136,6 +131,20 @@ namespace Conquera.BattlePrototype
 
             mPlayers[0].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
             mPlayers[1].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
+
+        }
+
+        private void ResetPlayers()
+        {
+            foreach (var player in mPlayers)
+            {
+                player.CardDeck = SpellCardDecks.FullDeck;
+                player.FillCardsInHand();
+                player.MaxMana = mMaxMana;
+                player.Mana = mInitMana;
+                player.Units.Clear();
+                new HeroBattleUnit(player, mTerrain, player.StartPos);
+            }
         }
 
         private void mPlayerCardsInHand_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -336,6 +345,8 @@ namespace Conquera.BattlePrototype
             mTurnNum = 0;
 
             LoadTerrain();
+
+            ResetPlayers();
         }
 
         private static string GetMapFileName(string name)
@@ -529,13 +540,6 @@ namespace Conquera.BattlePrototype
 
         private void ResetMap()
         {
-            mPlayers[0].CardDeck = SpellCardDecks.FullDeck;
-            mPlayers[1].CardDeck = SpellCardDecks.FullDeck;
-            mPlayers[0].FillCardsInHand();
-            mPlayers[1].FillCardsInHand();
-            mPlayers[0].Mana = 5;
-            mPlayers[1].Mana = 5;
-
             mPlayers[0].StartPos = new Microsoft.Xna.Framework.Point(0, 0);
             mPlayers[1].StartPos = new Microsoft.Xna.Framework.Point(1, 0);
 

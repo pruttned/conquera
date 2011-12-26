@@ -87,7 +87,8 @@ namespace Conquera.BattlePrototype
     {
         private static Type[] mUnitCtorArgTypes = new Type[] { typeof(BattlePlayer), typeof(HexTerrain), typeof(Point) };
         private ConstructorInfo mUnitCtor;
-        protected int mCost;
+        private static List<HexTerrainTile> mSiblings = new List<HexTerrainTile>();
+        private int mCost;
 
         public override string Name
         {
@@ -119,7 +120,13 @@ namespace Conquera.BattlePrototype
         {
             //todo: cast on existing unit
             OutpostHexTerrainTile outpost = tile as OutpostHexTerrainTile;
-            return (outpost != null && outpost.OwningPlayer == player && null == tile.Unit);
+            if (outpost != null && outpost.OwningPlayer == player && null == tile.Unit)
+            {
+                return true;
+            }
+            mSiblings.Clear();
+            terrain.GetSiblings(tile.Index, mSiblings);
+            return (from s in mSiblings where s.Unit is HeroBattleUnit && s.Unit.Player == player select 1).Any();
         }
 
         public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
@@ -138,17 +145,10 @@ namespace Conquera.BattlePrototype
 
     #region ManaCards
 
-    public class Add2ManaCard : AddManaSpellCard
-    {
-        public Add2ManaCard()
-            :base(2)
-        {
-        }
-    }
     public class Add5ManaCard : AddManaSpellCard
     {
         public Add5ManaCard()
-            : base(5)
+            :base(5)
         {
         }
     }
@@ -170,6 +170,13 @@ namespace Conquera.BattlePrototype
     {
         public Add15ManaCard()
             : base(15)
+        {
+        }
+    }
+    public class Add20ManaCard : AddManaSpellCard
+    {
+        public Add20ManaCard()
+            : base(20)
         {
         }
     }

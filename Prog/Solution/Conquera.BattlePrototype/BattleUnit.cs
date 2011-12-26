@@ -846,4 +846,44 @@ namespace Conquera.BattlePrototype
             return "VampiricTouchIcon.png";
         }
     }
+
+
+
+    public class HeroBattleUnit : BattleUnit
+    {
+        public override int BaseAttack
+        {
+            get { return 2; }
+        }
+
+        public override int BaseDefense
+        {
+            get { return 2; }
+        }
+
+        public override int BaseMovementDistance
+        {
+            get { return 2; }
+        }
+
+        public override int MaxHp
+        {
+            get { return 15; }
+        }
+
+        public override int Level
+        {
+            get { return 0; }
+        }
+
+        public HeroBattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(player, terrain, tileIndex)
+        {
+        }
+
+        protected override string GetImageFileName()
+        {
+            return "PackReinforcementIcon.png";
+        }
+    }
 }
