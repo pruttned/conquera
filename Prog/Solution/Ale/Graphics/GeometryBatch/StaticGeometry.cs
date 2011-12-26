@@ -50,6 +50,7 @@ namespace Ale.Graphics
         
         //private List<List<List<List<GeometryBatch>>>> mGeometryBatches = new List<List<List<List<GeometryBatch>>>>();
         private Dictionary<Point3D, List<GeometryBatch>> mGeometryBatches = new Dictionary<Point3D, List<GeometryBatch>>();
+        private Dictionary<GeometryBatch, Point3D> mGeometryBatchIndices = new Dictionary<GeometryBatch, Point3D>();
         
         bool mShowWorldBounds = false;
 
@@ -164,7 +165,23 @@ namespace Ale.Graphics
                 throw new ArgumentException("Model doesn't belong to this static geometry");
             }
 
-            model.Batch.RemoveGeometryUnit(model.IdInBatch);
+            var batch = model.Batch;
+            batch.RemoveGeometryUnit(model.IdInBatch);
+
+            if (batch.IsEmpty)
+            {
+                Point3D index  = mGeometryBatchIndices[batch];
+                mGeometryBatchIndices.Remove(batch);
+                batch.Dispose();
+
+                var list = mGeometryBatches[index];
+
+                list.Remove(batch);
+                if (0 == list.Count)
+                {
+                    mGeometryBatches.Remove(index);
+                }
+            }
         }
 
         #region IDisposable
@@ -225,36 +242,6 @@ namespace Ale.Graphics
                 throw new ArgumentException("Model has to many vertices to be stored in a static geometry");
             }
 
-            //while (mGeometryBatches.Count <= x)
-            //{
-            //    mGeometryBatches.Add(null);
-            //}
-            //List<List<List<GeometryBatch>>> xb = mGeometryBatches[x];
-            //if (null == xb)
-            //{
-            //    mGeometryBatches[x] = xb = new List<List<List<GeometryBatch>>>();
-            //}
-
-            //while (xb.Count <= y)
-            //{
-            //    xb.Add(null);
-            //}
-            //List<List<GeometryBatch>> yb = xb[y];
-            //if (null == yb)
-            //{
-            //    xb[y] = yb = new List<List<GeometryBatch>>();
-            //}
-
-            //while (yb.Count <= z)
-            //{
-            //    yb.Add(null);
-            //}
-            //List<GeometryBatch> batches = yb[z];
-            //if (null == batches)
-            //{
-            //    yb[z] = batches = new List<GeometryBatch>();
-            //}
-
             List<GeometryBatch> batchList;
             Point3D bIndex = new Point3D(x, y, z);
             if (!mGeometryBatches.TryGetValue(bIndex, out batchList))
@@ -273,6 +260,7 @@ namespace Ale.Graphics
             }
 
             batch = new GeometryBatch(mGraphicsDeviceManager.GraphicsDevice);
+            mGeometryBatchIndices.Add(batch, bIndex);
             
             //batch.WorldPosition = ;
             mOctree.AddObject(batch);
