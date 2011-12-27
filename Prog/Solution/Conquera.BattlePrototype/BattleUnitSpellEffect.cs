@@ -7,9 +7,10 @@ namespace Conquera.BattlePrototype
 {
     public interface IBattleUnitSpellEffect
     {
+        string Description { get; }
         void OnCast(int turnNum, BattleUnit unit);
         void OnEnd();
-        bool OnStartTurn(int turnNum);
+        bool OnStartTurn(int turnNum);        
     }
 
     public interface IBattleUnitDefenseModifier
@@ -29,6 +30,14 @@ namespace Conquera.BattlePrototype
     {
         private int mDuration;
         private int mEndTurn;
+        private int mTurnNum = -1;
+
+        public string Description
+        {
+            get { return string.Format("{0} ({1})", EffectDescription, mEndTurn - mTurnNum); }
+        }
+
+        public abstract string EffectDescription { get; }
 
         public BattleUnitSpellEffectWithDuration(int duration)
         {
@@ -38,6 +47,7 @@ namespace Conquera.BattlePrototype
         public void OnCast(int turnNum, BattleUnit unit)
         {
             mEndTurn = turnNum + mDuration;
+            mTurnNum = turnNum;
 
             OnCastImpl(turnNum, unit);
         }
@@ -48,6 +58,7 @@ namespace Conquera.BattlePrototype
             {
                 return false;
             }
+            mTurnNum = turnNum;
 
             return OnStartTurnImpl(turnNum);
         }
@@ -67,6 +78,11 @@ namespace Conquera.BattlePrototype
     {
         private int mAmount;
         private BattleUnit mUnit;
+
+        public override string EffectDescription
+        {
+            get { return string.Format("Defense +{0}", mAmount); }
+        }
 
         public int GetModifier(BattleUnit unit)
         {
@@ -101,6 +117,11 @@ namespace Conquera.BattlePrototype
         private int mAmount;
         private BattleUnit mUnit;
 
+        public override string EffectDescription
+        {
+            get { return string.Format("Attack +{0}", mAmount); }
+        }
+
         public int GetModifier(BattleUnit unit)
         {
             return mAmount;
@@ -128,10 +149,16 @@ namespace Conquera.BattlePrototype
             return true;
         }
     }
+
     public class ConstIncMovementDistanceBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration, IBattleUnitMovementDistanceModifier
     {
         private int mAmount;
         private BattleUnit mUnit;
+
+        public override string EffectDescription
+        {
+            get { return string.Format("Movement +{0}", mAmount); }
+        }
 
         public int GetModifier(BattleUnit unit)
         {

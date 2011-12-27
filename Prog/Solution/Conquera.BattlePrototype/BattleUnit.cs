@@ -231,7 +231,19 @@ namespace Conquera.BattlePrototype
             levelTextBlock.Background = Brushes.Black;
             levelTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
             levelTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            Children.Add(levelTextBlock);
+            Children.Add(levelTextBlock);            
+        }
+
+        private void UpdateSpellEffectsToolTip()
+        {
+            StackPanel panel = new StackPanel();
+            foreach (IBattleUnitSpellEffect effect in mSpellEffects)
+            {
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = effect.Description;
+                panel.Children.Add(textBlock);
+            }
+            ToolTip = panel;
         }
 
         //Only for temporary unit (to read base attributes while constructing description)
@@ -291,6 +303,7 @@ namespace Conquera.BattlePrototype
                 {
                     mSpellEffects[i].OnEnd();
                     mSpellEffects.RemoveAt(i);
+                    UpdateSpellEffectsToolTip();
                 }
             }
 
@@ -431,8 +444,9 @@ namespace Conquera.BattlePrototype
 
         public void AddSpellEffect(int turnNum, IBattleUnitSpellEffect spellEffect)
         {
-            mSpellEffects.Add(spellEffect);
+            mSpellEffects.Add(spellEffect);            
             spellEffect.OnCast(turnNum, this);
+            UpdateSpellEffectsToolTip();
         }
 
         public Image CreateImage()
