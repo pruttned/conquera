@@ -22,6 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Microsoft.Xna.Framework;
+using System.Windows.Controls;
 
 namespace Conquera.BattlePrototype
 {
@@ -30,6 +31,11 @@ namespace Conquera.BattlePrototype
         public abstract string Name { get; }
 
         public abstract string Description { get; }
+
+        public virtual object ToolTip
+        {
+            get { return Description; }
+        }
 
         public abstract int Cost { get; }
 
@@ -60,7 +66,7 @@ namespace Conquera.BattlePrototype
 
         public override string Description
         {
-            get { return string.Format("Adds +{0} mana", mManaInc); }
+            get { return string.Format("Mana +{0}", mManaInc); }
         }
 
         public override int Cost { get { return 0; } }
@@ -97,7 +103,28 @@ namespace Conquera.BattlePrototype
 
         public override string Description
         {
-            get { return string.Format("Summons the {0} unit", mUnitCtor.DeclaringType.Name); }
+            get
+            {
+                BattleUnit unit = (BattleUnit)Activator.CreateInstance(mUnitCtor.DeclaringType);
+                return string.Format("Attack: {0}\nDefense: {1}\nMovement: {2}", unit.BaseAttack, unit.BaseDefense, unit.BaseMovementDistance);
+            }
+        }
+
+        public override object ToolTip
+        {
+            get
+            {
+                StackPanel panel = new StackPanel();
+                
+                BattleUnit unit = (BattleUnit)Activator.CreateInstance(mUnitCtor.DeclaringType);
+                panel.Children.Add(unit.CreateImage());
+
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = Description;
+                panel.Children.Add(textBlock);
+
+                return panel;
+            }
         }
 
         public override int Cost { get { return mCost; } }
@@ -255,12 +282,12 @@ namespace Conquera.BattlePrototype
 
         public override string Name
         {
-            get { return string.Format("Defense {0} for {1} turns", DefenseInc, Duration); }
+            get { return string.Format("Defense +{0} for {1} turn(s)", DefenseInc, Duration); }
         }
 
         public override string Description
         {
-            get { return string.Format("Defense {0} for {1} turns", DefenseInc, Duration); }
+            get { return Name; }
         }
 
         public override int Cost
@@ -288,18 +315,19 @@ namespace Conquera.BattlePrototype
             tile.Unit.AddSpellEffect(turnNum, new ConstIncDefenseBattleUnitSpellEffect(DefenseInc, Duration));
         }
     }
+    
     public class AddAttackSpellCard : SpellCard
     {
         protected int mCost;
 
         public override string Name
         {
-            get { return string.Format("Attack {0} for {1} turns", AttackInc, Duration); }
+            get { return string.Format("Attack +{0} for {1} turn(s)", AttackInc, Duration); }
         }
 
         public override string Description
         {
-            get { return string.Format("Attack {0} for {1} turns", AttackInc, Duration); }
+            get { return Name; }
         }
 
         public override int Cost
@@ -327,18 +355,19 @@ namespace Conquera.BattlePrototype
             tile.Unit.AddSpellEffect(turnNum, new ConstIncAttackBattleUnitSpellEffect(AttackInc, Duration));
         }
     }
+    
     public class AddMovementDistanceSpellCard : SpellCard
     {
         protected int mCost;
 
         public override string Name
         {
-            get { return string.Format("MovementDistance {0} for {1} turns", MovementDistanceInc, Duration); }
+            get { return string.Format("Movement +{0} for {1} turn(s)", MovementDistanceInc, Duration); }
         }
 
         public override string Description
         {
-            get { return string.Format("MovementDistance {0} for {1} turns", MovementDistanceInc, Duration); }
+            get { return Name; }
         }
 
         public override int Cost

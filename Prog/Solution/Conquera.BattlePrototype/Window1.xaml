@@ -43,7 +43,7 @@
                     <ListBox x:Name="mCardsListBox" SelectionChanged="mCardsListBox_SelectionChanged">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding}" MouseDown="CardItem_MouseDown">
+                                <TextBlock Text="{Binding}" MouseDown="CardItem_MouseDown" ToolTip="{Binding Card.ToolTip}">
                                     <TextBlock.Background>
                                         <MultiBinding>
                                             <MultiBinding.Converter>
