@@ -213,10 +213,7 @@ namespace Conquera.BattlePrototype
             Children.Add(mBorder);
             UpdateGraphics();
 
-            Image image = new Image();
-            image.Source = new BitmapImage(new Uri(System.IO.Path.Combine(mBattleUnitImagesDirectory, GetImageFileName())));
-            image.Width = 22;
-            image.Height = 22;
+            Image image = CreateImage();            
             image.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             image.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             Children.Add(image);
@@ -235,6 +232,11 @@ namespace Conquera.BattlePrototype
             levelTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
             levelTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             Children.Add(levelTextBlock);
+        }
+
+        //Only for temporary unit (to read base attributes while constructing description)
+        public BattleUnit()
+        {
         }
 
         public void AddDefenseModifier(IBattleUnitDefenseModifier modifier)
@@ -433,6 +435,15 @@ namespace Conquera.BattlePrototype
             spellEffect.OnCast(turnNum, this);
         }
 
+        public Image CreateImage()
+        {
+            Image image = new Image();
+            image.Source = new BitmapImage(new Uri(System.IO.Path.Combine(mBattleUnitImagesDirectory, GetImageFileName())));
+            image.Width = 22;
+            image.Height = 22;
+            return image;
+        }
+
         protected abstract string GetImageFileName();
 
         private void AfterSiblingArrival(BattleUnit battleUnit)
@@ -524,7 +535,6 @@ namespace Conquera.BattlePrototype
             }
             return sum;
         }
-
     }
 
     public class GeneralBattleUnit : BattleUnit
@@ -550,6 +560,11 @@ namespace Conquera.BattlePrototype
         }
         public GeneralBattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
+        {
+        }
+        
+        //Only for temporary unit (to read base attributes while constructing description)
+        public GeneralBattleUnit()
         {
         }
 
@@ -588,6 +603,11 @@ namespace Conquera.BattlePrototype
         {
         }
 
+        //Only for temporary unit (to read base attributes while constructing description)
+        public SkeletonLv1BattleUnit()
+        {
+        }
+
         protected override string GetImageFileName()
         {
             return "SlayerIcon.png";
@@ -618,6 +638,11 @@ namespace Conquera.BattlePrototype
 
         public ZombieLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
+        {
+        }
+        
+        //Only for temporary unit (to read base attributes while constructing description)
+        public ZombieLv1BattleUnit()
         {
         }
 
@@ -653,6 +678,11 @@ namespace Conquera.BattlePrototype
             : base(player, terrain, tileIndex)
         {
         }
+                
+        //Only for temporary unit (to read base attributes while constructing description)
+        public BansheeLv1BattleUnit()
+        {
+        }
 
         protected override string GetImageFileName()
         {
@@ -684,6 +714,11 @@ namespace Conquera.BattlePrototype
 
         public SpectreLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
+        {
+        }
+                
+        //Only for temporary unit (to read base attributes while constructing description)
+        public SpectreLv1BattleUnit()
         {
         }
 
@@ -726,6 +761,11 @@ namespace Conquera.BattlePrototype
             : base(player, terrain, tileIndex)
         {
         }
+                
+        //Only for temporary unit (to read base attributes while constructing description)
+        public SkeletonLv2BattleUnit()
+        {
+        }
 
         protected override string GetImageFileName()
         {
@@ -762,6 +802,11 @@ namespace Conquera.BattlePrototype
 
         public ZombieLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
+        {
+        }
+                
+        //Only for temporary unit (to read base attributes while constructing description)
+        public ZombieLv2BattleUnit()
         {
         }
 
@@ -802,6 +847,11 @@ namespace Conquera.BattlePrototype
             : base(player, terrain, tileIndex)
         {
         }
+                
+        //Only for temporary unit (to read base attributes while constructing description)
+        public BansheeLv2BattleUnit()
+        {
+        }
 
         protected override string GetImageFileName()
         {
@@ -838,6 +888,11 @@ namespace Conquera.BattlePrototype
 
         public SpectreLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
+        {
+        }
+                
+        //Only for temporary unit (to read base attributes while constructing description)
+        public SpectreLv2BattleUnit()
         {
         }
 
@@ -878,6 +933,11 @@ namespace Conquera.BattlePrototype
 
         public HeroBattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(player, terrain, tileIndex)
+        {
+        }
+                
+        //Only for temporary unit (to read base attributes while constructing description)
+        public HeroBattleUnit()
         {
         }
 
