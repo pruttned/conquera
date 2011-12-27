@@ -81,7 +81,7 @@ namespace Conquera.BattlePrototype
 
         public override string EffectDescription
         {
-            get { return string.Format("Defense +{0}", mAmount); }
+            get { return string.Format("Defense {0}{1}", 0 < mAmount ? "+" : null, mAmount); }
         }
 
         public int GetModifier(BattleUnit unit)
@@ -119,7 +119,7 @@ namespace Conquera.BattlePrototype
 
         public override string EffectDescription
         {
-            get { return string.Format("Attack +{0}", mAmount); }
+            get { return string.Format("Attack {0}{1}", 0 < mAmount ? "+" : null, mAmount); }
         }
 
         public int GetModifier(BattleUnit unit)
@@ -157,7 +157,7 @@ namespace Conquera.BattlePrototype
 
         public override string EffectDescription
         {
-            get { return string.Format("Movement +{0}", mAmount); }
+            get { return string.Format("Movement {0}{1}", 0 < mAmount ? "+" : null, mAmount); }
         }
 
         public int GetModifier(BattleUnit unit)
@@ -180,6 +180,65 @@ namespace Conquera.BattlePrototype
         {
             unit.AddMovementDistanceModifier(this);
             mUnit = unit;
+        }
+
+        protected override bool OnStartTurnImpl(int turnNum)
+        {
+            return true;
+        }
+    }
+
+    public class DisableMovementBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration
+    {
+        BattleUnit mUnit;
+        public override string EffectDescription
+        {
+            get { return "Disables movement"; }
+        }
+
+        public DisableMovementBattleUnitSpellEffect(int duration)
+            :base(duration)
+        {
+        }
+
+        public override void OnEnd()
+        {
+            mUnit.MovementPreventerCnt--;
+        }
+
+        protected override void OnCastImpl(int turnNum, BattleUnit unit)
+        {
+            mUnit = unit;
+            unit.MovementPreventerCnt++;
+        }
+
+        protected override bool OnStartTurnImpl(int turnNum)
+        {
+            return true;
+        }
+    }
+    public class DisableAttackBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration
+    {
+        BattleUnit mUnit;
+        public override string EffectDescription
+        {
+            get { return "Disables attack"; }
+        }
+
+        public DisableAttackBattleUnitSpellEffect(int duration)
+            : base(duration)
+        {
+        }
+
+        public override void OnEnd()
+        {
+            mUnit.AttackPreventerCnt--;
+        }
+
+        protected override void OnCastImpl(int turnNum, BattleUnit unit)
+        {
+            mUnit = unit;
+            unit.AttackPreventerCnt++;
         }
 
         protected override bool OnStartTurnImpl(int turnNum)

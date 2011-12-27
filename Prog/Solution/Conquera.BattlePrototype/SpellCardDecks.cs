@@ -38,24 +38,54 @@ namespace Conquera.BattlePrototype
             new SummonSpectreLv2UnitSpellCard(),
 
 
-            new AddDefenseSpellCard(3,1,2),
-            new AddDefenseSpellCard(4,1,3),
-            new AddDefenseSpellCard(3,2,1),
+            
+            new IncDecDefenseSpellCard(3,1,2),
+            new IncDecDefenseSpellCard(4,1,3),
+            new IncDecDefenseSpellCard(3,2,1),
 
-            new AddAttackSpellCard(3,1,2),
-            new AddAttackSpellCard(4,1,3),
-            new AddAttackSpellCard(3,2,1),
+            new IncDecAttackSpellCard(3,1,2),
+            new IncDecAttackSpellCard(4,1,3),
+            new IncDecAttackSpellCard(3,2,1),
 
-            new AddMovementDistanceSpellCard(3,1,2),
-            new AddMovementDistanceSpellCard(4,1,4),
-            new AddMovementDistanceSpellCard(3,2,1)
+            new IncDecMovementDistanceSpellCard(3,1,2),
+            new IncDecMovementDistanceSpellCard(4,1,4),
+            new IncDecMovementDistanceSpellCard(3,2,1),
+
+            new IncDecDefenseSpellCard(3,1,-2),
+            new IncDecDefenseSpellCard(4,1,-3),
+            new IncDecDefenseSpellCard(3,2,-1),
+
+            new IncDecAttackSpellCard(3,1,-2),
+            new IncDecAttackSpellCard(4,1,-3),
+            new IncDecAttackSpellCard(3,2,-1),
+
+            new IncDecMovementDistanceSpellCard(3,1,-2),
+            new IncDecMovementDistanceSpellCard(4,1,-4),
+            new IncDecMovementDistanceSpellCard(3,2,-1),
 
 
-            //new Add2ManaCard(),
-            //new Add5ManaCard(),
-            //new Add7ManaCard(),
-            //new Add10ManaCard(),
-            //new Add15ManaCard()
+            new AddManaSpellCard(10),
+            new AddManaSpellCard(15),
+
+            new DiscardCardsSpellCard(4, 1),
+            new DiscardCardsSpellCard(6, 2),
+            new DiscardCardsSpellCard(8, 3),
+
+            new DisableMovementSpellCard(6, 2),
+            new DisableMovementSpellCard(9, 4),
+
+            new DisableAttackSpellCard(5, 1),
+            new DisableAttackSpellCard(7, 2),
+
+            new HealSpellCard(5,1),
+            new HealSpellCard(8,2),
+            new HealSpellCard(13,3),
+
+            new DamageSpellCard(9, 1),
+            new DamageSpellCard(14, 2),
+
+            new RemoveDisableMovementsSpellCard(),
+            new RemoveDisableAttacksSpellCard()
         };
 
         //public static List<SpellCard> FullDeck = new List<SpellCard>()

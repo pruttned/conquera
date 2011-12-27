@@ -125,7 +125,7 @@ namespace Conquera.BattlePrototype
             mSetTilesLeftButtonTextBlock.Text = "Land";
             mSetTilesRightButtonTextBlock.Text = "Gap";
 
-            UpdateManaTextBlock();
+            UpdatePlayerInfoTextBlocks();
             mPlayers[0].ManaChanged += new EventHandler(Player_ManaChanged);
             mPlayers[1].ManaChanged += new EventHandler(Player_ManaChanged);
 
@@ -150,6 +150,7 @@ namespace Conquera.BattlePrototype
         private void mPlayerCardsInHand_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             UpdateCardsListBox();
+            UpdatePlayerInfoTextBlocks();
         }
 
         private void UpdateCardsListBox()
@@ -163,13 +164,13 @@ namespace Conquera.BattlePrototype
 
         private void Player_ManaChanged(object sender, EventArgs e)
         {
-            UpdateManaTextBlock();
+            UpdatePlayerInfoTextBlocks();
         }
 
-        private void UpdateManaTextBlock()
+        private void UpdatePlayerInfoTextBlocks()
         {
-            mBlueManaTextBlock.Text = string.Format("{0}/{1}", mPlayers[0].Mana, mPlayers[0].MaxMana);
-            mRedManaTextBlock.Text = string.Format("{0}/{1}", mPlayers[1].Mana, mPlayers[1].MaxMana);
+            mBlueTextBlock.Text = string.Format("M:{0}/{1}; C:{2}", mPlayers[0].Mana, mPlayers[0].MaxMana, mPlayers[0].CardsInHand.Count);
+            mRedTextBlock.Text = string.Format("M:{0}/{1}; C:{2}", mPlayers[1].Mana, mPlayers[1].MaxMana, mPlayers[1].CardsInHand.Count);
         }
 
         private void UpdateMapsListBox()
@@ -257,7 +258,7 @@ namespace Conquera.BattlePrototype
 
         private void SetMoveIndicatorsVisibility(bool isVisible)
         {
-            if (!isVisible || !SelectedUnit.HasMovedThisTurn)
+            if (!isVisible || (!SelectedUnit.HasMovedThisTurn && SelectedUnit.HasEnabledMovement))
             {
                 List<Microsoft.Xna.Framework.Point> indices = new List<Microsoft.Xna.Framework.Point>();
                 SelectedUnit.GetPossibleMoves(indices);
@@ -432,7 +433,7 @@ namespace Conquera.BattlePrototype
                                 SpellCard card = cardListBoxItem.Card;
                                 if (card.Cost <= ActivePlayer.Mana && card.IsValidTarget(ActivePlayer, tile, mTerrain))
                                 {
-                                    ActivePlayer.CastSpellCard(mTurnNum, mCardsListBox.SelectedIndex, tile, mTerrain);
+                                    ActivePlayer.CastSpellCard(mTurnNum, mCardsListBox.SelectedIndex, tile, mTerrain, mPlayers);
                                     //mCardsListBox.IsEnabled = false;
                                 }
                             }

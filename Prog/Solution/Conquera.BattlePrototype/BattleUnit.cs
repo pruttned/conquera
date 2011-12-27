@@ -72,6 +72,9 @@ namespace Conquera.BattlePrototype
         private int mAttack;
         private int mMovementDistance;
 
+        private int mAttackPreventerCnt;
+        private int mMovementPreventerCnt;
+
         private List<IBattleUnitSpellEffect> mSpellEffects = new List<IBattleUnitSpellEffect>();
 
 
@@ -82,6 +85,20 @@ namespace Conquera.BattlePrototype
         public abstract int BaseDefense { get; }
         public abstract int BaseMovementDistance { get; }
         public abstract int MaxHp { get; }
+
+        public bool HasEnabledAttack { get { return 0 == AttackPreventerCnt; } }
+        public bool HasEnabledMovement { get { return 0 == MovementPreventerCnt; } }
+
+        public int AttackPreventerCnt
+        {
+            get { return mAttackPreventerCnt; }
+            set { mAttackPreventerCnt = Math.Max(0, value); }
+        }
+        public int MovementPreventerCnt
+        {
+            get { return mMovementPreventerCnt; }
+            set { mMovementPreventerCnt = Math.Max(0, value); }
+        }
 
         public bool IsKilled { get; private set; }
 
@@ -95,11 +112,6 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        //public int Attack { get; private set; }
-        //public int Defense { get; private set; }
-        //public int MovementDistance { get; private set; }
-
-        //temp
         public int Attack
         {
             get { return mAttack; }
@@ -246,7 +258,7 @@ namespace Conquera.BattlePrototype
             ToolTip = panel;
         }
 
-        //Only for temporary unit (to read base attributes while constructing description)
+        //Only for temporary unit (for reading base attributes while constructing description)
         public BattleUnit()
         {
         }
@@ -303,9 +315,10 @@ namespace Conquera.BattlePrototype
                 {
                     mSpellEffects[i].OnEnd();
                     mSpellEffects.RemoveAt(i);
-                    UpdateSpellEffectsToolTip();
                 }
             }
+
+            UpdateSpellEffectsToolTip();
 
             if (!IsKilled)
             {
@@ -419,7 +432,7 @@ namespace Conquera.BattlePrototype
             mTerrain.ForEachSibling(TileIndex,
                 sibling =>
                 {
-                    if (null != sibling.Unit && sibling.Unit.Player != Player)
+                    if (null != sibling.Unit && sibling.Unit.Player != Player && sibling.Unit.HasEnabledAttack)
                     {
                         damage += sibling.Unit.Attack;
                     }
@@ -437,15 +450,28 @@ namespace Conquera.BattlePrototype
         public void UpdateGraphics()
         {
             mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
-            mPropertiesTextBlock.Text += string.Format("A = {0}+{5}\nD = {1}+{6}\nM = {2}+{7}\nHp = {3}/{4}", BaseAttack, BaseDefense, BaseMovementDistance, Hp, MaxHp,
-                Attack - BaseAttack, Defense - BaseDefense, MovementDistance-BaseMovementDistance);
-            mBorder.BorderBrush = (!HasMovedThisTurn && Player.IsActive ? Brushes.Yellow : Brushes.Black);
+            mPropertiesTextBlock.Text += string.Format("A = {0}({5})\nD = {1}({6})\nM = {2}({7})\nHp = {3}/{4}", BaseAttack, BaseDefense, BaseMovementDistance, Hp, MaxHp,
+                Attack, Defense , MovementDistance);
+            mBorder.BorderBrush = (!HasMovedThisTurn && HasEnabledMovement && Player.IsActive && HasEnabledMovement ? Brushes.Yellow : Brushes.Black);
         }
 
         public void AddSpellEffect(int turnNum, IBattleUnitSpellEffect spellEffect)
         {
-            mSpellEffects.Add(spellEffect);            
+            mSpellEffects.Add(spellEffect);
             spellEffect.OnCast(turnNum, this);
+            UpdateSpellEffectsToolTip();
+        }
+
+        public void RemoveSpellEffects(Predicate<IBattleUnitSpellEffect> effectPredicate)
+        {
+            for (int i = mSpellEffects.Count - 1; i >= 0 && !IsKilled; --i)
+            {
+                if (effectPredicate(mSpellEffects[i]))
+                {
+                    mSpellEffects[i].OnEnd();
+                    mSpellEffects.RemoveAt(i);
+                }
+            }
             UpdateSpellEffectsToolTip();
         }
 
@@ -922,7 +948,7 @@ namespace Conquera.BattlePrototype
     {
         public override int BaseAttack
         {
-            get { return 2; }
+            get { return 7; }
         }
 
         public override int BaseDefense
@@ -932,7 +958,7 @@ namespace Conquera.BattlePrototype
 
         public override int BaseMovementDistance
         {
-            get { return 2; }
+            get { return 20; }
         }
 
         public override int MaxHp

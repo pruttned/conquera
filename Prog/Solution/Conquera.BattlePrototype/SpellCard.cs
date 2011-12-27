@@ -41,7 +41,7 @@ namespace Conquera.BattlePrototype
 
         public abstract bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain);
 
-        public abstract void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain);
+        public abstract void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players);
 
         public override string ToString()
         {
@@ -81,7 +81,7 @@ namespace Conquera.BattlePrototype
             return true;
         }
 
-        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
         {
             if (null == player) throw new ArgumentNullException("player");
 
@@ -165,7 +165,7 @@ namespace Conquera.BattlePrototype
             return false;
         }
 
-        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
         {
             if (null == player) throw new ArgumentNullException("player");
             if (null == tile) throw new ArgumentNullException("tile");
@@ -179,44 +179,6 @@ namespace Conquera.BattlePrototype
 
 
 
-    #region ManaCards
-
-    public class Add5ManaCard : AddManaSpellCard
-    {
-        public Add5ManaCard()
-            :base(5)
-        {
-        }
-    }
-    public class Add7ManaCard : AddManaSpellCard
-    {
-        public Add7ManaCard()
-            : base(7)
-        {
-        }
-    }
-    public class Add10ManaCard : AddManaSpellCard
-    {
-        public Add10ManaCard()
-            : base(10)
-        {
-        }
-    }
-    public class Add15ManaCard : AddManaSpellCard
-    {
-        public Add15ManaCard()
-            : base(15)
-        {
-        }
-    }
-    public class Add20ManaCard : AddManaSpellCard
-    {
-        public Add20ManaCard()
-            : base(20)
-        {
-        }
-    }
-    #endregion ManaCards
 
     #region UnitCards
 
@@ -281,13 +243,13 @@ namespace Conquera.BattlePrototype
     #endregion UnitCards
 
 
-    public class AddDefenseSpellCard : SpellCard
+    public class IncDecDefenseSpellCard : SpellCard
     {
-        protected int mCost;
+        private int mCost;
 
         public override string Name
         {
-            get { return string.Format("Defense +{0} for {1} turn(s)", DefenseInc, Duration); }
+            get { return string.Format("Defense {0}{1} for {2} turn(s)", 0 < DefenseInc ? "+" : null, DefenseInc, Duration); }
         }
 
         public override string Description
@@ -303,7 +265,7 @@ namespace Conquera.BattlePrototype
         public int Duration { get; private set; }
         public int DefenseInc { get; private set; }
 
-        public AddDefenseSpellCard(int cost, int duration, int defenseInc)
+        public IncDecDefenseSpellCard(int cost, int duration, int defenseInc)
         {
             mCost = cost;
             Duration = duration;
@@ -312,22 +274,22 @@ namespace Conquera.BattlePrototype
 
         public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
         {
-            return (null != tile.Unit && player == tile.Unit.Player);
+            return (null != tile.Unit && (player == tile.Unit.Player && 0 < DefenseInc || player != tile.Unit.Player && 0 > DefenseInc));
         }
 
-        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
         {
             tile.Unit.AddSpellEffect(turnNum, new ConstIncDefenseBattleUnitSpellEffect(DefenseInc, Duration));
         }
     }
     
-    public class AddAttackSpellCard : SpellCard
+    public class IncDecAttackSpellCard : SpellCard
     {
-        protected int mCost;
+        private int mCost;
 
         public override string Name
         {
-            get { return string.Format("Attack +{0} for {1} turn(s)", AttackInc, Duration); }
+            get { return string.Format("Attack {0}{1} for {2} turn(s)", 0 < AttackInc ? "+" : null, AttackInc, Duration); }
         }
 
         public override string Description
@@ -343,7 +305,7 @@ namespace Conquera.BattlePrototype
         public int Duration { get; private set; }
         public int AttackInc { get; private set; }
 
-        public AddAttackSpellCard(int cost, int duration, int attackInc)
+        public IncDecAttackSpellCard(int cost, int duration, int attackInc)
         {
             mCost = cost;
             Duration = duration;
@@ -352,22 +314,22 @@ namespace Conquera.BattlePrototype
 
         public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
         {
-            return (null != tile.Unit && player == tile.Unit.Player);
+            return (null != tile.Unit && (player == tile.Unit.Player && 0 < AttackInc || player != tile.Unit.Player && 0 > AttackInc));
         }
 
-        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
         {
             tile.Unit.AddSpellEffect(turnNum, new ConstIncAttackBattleUnitSpellEffect(AttackInc, Duration));
         }
     }
     
-    public class AddMovementDistanceSpellCard : SpellCard
+    public class IncDecMovementDistanceSpellCard : SpellCard
     {
-        protected int mCost;
+        private int mCost;
 
         public override string Name
         {
-            get { return string.Format("Movement +{0} for {1} turn(s)", MovementDistanceInc, Duration); }
+            get { return string.Format("Movement {0}{1} for {2} turn(s)", 0 < MovementDistanceInc ? "+" : null, MovementDistanceInc, Duration); }
         }
 
         public override string Description
@@ -383,7 +345,7 @@ namespace Conquera.BattlePrototype
         public int Duration { get; private set; }
         public int MovementDistanceInc { get; private set; }
 
-        public AddMovementDistanceSpellCard(int cost, int duration, int movementDistanceInc)
+        public IncDecMovementDistanceSpellCard(int cost, int duration, int movementDistanceInc)
         {
             mCost = cost;
             Duration = duration;
@@ -392,12 +354,281 @@ namespace Conquera.BattlePrototype
 
         public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
         {
+            return (null != tile.Unit && (player == tile.Unit.Player && 0 < MovementDistanceInc || player != tile.Unit.Player && 0 > MovementDistanceInc));
+        }
+
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
+        {
+            tile.Unit.AddSpellEffect(turnNum, new ConstIncMovementDistanceBattleUnitSpellEffect(MovementDistanceInc, Duration));
+        }
+    }
+
+
+    public class DiscardCardsSpellCard : SpellCard
+    {
+        private int mCost;
+        private int mCardNumber;
+
+        public override string Name
+        {
+            get { return string.Format("Oponents discards {0} random cards", mCardNumber); }
+        }
+
+        public override string Description
+        {
+            get { return Name; }
+        }
+
+        public override int Cost
+        {
+            get { return mCost; }
+        }
+
+        public DiscardCardsSpellCard(int cost, int cardNumber)
+        {
+            mCost = cost;
+            mCardNumber = cardNumber;
+        }
+
+        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            return true;
+        }
+
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
+        {
+            foreach (var p in players)
+            {
+                if (p != player)
+                {
+                    for(int i =0; i < mCardNumber && 0 < p.CardsInHand.Count ; ++i)
+                    {
+                        p.CardsInHand.RemoveAt(MathExt.Random.Next(p.CardsInHand.Count));
+                    }
+                }
+
+            }
+        }
+    }
+
+
+    public class DisableMovementSpellCard : SpellCard
+    {
+        int mCost;
+
+        public override string Name
+        {
+            get { return string.Format("Disable movement for {0} turns", Duration); }
+        }
+
+        public override string Description
+        {
+            get { return Name; }
+        }
+
+        public override int Cost
+        {
+            get { return mCost; }
+        }
+
+        public int Duration { get; private set; }
+
+        public DisableMovementSpellCard(int cost, int duration)
+        {
+            mCost = cost;
+            Duration = duration;
+        }
+
+        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            return (null != tile.Unit && player != tile.Unit.Player);
+        }
+
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
+        {
+            tile.Unit.AddSpellEffect(turnNum, new DisableMovementBattleUnitSpellEffect(Duration+1));
+        }
+    }
+
+    public class DisableAttackSpellCard : SpellCard
+    {
+        int mCost;
+
+        public override string Name
+        {
+            get { return string.Format("Disable attack for {0} turns", Duration); }
+        }
+
+        public override string Description
+        {
+            get { return Name; }
+        }
+
+        public override int Cost
+        {
+            get { return mCost; }
+        }
+
+        public int Duration { get; private set; }
+
+        public DisableAttackSpellCard(int cost, int duration)
+        {
+            mCost = cost;
+            Duration = duration;
+        }
+
+        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            return (null != tile.Unit && player != tile.Unit.Player);
+        }
+
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
+        {
+            tile.Unit.AddSpellEffect(turnNum, new DisableAttackBattleUnitSpellEffect(Duration));
+        }
+    }
+
+    public class HealSpellCard : SpellCard
+    {
+        int mCost;
+
+        public override string Name
+        {
+            get { return string.Format("Heals {0} HP", HpInc); }
+        }
+
+        public override string Description
+        {
+            get { return Name; }
+        }
+
+        public override int Cost
+        {
+            get { return mCost; }
+        }
+
+        public int HpInc { get; private set; }
+
+        public HealSpellCard(int cost, int hpInc)
+        {
+            mCost = cost;
+            HpInc = hpInc;
+        }
+
+        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
             return (null != tile.Unit && player == tile.Unit.Player);
         }
 
-        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
         {
-            tile.Unit.AddSpellEffect(turnNum, new ConstIncMovementDistanceBattleUnitSpellEffect(MovementDistanceInc, Duration));
+            tile.Unit.Hp += HpInc;
+        }
+    }
+
+    public class DamageSpellCard : SpellCard
+    {
+        int mCost;
+
+        public override string Name
+        {
+            get { return string.Format("Removes {0} HP", HpDec); }
+        }
+
+        public override string Description
+        {
+            get { return Name; }
+        }
+
+        public override int Cost
+        {
+            get { return mCost; }
+        }
+
+        public int HpDec { get; private set; }
+
+        public DamageSpellCard(int cost, int hpDec)
+        {
+            mCost = cost;
+            HpDec = hpDec;
+        }
+
+        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            return (null != tile.Unit && player != tile.Unit.Player);
+        }
+
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
+        {
+            tile.Unit.Hp -= HpDec;
+        }
+    }
+
+    public class RemoveDisableMovementsSpellCard : SpellCard
+    {
+        public override string Name
+        {
+            get { return "Removes all disable movements"; }
+        }
+
+        public override string Description
+        {
+            get { return Name; }
+        }
+
+        public override int Cost
+        {
+            get { return 3; }
+        }
+
+        public int HpDec { get; private set; }
+
+        public RemoveDisableMovementsSpellCard()
+        {
+        }
+
+        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            return (null != tile.Unit && player == tile.Unit.Player);
+        }
+
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
+        {
+            tile.Unit.RemoveSpellEffects(e => e is DisableMovementBattleUnitSpellEffect);
+        }
+    }
+
+    public class RemoveDisableAttacksSpellCard : SpellCard
+    {
+        public override string Name
+        {
+            get { return "Removes all disable attacks"; }
+        }
+
+        public override string Description
+        {
+            get { return Name; }
+        }
+
+        public override int Cost
+        {
+            get { return 4; }
+        }
+
+        public int HpDec { get; private set; }
+
+        public RemoveDisableAttacksSpellCard()
+        {
+        }
+
+        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            return (null != tile.Unit && player == tile.Unit.Player);
+        }
+
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
+        {
+            tile.Unit.RemoveSpellEffects(e => e is DisableAttackBattleUnitSpellEffect);
         }
     }
 }
