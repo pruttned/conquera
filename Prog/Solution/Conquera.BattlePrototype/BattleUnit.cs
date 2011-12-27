@@ -577,43 +577,6 @@ namespace Conquera.BattlePrototype
         }
     }
 
-    public class GeneralBattleUnit : BattleUnit
-    {
-        public override int BaseAttack
-        {
-            get { return 3; }
-        }
-
-        public override int BaseDefense
-        {
-            get { return 10; }
-        }
-
-        public override int BaseMovementDistance
-        {
-            get { return 1; }
-        }
-
-        public override int MaxHp
-        {
-            get { return 10; }
-        }
-        public GeneralBattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(player, terrain, tileIndex)
-        {
-        }
-        
-        //Only for temporary unit (to read base attributes while constructing description)
-        public GeneralBattleUnit()
-        {
-        }
-
-        protected override string GetImageFileName()
-        {
-            return "SpikesIcon.png";
-        }
-    }
-
 
 
     public class SkeletonLv1BattleUnit : BattleUnit
@@ -948,7 +911,7 @@ namespace Conquera.BattlePrototype
     {
         public override int BaseAttack
         {
-            get { return 7; }
+            get { return 2; }
         }
 
         public override int BaseDefense
@@ -958,7 +921,7 @@ namespace Conquera.BattlePrototype
 
         public override int BaseMovementDistance
         {
-            get { return 20; }
+            get { return 2; }
         }
 
         public override int MaxHp
