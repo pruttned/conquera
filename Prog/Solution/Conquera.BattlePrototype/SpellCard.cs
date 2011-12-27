@@ -95,6 +95,7 @@ namespace Conquera.BattlePrototype
         private ConstructorInfo mUnitCtor;
         private static List<HexTerrainTile> mSiblings = new List<HexTerrainTile>();
         private int mCost;
+        private string mDescription;
 
         public override string Name
         {
@@ -105,8 +106,7 @@ namespace Conquera.BattlePrototype
         {
             get
             {
-                BattleUnit unit = (BattleUnit)Activator.CreateInstance(mUnitCtor.DeclaringType);
-                return string.Format("Attack: {0}\nDefense: {1}\nMovement: {2}", unit.BaseAttack, unit.BaseDefense, unit.BaseMovementDistance);
+                return mDescription;
             }
         }
 
@@ -139,6 +139,11 @@ namespace Conquera.BattlePrototype
                 throw new Exception(string.Format("Type '{0}' is missing public ctor with arguments '{1}'", unitType.Name,
                     string.Join(",", (from t in mUnitCtorArgTypes select t.Name).ToArray())));
             }
+
+            //desription
+            BattleUnit unit = (BattleUnit)Activator.CreateInstance(unitType);
+            mDescription = string.Format("Attack: {0}\nDefense: {1}\nMovement: {2}", unit.BaseAttack, unit.BaseDefense, unit.BaseMovementDistance);
+            
 
             mCost = cost;
         }
