@@ -18,18 +18,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.ComponentModel;
 using System.Xml.Linq;
 
 namespace Conquera.BattlePrototype
@@ -132,6 +127,17 @@ namespace Conquera.BattlePrototype
             mPlayers[0].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
             mPlayers[1].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
 
+            Logger.Logged += new EventHandler<Logger.LogEventArgs>(Logger_Logged);
+
+        }
+
+        private void Logger_Logged(object sender, Logger.LogEventArgs e)
+        {
+            ListBoxItem item = new ListBoxItem();
+            item.Content = e.Record;
+            mLogBox.Items.Add(item);
+            mLogBox.ScrollIntoView(item);
+            e.Item = item;
         }
 
         private void ResetPlayers()
@@ -653,5 +659,4 @@ namespace Conquera.BattlePrototype
             throw new NotImplementedException();
         }
     }
-
 }
