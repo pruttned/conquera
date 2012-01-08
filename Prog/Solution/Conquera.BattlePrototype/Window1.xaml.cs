@@ -37,6 +37,25 @@ namespace Conquera.BattlePrototype
         int mInitMana = 0;
         int mMaxMana = 99;
 
+        Type[] mUnits1 = new Type[] 
+        {
+            typeof(SoldierAtt),
+            typeof(SoldierAtt),
+            typeof(SoldierBl),
+            typeof(SoldierBl),
+            typeof(SoldierDef),
+            typeof(SoldierDef),
+        };
+        Type[] mUnits2 = new Type[] 
+        {
+            typeof(ScoutBase),
+            typeof(ScoutFly),
+            typeof(ScoutFs),
+            typeof(SupportAtt),
+            typeof(SupportDef),
+            typeof(SupportHeal),
+        };
+
         private class SpellCardListBoxItem
         {
             public SpellCard Card { get; private set; }
@@ -59,13 +78,13 @@ namespace Conquera.BattlePrototype
         HexTerrain mTerrain = new HexTerrain(20, 20);
         BattlePlayer[] mPlayers = new BattlePlayer[]{
             new BattlePlayer(Colors.Blue, 0),
-            new BattlePlayer(Colors.Red, 1)};        
+            new BattlePlayer(Colors.Red, 1)};
         private BattlePlayer mActivePlayer;
 
         public BattlePlayer ActivePlayer
         {
             get { return mActivePlayer; }
-            private set 
+            private set
             {
                 if (null == value) throw new ArgumentNullException("ActivePlayer");
                 if (mActivePlayer != value)
@@ -82,7 +101,7 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        public BattleUnit SelectedUnit {get; private set; }
+        public BattleUnit SelectedUnit { get; private set; }
 
         int mTurnNum = 0;
 
@@ -95,10 +114,10 @@ namespace Conquera.BattlePrototype
             {
                 System.IO.Directory.CreateDirectory(mMapsDir);
             }
-            LoadMap("test");
-                
+
             ActivePlayer = mPlayers[0];
-            
+            LoadMap("test");
+
             ////LoadTerrain();
             //mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1, 2), "Outpost");
             //mTerrain.SetTile(new Microsoft.Xna.Framework.Point(0, 2), "Outpost");
@@ -127,8 +146,13 @@ namespace Conquera.BattlePrototype
             mPlayers[0].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
             mPlayers[1].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
 
+
             Logger.Logged += new EventHandler<Logger.LogEventArgs>(Logger_Logged);
 
+            foreach (var player in mPlayers)
+            {
+                player.OnTurnStart(mTurnNum, (ActivePlayer == player));
+            }
         }
 
         private void Logger_Logged(object sender, Logger.LogEventArgs e)
@@ -137,7 +161,7 @@ namespace Conquera.BattlePrototype
             item.Content = e.Record;
             mLogBox.Items.Add(item);
             mLogBox.ScrollIntoView(item);
-            e.Item = item;            
+            e.Item = item;
         }
 
         private void ResetPlayers()
@@ -149,8 +173,21 @@ namespace Conquera.BattlePrototype
                 player.MaxMana = mMaxMana;
                 player.Mana = mInitMana;
                 player.Units.Clear();
-                new HeroBattleUnit(player, mTerrain, player.StartPos);
+                //                new HeroBattleUnit(player, mTerrain, player.StartPos);
+
+                for (int i = 0; i < mUnits1.Length; ++i)
+                {
+                    Activator.CreateInstance(mUnits1[i], player, mTerrain, mTerrain.GetSibling(player.StartPos, (HexDirection)i).Index);
+                }
+                var p2 = player.StartPos;
+                p2.Y += 3;
+                for (int i = 0; i < mUnits2.Length; ++i)
+                {
+                    Activator.CreateInstance(mUnits2[i], player, mTerrain, mTerrain.GetSibling(p2, (HexDirection)i).Index);
+                }
+                player.Mana = 0;
             }
+
             NotifyTilesTurnStart();
         }
 
@@ -165,7 +202,7 @@ namespace Conquera.BattlePrototype
             mCardsListBox.Items.Clear();
             foreach (SpellCard card in ActivePlayer.CardsInHand)
             {
-                mCardsListBox.Items.Add(new SpellCardListBoxItem(card));                
+                mCardsListBox.Items.Add(new SpellCardListBoxItem(card));
             }
         }
 
@@ -182,8 +219,8 @@ namespace Conquera.BattlePrototype
 
         private void UpdateMapsListBox()
         {
-            List<string> mapNames = new List<string>();            
-            foreach(string mapName in System.IO.Directory.GetFiles(mMapsDir, "*.map"))
+            List<string> mapNames = new List<string>();
+            foreach (string mapName in System.IO.Directory.GetFiles(mMapsDir, "*.map"))
             {
                 mapNames.Add(System.IO.Path.GetFileNameWithoutExtension(mapName));
             }
@@ -193,31 +230,8 @@ namespace Conquera.BattlePrototype
         private void EndTurn()
         {
             //Resolve battle
-            List<BattleUnit> unitsToKill = new List<BattleUnit>();
-            foreach (var player in mPlayers)
-            {
-
-                //if (player != ActivePlayer)
-                {
-                    foreach (var unit in player.Units)
-                    {
-                        if (unit.ComputeDamageFromEnemies() >= unit.Defense)
-                        {
-                            int damage = Math.Max(0, unit.ComputeDamageFromEnemies() - unit.Defense );
-                            unit.Hp -= damage;
-                            if (unit.Hp <= 0)
-                            {
-                                unitsToKill.Add(unit);
-                            }
-                        }
-                    }
-                }
-            }
-            //kill units
-            foreach (var unit in unitsToKill)
-            {
-                unit.Kill();
-            }
+            ResolveBattle(true);
+            ResolveBattle(false);
 
             mTurnNum++;
             ActivePlayer = mPlayers[mTurnNum % 2];
@@ -226,13 +240,46 @@ namespace Conquera.BattlePrototype
             SelectUnit(null);
             mCardsListBox.IsEnabled = true;
 
-
             foreach (var player in mPlayers)
             {
                 player.Mana = 0;
                 player.OnTurnStart(mTurnNum, (ActivePlayer == player));
             }
             NotifyTilesTurnStart();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="isPrebatlePhase">Only damage from units with first strike is considered</param>
+        private void ResolveBattle(bool isPrebatlePhase)
+        {
+            List<BattleUnit> unitsToKill = new List<BattleUnit>();
+            foreach (var player in mPlayers)
+            {
+
+                //if (player != ActivePlayer)
+                {
+                    foreach (var unit in player.Units)
+                    {
+                        int damageFromEnemies = unit.ComputeDamageFromEnemies(isPrebatlePhase);
+                        if (damageFromEnemies >= unit.Defense)
+                        {
+                            int damage = Math.Max(0, damageFromEnemies - unit.Defense);
+                            unit.Hp -= damage;
+                            if (unit.Hp <= 0)
+                            {
+                                unitsToKill.Add(unit);
+                            }
+                        }
+                    }
+                }
+                //kill units
+                foreach (var unit in unitsToKill)
+                {
+                    unit.Kill();
+                }
+            }
         }
 
         private void NotifyTilesTurnStart()
@@ -293,13 +340,13 @@ namespace Conquera.BattlePrototype
         private void LoadTerrain()
         {
             //Canvas size
-            Microsoft.Xna.Framework.Vector2 lastTilePos = HexHelper.Get2DPosFromIndex(new Microsoft.Xna.Framework.Point(mTerrain.Width -1 , mTerrain.Height - 1));
+            Microsoft.Xna.Framework.Vector2 lastTilePos = HexHelper.Get2DPosFromIndex(new Microsoft.Xna.Framework.Point(mTerrain.Width - 1, mTerrain.Height - 1));
             mMainCanvas.Width = lastTilePos.X + HexHelper.TileW;
             if (mTerrain.Height > 1 && 0 != mTerrain.Height % 2)
             {
                 mMainCanvas.Width += HexHelper.HalfTileW;
             }
-            mMainCanvas.Height = lastTilePos.Y + 2*HexHelper.TileR;
+            mMainCanvas.Height = lastTilePos.Y + 2 * HexHelper.TileR;
 
             //Adding tiles
             for (int i = 0; i < mTerrain.Width; i++)
@@ -338,7 +385,7 @@ namespace Conquera.BattlePrototype
             XElement mapElm = new XElement("map");
             for (int i = 0; i < mPlayers.Length; ++i)
             {
-                mapElm.Add(new XElement("player", 
+                mapElm.Add(new XElement("player",
                     new XAttribute("index", i),
                     new XElement("startPos",
                         new XAttribute("x", mPlayers[i].StartPos.X),
@@ -454,6 +501,7 @@ namespace Conquera.BattlePrototype
                                 if (card.Cost <= ActivePlayer.Mana && card.IsValidTarget(ActivePlayer, tile, mTerrain))
                                 {
                                     ActivePlayer.CastSpellCard(mTurnNum, mCardsListBox.SelectedIndex, tile, mTerrain, mPlayers);
+                                    mCardsListBox.UnselectAll();
                                     //mCardsListBox.IsEnabled = false;
                                 }
                             }
@@ -486,7 +534,7 @@ namespace Conquera.BattlePrototype
         }
 
         private void SetStartPosIndicatorsVisibility(bool visible)
-        {            
+        {
             if (visible)
             {
                 mTerrain[mPlayers[0].StartPos].SetStartPosIndicator(mPlayers[0]);
@@ -577,7 +625,7 @@ namespace Conquera.BattlePrototype
         }
 
         private void mSetTilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {            
+        {
             if (Mouse.RightButton == MouseButtonState.Pressed)
             {
                 mSetTilesRightButtonTextBlock.Text = (string)mSetTilesListBox.SelectedItem;
@@ -631,7 +679,7 @@ namespace Conquera.BattlePrototype
         private void CardItem_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.RightButton == MouseButtonState.Pressed)
-            {                
+            {
                 SpellCardListBoxItem cardItem = (SpellCardListBoxItem)((TextBlock)sender).DataContext;
                 ActivePlayer.DiscardSpellCard(mTurnNum, mCardsListBox.Items.IndexOf(cardItem));
                 //mCardsListBox.IsEnabled = false;

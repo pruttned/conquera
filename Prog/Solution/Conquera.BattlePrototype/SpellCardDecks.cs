@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace Conquera.BattlePrototype
 {
@@ -27,65 +28,63 @@ namespace Conquera.BattlePrototype
     {
         public static List<SpellCard> FullDeck = new List<SpellCard>()
         {
-            new SummonSkeletonLv1UnitSpellCard(),
-            new SummonZombieLv1UnitSpellCard(),
-            new SummonBansheeLv1UnitSpellCard(),
-            new SummonSpectreLv1UnitSpellCard(),
+        //    new SummonSkeletonLv1UnitSpellCard(),
+        //    new SummonZombieLv1UnitSpellCard(),
+        //    new SummonBansheeLv1UnitSpellCard(),
+            //new SummonSpectreLv1UnitSpellCard(),
             
-            new SummonSkeletonLv2UnitSpellCard(),
-            new SummonZombieLv2UnitSpellCard(),
-            new SummonBansheeLv2UnitSpellCard(),
-            new SummonSpectreLv2UnitSpellCard(),
+          //  new SummonSkeletonLv2UnitSpellCard(),
+            //new SummonZombieLv2UnitSpellCard(),
+            //new SummonBansheeLv2UnitSpellCard(),
+          //  new SummonSpectreLv2UnitSpellCard(),
 
-
-            
             new IncDecDefenseSpellCard(3,1,2),
-            new IncDecDefenseSpellCard(4,1,3),
-            new IncDecDefenseSpellCard(3,2,1),
+            //new IncDecDefenseSpellCard(4,1,3),
+            //new IncDecDefenseSpellCard(3,2,1),
 
-            new IncDecAttackSpellCard(3,1,2),
-            new IncDecAttackSpellCard(4,1,3),
-            new IncDecAttackSpellCard(3,2,1),
+            new IncDecAttackSpellCard(3,1,new Point(10,10)),
+            //new IncDecAttackSpellCard(4,1,3),
+            //new IncDecAttackSpellCard(3,2,1),
 
-            new IncDecMovementDistanceSpellCard(3,1,2),
-            new IncDecMovementDistanceSpellCard(4,1,4),
-            new IncDecMovementDistanceSpellCard(3,2,1),
+            //new IncDecMovementDistanceSpellCard(3,1,2),
+            //new IncDecMovementDistanceSpellCard(4,1,4),
+            //new IncDecMovementDistanceSpellCard(3,2,1),
 
-            new IncDecDefenseSpellCard(3,1,-2),
-            new IncDecDefenseSpellCard(4,1,-3),
-            new IncDecDefenseSpellCard(3,2,-1),
+            //new IncDecDefenseSpellCard(3,1,-2),
+            //new IncDecDefenseSpellCard(4,1,-3),
+            //new IncDecDefenseSpellCard(3,2,-1),
 
-            new IncDecAttackSpellCard(3,1,-2),
-            new IncDecAttackSpellCard(4,1,-3),
-            new IncDecAttackSpellCard(3,2,-1),
+            //new IncDecAttackSpellCard(3,1,-2),
+            //new IncDecAttackSpellCard(4,1,-3),
+            //new IncDecAttackSpellCard(3,2,-1),
 
-            new IncDecMovementDistanceSpellCard(3,1,-2),
-            new IncDecMovementDistanceSpellCard(4,1,-4),
-            new IncDecMovementDistanceSpellCard(3,2,-1),
+            //new IncDecMovementDistanceSpellCard(3,1,-2),
+            //new IncDecMovementDistanceSpellCard(4,1,-4),
+            //new IncDecMovementDistanceSpellCard(3,2,-1),
 
 
-            new AddManaSpellCard(10),
-            new AddManaSpellCard(15),
+            //new AddManaSpellCard(10),
+            //new AddManaSpellCard(15),
 
-            new DiscardCardsSpellCard(4, 1),
-            new DiscardCardsSpellCard(6, 2),
-            new DiscardCardsSpellCard(8, 3),
+            //new DiscardCardsSpellCard(4, 1),
+            //new DiscardCardsSpellCard(6, 2),
+            //new DiscardCardsSpellCard(8, 3),
 
-            new DisableMovementSpellCard(6, 2),
-            new DisableMovementSpellCard(9, 4),
+            //new DisableMovementSpellCard(6, 2),
+            //new DisableMovementSpellCard(9, 4),
 
-            new DisableAttackSpellCard(5, 1),
-            new DisableAttackSpellCard(7, 2),
+            //new DisableAttackSpellCard(5, 1),
+            //new DisableAttackSpellCard(7, 2),
 
-            new HealSpellCard(5,1),
+         //   new HealSpellCard(5,1),
             new HealSpellCard(8,2),
-            new HealSpellCard(13,3),
+           // new HealSpellCard(13,3),
 
             new DamageSpellCard(9, 1),
-            new DamageSpellCard(14, 2),
+        //    new DamageSpellCard(14, 2),
 
-            new RemoveDisableMovementsSpellCard(),
-            new RemoveDisableAttacksSpellCard()
+            //new RemoveDisableMovementsSpellCard(),
+            //new RemoveDisableAttacksSpellCard()
         };
 
         //public static List<SpellCard> FullDeck = new List<SpellCard>()

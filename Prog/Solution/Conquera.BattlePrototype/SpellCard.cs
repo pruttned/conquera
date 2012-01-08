@@ -89,158 +89,158 @@ namespace Conquera.BattlePrototype
         }
     }
 
-    public class SummonUnitSpellCard : SpellCard
-    {
-        private static Type[] mUnitCtorArgTypes = new Type[] { typeof(BattlePlayer), typeof(HexTerrain), typeof(Point) };
-        private ConstructorInfo mUnitCtor;
-        private static List<HexTerrainTile> mSiblings = new List<HexTerrainTile>();
-        private int mCost;
-        private string mDescription;
+    //public class SummonUnitSpellCard : SpellCard
+    //{
+    //    private static Type[] mUnitCtorArgTypes = new Type[] { typeof(BattlePlayer), typeof(HexTerrain), typeof(Point) };
+    //    private ConstructorInfo mUnitCtor;
+    //    private static List<HexTerrainTile> mSiblings = new List<HexTerrainTile>();
+    //    private int mCost;
+    //    private string mDescription;
 
-        public override string Name
-        {
-            get { return string.Format("Summon {0}", mUnitCtor.DeclaringType.Name); }
-        }
+    //    public override string Name
+    //    {
+    //        get { return string.Format("Summon {0}", mUnitCtor.DeclaringType.Name); }
+    //    }
 
-        public override string Description
-        {
-            get
-            {
-                return mDescription;
-            }
-        }
+    //    public override string Description
+    //    {
+    //        get
+    //        {
+    //            return mDescription;
+    //        }
+    //    }
 
-        public override object ToolTip
-        {
-            get
-            {
-                StackPanel panel = new StackPanel();
+    //    public override object ToolTip
+    //    {
+    //        get
+    //        {
+    //            StackPanel panel = new StackPanel();
                 
-                BattleUnit unit = (BattleUnit)Activator.CreateInstance(mUnitCtor.DeclaringType);
-                panel.Children.Add(unit.CreateImage());
+    //            BattleUnit unit = (BattleUnit)Activator.CreateInstance(mUnitCtor.DeclaringType);
+    //            panel.Children.Add(unit.CreateImage());
 
-                TextBlock textBlock = new TextBlock();
-                textBlock.Text = Description;
-                panel.Children.Add(textBlock);
+    //            TextBlock textBlock = new TextBlock();
+    //            textBlock.Text = Description;
+    //            panel.Children.Add(textBlock);
 
-                return panel;
-            }
-        }
+    //            return panel;
+    //        }
+    //    }
 
-        public override int Cost { get { return mCost; } }
+    //    public override int Cost { get { return mCost; } }
 
-        public SummonUnitSpellCard(Type unitType, int cost)
-        {
-            if (null == unitType) throw new ArgumentNullException("unitType");
+    //    public SummonUnitSpellCard(Type unitType, int cost)
+    //    {
+    //        if (null == unitType) throw new ArgumentNullException("unitType");
 
-            mUnitCtor = unitType.GetConstructor(mUnitCtorArgTypes);
-            if (null == mUnitCtor)
-            {
-                throw new Exception(string.Format("Type '{0}' is missing public ctor with arguments '{1}'", unitType.Name,
-                    string.Join(",", (from t in mUnitCtorArgTypes select t.Name).ToArray())));
-            }
+    //        mUnitCtor = unitType.GetConstructor(mUnitCtorArgTypes);
+    //        if (null == mUnitCtor)
+    //        {
+    //            throw new Exception(string.Format("Type '{0}' is missing public ctor with arguments '{1}'", unitType.Name,
+    //                string.Join(",", (from t in mUnitCtorArgTypes select t.Name).ToArray())));
+    //        }
 
-            //desription
-            BattleUnit unit = (BattleUnit)Activator.CreateInstance(unitType);
-            mDescription = string.Format("Attack: {0}\nDefense: {1}\nMovement: {2}", unit.BaseAttack, unit.BaseDefense, unit.BaseMovementDistance);
+    //        //desription
+    //        BattleUnit unit = (BattleUnit)Activator.CreateInstance(unitType);
+    //        mDescription = string.Format("Attack: {0}\nDefense: {1}\nMovement: {2}", unit.BaseAttack, unit.BaseDefense, unit.BaseMovementDistance);
             
 
-            mCost = cost;
-        }
+    //        mCost = cost;
+    //    }
 
-        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
-        {
-            if (tile.IsPassableAndEmpty)
-            {
-                //todo: cast on existing unit
-                OutpostHexTerrainTile outpost = tile as OutpostHexTerrainTile;
-                if (outpost != null && outpost.OwningPlayer == player && null == tile.Unit)
-                {
-                    return true;
-                }
-                mSiblings.Clear();
-                terrain.GetSiblings(tile.Index, mSiblings);
-                return (from s in mSiblings where s.Unit is HeroBattleUnit && s.Unit.Player == player select 1).Any();
-            }
-            return false;
-        }
+    //    public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+    //    {
+    //        if (tile.IsPassableAndEmpty)
+    //        {
+    //            //todo: cast on existing unit
+    //            OutpostHexTerrainTile outpost = tile as OutpostHexTerrainTile;
+    //            if (outpost != null && outpost.OwningPlayer == player && null == tile.Unit)
+    //            {
+    //                return true;
+    //            }
+    //            mSiblings.Clear();
+    //            terrain.GetSiblings(tile.Index, mSiblings);
+    //            return (from s in mSiblings where s.Unit is HeroBattleUnit && s.Unit.Player == player select 1).Any();
+    //        }
+    //        return false;
+    //    }
 
-        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
-        {
-            if (null == player) throw new ArgumentNullException("player");
-            if (null == tile) throw new ArgumentNullException("tile");
-
-
-            //todo: cast on existing unit
-
-            mUnitCtor.Invoke(new object[] { player, terrain, tile.Index });
-        }
-    }
+    //    public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
+    //    {
+    //        if (null == player) throw new ArgumentNullException("player");
+    //        if (null == tile) throw new ArgumentNullException("tile");
 
 
+    //        //todo: cast on existing unit
+
+    //        mUnitCtor.Invoke(new object[] { player, terrain, tile.Index });
+    //    }
+    //}
 
 
-    #region UnitCards
 
-    public class SummonSkeletonLv1UnitSpellCard : SummonUnitSpellCard
-    {
-        public SummonSkeletonLv1UnitSpellCard()
-            :base(typeof(SkeletonLv1BattleUnit), 3)
-        {
-        }
-    }
-    public class SummonZombieLv1UnitSpellCard : SummonUnitSpellCard
-    {
-        public SummonZombieLv1UnitSpellCard()
-            : base(typeof(ZombieLv1BattleUnit), 3)
-        {
-        }
-    }
-    public class SummonBansheeLv1UnitSpellCard : SummonUnitSpellCard
-    {
-        public SummonBansheeLv1UnitSpellCard()
-            : base(typeof(BansheeLv1BattleUnit), 3)
-        {
-        }
-    }
-    public class SummonSpectreLv1UnitSpellCard : SummonUnitSpellCard
-    {
-        public SummonSpectreLv1UnitSpellCard()
-            : base(typeof(SpectreLv1BattleUnit), 3)
-        {
-        }
-    }
 
-    public class SummonSkeletonLv2UnitSpellCard : SummonUnitSpellCard
-    {
-        public SummonSkeletonLv2UnitSpellCard()
-            : base(typeof(SkeletonLv2BattleUnit), 5)
-        {
-        }
-    }
-    public class SummonZombieLv2UnitSpellCard : SummonUnitSpellCard
-    {
-        public SummonZombieLv2UnitSpellCard()
-            : base(typeof(ZombieLv2BattleUnit), 5)
-        {
-        }
-    }
-    public class SummonBansheeLv2UnitSpellCard : SummonUnitSpellCard
-    {
-        public SummonBansheeLv2UnitSpellCard()
-            : base(typeof(BansheeLv2BattleUnit), 5)
-        {
-        }
-    }
-    public class SummonSpectreLv2UnitSpellCard : SummonUnitSpellCard
-    {
-        public SummonSpectreLv2UnitSpellCard()
-            : base(typeof(SpectreLv2BattleUnit), 5)
-        {
-        }
-    }
+    //#region UnitCards
 
-    #endregion UnitCards
+    //public class SummonSkeletonLv1UnitSpellCard : SummonUnitSpellCard
+    //{
+    //    public SummonSkeletonLv1UnitSpellCard()
+    //        :base(typeof(SkeletonLv1BattleUnit), 3)
+    //    {
+    //    }
+    //}
+    //public class SummonZombieLv1UnitSpellCard : SummonUnitSpellCard
+    //{
+    //    public SummonZombieLv1UnitSpellCard()
+    //        : base(typeof(ZombieLv1BattleUnit), 3)
+    //    {
+    //    }
+    //}
+    //public class SummonBansheeLv1UnitSpellCard : SummonUnitSpellCard
+    //{
+    //    public SummonBansheeLv1UnitSpellCard()
+    //        : base(typeof(BansheeLv1BattleUnit), 3)
+    //    {
+    //    }
+    //}
+    //public class SummonSpectreLv1UnitSpellCard : SummonUnitSpellCard
+    //{
+    //    public SummonSpectreLv1UnitSpellCard()
+    //        : base(typeof(SpectreLv1BattleUnit), 3)
+    //    {
+    //    }
+    //}
+
+    //public class SummonSkeletonLv2UnitSpellCard : SummonUnitSpellCard
+    //{
+    //    public SummonSkeletonLv2UnitSpellCard()
+    //        : base(typeof(SkeletonLv2BattleUnit), 5)
+    //    {
+    //    }
+    //}
+    //public class SummonZombieLv2UnitSpellCard : SummonUnitSpellCard
+    //{
+    //    public SummonZombieLv2UnitSpellCard()
+    //        : base(typeof(ZombieLv2BattleUnit), 5)
+    //    {
+    //    }
+    //}
+    //public class SummonBansheeLv2UnitSpellCard : SummonUnitSpellCard
+    //{
+    //    public SummonBansheeLv2UnitSpellCard()
+    //        : base(typeof(BansheeLv2BattleUnit), 5)
+    //    {
+    //    }
+    //}
+    //public class SummonSpectreLv2UnitSpellCard : SummonUnitSpellCard
+    //{
+    //    public SummonSpectreLv2UnitSpellCard()
+    //        : base(typeof(SpectreLv2BattleUnit), 5)
+    //    {
+    //    }
+    //}
+
+    //#endregion UnitCards
 
 
     public class IncDecDefenseSpellCard : SpellCard
@@ -289,7 +289,7 @@ namespace Conquera.BattlePrototype
 
         public override string Name
         {
-            get { return string.Format("Attack {0}{1} for {2} turn(s)", 0 < AttackInc ? "+" : null, AttackInc, Duration); }
+            get { return string.Format("Attack [{0}{1}]-[{2}{3}] for {4} turn(s)", (0 < AttackInc.X ? "+" : null), AttackInc.X, (0 < AttackInc.Y ? "+" : null), AttackInc.Y, Duration); }
         }
 
         public override string Description
@@ -303,9 +303,9 @@ namespace Conquera.BattlePrototype
         }
 
         public int Duration { get; private set; }
-        public int AttackInc { get; private set; }
+        public Point AttackInc { get; private set; }
 
-        public IncDecAttackSpellCard(int cost, int duration, int attackInc)
+        public IncDecAttackSpellCard(int cost, int duration, Point attackInc)
         {
             mCost = cost;
             Duration = duration;
@@ -314,7 +314,8 @@ namespace Conquera.BattlePrototype
 
         public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
         {
-            return (null != tile.Unit && (player == tile.Unit.Player && 0 < AttackInc || player != tile.Unit.Player && 0 > AttackInc));
+//            return (null != tile.Unit && (player == tile.Unit.Player && 0 < AttackInc || player != tile.Unit.Player && 0 > AttackInc));
+            return (null != tile.Unit);
         }
 
         public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
@@ -561,6 +562,10 @@ namespace Conquera.BattlePrototype
         public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
         {
             tile.Unit.Hp -= HpDec;
+            if (0 >= tile.Unit.Hp)
+            {
+                tile.Unit.Kill();
+            }
         }
     }
 
