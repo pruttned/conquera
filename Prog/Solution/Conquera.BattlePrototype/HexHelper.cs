@@ -36,7 +36,7 @@ namespace Conquera
         /// </summary>
         private static Vector2[] UnitCorners;
 
-        public static float TileR = 50f;
+        public static float TileR = 60f;
         public static float HalfTileR = 0.5f * TileR;
         public static float HalfTileW = (float)Math.Cos(MathHelper.ToRadians(30)) * TileR;
         public static float TileW = 2 * HalfTileW;

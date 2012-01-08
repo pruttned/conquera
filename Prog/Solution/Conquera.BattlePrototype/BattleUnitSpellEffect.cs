@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace Conquera.BattlePrototype
 {
@@ -19,7 +20,7 @@ namespace Conquera.BattlePrototype
     }
     public interface IBattleUnitAttackModifier
     {
-        int GetModifier(BattleUnit unit);
+        Point GetModifier(BattleUnit unit);
     }
     public interface IBattleUnitMovementDistanceModifier
     {
@@ -114,20 +115,20 @@ namespace Conquera.BattlePrototype
 
     public class ConstIncAttackBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration, IBattleUnitAttackModifier
     {
-        private int mAmount;
+        private Point mAmount;
         private BattleUnit mUnit;
 
         public override string EffectDescription
         {
-            get { return string.Format("Attack {0}{1}", 0 < mAmount ? "+" : null, mAmount); }
+            get { return string.Format("Attack [{0}{1}]-[{2}{3}]", (0 < mAmount.X ? "+" : null), mAmount.X, (0 < mAmount.Y ? "+" : null), mAmount.Y); }
         }
 
-        public int GetModifier(BattleUnit unit)
+        public Point GetModifier(BattleUnit unit)
         {
             return mAmount;
         }
 
-        public ConstIncAttackBattleUnitSpellEffect(int amount, int duration)
+        public ConstIncAttackBattleUnitSpellEffect(Point amount, int duration)
             : base(duration)
         {
             mAmount = amount;

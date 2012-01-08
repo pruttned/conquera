@@ -69,35 +69,89 @@ namespace Conquera.BattlePrototype
         private bool mIsSelected = false;
 
         private int mDefense;
-        private int mAttack;
+        private Point mAttack;
         private int mMovementDistance;
 
         private int mAttackPreventerCnt;
         private int mMovementPreventerCnt;
 
+        private int mFlyEnablerCnt;
+        private int mFirstStrikeEnablerCnt;
+        private int mFlyPreventerCnt;
+        private int mFirstStrikePreventerCnt;
+
         private List<IBattleUnitSpellEffect> mSpellEffects = new List<IBattleUnitSpellEffect>();
 
 
+        public string ImageFileName { get; private set; }
 
         public BattlePlayer Player { get; private set; }
+        public HexTerrain Terrain { get { return mTerrain; } }
 
-        public abstract int BaseAttack { get; }
-        public abstract int BaseDefense { get; }
-        public abstract int BaseMovementDistance { get; }
-        public abstract int MaxHp { get; }
+        public Point BaseAttack { get; private set; }
+        public int BaseDefense { get; private set; }
+        public int BaseMovementDistance { get; private set; }
+        public int MaxHp { get; private set; }
 
         public bool HasEnabledAttack { get { return 0 == AttackPreventerCnt; } }
         public bool HasEnabledMovement { get { return 0 == MovementPreventerCnt; } }
 
+        public bool IsFlying { get { return 0 < FlyEnablerCnt && 0 == FlyPreventerCnt; } }
+        public bool HasFirstStrike { get { return 0 < FirstStrikeEnablerCnt && 0 == FirstStrikePreventerCnt; } }
+
+        public int FlyEnablerCnt
+        {
+            get { return mFlyEnablerCnt; }
+            set
+            {
+                mFlyEnablerCnt = Math.Max(0, value);
+                UpdateGraphics();
+            }
+        }
+        public int FirstStrikeEnablerCnt
+        {
+            get { return mFirstStrikeEnablerCnt; }
+            set
+            {
+                mFirstStrikeEnablerCnt = Math.Max(0, value);
+                UpdateGraphics();
+            }
+        }
+        public int FlyPreventerCnt
+        {
+            get { return mFlyPreventerCnt; }
+            set
+            {
+                mFlyPreventerCnt = Math.Max(0, value);
+                UpdateGraphics();
+            }
+        }
+        public int FirstStrikePreventerCnt
+        {
+            get { return mFirstStrikePreventerCnt; }
+            set
+            {
+                mFirstStrikePreventerCnt = Math.Max(0, value);
+                UpdateGraphics();
+            }
+        }
         public int AttackPreventerCnt
         {
             get { return mAttackPreventerCnt; }
-            set { mAttackPreventerCnt = Math.Max(0, value); }
+            set
+            {
+                mAttackPreventerCnt = Math.Max(0, value);
+                UpdateGraphics();
+            }
         }
         public int MovementPreventerCnt
         {
             get { return mMovementPreventerCnt; }
-            set { mMovementPreventerCnt = Math.Max(0, value); }
+            set
+            {
+                mMovementPreventerCnt = Math.Max(0, value);
+                UpdateGraphics();
+            }
         }
 
         public bool IsKilled { get; private set; }
@@ -105,17 +159,21 @@ namespace Conquera.BattlePrototype
         public int Hp
         {
             get { return mHp; }
-            set 
-            { 
+            set
+            {
                 mHp = MathExt.Clamp(value, 0, MaxHp);
                 UpdateGraphics();
             }
         }
 
-        public int Attack
+        public Point Attack
         {
             get { return mAttack; }
-            private set { mAttack = Math.Max(0, value); }
+            private set
+            {
+                mAttack = new Point(Math.Max(0, value.X), Math.Max(0, value.Y));
+                mAttack.Y = Math.Max(mAttack.X, mAttack.Y);
+            }
         }
         public int Defense
         {
@@ -192,17 +250,28 @@ namespace Conquera.BattlePrototype
             get { return 1; }
         }
 
-        public BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+        public BattleUnit(Point baseAttack, int baseDefense, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
+            string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
         {
+            if (string.IsNullOrEmpty(imageFileName)) throw new ArgumentNullException("imageName");
             if (null == player) throw new ArgumentNullException("player");
             if (null == terrain) throw new ArgumentNullException("terrain");
+
+            BaseAttack = baseAttack;
+            BaseDefense = baseDefense;
+            BaseMovementDistance = baseMovementDistance;
+            mHp = MaxHp = maxHp;
+
+            ImageFileName = imageFileName;
 
             IsKilled = false;
             Player = player;
             mTerrain = terrain;
             mTileIndex = tileIndex;
+            mFlyEnablerCnt = isFlying ? 1 : 0;
+            mFirstStrikeEnablerCnt = hasFirstStrike ? 1 : 0;
 
-            if(null != terrain[tileIndex.X, tileIndex.Y].Unit)
+            if (null != terrain[tileIndex.X, tileIndex.Y].Unit)
             {
                 throw new ArgumentException("Destination tile already contains a unit");
             }
@@ -225,7 +294,7 @@ namespace Conquera.BattlePrototype
             Children.Add(mBorder);
             UpdateGraphics();
 
-            Image image = CreateImage();            
+            Image image = CreateImage();
             image.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             image.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             Children.Add(image);
@@ -235,15 +304,13 @@ namespace Conquera.BattlePrototype
             UpdateMovementDistance();
             NotifySiblingsAfterArrival();
 
-            Hp = MaxHp;
-
             TextBlock levelTextBlock = new TextBlock();
             levelTextBlock.Text = Level.ToString();
             levelTextBlock.Foreground = Brushes.Yellow;
             levelTextBlock.Background = Brushes.Black;
             levelTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
             levelTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            Children.Add(levelTextBlock);            
+            Children.Add(levelTextBlock);
         }
 
         private void UpdateSpellEffectsToolTip()
@@ -303,9 +370,6 @@ namespace Conquera.BattlePrototype
             return removed;
         }
 
-
-
-
         public void OnTurnStart(int turnNum)
         {
             //update spell effects
@@ -322,10 +386,14 @@ namespace Conquera.BattlePrototype
 
             if (!IsKilled)
             {
-                UpdateGraphics();
+                OnTurnStartImpl(turnNum);
+                if (!IsKilled)
+                {
+                    UpdateGraphics();
+                }
             }
         }
-        
+
         public void Kill()
         {
             IsKilled = true;
@@ -354,9 +422,12 @@ namespace Conquera.BattlePrototype
                     sibling =>
                     {
                         Point index = sibling.Index;
-                        if (sibling.IsPassableAndEmpty && !CheckedPoints.Contains(index))
+                        if ((sibling.IsPassableAndEmpty || IsFlying) && !CheckedPoints.Contains(index))
                         {
-                            points.Add(index);
+                            if (sibling.IsPassableAndEmpty)
+                            {
+                                points.Add(index);
+                            }
                             CheckedPoints.Add(index);
                             if (0 < seed.Live - 1)
                             {
@@ -425,16 +496,17 @@ namespace Conquera.BattlePrototype
         /// <summary>
         /// No defense is considered here
         /// </summary>
+        /// <param name="isPrebatlePhase">Take damage only from units with first strike</param>
         /// <returns></returns>
-        public int ComputeDamageFromEnemies()
+        public int ComputeDamageFromEnemies(bool isPrebatlePhase)
         {
             int damage = 0;
             mTerrain.ForEachSibling(TileIndex,
                 sibling =>
                 {
-                    if (null != sibling.Unit && sibling.Unit.Player != Player && sibling.Unit.HasEnabledAttack)
+                    if (null != sibling.Unit && sibling.Unit.Player != Player && sibling.Unit.HasEnabledAttack && (!isPrebatlePhase || sibling.Unit.HasFirstStrike))
                     {
-                        damage += sibling.Unit.Attack;
+                        damage += MathExt.Random.Next(sibling.Unit.Attack.X, sibling.Unit.Attack.Y + 1);
                     }
                 });
 
@@ -450,8 +522,9 @@ namespace Conquera.BattlePrototype
         public void UpdateGraphics()
         {
             mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
-            mPropertiesTextBlock.Text += string.Format("A = {0}({5})\nD = {1}({6})\nM = {2}({7})\nHp = {3}/{4}", BaseAttack, BaseDefense, BaseMovementDistance, Hp, MaxHp,
-                Attack, Defense , MovementDistance);
+            mPropertiesTextBlock.Text += string.Format("[{0}{1}{2}{3}]\n", (IsFlying ? " F" : null), (HasFirstStrike ? " Fs" : null), (!HasEnabledMovement ? " MD" : null), (!HasEnabledAttack ? " AD" : null));
+            mPropertiesTextBlock.Text += string.Format("A = {0}-{1}({6}-{7})\nD = {2}({8})\nM = {3}({9})\nHp = {4}/{5}", BaseAttack.X, BaseAttack.Y, BaseDefense, BaseMovementDistance, Hp, MaxHp,
+                Attack.X, Attack.Y, Defense, MovementDistance);
             mBorder.BorderBrush = (!HasMovedThisTurn && HasEnabledMovement && Player.IsActive && HasEnabledMovement ? Brushes.Yellow : Brushes.Black);
         }
 
@@ -478,13 +551,13 @@ namespace Conquera.BattlePrototype
         public Image CreateImage()
         {
             Image image = new Image();
-            image.Source = new BitmapImage(new Uri(System.IO.Path.Combine(mBattleUnitImagesDirectory, GetImageFileName())));
+            image.Source = new BitmapImage(new Uri(System.IO.Path.Combine(mBattleUnitImagesDirectory, ImageFileName)));
             image.Width = 22;
             image.Height = 22;
             return image;
         }
 
-        protected abstract string GetImageFileName();
+        protected virtual void OnTurnStartImpl(int turnNum) { }
 
         private void AfterSiblingArrival(BattleUnit battleUnit)
         {
@@ -513,7 +586,9 @@ namespace Conquera.BattlePrototype
         }
         private void UpdateAttack()
         {
-            Attack = BaseAttack + GetAttackModifier();
+            Point modif = GetAttackModifier();
+            mAttack.X = BaseAttack.X + modif.X;
+            mAttack.Y = BaseAttack.Y + modif.Y;
 
             UpdateGraphics();
         }
@@ -557,12 +632,14 @@ namespace Conquera.BattlePrototype
             }
             return sum;
         }
-        private int GetAttackModifier()
+        private Point GetAttackModifier()
         {
-            int sum = 0;
+            Point sum = new Point();
             foreach (var modif in mAttackModifiers)
             {
-                sum += modif.GetModifier(this);
+                Point m = modif.GetModifier(this);
+                sum.X += m.X;
+                sum.Y += m.Y;
             }
             return sum;
         }
@@ -577,376 +654,219 @@ namespace Conquera.BattlePrototype
         }
     }
 
-
-
-    public class SkeletonLv1BattleUnit : BattleUnit
+    public class SoldierAtt : BattleUnit
     {
-        public override int BaseAttack
-        {
-            get { return 1; }
-        }
-
-        public override int BaseDefense
-        {
-            get { return 1; }
-        }
-
-        public override int BaseMovementDistance
-        {
-            get { return 3; }
-        }
-
-        public override int MaxHp
-        {
-            get { return 3; }
-        }
-
-        public SkeletonLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            :base(player, terrain, tileIndex)
-        {
-        }
-
-        //Only for temporary unit (to read base attributes while constructing description)
-        public SkeletonLv1BattleUnit()
-        {
-        }
-
-        protected override string GetImageFileName()
-        {
-            return "SlayerIcon.png";
-        }
+        public SoldierAtt(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(
+            new Point(30, 40) //attack
+            , 20 //defense
+            , 3 //movement distance
+            , 40 //maxHp
+            , false //flying
+            , false //first strike
+            , "BloodMadnessIcon.png" //image
+            , player, terrain, tileIndex)
+        { }
+    }
+    public class SoldierBl : BattleUnit
+    {
+        public SoldierBl(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(
+            new Point(20, 30) //attack
+            , 30 //defense
+            , 3 //movement distance
+            , 40 //maxHp
+            , false //flying
+            , false //first strike
+            , "BloodMadnessIcon.png" //image
+            , player, terrain, tileIndex)
+        { }
+    }
+    public class SoldierDef : BattleUnit
+    {
+        public SoldierDef(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(
+            new Point(10, 40) //attack
+            , 40 //defense
+            , 3 //movement distance
+            , 40 //maxHp
+            , false //flying
+            , false //first strike
+            , "BloodMadnessIcon.png" //image
+            , player, terrain, tileIndex)
+        { }
     }
 
-    public class ZombieLv1BattleUnit : BattleUnit
+
+    public class ScoutBase : BattleUnit
     {
-        public override int BaseAttack
-        {
-            get { return 2; }
-        }
+        public ScoutBase(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(
+            new Point(10, 25) //attack
+            , 20 //defense
+            , 6 //movement distance
+            , 30 //maxHp
+            , false //flying
+            , false //first strike
+            , "SlayerIcon.png" //image
+            , player, terrain, tileIndex)
+        { }
+    }
 
-        public override int BaseDefense
-        {
-            get { return 2; }
-        }
+    public class ScoutFs : BattleUnit
+    {
+        public ScoutFs(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(
+            new Point(10, 20) //attack
+            , 15 //defense
+            , 5 //movement distance
+            , 30 //maxHp
+            , false //flying
+            , true //first strike
+            , "SlayerIcon.png" //image
+            , player, terrain, tileIndex)
+        { }
+    }
 
-        public override int BaseMovementDistance
-        {
-            get { return 2; }
-        }
+    public class ScoutFly : BattleUnit
+    {
+        public ScoutFly(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(
+            new Point(10, 20) //attack
+            , 15 //defense
+            , 4 //movement distance
+            , 30 //maxHp
+            , true //flying
+            , false //first strike
+            , "SlayerIcon.png" //image
+            , player, terrain, tileIndex)
+        { }
+    }
 
-        public override int MaxHp
-        {
-            get { return 3; }
-        }
-
-        public ZombieLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(player, terrain, tileIndex)
-        {
-        }
+    #region Support base
+    public class SupportHealBase : BattleUnit
+    {
+        int mHpIncrement;
         
-        //Only for temporary unit (to read base attributes while constructing description)
-        public ZombieLv1BattleUnit()
+        public SupportHealBase(Point baseAttack, int baseDefense, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
+                int hpIncrement, 
+                string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            :base(baseAttack, baseDefense, baseMovementDistance, maxHp, isFlying, hasFirstStrike, imageFileName, player, terrain, tileIndex)
         {
+            mHpIncrement = hpIncrement;
         }
 
-        protected override string GetImageFileName()
+        protected override void OnTurnStartImpl(int turnNum)
         {
-            return "PlagueIcon.png";
+            base.OnTurnStartImpl(turnNum);
+
+            Terrain.ForEachSibling(TileIndex,
+                sibling =>
+                {
+                    if (null != sibling.Unit && sibling.Unit.Player == Player)
+                    {
+                        sibling.Unit.Hp += mHpIncrement;
+                    }
+                });
         }
     }
-
-    public class BansheeLv1BattleUnit : BattleUnit
+    public class SupportAttBase : BattleUnit
     {
-        public override int BaseAttack
+        Point mAttIncrement;
+
+        public SupportAttBase(Point baseAttack, int baseDefense, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
+                Point attIncrement, 
+                string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            :base(baseAttack, baseDefense, baseMovementDistance, maxHp, isFlying, hasFirstStrike, imageFileName, player, terrain, tileIndex)
         {
-            get { return 3; }
+            mAttIncrement = attIncrement;
         }
 
-        public override int BaseDefense
+        protected override void OnTurnStartImpl(int turnNum)
         {
-            get { return 1; }
-        }
+            base.OnTurnStartImpl(turnNum);
 
-        public override int BaseMovementDistance
-        {
-            get { return 2; }
-        }
-
-        public override int MaxHp
-        {
-            get { return 3; }
-        }
-
-        public BansheeLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(player, terrain, tileIndex)
-        {
-        }
-                
-        //Only for temporary unit (to read base attributes while constructing description)
-        public BansheeLv1BattleUnit()
-        {
-        }
-
-        protected override string GetImageFileName()
-        {
-            return "BloodMadnessIcon.png";
+            Terrain.ForEachSibling(TileIndex,
+                sibling =>
+                {
+                    if (null != sibling.Unit && sibling.Unit.Player == Player)
+                    {
+                        sibling.Unit.AddSpellEffect(turnNum, new ConstIncAttackBattleUnitSpellEffect(mAttIncrement, 1));
+                    }
+                });
         }
     }
-
-    public class SpectreLv1BattleUnit : BattleUnit
+    public class SupportDefBase : BattleUnit
     {
-        public override int BaseAttack
+        int mDefIncrement;
+
+        public SupportDefBase(Point baseAttack, int baseDefense, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
+                int defIncrement,
+                string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(baseAttack, baseDefense, baseMovementDistance, maxHp, isFlying, hasFirstStrike, imageFileName, player, terrain, tileIndex)
         {
-            get { return 1; }
+            mDefIncrement = defIncrement;
         }
 
-        public override int BaseDefense
+        protected override void OnTurnStartImpl(int turnNum)
         {
-            get { return 3; }
-        }
+            base.OnTurnStartImpl(turnNum);
 
-        public override int BaseMovementDistance
-        {
-            get { return 3; }
-        }
-
-        public override int MaxHp
-        {
-            get { return 3; }
-        }
-
-        public SpectreLv1BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(player, terrain, tileIndex)
-        {
-        }
-                
-        //Only for temporary unit (to read base attributes while constructing description)
-        public SpectreLv1BattleUnit()
-        {
-        }
-
-        protected override string GetImageFileName()
-        {
-            return "VampiricTouchIcon.png";
+            Terrain.ForEachSibling(TileIndex,
+                sibling =>
+                {
+                    if (null != sibling.Unit && sibling.Unit.Player == Player)
+                    {
+                        sibling.Unit.AddSpellEffect(turnNum, new ConstIncDefenseBattleUnitSpellEffect(mDefIncrement, 1));
+                    }
+                });
         }
     }
+    #endregion Support base
 
-
-
-    public class SkeletonLv2BattleUnit : BattleUnit
+    public class SupportHeal : SupportHealBase
     {
-        public override int BaseAttack
-        {
-            get { return 2; }
-        }
-
-        public override int BaseDefense
-        {
-            get { return 2; }
-        }
-
-        public override int BaseMovementDistance
-        {
-            get { return 3; }
-        }
-
-        public override int MaxHp
-        {
-            get { return 4; }
-        }
-
-        public override int Level
-        {
-            get { return 2; }
-        }
-
-        public SkeletonLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(player, terrain, tileIndex)
-        {
-        }
-                
-        //Only for temporary unit (to read base attributes while constructing description)
-        public SkeletonLv2BattleUnit()
-        {
-        }
-
-        protected override string GetImageFileName()
-        {
-            return "SlayerIcon.png";
-        }
+        public SupportHeal(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(
+            new Point(5, 10) //attack
+            , 10 //defense
+            , 2 //movement distance
+            , 20 //maxHp
+            , false //flying
+            , false //first strike
+            , 3 //hpInc
+            , "VampiricTouchIcon.png" //image
+            , player, terrain, tileIndex)
+        {}
     }
-
-    public class ZombieLv2BattleUnit : BattleUnit
+    public class SupportAtt : SupportAttBase
     {
-        public override int BaseAttack
-        {
-            get { return 3; }
-        }
-
-        public override int BaseDefense
-        {
-            get { return 3; }
-        }
-
-        public override int BaseMovementDistance
-        {
-            get { return 2; }
-        }
-
-        public override int MaxHp
-        {
-            get { return 4; }
-        }
-
-        public override int Level
-        {
-            get { return 2; }
-        }
-
-        public ZombieLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(player, terrain, tileIndex)
-        {
-        }
-                
-        //Only for temporary unit (to read base attributes while constructing description)
-        public ZombieLv2BattleUnit()
-        {
-        }
-
-        protected override string GetImageFileName()
-        {
-            return "PlagueIcon.png";
-        }
+        public SupportAtt(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(
+            new Point(5, 10) //attack
+            , 10 //defense
+            , 2 //movement distance
+            , 20 //maxHp
+            , false //flying
+            , false //first strike,
+            , new Point(5,5) //attInc
+            , "SpikesIcon.png" //image
+            , player, terrain, tileIndex)
+        {}
     }
-
-    public class BansheeLv2BattleUnit : BattleUnit
+    public class SupportDef : SupportDefBase
     {
-        public override int BaseAttack
-        {
-            get { return 4; }
-        }
-
-        public override int BaseDefense
-        {
-            get { return 2; }
-        }
-
-        public override int BaseMovementDistance
-        {
-            get { return 2; }
-        }
-
-        public override int MaxHp
-        {
-            get { return 4; }
-        }
-
-        public override int Level
-        {
-            get { return 2; }
-        }
-
-        public BansheeLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(player, terrain, tileIndex)
-        {
-        }
-                
-        //Only for temporary unit (to read base attributes while constructing description)
-        public BansheeLv2BattleUnit()
-        {
-        }
-
-        protected override string GetImageFileName()
-        {
-            return "BloodMadnessIcon.png";
-        }
-    }
-
-    public class SpectreLv2BattleUnit : BattleUnit
-    {
-        public override int BaseAttack
-        {
-            get { return 2; }
-        }
-
-        public override int BaseDefense
-        {
-            get { return 4; }
-        }
-
-        public override int BaseMovementDistance
-        {
-            get { return 3; }
-        }
-
-        public override int MaxHp
-        {
-            get { return 4; }
-        }
-
-        public override int Level
-        {
-            get { return 2; }
-        }
-
-        public SpectreLv2BattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(player, terrain, tileIndex)
-        {
-        }
-                
-        //Only for temporary unit (to read base attributes while constructing description)
-        public SpectreLv2BattleUnit()
-        {
-        }
-
-        protected override string GetImageFileName()
-        {
-            return "VampiricTouchIcon.png";
-        }
-    }
-
-
-
-    public class HeroBattleUnit : BattleUnit
-    {
-        public override int BaseAttack
-        {
-            get { return 2; }
-        }
-
-        public override int BaseDefense
-        {
-            get { return 2; }
-        }
-
-        public override int BaseMovementDistance
-        {
-            get { return 2; }
-        }
-
-        public override int MaxHp
-        {
-            get { return 15; }
-        }
-
-        public override int Level
-        {
-            get { return 0; }
-        }
-
-        public HeroBattleUnit(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(player, terrain, tileIndex)
-        {
-        }
-                
-        //Only for temporary unit (to read base attributes while constructing description)
-        public HeroBattleUnit()
-        {
-        }
-
-        protected override string GetImageFileName()
-        {
-            return "PackReinforcementIcon.png";
-        }
+        public SupportDef(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+            : base(
+            new Point(5, 10) //attack
+            , 10 //defense
+            , 2 //movement distance
+            , 20 //maxHp
+            , false //flying
+            , false //first strike,
+            , 5 //defInc
+            , "PackReinforcementIcon.png" //image
+            , player, terrain, tileIndex)
+        { }
     }
 }

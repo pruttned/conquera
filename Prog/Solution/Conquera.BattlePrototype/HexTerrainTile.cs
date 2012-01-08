@@ -78,7 +78,12 @@ namespace Conquera.BattlePrototype
         
         public bool IsPassableAndEmpty
         {
-            get { return IsPassable && null == Unit; }
+            get { return IsPassable && IsEmpty; }
+        }
+
+        public bool IsEmpty
+        {
+            get { return null == Unit; }
         }
 
         public virtual Brush Fill        
@@ -373,8 +378,12 @@ namespace Conquera.BattlePrototype
         {
             if (activePlayer == OwningPlayer)
             {
-                activePlayer.Mana += 5;
+                activePlayer.Mana += 1;
             }
+        }
+        public override void OnCaptured(BattlePlayer newPlayer)
+        {
+            newPlayer.Mana += 1;
         }
     }
 }

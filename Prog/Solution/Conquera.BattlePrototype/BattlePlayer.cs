@@ -95,7 +95,7 @@ namespace Conquera.BattlePrototype
                 throw new ArgumentException("Not enough mana for a specified card");
             }
             Mana -= card.Cost;
-            CardsInHand.RemoveAt(indexInHand);
+        //    CardsInHand.RemoveAt(indexInHand);
             card.Cast(turnNum, this, tile, terrain, players);
         }
 
@@ -121,21 +121,29 @@ namespace Conquera.BattlePrototype
             Units.Tidy();
             
             //FillCardsInHand();
-            if (isActive)
-            {
-                AddRandomCard();
-            }
+            //if (isActive)
+            //{
+            //    AddRandomCard();
+            //}
+
+//            Mana++;
         }
 
         public void FillCardsInHand()
         {
-            if (CardDeck.Count > 0)
+            //if (CardDeck.Count > 0)
+            //{
+            //    while (CardsInHand.Count < MaxCardsInHandCnt)
+            //    {
+            //        CardsInHand.Add(CardDeck[MathExt.Random.Next(CardDeck.Count)]);
+            //    }
+            //}
+
+            foreach(var card in CardDeck)
             {
-                while (CardsInHand.Count < MaxCardsInHandCnt)
-                {
-                    CardsInHand.Add(CardDeck[MathExt.Random.Next(CardDeck.Count)]);
-                }
+                CardsInHand.Add(card);
             }
+
         }
 
         private void AddRandomCard()
