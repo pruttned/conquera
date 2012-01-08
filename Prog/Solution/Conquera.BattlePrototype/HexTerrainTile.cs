@@ -225,6 +225,9 @@ namespace Conquera.BattlePrototype
                     ((0 == (j & 1)) && ((i2 == i - 1 && j2 == j - 1) || (i2 == i && j2 == j - 1) || (i2 == i - 1 && j2 == j + 1) || (i2 == i && j2 == j + 1)));
         }
 
+        public virtual void OnTurnStart(int turnNum, BattlePlayer activePlayer)
+        {}
+
         protected virtual void OnUnitEnter(BattleUnit unit)
         {}
 
@@ -350,6 +353,28 @@ namespace Conquera.BattlePrototype
         public OutpostHexTerrainTile(Point index)
             : base(index)
         {
+        }
+    }
+
+    [HexTerrainTile("ManaShrine")]
+    public class ManaShrineHexTerrainTile : CapturableHexTerrainTile
+    {
+        public override Brush Fill
+        {
+            get { return Brushes.Plum; }
+        }
+
+        public ManaShrineHexTerrainTile(Point index)
+            :base(index)
+        {
+        }
+
+        public override void OnTurnStart(int turnNum, BattlePlayer activePlayer)
+        {
+            if (activePlayer == OwningPlayer)
+            {
+                activePlayer.Mana += 5;
+            }
         }
     }
 }

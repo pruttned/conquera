@@ -34,8 +34,8 @@ namespace Conquera.BattlePrototype
     /// </summary>
     public partial class Window1 : Window, INotifyPropertyChanged
     {
-        int mInitMana = 15;
-        int mMaxMana = 30;
+        int mInitMana = 0;
+        int mMaxMana = 99;
 
         private class SpellCardListBoxItem
         {
@@ -151,6 +151,7 @@ namespace Conquera.BattlePrototype
                 player.Units.Clear();
                 new HeroBattleUnit(player, mTerrain, player.StartPos);
             }
+            NotifyTilesTurnStart();
         }
 
         private void mPlayerCardsInHand_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -228,7 +229,20 @@ namespace Conquera.BattlePrototype
 
             foreach (var player in mPlayers)
             {
+                player.Mana = 0;
                 player.OnTurnStart(mTurnNum, (ActivePlayer == player));
+            }
+            NotifyTilesTurnStart();
+        }
+
+        private void NotifyTilesTurnStart()
+        {
+            for (int i = 0; i < mTerrain.Width; i++)
+            {
+                for (int j = 0; j < mTerrain.Width; j++)
+                {
+                    mTerrain[i, j].OnTurnStart(mTurnNum, ActivePlayer);
+                }
             }
         }
 
