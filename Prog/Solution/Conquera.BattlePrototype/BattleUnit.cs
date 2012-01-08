@@ -576,7 +576,7 @@ namespace Conquera.BattlePrototype
                 {
                     if (null != sibling.Unit && sibling.Unit.Player == Player)
                     {
-                        defenseFromAllies++;
+                        defenseFromAllies+=5;
                     }
                 });
 
@@ -864,7 +864,7 @@ namespace Conquera.BattlePrototype
             , 20 //maxHp
             , false //flying
             , false //first strike,
-            , 5 //defInc
+            , 10 //defInc
             , "PackReinforcementIcon.png" //image
             , player, terrain, tileIndex)
         { }

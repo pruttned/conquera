@@ -24,11 +24,71 @@ using Microsoft.Xna.Framework;
 
 namespace Conquera.BattlePrototype
 {
-    static class SpellCardDecks
+    public class SpellCardDeck
     {
-        public static List<SpellCard> FullDeck = new List<SpellCard>()
+        List<SpellCard> mCards;
+
+        public bool IsEmpty { get { return 0 == mCards.Count; } }
+        public int Count { get { return mCards.Count; } }
+
+        public SpellCardDeck(IList<SpellCard> cards)
         {
-        //    new SummonSkeletonLv1UnitSpellCard(),
+            mCards = new List<SpellCard>(cards);
+            
+            //http://en.wikipedia.org/wiki/Fisher-Yates_shuffle#The_modern_algorithm
+            for (int i = 0; i < mCards.Count; i++)
+            {
+                int j = MathExt.Random.Next(i, mCards.Count);
+                SpellCard card = mCards[j];
+                mCards[j] = mCards[i];
+                mCards[i] = card;
+            }
+        }
+
+        public SpellCard PopCard()
+        {
+            if(IsEmpty)
+            {
+                return null;
+            }
+            SpellCard card = mCards[mCards.Count-1];
+            mCards.RemoveAt(mCards.Count - 1);
+            return card;
+        }
+    }
+    static class BaseSpellCardDecks
+    {
+        public static List<SpellCard> Deck1 = new List<SpellCard>()
+        {
+            new IncDecAttackSpellCard(2,1,new Point(10,10)),
+            new IncDecAttackSpellCard(2,1,new Point(10,10)),
+            new IncDecAttackSpellCard(2,1,new Point(10,10)),
+            new IncDecAttackSpellCard(2,1,new Point(10,10)),
+
+            new IncDecDefenseSpellCard(2,1, 30),
+            new IncDecDefenseSpellCard(2,1, 30),
+            new IncDecDefenseSpellCard(2,1, 30),
+            new IncDecDefenseSpellCard(2,1, 30),
+   
+            new DiscardCardsSpellCard(4, 1),
+            new DiscardCardsSpellCard(4, 1),
+            new DiscardCardsSpellCard(4, 1),
+            new DiscardCardsSpellCard(4, 1),
+
+            new DisableMovementSpellCard(4, 2),
+            new DisableMovementSpellCard(4, 2),
+            new DisableMovementSpellCard(4, 2),
+            new DisableMovementSpellCard(4, 2),
+
+            new DisableAttackSpellCard(5, 1),
+            new DisableAttackSpellCard(5, 1),
+            new DisableAttackSpellCard(5, 1),
+            new DisableAttackSpellCard(5, 1),
+        };
+
+
+
+  //    new SummonSkeletonLv1UnitSpellCard(),
         //    new SummonZombieLv1UnitSpellCard(),
         //    new SummonBansheeLv1UnitSpellCard(),
             //new SummonSpectreLv1UnitSpellCard(),
@@ -38,11 +98,11 @@ namespace Conquera.BattlePrototype
             //new SummonBansheeLv2UnitSpellCard(),
           //  new SummonSpectreLv2UnitSpellCard(),
 
-            new IncDecDefenseSpellCard(3,1,2),
+          //  new IncDecDefenseSpellCard(3,1,2),
             //new IncDecDefenseSpellCard(4,1,3),
             //new IncDecDefenseSpellCard(3,2,1),
 
-            new IncDecAttackSpellCard(3,1,new Point(10,10)),
+     //       new IncDecAttackSpellCard(3,1,new Point(10,10)),
             //new IncDecAttackSpellCard(4,1,3),
             //new IncDecAttackSpellCard(3,2,1),
 
@@ -77,19 +137,13 @@ namespace Conquera.BattlePrototype
             //new DisableAttackSpellCard(7, 2),
 
          //   new HealSpellCard(5,1),
-            new HealSpellCard(8,2),
+         //   new HealSpellCard(8,2),
            // new HealSpellCard(13,3),
 
-            new DamageSpellCard(9, 1),
+           // new DamageSpellCard(9, 1),
         //    new DamageSpellCard(14, 2),
 
             //new RemoveDisableMovementsSpellCard(),
             //new RemoveDisableAttacksSpellCard()
-        };
-
-        //public static List<SpellCard> FullDeck = new List<SpellCard>()
-        //{
-        //    new AddDefenseSpellCard(1,1,2)
-        //};
     }
 }
