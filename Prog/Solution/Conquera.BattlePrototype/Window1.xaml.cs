@@ -137,7 +137,7 @@ namespace Conquera.BattlePrototype
             item.Content = e.Record;
             mLogBox.Items.Add(item);
             mLogBox.ScrollIntoView(item);
-            e.Item = item;
+            e.Item = item;            
         }
 
         private void ResetPlayers()
@@ -622,6 +622,11 @@ namespace Conquera.BattlePrototype
                 ActivePlayer.DiscardSpellCard(mTurnNum, mCardsListBox.Items.IndexOf(cardItem));
                 //mCardsListBox.IsEnabled = false;
             }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            mLogBox.SelectedItem = null;
         }
     }
 

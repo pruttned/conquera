@@ -58,9 +58,10 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
                     
-                    <Button Click="mUnselectCardButton_Click" Content="Deselect Card"/>                    
-                    
-                    <ListBox Name="mLogBox" Margin="5,0,0,0" MinWidth="50" />
+                    <Button Click="mUnselectCardButton_Click" Content="Deselect Card"/>
+
+                    <ListBox Name="mLogBox" MinWidth="50" Margin="10,0,0,0"/>
+                    <Button Content="X" Click="Button_Click_1" />
                 </StackPanel>
             </TabItem>
             <!--Editor GUI-->

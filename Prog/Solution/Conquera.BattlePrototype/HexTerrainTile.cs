@@ -35,6 +35,7 @@ namespace Conquera.BattlePrototype
         private bool mIsMoveIndicatorVisible = false;
         private Line mStartPosIndicator;
         private Polygon mCanCasCardIndicator;
+        private Border mHighlightIndicator;
 
         public Point Index { get; private set; }
         
@@ -106,6 +107,12 @@ namespace Conquera.BattlePrototype
             }
         }
 
+        public bool IsHighlighted
+        {
+            get { return mHighlightIndicator.IsVisible; }
+            set { mHighlightIndicator.Visibility = value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden; }
+        }
+
         public HexTerrainTile(Point index)
         {
             Index = index;
@@ -166,6 +173,16 @@ namespace Conquera.BattlePrototype
             mCanCasCardIndicator.Opacity = 0.8;
             mCanCasCardIndicator.StrokeThickness = 1.0;
             Children.Add(mCanCasCardIndicator);
+
+            mHighlightIndicator = new Border()
+            {
+                Width = 32,
+                Height = 32,
+                Background = Brushes.Blue,
+                Visibility = System.Windows.Visibility.Hidden
+            };
+            Grid.SetZIndex(mHighlightIndicator, 99);
+            Children.Add(mHighlightIndicator);
         }
 
         public void ShowCanCastCardIndicator(bool canCast)
