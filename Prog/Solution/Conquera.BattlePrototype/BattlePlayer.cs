@@ -29,10 +29,13 @@ namespace Conquera.BattlePrototype
 {
     public class BattlePlayer : INotifyPropertyChanged
     {
+        static int MaxCardCntInHand = 4;
+
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler ManaChanged;
 
         public const int MaxCardsInHandCnt = 7;
+        private SpellCardDeck mCardDeck = null;
 
         private int mMana;
         private int mMaxMana;
@@ -68,7 +71,20 @@ namespace Conquera.BattlePrototype
 
         public bool IsActive { get; set; }
 
-        public List<SpellCard> CardDeck { get; set; }
+        public SpellCardDeck CardDeck 
+        {
+            get 
+            { 
+                if(null == mCardDeck) throw new InvalidOperationException("Card deck has not yet been initialized");
+                return mCardDeck; 
+
+            }
+            set 
+            { 
+                mCardDeck = value;
+                FillCardsInHand();
+            }
+        }
         
         public ObservableCollection<SpellCard> CardsInHand { get; set; }
 
@@ -80,7 +96,6 @@ namespace Conquera.BattlePrototype
             Index = index;
 
             Units = new SafeModifiableIterableCollection<BattleUnit>();
-            CardDeck = new List<SpellCard>();
             CardsInHand = new ObservableCollection<SpellCard>();
         }
 
@@ -95,7 +110,7 @@ namespace Conquera.BattlePrototype
                 throw new ArgumentException("Not enough mana for a specified card");
             }
             Mana -= card.Cost;
-        //    CardsInHand.RemoveAt(indexInHand);
+            CardsInHand.RemoveAt(indexInHand);
             card.Cast(turnNum, this, tile, terrain, players);
         }
 
@@ -119,7 +134,11 @@ namespace Conquera.BattlePrototype
                 unit.OnTurnStart(turnNum);
             }
             Units.Tidy();
-            
+
+            if (isActive && !CardDeck.IsEmpty && MaxCardCntInHand > CardsInHand.Count )
+            {
+                CardsInHand.Add(CardDeck.PopCard());
+            }
             //FillCardsInHand();
             //if (isActive)
             //{
@@ -131,6 +150,11 @@ namespace Conquera.BattlePrototype
 
         public void FillCardsInHand()
         {
+            CardsInHand.Clear();
+            while (!CardDeck.IsEmpty && MaxCardCntInHand > CardsInHand.Count)
+            {
+                CardsInHand.Add(CardDeck.PopCard());
+            }
             //if (CardDeck.Count > 0)
             //{
             //    while (CardsInHand.Count < MaxCardsInHandCnt)
@@ -139,19 +163,19 @@ namespace Conquera.BattlePrototype
             //    }
             //}
 
-            foreach(var card in CardDeck)
-            {
-                CardsInHand.Add(card);
-            }
+            //foreach (var card in CardDeck)
+            //{
+            //    CardsInHand.Add(card);
+            //}
 
         }
 
-        private void AddRandomCard()
-        {
-            if (CardDeck.Count > 0)
-            {
-                CardsInHand.Add(CardDeck[MathExt.Random.Next(CardDeck.Count)]);
-            }
-        }
+        //private void AddRandomCard()
+        //{
+        //    if (CardDeck.Count > 0)
+        //    {
+        //        CardsInHand.Add(CardDeck[MathExt.Random.Next(CardDeck.Count)]);
+        //    }
+        //}
     }
 }

@@ -115,6 +115,13 @@ namespace Conquera.BattlePrototype
                 System.IO.Directory.CreateDirectory(mMapsDir);
             }
 
+            mPlayers[0].ManaChanged += new EventHandler(Player_ManaChanged);
+            mPlayers[1].ManaChanged += new EventHandler(Player_ManaChanged);
+
+            mPlayers[0].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
+            mPlayers[1].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
+
+
             ActivePlayer = mPlayers[0];
             LoadMap("test");
 
@@ -140,11 +147,6 @@ namespace Conquera.BattlePrototype
             mSetTilesRightButtonTextBlock.Text = "Gap";
 
             UpdatePlayerInfoTextBlocks();
-            mPlayers[0].ManaChanged += new EventHandler(Player_ManaChanged);
-            mPlayers[1].ManaChanged += new EventHandler(Player_ManaChanged);
-
-            mPlayers[0].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
-            mPlayers[1].CardsInHand.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(mPlayerCardsInHand_CollectionChanged);
 
 
             Logger.Logged += new EventHandler<Logger.LogEventArgs>(Logger_Logged);
@@ -168,7 +170,7 @@ namespace Conquera.BattlePrototype
         {
             foreach (var player in mPlayers)
             {
-                player.CardDeck = SpellCardDecks.FullDeck;
+                player.CardDeck = new SpellCardDeck(BaseSpellCardDecks.Deck1);
                 player.FillCardsInHand();
                 player.MaxMana = mMaxMana;
                 player.Mana = mInitMana;
