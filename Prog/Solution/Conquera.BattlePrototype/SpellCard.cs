@@ -586,8 +586,6 @@ namespace Conquera.BattlePrototype
             get { return 3; }
         }
 
-        public int HpDec { get; private set; }
-
         public RemoveDisableMovementsSpellCard()
         {
         }
@@ -620,8 +618,6 @@ namespace Conquera.BattlePrototype
             get { return 4; }
         }
 
-        public int HpDec { get; private set; }
-
         public RemoveDisableAttacksSpellCard()
         {
         }
@@ -634,6 +630,48 @@ namespace Conquera.BattlePrototype
         public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
         {
             tile.Unit.RemoveSpellEffects(e => e is DisableAttackBattleUnitSpellEffect);
+        }
+    }
+
+    public class BerserkerSpellCard : SpellCard
+    {
+        private int mCost;
+        private int mDuration;
+
+        public override string Name
+        {
+            get { return string.Format("Berseker (A+{0}) for {1} turn{2}", AttInc, mDuration, (1 != mDuration ? "s" : null)); }
+        }
+
+        public override string Description
+        {
+            get { return Name; }
+        }
+
+        public override int Cost
+        {
+            get { return mCost; }
+        }
+
+        public int AttInc { get; private set; }
+
+        public BerserkerSpellCard(int cost, int duration, int attCnt)
+        {
+            mCost = cost;
+            mDuration = duration;
+            AttInc = attCnt;
+        }
+
+        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
+        {
+            return (null != tile.Unit && player == tile.Unit.Player);
+        }
+
+        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
+        {
+            tile.Unit.AddSpellEffect(turnNum, new BerserkerBattleUnitSpellEffect(mDuration));
+            tile.Unit.AddSpellEffect(turnNum, new ConstIncAttackBattleUnitSpellEffect(new Point(AttInc,AttInc), mDuration));
+
         }
     }
 }

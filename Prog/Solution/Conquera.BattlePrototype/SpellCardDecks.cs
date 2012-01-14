@@ -60,6 +60,12 @@ namespace Conquera.BattlePrototype
     {
         public static List<SpellCard> Deck1 = new List<SpellCard>()
         {
+            new BerserkerSpellCard(2,1,20),
+            new BerserkerSpellCard(2,1,20),
+            new BerserkerSpellCard(2,1,20),
+            new BerserkerSpellCard(2,1,20),
+            new BerserkerSpellCard(2,1,20),
+
             new IncDecAttackSpellCard(2,1,new Point(10,10)),
             new IncDecAttackSpellCard(2,1,new Point(10,10)),
             new IncDecAttackSpellCard(2,1,new Point(10,10)),

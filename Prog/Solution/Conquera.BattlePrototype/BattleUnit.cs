@@ -80,6 +80,8 @@ namespace Conquera.BattlePrototype
         private int mFlyPreventerCnt;
         private int mFirstStrikePreventerCnt;
 
+        private int mBersekerEnablerCnt;
+
         private List<IBattleUnitSpellEffect> mSpellEffects = new List<IBattleUnitSpellEffect>();
 
 
@@ -98,6 +100,8 @@ namespace Conquera.BattlePrototype
 
         public bool IsFlying { get { return 0 < FlyEnablerCnt && 0 == FlyPreventerCnt; } }
         public bool HasFirstStrike { get { return 0 < FirstStrikeEnablerCnt && 0 == FirstStrikePreventerCnt; } }
+
+        public bool IsBerserker { get { return 0 < BerserkerEnablerCnt; } }
 
         public int FlyEnablerCnt
         {
@@ -150,6 +154,15 @@ namespace Conquera.BattlePrototype
             set
             {
                 mMovementPreventerCnt = Math.Max(0, value);
+                UpdateGraphics();
+            }
+        }
+        public int BerserkerEnablerCnt
+        {
+            get { return mBersekerEnablerCnt; }
+            set
+            {
+                mBersekerEnablerCnt = Math.Max(0, value);
                 UpdateGraphics();
             }
         }
@@ -316,11 +329,11 @@ namespace Conquera.BattlePrototype
         private void UpdateSpellEffectsToolTip()
         {
             StackPanel panel = new StackPanel();
+            panel.Children.Add(new TextBlock() { Text = GetType().Name, FontWeight = System.Windows.FontWeights.Bold});            
+
             foreach (IBattleUnitSpellEffect effect in mSpellEffects)
             {
-                TextBlock textBlock = new TextBlock();
-                textBlock.Text = effect.Description;
-                panel.Children.Add(textBlock);
+                panel.Children.Add(new TextBlock() { Text = effect.Description });
             }
             ToolTip = panel;
         }
@@ -402,6 +415,8 @@ namespace Conquera.BattlePrototype
                 mTerrain[mTileIndex.X, mTileIndex.Y].Unit = null;
             }
             NotifySiblingsAfterDeparture(mTileIndex);
+
+            Logger.Log(Name + " has been killed", mTerrain[mTileIndex.X, mTileIndex.Y]);
         }
 
         /// <summary>
@@ -504,7 +519,7 @@ namespace Conquera.BattlePrototype
             mTerrain.ForEachSibling(TileIndex,
                 sibling =>
                 {
-                    if (null != sibling.Unit && sibling.Unit.Player != Player && sibling.Unit.HasEnabledAttack && (!isPrebatlePhase || sibling.Unit.HasFirstStrike))
+                    if (null != sibling.Unit && (sibling.Unit.IsBerserker || sibling.Unit.Player != Player) && sibling.Unit.HasEnabledAttack && ((isPrebatlePhase && sibling.Unit.HasFirstStrike) || (!isPrebatlePhase && !sibling.Unit.HasFirstStrike)))
                     {
                         damage += MathExt.Random.Next(sibling.Unit.Attack.X, sibling.Unit.Attack.Y + 1);
                     }
@@ -522,7 +537,7 @@ namespace Conquera.BattlePrototype
         public void UpdateGraphics()
         {
             mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
-            mPropertiesTextBlock.Text += string.Format("[{0}{1}{2}{3}]\n", (IsFlying ? " F" : null), (HasFirstStrike ? " Fs" : null), (!HasEnabledMovement ? " MD" : null), (!HasEnabledAttack ? " AD" : null));
+            mPropertiesTextBlock.Text += string.Format("[{0}{1}{2}{3}{4}]\n", (IsFlying ? " F" : null), (HasFirstStrike ? " Fs" : null), (!HasEnabledMovement ? " MD" : null), (!HasEnabledAttack ? " AD" : null), (IsBerserker ? " B" : null));
             mPropertiesTextBlock.Text += string.Format("A = {0}-{1}({6}-{7})\nD = {2}({8})\nM = {3}({9})\nHp = {4}/{5}", BaseAttack.X, BaseAttack.Y, BaseDefense, BaseMovementDistance, Hp, MaxHp,
                 Attack.X, Attack.Y, Defense, MovementDistance);
             mBorder.BorderBrush = (!HasMovedThisTurn && HasEnabledMovement && Player.IsActive && HasEnabledMovement ? Brushes.Yellow : Brushes.Black);
@@ -702,7 +717,7 @@ namespace Conquera.BattlePrototype
     {
         public ScoutBase(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            new Point(10, 25) //attack
+            new Point(15, 25) //attack
             , 20 //defense
             , 6 //movement distance
             , 30 //maxHp
@@ -717,7 +732,7 @@ namespace Conquera.BattlePrototype
     {
         public ScoutFs(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            new Point(10, 20) //attack
+            new Point(15, 20) //attack
             , 15 //defense
             , 5 //movement distance
             , 30 //maxHp
@@ -732,7 +747,7 @@ namespace Conquera.BattlePrototype
     {
         public ScoutFly(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            new Point(10, 20) //attack
+            new Point(15, 20) //attack
             , 15 //defense
             , 4 //movement distance
             , 30 //maxHp
@@ -829,8 +844,8 @@ namespace Conquera.BattlePrototype
         public SupportHeal(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             new Point(5, 10) //attack
-            , 10 //defense
-            , 2 //movement distance
+            , 5 //defense
+            , 3 //movement distance
             , 20 //maxHp
             , false //flying
             , false //first strike
@@ -844,8 +859,8 @@ namespace Conquera.BattlePrototype
         public SupportAtt(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             new Point(5, 10) //attack
-            , 10 //defense
-            , 2 //movement distance
+            , 5 //defense
+            , 3 //movement distance
             , 20 //maxHp
             , false //flying
             , false //first strike,
@@ -859,8 +874,8 @@ namespace Conquera.BattlePrototype
         public SupportDef(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             new Point(5, 10) //attack
-            , 10 //defense
-            , 2 //movement distance
+            , 5 //defense
+            , 3 //movement distance
             , 20 //maxHp
             , false //flying
             , false //first strike,
