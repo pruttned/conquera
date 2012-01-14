@@ -247,4 +247,34 @@ namespace Conquera.BattlePrototype
             return true;
         }
     }
+
+    public class BerserkerBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration
+    {
+        BattleUnit mUnit;
+        public override string EffectDescription
+        {
+            get { return "Berserker"; }
+        }
+
+        public BerserkerBattleUnitSpellEffect(int duration)
+            : base(duration)
+        {
+        }
+
+        public override void OnEnd()
+        {
+            mUnit.BerserkerEnablerCnt--;
+        }
+
+        protected override void OnCastImpl(int turnNum, BattleUnit unit)
+        {
+            mUnit = unit;
+            unit.BerserkerEnablerCnt++;
+        }
+
+        protected override bool OnStartTurnImpl(int turnNum)
+        {
+            return true;
+        }
+    }
 }

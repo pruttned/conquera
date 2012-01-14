@@ -75,7 +75,7 @@ namespace Conquera.BattlePrototype
         {
             get 
             { 
-                if(null == mCardDeck) throw new InvalidOperationException("Card deck has not yet been initialized");
+              //  if(null == mCardDeck) throw new InvalidOperationException("Card deck has not yet been initialized");
                 return mCardDeck; 
 
             }
@@ -112,6 +112,8 @@ namespace Conquera.BattlePrototype
             Mana -= card.Cost;
             CardsInHand.RemoveAt(indexInHand);
             card.Cast(turnNum, this, tile, terrain, players);
+
+            Logger.Log(card.Name, tile);
         }
 
 

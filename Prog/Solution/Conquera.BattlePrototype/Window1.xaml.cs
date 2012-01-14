@@ -34,6 +34,8 @@ namespace Conquera.BattlePrototype
     /// </summary>
     public partial class Window1 : Window, INotifyPropertyChanged
     {
+        private readonly string mPlayerTextBlockStrTemplate = "M:{0}/{1}; Hand:{2} Deck:{3}";
+
         int mInitMana = 0;
         int mMaxMana = 99;
 
@@ -171,21 +173,22 @@ namespace Conquera.BattlePrototype
             foreach (var player in mPlayers)
             {
                 player.CardDeck = new SpellCardDeck(BaseSpellCardDecks.Deck1);
-                player.FillCardsInHand();
                 player.MaxMana = mMaxMana;
                 player.Mana = mInitMana;
                 player.Units.Clear();
                 //                new HeroBattleUnit(player, mTerrain, player.StartPos);
 
+                bool swap = player.StartPos.X > mTerrain.Width*0.5;
+
                 for (int i = 0; i < mUnits1.Length; ++i)
                 {
-                    Activator.CreateInstance(mUnits1[i], player, mTerrain, mTerrain.GetSibling(player.StartPos, (HexDirection)i).Index);
+                    Activator.CreateInstance(mUnits1[i], player, mTerrain, mTerrain.GetSibling(player.StartPos, swap ? (HexDirection)5 - i : (HexDirection)i).Index);
                 }
                 var p2 = player.StartPos;
                 p2.Y += 3;
                 for (int i = 0; i < mUnits2.Length; ++i)
                 {
-                    Activator.CreateInstance(mUnits2[i], player, mTerrain, mTerrain.GetSibling(p2, (HexDirection)i).Index);
+                    Activator.CreateInstance(mUnits2[i], player, mTerrain, mTerrain.GetSibling(p2, swap ? (HexDirection)5 - i : (HexDirection)i).Index);
                 }
                 player.Mana = 0;
             }
@@ -215,8 +218,8 @@ namespace Conquera.BattlePrototype
 
         private void UpdatePlayerInfoTextBlocks()
         {
-            mBlueTextBlock.Text = string.Format("M:{0}/{1}; C:{2}", mPlayers[0].Mana, mPlayers[0].MaxMana, mPlayers[0].CardsInHand.Count);
-            mRedTextBlock.Text = string.Format("M:{0}/{1}; C:{2}", mPlayers[1].Mana, mPlayers[1].MaxMana, mPlayers[1].CardsInHand.Count);
+            mBlueTextBlock.Text = string.Format(mPlayerTextBlockStrTemplate, mPlayers[0].Mana, mPlayers[0].MaxMana, mPlayers[0].CardsInHand.Count, (null != mPlayers[0].CardDeck ? mPlayers[0].CardDeck.Count : 0));
+            mRedTextBlock.Text = string.Format(mPlayerTextBlockStrTemplate, mPlayers[1].Mana, mPlayers[1].MaxMana, mPlayers[1].CardsInHand.Count, (null != mPlayers[1].CardDeck ? mPlayers[1].CardDeck.Count : 0));
         }
 
         private void UpdateMapsListBox()
