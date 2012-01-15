@@ -26,6 +26,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Linq;
+using System.Linq;
 
 namespace Conquera.BattlePrototype
 {
@@ -78,9 +79,7 @@ namespace Conquera.BattlePrototype
         static readonly string mMapsDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PrototypeMaps");
 
         HexTerrain mTerrain = new HexTerrain(20, 20);
-        BattlePlayer[] mPlayers = new BattlePlayer[]{
-            new BattlePlayer(Colors.Blue, 0),
-            new BattlePlayer(Colors.Red, 1)};
+        BattlePlayer[] mPlayers;
         private BattlePlayer mActivePlayer;
 
         public BattlePlayer ActivePlayer
@@ -110,6 +109,12 @@ namespace Conquera.BattlePrototype
 
         public Window1()
         {
+            mPlayers = new BattlePlayer[]{
+                new BattlePlayer(Colors.Blue, 0),
+                new BattlePlayer(Colors.Red, 1)};
+           //     new AiBattlePlayer(Colors.Red, 1, this)};
+
+
             InitializeComponent();
 
             if (!System.IO.Directory.Exists(mMapsDir))
@@ -157,6 +162,27 @@ namespace Conquera.BattlePrototype
             {
                 player.OnTurnStart(mTurnNum, (ActivePlayer == player));
             }
+        }
+
+        public void EndTurn()
+        {
+            //Resolve battle
+            ResolveBattle(true);
+            ResolveBattle(false);
+
+            mTurnNum++;
+            ActivePlayer = mPlayers[mTurnNum % 2];
+
+
+            SelectUnit(null);
+            mCardsListBox.IsEnabled = true;
+
+            foreach (var player in mPlayers)
+            {
+                player.Mana = 0;
+                player.OnTurnStart(mTurnNum, (ActivePlayer == player));
+            }
+            NotifyTilesTurnStart();
         }
 
         private void Logger_Logged(object sender, Logger.LogEventArgs e)
@@ -230,27 +256,6 @@ namespace Conquera.BattlePrototype
                 mapNames.Add(System.IO.Path.GetFileNameWithoutExtension(mapName));
             }
             mMapsListBox.ItemsSource = mapNames;
-        }
-
-        private void EndTurn()
-        {
-            //Resolve battle
-            ResolveBattle(true);
-            ResolveBattle(false);
-
-            mTurnNum++;
-            ActivePlayer = mPlayers[mTurnNum % 2];
-
-
-            SelectUnit(null);
-            mCardsListBox.IsEnabled = true;
-
-            foreach (var player in mPlayers)
-            {
-                player.Mana = 0;
-                player.OnTurnStart(mTurnNum, (ActivePlayer == player));
-            }
-            NotifyTilesTurnStart();
         }
 
         /// <summary>
@@ -696,6 +701,8 @@ namespace Conquera.BattlePrototype
         {
             mLogBox.SelectedItem = null;
         }
+
+
     }
 
     public class ColorToBrushConverter : IValueConverter

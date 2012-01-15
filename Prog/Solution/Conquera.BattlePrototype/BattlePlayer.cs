@@ -148,6 +148,8 @@ namespace Conquera.BattlePrototype
             //}
 
 //            Mana++;
+
+            OnTurnStartImpl(turnNum, isActive);
         }
 
         public void FillCardsInHand()
@@ -179,5 +181,7 @@ namespace Conquera.BattlePrototype
         //        CardsInHand.Add(CardDeck[MathExt.Random.Next(CardDeck.Count)]);
         //    }
         //}
+
+        protected virtual void OnTurnStartImpl(int turnNum, bool isActive) { }
     }
 }
