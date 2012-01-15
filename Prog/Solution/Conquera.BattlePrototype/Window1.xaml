@@ -24,7 +24,11 @@
             
         <!--Main canvas-->
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Grid.Row="1">
-            <Canvas x:Name="mMainCanvas" PreviewMouseMove="mMainCanvas_PreviewMouseMove" PreviewMouseDown="mMainCanvas_PreviewMouseDown"/>
+            <Canvas x:Name="mMainCanvas" PreviewMouseMove="mMainCanvas_PreviewMouseMove" PreviewMouseDown="mMainCanvas_PreviewMouseDown">
+                <Canvas.RenderTransform>
+                    <ScaleTransform ScaleX="{Binding Value, ElementName=mZoomSlider}" ScaleY="{Binding Value, ElementName=mZoomSlider}" />
+                </Canvas.RenderTransform>
+            </Canvas>
         </ScrollViewer>
         
         <!--Splitter-->
@@ -113,6 +117,7 @@
 
 
 
-        </TabControl>
+        </TabControl>        
+        <Slider Grid.Row="2" Height="22" HorizontalAlignment="Right" Margin="0,1,0,0" Name="mZoomSlider" VerticalAlignment="Top" Width="261" Minimum="0.3" Maximum="1" Value="1"/>
     </Grid>
 </Window>
