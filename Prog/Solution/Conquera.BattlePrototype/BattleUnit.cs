@@ -54,7 +54,7 @@ namespace Conquera.BattlePrototype
 
         private HexTerrain mTerrain;
 
-        private Point mTileIndex;
+        private Point mTileIndex;        
 
         public int mHp;
 
@@ -224,8 +224,8 @@ namespace Conquera.BattlePrototype
                         throw new ArgumentException("Destination tile already contains a unit");
                     }
 
-                    Point oldValue = mTileIndex;
-                    mTerrain[oldValue.X, oldValue.Y].Unit = null;
+                    PreviousTileIndex = mTileIndex;
+                    mTerrain[PreviousTileIndex.X, PreviousTileIndex.Y].Unit = null;
 
                     mTileIndex = value;
 
@@ -233,17 +233,19 @@ namespace Conquera.BattlePrototype
                     //UpdatePositionFromIndex();
                     mTerrain[mTileIndex.X, mTileIndex.Y].Unit = this;
 
-                    NotifySiblingsAfterDeparture(oldValue);
+                    NotifySiblingsAfterDeparture(PreviousTileIndex);
                     NotifySiblingsAfterArrival();
                     UpdateDefense();
 
                     if (null != TileIndexChanged)
                     {
-                        TileIndexChanged.Invoke(this, oldValue);
+                        TileIndexChanged.Invoke(this, PreviousTileIndex);
                     }
                 }
             }
         }
+
+        public Point PreviousTileIndex { get; private set; }
 
         public bool IsSelected
         {
@@ -416,7 +418,7 @@ namespace Conquera.BattlePrototype
             }
             NotifySiblingsAfterDeparture(mTileIndex);
 
-            Logger.Log(Name + " has been killed", mTerrain[mTileIndex.X, mTileIndex.Y]);
+            Logger.Log(GetType().Name + " died", mTerrain[mTileIndex.X, mTileIndex.Y]);
         }
 
         /// <summary>
@@ -688,7 +690,7 @@ namespace Conquera.BattlePrototype
         public SoldierBl(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             new Point(20, 30) //attack
-            , 30 //defense
+            , 29 //defense
             , 3 //movement distance
             , 40 //maxHp
             , false //flying
