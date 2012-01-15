@@ -28,16 +28,6 @@
                 <Canvas.RenderTransform>
                     <ScaleTransform ScaleX="{Binding Value, ElementName=mZoomSlider}" ScaleY="{Binding Value, ElementName=mZoomSlider}" />
                 </Canvas.RenderTransform>
-
-                <!--<Canvas.Resources>
-                    <Style TargetType="{x:Type proto:BattleUnit}">
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="IsMovementArrowVisible" Value="true" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Canvas.Resources>-->
             </Canvas>
         </ScrollViewer>
         

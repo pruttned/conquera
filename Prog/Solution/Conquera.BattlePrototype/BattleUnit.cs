@@ -1,4 +1,4 @@
-﻿//////////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2010 by Conquera Team
 //  Part of the Conquera Project
 //
@@ -24,6 +24,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.ComponentModel;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace Conquera.BattlePrototype
 {
@@ -84,6 +85,7 @@ namespace Conquera.BattlePrototype
 
         private List<IBattleUnitSpellEffect> mSpellEffects = new List<IBattleUnitSpellEffect>();
 
+        private Line mMovementLine = null;
 
         public string ImageFileName { get; private set; }
 
@@ -225,7 +227,7 @@ namespace Conquera.BattlePrototype
                     }
 
                     PreviousTileIndex = mTileIndex;
-                    mTerrain[PreviousTileIndex.X, PreviousTileIndex.Y].Unit = null;
+                    mTerrain[PreviousTileIndex.Value.X, PreviousTileIndex.Value.Y].Unit = null;
 
                     mTileIndex = value;
 
@@ -233,19 +235,19 @@ namespace Conquera.BattlePrototype
                     //UpdatePositionFromIndex();
                     mTerrain[mTileIndex.X, mTileIndex.Y].Unit = this;
 
-                    NotifySiblingsAfterDeparture(PreviousTileIndex);
+                    NotifySiblingsAfterDeparture(PreviousTileIndex.Value);
                     NotifySiblingsAfterArrival();
                     UpdateDefense();
 
                     if (null != TileIndexChanged)
                     {
-                        TileIndexChanged.Invoke(this, PreviousTileIndex);
+                        TileIndexChanged.Invoke(this, PreviousTileIndex.Value);
                     }
                 }
             }
         }
 
-        public Point PreviousTileIndex { get; private set; }
+        public Point? PreviousTileIndex { get; private set; }
 
         public bool IsSelected
         {
@@ -326,6 +328,51 @@ namespace Conquera.BattlePrototype
             levelTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
             levelTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             Children.Add(levelTextBlock);
+
+            MouseEnter += new System.Windows.Input.MouseEventHandler(BattleUnit_MouseEnter);
+            MouseLeave += new System.Windows.Input.MouseEventHandler(BattleUnit_MouseLeave);
+        }
+
+        private void BattleUnit_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if(PreviousTileIndex != null)
+            {
+                mMovementLine = new Line();
+                mMovementLine.StrokeThickness = 5;
+                mMovementLine.Stroke = Brushes.Yellow;
+
+                HexTerrainTile previousTile = mTerrain[(int)PreviousTileIndex.Value.X, (int)PreviousTileIndex.Value.Y];
+                mMovementLine.X1 = Canvas.GetLeft(previousTile) + previousTile.ActualWidth / 2.0;
+                mMovementLine.Y1 = Canvas.GetTop(previousTile) + previousTile.ActualHeight / 2.0;
+
+                HexTerrainTile currentTile = mTerrain[(int)TileIndex.X, (int)TileIndex.Y];
+                mMovementLine.X2 = Canvas.GetLeft(currentTile) + currentTile.ActualWidth / 2.0;
+                mMovementLine.Y2 = Canvas.GetTop(currentTile) + currentTile.ActualHeight / 2.0;
+
+                GetParent<Canvas>(this).Children.Add(mMovementLine);
+            }
+        }
+
+        private void BattleUnit_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (mMovementLine != null)
+            {
+                GetParent<Canvas>(this).Children.Remove(mMovementLine);
+            }
+        }
+
+        private T GetParent<T>(System.Windows.DependencyObject element) where T : System.Windows.DependencyObject
+        {
+            System.Windows.DependencyObject parent = VisualTreeHelper.GetParent(element);
+            if (parent == null)
+            {
+                return null;
+            }
+            if (parent is T)
+            {
+                return (T)parent;
+            }
+            return GetParent<T>(parent);
         }
 
         private void UpdateSpellEffectsToolTip()
