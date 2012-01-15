@@ -258,11 +258,11 @@ namespace Conquera.BattlePrototype
         /// </summary>
         /// <param name="isPrebatlePhase">Only damage from units with first strike is considered</param>
         private void ResolveBattle(bool isPrebatlePhase)
-        {            
+        {
+            List<BattleUnit> unitsToKill = new List<BattleUnit>();
+
             foreach (var player in mPlayers)
             {
-                List<BattleUnit> unitsToKill = new List<BattleUnit>();
-
                 //if (player != ActivePlayer)
                 {
                     foreach (var unit in player.Units)
@@ -279,11 +279,12 @@ namespace Conquera.BattlePrototype
                         }
                     }
                 }
-                //kill units
-                foreach (var unit in unitsToKill)
-                {
-                    unit.Kill();
-                }
+            }
+
+            //kill units
+            foreach (var unit in unitsToKill)
+            {
+                unit.Kill();
             }
         }
 
