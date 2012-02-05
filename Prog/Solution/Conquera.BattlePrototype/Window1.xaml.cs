@@ -40,25 +40,42 @@ namespace Conquera.BattlePrototype
         int mInitMana = 0;
         int mMaxMana = 99;
 
+        //Type[] mUnits1 = new Type[] 
+        //{
+        //    typeof(SoldierAtt),
+        //    typeof(SoldierAtt),
+        //    typeof(SoldierBl),
+        //    typeof(SoldierBl),
+        //    typeof(SoldierDef),
+        //    typeof(SoldierDef),
+        //};
+        //Type[] mUnits2 = new Type[] 
+        //{
+        //    typeof(ScoutBase),
+        //    typeof(ScoutFly),
+        //    typeof(ScoutFs),
+        //    typeof(SupportAtt),
+        //    typeof(SupportDef),
+        //    typeof(SupportHeal),
+        //};
         Type[] mUnits1 = new Type[] 
         {
             typeof(SoldierAtt),
             typeof(SoldierAtt),
-            typeof(SoldierBl),
-            typeof(SoldierBl),
-            typeof(SoldierDef),
-            typeof(SoldierDef),
+            typeof(SoldierAtt),
+            typeof(SoldierAtt),
+            typeof(SoldierAtt),
+            typeof(SoldierAtt),
         };
         Type[] mUnits2 = new Type[] 
         {
-            typeof(ScoutBase),
-            typeof(ScoutFly),
-            typeof(ScoutFs),
-            typeof(SupportAtt),
-            typeof(SupportDef),
-            typeof(SupportHeal),
+            typeof(SoldierAtt),
+            typeof(SoldierAtt),
+            typeof(SoldierAtt),
+            typeof(SoldierAtt),
+            typeof(SoldierAtt),
+            typeof(SoldierAtt),
         };
-
         private class SpellCardListBoxItem
         {
             public SpellCard Card { get; private set; }
@@ -82,6 +99,16 @@ namespace Conquera.BattlePrototype
         BattlePlayer[] mPlayers;
         private BattlePlayer mActivePlayer;
 
+        public HexTerrain Terrain
+        {
+            get { return mTerrain; }
+        }
+
+        public IEnumerable<BattlePlayer> Players
+        {
+            get { return mPlayers; }
+        }
+        
         public BattlePlayer ActivePlayer
         {
             get { return mActivePlayer; }
@@ -111,8 +138,9 @@ namespace Conquera.BattlePrototype
         {
             mPlayers = new BattlePlayer[]{
                 new BattlePlayer(Colors.Blue, 0),
-                new BattlePlayer(Colors.Red, 1)};
-           //     new AiBattlePlayer(Colors.Red, 1, this)};
+                //new AiBattlePlayer(Colors.Blue, 0,this),
+              //  new BattlePlayer(Colors.Red, 1)};
+                new AiBattlePlayer(Colors.Red, 1, this)};
 
 
             InitializeComponent();
@@ -130,7 +158,7 @@ namespace Conquera.BattlePrototype
 
 
             ActivePlayer = mPlayers[0];
-            LoadMap("test");
+            LoadMap("test2");
 
             ////LoadTerrain();
             //mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1, 2), "Outpost");
