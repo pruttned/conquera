@@ -50,12 +50,13 @@ namespace Conquera.BattlePrototype
         protected static readonly string mBattleUnitImagesDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BattleUnitImages");
 
         //promoted collections
+        private static HashSet<BattleUnit> CheckedUnits = new HashSet<BattleUnit>();
         private static HashSet<Point> CheckedPoints = new HashSet<Point>();
         private static Queue<HexTileSeed> Seeds = new Queue<HexTileSeed>();
 
         private HexTerrain mTerrain;
 
-        private Point mTileIndex;        
+        private Point mTileIndex;
 
         public int mHp;
 
@@ -333,60 +334,6 @@ namespace Conquera.BattlePrototype
             MouseLeave += new System.Windows.Input.MouseEventHandler(BattleUnit_MouseLeave);
         }
 
-        private void BattleUnit_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if(PreviousTileIndex != null)
-            {
-                mMovementLine = new Line();
-                mMovementLine.StrokeThickness = 5;
-                mMovementLine.Stroke = Brushes.Yellow;
-
-                HexTerrainTile previousTile = mTerrain[(int)PreviousTileIndex.Value.X, (int)PreviousTileIndex.Value.Y];
-                mMovementLine.X1 = Canvas.GetLeft(previousTile) + previousTile.ActualWidth / 2.0;
-                mMovementLine.Y1 = Canvas.GetTop(previousTile) + previousTile.ActualHeight / 2.0;
-
-                HexTerrainTile currentTile = mTerrain[(int)TileIndex.X, (int)TileIndex.Y];
-                mMovementLine.X2 = Canvas.GetLeft(currentTile) + currentTile.ActualWidth / 2.0;
-                mMovementLine.Y2 = Canvas.GetTop(currentTile) + currentTile.ActualHeight / 2.0;
-
-                GetParent<Canvas>(this).Children.Add(mMovementLine);
-            }
-        }
-
-        private void BattleUnit_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (mMovementLine != null)
-            {
-                GetParent<Canvas>(this).Children.Remove(mMovementLine);
-            }
-        }
-
-        private T GetParent<T>(System.Windows.DependencyObject element) where T : System.Windows.DependencyObject
-        {
-            System.Windows.DependencyObject parent = VisualTreeHelper.GetParent(element);
-            if (parent == null)
-            {
-                return null;
-            }
-            if (parent is T)
-            {
-                return (T)parent;
-            }
-            return GetParent<T>(parent);
-        }
-
-        private void UpdateSpellEffectsToolTip()
-        {
-            StackPanel panel = new StackPanel();
-            panel.Children.Add(new TextBlock() { Text = GetType().Name, FontWeight = System.Windows.FontWeights.Bold});            
-
-            foreach (IBattleUnitSpellEffect effect in mSpellEffects)
-            {
-                panel.Children.Add(new TextBlock() { Text = effect.Description });
-            }
-            ToolTip = panel;
-        }
-
         //Only for temporary unit (for reading base attributes while constructing description)
         public BattleUnit()
         {
@@ -468,16 +415,37 @@ namespace Conquera.BattlePrototype
             Logger.Log(GetType().Name + " died", mTerrain[mTileIndex.X, mTileIndex.Y]);
         }
 
-        /// <summary>
-        /// Gets all poitions where is possible for unit to move
-        /// </summary>
-        /// <param name="points"></param>
-        public void GetPossibleMoves(List<Point> points)
+        public void GetEnemyUnitsInRange(List<BattleUnit> units)
+        {
+
+        }
+
+        public void ForEachEnemyInRange(Action<BattleUnit> action)
+        {
+            ForEachEnemyInRange(MovementDistance + 1, action);
+        }
+
+        public void ForEachEnemyInRange(int range, Action<BattleUnit> action)
+        {
+            CheckedUnits.Clear();
+            ForEachPassableCellInRange(range,
+                index => Terrain.ForEachSibling(index,
+                    tile =>
+                    {
+                        if (null != tile.Unit && tile.Unit.Player != Player && !CheckedUnits.Contains(tile.Unit))
+                        {
+                            CheckedUnits.Add(tile.Unit);
+                            action(tile.Unit);
+                        }
+                    }));
+        }
+
+        public void ForEachPassableCellInRange(int range, Action<Point> action)
         {
             Seeds.Clear();
             CheckedPoints.Clear();
 
-            Seeds.Enqueue(new HexTileSeed(mTerrain[TileIndex], MovementDistance));
+            Seeds.Enqueue(new HexTileSeed(mTerrain[TileIndex], range));
             while (0 < Seeds.Count)
             {
                 var seed = Seeds.Dequeue();
@@ -490,7 +458,7 @@ namespace Conquera.BattlePrototype
                         {
                             if (sibling.IsPassableAndEmpty)
                             {
-                                points.Add(index);
+                                action(index);
                             }
                             CheckedPoints.Add(index);
                             if (0 < seed.Live - 1)
@@ -502,8 +470,28 @@ namespace Conquera.BattlePrototype
             }
         }
 
+        /// <summary>
+        /// Gets all poitions where is possible for unit to move
+        /// </summary>
+        /// <param name="points"></param>
+        public void GetPossibleMoves(List<Point> points)
+        {
+            ForEachPassableCellInRange(MovementDistance, index => points.Add(index));
+        }
+
+        /// <summary>
+        /// Gets all poitions where is possible for unit to move
+        /// </summary>
+        /// <param name="points"></param>
+        public void GetPossibleMoves(HashSet<Point> points)
+        {
+            ForEachPassableCellInRange(MovementDistance, index => points.Add(index));
+        }
+
         public bool CanMoveTo(Point index)
         {
+            //todo  refactor a* / depth first
+
             if (index == TileIndex)
             {
                 return false;
@@ -640,7 +628,7 @@ namespace Conquera.BattlePrototype
                 {
                     if (null != sibling.Unit && sibling.Unit.Player == Player)
                     {
-                        defenseFromAllies+=5;
+                        defenseFromAllies += 5;
                     }
                 });
 
@@ -715,6 +703,60 @@ namespace Conquera.BattlePrototype
                 sum += modif.GetModifier(this);
             }
             return sum;
+        }
+
+        private void BattleUnit_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (PreviousTileIndex != null)
+            {
+                mMovementLine = new Line();
+                mMovementLine.StrokeThickness = 5;
+                mMovementLine.Stroke = Brushes.Yellow;
+
+                HexTerrainTile previousTile = mTerrain[(int)PreviousTileIndex.Value.X, (int)PreviousTileIndex.Value.Y];
+                mMovementLine.X1 = Canvas.GetLeft(previousTile) + previousTile.ActualWidth / 2.0;
+                mMovementLine.Y1 = Canvas.GetTop(previousTile) + previousTile.ActualHeight / 2.0;
+
+                HexTerrainTile currentTile = mTerrain[(int)TileIndex.X, (int)TileIndex.Y];
+                mMovementLine.X2 = Canvas.GetLeft(currentTile) + currentTile.ActualWidth / 2.0;
+                mMovementLine.Y2 = Canvas.GetTop(currentTile) + currentTile.ActualHeight / 2.0;
+
+                GetParent<Canvas>(this).Children.Add(mMovementLine);
+            }
+        }
+
+        private void BattleUnit_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (mMovementLine != null)
+            {
+                GetParent<Canvas>(this).Children.Remove(mMovementLine);
+            }
+        }
+
+        private T GetParent<T>(System.Windows.DependencyObject element) where T : System.Windows.DependencyObject
+        {
+            System.Windows.DependencyObject parent = VisualTreeHelper.GetParent(element);
+            if (parent == null)
+            {
+                return null;
+            }
+            if (parent is T)
+            {
+                return (T)parent;
+            }
+            return GetParent<T>(parent);
+        }
+
+        private void UpdateSpellEffectsToolTip()
+        {
+            StackPanel panel = new StackPanel();
+            panel.Children.Add(new TextBlock() { Text = GetType().Name, FontWeight = System.Windows.FontWeights.Bold });
+
+            foreach (IBattleUnitSpellEffect effect in mSpellEffects)
+            {
+                panel.Children.Add(new TextBlock() { Text = effect.Description });
+            }
+            ToolTip = panel;
         }
     }
 
@@ -811,11 +853,11 @@ namespace Conquera.BattlePrototype
     public class SupportHealBase : BattleUnit
     {
         int mHpIncrement;
-        
+
         public SupportHealBase(Point baseAttack, int baseDefense, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
-                int hpIncrement, 
+                int hpIncrement,
                 string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            :base(baseAttack, baseDefense, baseMovementDistance, maxHp, isFlying, hasFirstStrike, imageFileName, player, terrain, tileIndex)
+            : base(baseAttack, baseDefense, baseMovementDistance, maxHp, isFlying, hasFirstStrike, imageFileName, player, terrain, tileIndex)
         {
             mHpIncrement = hpIncrement;
         }
@@ -839,9 +881,9 @@ namespace Conquera.BattlePrototype
         Point mAttIncrement;
 
         public SupportAttBase(Point baseAttack, int baseDefense, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
-                Point attIncrement, 
+                Point attIncrement,
                 string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            :base(baseAttack, baseDefense, baseMovementDistance, maxHp, isFlying, hasFirstStrike, imageFileName, player, terrain, tileIndex)
+            : base(baseAttack, baseDefense, baseMovementDistance, maxHp, isFlying, hasFirstStrike, imageFileName, player, terrain, tileIndex)
         {
             mAttIncrement = attIncrement;
         }
@@ -901,7 +943,7 @@ namespace Conquera.BattlePrototype
             , 3 //hpInc
             , "VampiricTouchIcon.png" //image
             , player, terrain, tileIndex)
-        {}
+        { }
     }
     public class SupportAtt : SupportAttBase
     {
@@ -913,10 +955,10 @@ namespace Conquera.BattlePrototype
             , 20 //maxHp
             , false //flying
             , false //first strike,
-            , new Point(5,5) //attInc
+            , new Point(5, 5) //attInc
             , "SpikesIcon.png" //image
             , player, terrain, tileIndex)
-        {}
+        { }
     }
     public class SupportDef : SupportDefBase
     {
