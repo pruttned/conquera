@@ -28,6 +28,43 @@ using System.Windows.Shapes;
 
 namespace Conquera.BattlePrototype
 {
+    public class Die
+    {
+        public static Die D6 { get; private set; }
+        public static Die D8 { get; private set; }
+        public static Die D10 { get; private set; }
+        public static Die D12 { get; private set; }
+        public static Die D20 { get; private set; }
+
+        public int MaxNum { get; private set; }
+
+        static Die()
+        {
+            D6 = new Die(6);
+            D8 = new Die(8);
+            D10 = new Die(10);
+            D12 = new Die(12);
+            D20 = new Die(20);
+        }
+
+        public int Roll()
+        {
+            return MathExt.Random.Next(1, MaxNum + 1);
+        }
+
+        private Die(int maxNum)
+        {
+            MaxNum = maxNum;
+        }
+    }
+
+    public struct DieAttackRoll
+    {
+        public Die Die;
+        public int Num;
+        public bool IsHit;
+    }
+
     public abstract class BattleUnit : Grid
     {
         #region Types
@@ -58,8 +95,6 @@ namespace Conquera.BattlePrototype
 
         private Point mTileIndex;
 
-        public int mHp;
-
         private List<IBattleUnitDefenseModifier> mDefenseModifiers = new List<IBattleUnitDefenseModifier>();
         private List<IBattleUnitAttackModifier> mAttackModifiers = new List<IBattleUnitAttackModifier>();
         private List<IBattleUnitMovementDistanceModifier> mMovementDistanceModifiers = new List<IBattleUnitMovementDistanceModifier>();
@@ -70,8 +105,6 @@ namespace Conquera.BattlePrototype
         private bool mHasMovedThisTurn;
         private bool mIsSelected = false;
 
-        private int mDefense;
-        private Point mAttack;
         private int mMovementDistance;
 
         private int mAttackPreventerCnt;
@@ -93,10 +126,7 @@ namespace Conquera.BattlePrototype
         public BattlePlayer Player { get; private set; }
         public HexTerrain Terrain { get { return mTerrain; } }
 
-        public Point BaseAttack { get; private set; }
-        public int BaseDefense { get; private set; }
         public int BaseMovementDistance { get; private set; }
-        public int MaxHp { get; private set; }
 
         public bool HasEnabledAttack { get { return 0 == AttackPreventerCnt; } }
         public bool HasEnabledMovement { get { return 0 == MovementPreventerCnt; } }
@@ -172,30 +202,6 @@ namespace Conquera.BattlePrototype
 
         public bool IsKilled { get; private set; }
 
-        public int Hp
-        {
-            get { return mHp; }
-            set
-            {
-                mHp = MathExt.Clamp(value, 0, MaxHp);
-                UpdateGraphics();
-            }
-        }
-
-        public Point Attack
-        {
-            get { return mAttack; }
-            private set
-            {
-                mAttack = new Point(Math.Max(0, value.X), Math.Max(0, value.Y));
-                mAttack.Y = Math.Max(mAttack.X, mAttack.Y);
-            }
-        }
-        public int Defense
-        {
-            get { return mDefense; }
-            private set { mDefense = Math.Max(0, value); }
-        }
         public int MovementDistance
         {
             get { return mMovementDistance; }
@@ -236,10 +242,6 @@ namespace Conquera.BattlePrototype
                     //UpdatePositionFromIndex();
                     mTerrain[mTileIndex.X, mTileIndex.Y].Unit = this;
 
-                    NotifySiblingsAfterDeparture(PreviousTileIndex.Value);
-                    NotifySiblingsAfterArrival();
-                    UpdateDefense();
-
                     if (null != TileIndexChanged)
                     {
                         TileIndexChanged.Invoke(this, PreviousTileIndex.Value);
@@ -268,17 +270,14 @@ namespace Conquera.BattlePrototype
             get { return 1; }
         }
 
-        public BattleUnit(Point baseAttack, int baseDefense, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
+        public BattleUnit(int baseMovementDistance, bool isFlying, bool hasFirstStrike,
             string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
         {
             if (string.IsNullOrEmpty(imageFileName)) throw new ArgumentNullException("imageName");
             if (null == player) throw new ArgumentNullException("player");
             if (null == terrain) throw new ArgumentNullException("terrain");
 
-            BaseAttack = baseAttack;
-            BaseDefense = baseDefense;
             BaseMovementDistance = baseMovementDistance;
-            mHp = MaxHp = maxHp;
 
             ImageFileName = imageFileName;
 
@@ -317,10 +316,7 @@ namespace Conquera.BattlePrototype
             image.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             Children.Add(image);
 
-            UpdateDefense();
-            UpdateAttack();
             UpdateMovementDistance();
-            NotifySiblingsAfterArrival();
 
             TextBlock levelTextBlock = new TextBlock();
             levelTextBlock.Text = Level.ToString();
@@ -339,32 +335,6 @@ namespace Conquera.BattlePrototype
         {
         }
 
-        public void AddDefenseModifier(IBattleUnitDefenseModifier modifier)
-        {
-            if (null == modifier) throw new ArgumentNullException("modifier");
-            mDefenseModifiers.Add(modifier);
-            UpdateDefense();
-        }
-        public bool RemoveDefenseModifier(IBattleUnitDefenseModifier modifier)
-        {
-            if (null == modifier) throw new ArgumentNullException("modifier");
-            bool removed = mDefenseModifiers.Remove(modifier);
-            UpdateDefense();
-            return removed;
-        }
-        public void AddAttackModifier(IBattleUnitAttackModifier modifier)
-        {
-            if (null == modifier) throw new ArgumentNullException("modifier");
-            mAttackModifiers.Add(modifier);
-            UpdateAttack();
-        }
-        public bool RemoveAttackModifier(IBattleUnitAttackModifier modifier)
-        {
-            if (null == modifier) throw new ArgumentNullException("modifier");
-            bool removed = mAttackModifiers.Remove(modifier);
-            UpdateAttack();
-            return removed;
-        }
         public void AddMovementDistanceModifier(IBattleUnitMovementDistanceModifier modifier)
         {
             if (null == modifier) throw new ArgumentNullException("modifier");
@@ -391,16 +361,33 @@ namespace Conquera.BattlePrototype
                 }
             }
 
-            UpdateSpellEffectsToolTip();
-
             if (!IsKilled)
             {
+                //constraint movement  - temp? (Cavalry  without constraint ? )
+                bool hasEnemySibling = false;
+                Terrain.ForEachSibling(TileIndex,
+                    tile =>
+                    {
+                        if (!hasEnemySibling && null != tile.Unit && tile.Unit.Player != Player)
+                        {
+                             hasEnemySibling = true;
+                        }
+                    });
+                if (hasEnemySibling)
+                {
+                    AddSpellEffect(turnNum, new ConstIncMovementDistanceBattleUnitSpellEffect(-BaseMovementDistance + 1, 1)); 
+                }
+
+
+
                 OnTurnStartImpl(turnNum);
                 if (!IsKilled)
                 {
                     UpdateGraphics();
                 }
             }
+
+            UpdateSpellEffectsToolTip();
         }
 
         public void Kill()
@@ -410,15 +397,13 @@ namespace Conquera.BattlePrototype
             {
                 mTerrain[mTileIndex.X, mTileIndex.Y].Unit = null;
             }
-            NotifySiblingsAfterDeparture(mTileIndex);
-
             Logger.Log(GetType().Name + " died", mTerrain[mTileIndex.X, mTileIndex.Y]);
         }
 
-        public void GetEnemyUnitsInRange(List<BattleUnit> units)
-        {
+        //public void GetEnemyUnitsInRange(List<BattleUnit> units)
+        //{
 
-        }
+        //}
 
         public void ForEachEnemyInRange(Action<BattleUnit> action)
         {
@@ -545,38 +530,50 @@ namespace Conquera.BattlePrototype
             return false;
         }
 
+        ///// <summary>
+        ///// No defense is considered here
+        ///// </summary>
+        ///// <param name="isPrebatlePhase">Take damage only from units with first strike</param>
+        ///// <returns></returns>
+        //public int ComputeDamageFromEnemies(bool isPrebatlePhase)
+        //{
+        //    int damage = 0;
+        //    //mTerrain.ForEachSibling(TileIndex,
+        //    //    sibling =>
+        //    //    {
+        //    //        if (null != sibling.Unit && (sibling.Unit.IsBerserker || sibling.Unit.Player != Player) && sibling.Unit.HasEnabledAttack && ((isPrebatlePhase && sibling.Unit.HasFirstStrike) || (!isPrebatlePhase && !sibling.Unit.HasFirstStrike)))
+        //    //        {
+        //    //            damage += MathExt.Random.Next(sibling.Unit.Attack.X, sibling.Unit.Attack.Y + 1);
+        //    //        }
+        //    //    });
+
+        //    return damage;
+        //}
+
         /// <summary>
-        /// No defense is considered here
+        /// All attack rols or null in case that the unit is not capable of attacking the specified target (out of range, ...)
         /// </summary>
-        /// <param name="isPrebatlePhase">Take damage only from units with first strike</param>
+        /// <param name="unit"></param>
         /// <returns></returns>
-        public int ComputeDamageFromEnemies(bool isPrebatlePhase)
-        {
-            int damage = 0;
-            mTerrain.ForEachSibling(TileIndex,
-                sibling =>
-                {
-                    if (null != sibling.Unit && (sibling.Unit.IsBerserker || sibling.Unit.Player != Player) && sibling.Unit.HasEnabledAttack && ((isPrebatlePhase && sibling.Unit.HasFirstStrike) || (!isPrebatlePhase && !sibling.Unit.HasFirstStrike)))
-                    {
-                        damage += MathExt.Random.Next(sibling.Unit.Attack.X, sibling.Unit.Attack.Y + 1);
-                    }
-                });
+        public abstract IList<DieAttackRoll> RollDiceAgainst(BattleUnit target);
 
-            return damage;
-        }
-
-        public void Move(Point tileIndex)
+        public void Move(int turnNum, Point tileIndex)
         {
-            HasMovedThisTurn = true;
-            TileIndex = tileIndex;
+            if(tileIndex != TileIndex)
+            {
+                HasMovedThisTurn = true;
+                Point oldIndex = TileIndex;
+                TileIndex = tileIndex;
+
+                OnMove(turnNum, oldIndex, tileIndex);
+            }
         }
 
         public void UpdateGraphics()
         {
             mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
             mPropertiesTextBlock.Text += string.Format("[{0}{1}{2}{3}{4}]\n", (IsFlying ? " F" : null), (HasFirstStrike ? " Fs" : null), (!HasEnabledMovement ? " MD" : null), (!HasEnabledAttack ? " AD" : null), (IsBerserker ? " B" : null));
-            mPropertiesTextBlock.Text += string.Format("A = {0}-{1}({6}-{7})\nD = {2}({8})\nM = {3}({9})\nHp = {4}/{5}", BaseAttack.X, BaseAttack.Y, BaseDefense, BaseMovementDistance, Hp, MaxHp,
-                Attack.X, Attack.Y, Defense, MovementDistance);
+            mPropertiesTextBlock.Text += string.Format("M = {0}({1})", BaseMovementDistance, MovementDistance);
             mBorder.BorderBrush = (!HasMovedThisTurn && HasEnabledMovement && Player.IsActive && HasEnabledMovement ? Brushes.Yellow : Brushes.Black);
         }
 
@@ -609,41 +606,12 @@ namespace Conquera.BattlePrototype
             return image;
         }
 
+        protected virtual void OnMove(int turnNum, Point oldIndex, Point tileIndex)
+        {
+        }
+
         protected virtual void OnTurnStartImpl(int turnNum) { }
 
-        private void AfterSiblingArrival(BattleUnit battleUnit)
-        {
-            UpdateDefense();
-        }
-        private void AfterSiblingDeparture(BattleUnit battleUnit)
-        {
-            UpdateDefense();
-        }
-
-        private void UpdateDefense()
-        {
-            int defenseFromAllies = 0;
-            mTerrain.ForEachSibling(TileIndex,
-                sibling =>
-                {
-                    if (null != sibling.Unit && sibling.Unit.Player == Player)
-                    {
-                        defenseFromAllies += 5;
-                    }
-                });
-
-            Defense = BaseDefense + defenseFromAllies + GetDefenseModifier();
-
-            UpdateGraphics();
-        }
-        private void UpdateAttack()
-        {
-            Point modif = GetAttackModifier();
-            mAttack.X = BaseAttack.X + modif.X;
-            mAttack.Y = BaseAttack.Y + modif.Y;
-
-            UpdateGraphics();
-        }
         private void UpdateMovementDistance()
         {
             MovementDistance = BaseMovementDistance + GetMovementDistanceModifier();
@@ -651,50 +619,6 @@ namespace Conquera.BattlePrototype
             UpdateGraphics();
         }
 
-        private void NotifySiblingsAfterArrival()
-        {
-            mTerrain.ForEachSibling(TileIndex,
-                sibling =>
-                {
-                    if (null != sibling.Unit && sibling.Unit.Player == Player)
-                    {
-                        sibling.Unit.AfterSiblingArrival(this);
-                    }
-                });
-        }
-
-        private void NotifySiblingsAfterDeparture(Point oldPos)
-        {
-            mTerrain.ForEachSibling(oldPos,
-                sibling =>
-                {
-                    if (null != sibling.Unit && sibling.Unit.Player == Player)
-                    {
-                        sibling.Unit.AfterSiblingDeparture(this);
-                    }
-                });
-        }
-
-        private int GetDefenseModifier()
-        {
-            int sum = 0;
-            foreach (var modif in mDefenseModifiers)
-            {
-                sum += modif.GetModifier(this);
-            }
-            return sum;
-        }
-        private Point GetAttackModifier()
-        {
-            Point sum = new Point();
-            foreach (var modif in mAttackModifiers)
-            {
-                Point m = modif.GetModifier(this);
-                sum.X += m.X;
-                sum.Y += m.Y;
-            }
-            return sum;
-        }
         private int GetMovementDistanceModifier()
         {
             int sum = 0;
@@ -760,219 +684,142 @@ namespace Conquera.BattlePrototype
         }
     }
 
-    public class SoldierAtt : BattleUnit
+    public class Swordsman : BattleUnit
     {
-        public SoldierAtt(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+        public Swordsman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            new Point(30, 40) //attack
-            , 20 //defense
-            , 3 //movement distance
-            , 40 //maxHp
+            1 //movement distance
             , false //flying
             , false //first strike
-            , "BloodMadnessIcon.png" //image
+            , "Swordsman.png" //image
             , player, terrain, tileIndex)
         { }
+
+        public override IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
+        {//temp
+            if (null == target) throw new ArgumentNullException("target");
+            
+            if (!HasEnabledAttack || 1 != HexHelper.GetDistance(TileIndex, target.TileIndex))
+            {
+                return null;
+            }
+
+            DieAttackRoll roll = new DieAttackRoll();
+            roll.Die = Die.D8;
+            roll.Num = Die.D8.Roll();
+            roll.IsHit = roll.Num >= 6;
+            return new DieAttackRoll[] { roll };
+        }
     }
-    public class SoldierBl : BattleUnit
+
+    public class Archer : BattleUnit
     {
-        public SoldierBl(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+        public Archer(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            new Point(20, 30) //attack
-            , 29 //defense
-            , 3 //movement distance
-            , 40 //maxHp
+            1 //movement distance
             , false //flying
             , false //first strike
-            , "BloodMadnessIcon.png" //image
+            , "Archer.png" //image
             , player, terrain, tileIndex)
         { }
+
+        public override IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
+        {//temp
+            if (null == target) throw new ArgumentNullException("target");
+
+            if (!HasEnabledAttack || 2 != HexHelper.GetDistance(TileIndex, target.TileIndex))
+            {
+                return null;
+            }
+
+            DieAttackRoll roll = new DieAttackRoll();
+            roll.Die = Die.D6;
+            roll.Num = Die.D6.Roll();
+            roll.IsHit = roll.Num >= 6;
+            return new DieAttackRoll[] { roll };
+        }
     }
-    public class SoldierDef : BattleUnit
+
+    public class Cavalry : BattleUnit
     {
-        public SoldierDef(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+        public Cavalry(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            new Point(10, 40) //attack
-            , 40 //defense
-            , 3 //movement distance
-            , 40 //maxHp
+            2 //movement distance
             , false //flying
             , false //first strike
-            , "BloodMadnessIcon.png" //image
+            , "Cavalry.png" //image
             , player, terrain, tileIndex)
         { }
-    }
 
+        public override IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
+        {//temp
+            if (null == target) throw new ArgumentNullException("target");
 
-    public class ScoutBase : BattleUnit
-    {
-        public ScoutBase(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(
-            new Point(15, 25) //attack
-            , 20 //defense
-            , 6 //movement distance
-            , 30 //maxHp
-            , false //flying
-            , false //first strike
-            , "SlayerIcon.png" //image
-            , player, terrain, tileIndex)
-        { }
-    }
+            if (!HasEnabledAttack || 1 != HexHelper.GetDistance(TileIndex, target.TileIndex))
+            {
+                return null;
+            }
 
-    public class ScoutFs : BattleUnit
-    {
-        public ScoutFs(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(
-            new Point(15, 20) //attack
-            , 15 //defense
-            , 5 //movement distance
-            , 30 //maxHp
-            , false //flying
-            , true //first strike
-            , "SlayerIcon.png" //image
-            , player, terrain, tileIndex)
-        { }
-    }
-
-    public class ScoutFly : BattleUnit
-    {
-        public ScoutFly(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(
-            new Point(15, 20) //attack
-            , 15 //defense
-            , 4 //movement distance
-            , 30 //maxHp
-            , true //flying
-            , false //first strike
-            , "SlayerIcon.png" //image
-            , player, terrain, tileIndex)
-        { }
-    }
-
-    #region Support base
-    public class SupportHealBase : BattleUnit
-    {
-        int mHpIncrement;
-
-        public SupportHealBase(Point baseAttack, int baseDefense, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
-                int hpIncrement,
-                string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(baseAttack, baseDefense, baseMovementDistance, maxHp, isFlying, hasFirstStrike, imageFileName, player, terrain, tileIndex)
-        {
-            mHpIncrement = hpIncrement;
+            DieAttackRoll roll = new DieAttackRoll();
+            roll.Die = Die.D10;
+            roll.Num = Die.D10.Roll();
+            roll.IsHit = roll.Num >= 6;
+            return new DieAttackRoll[] { roll };
         }
 
-        protected override void OnTurnStartImpl(int turnNum)
+        protected override void OnMove(int turnNum, Point oldIndex, Point tileIndex)
         {
-            base.OnTurnStartImpl(turnNum);
-
-            Terrain.ForEachSibling(TileIndex,
-                sibling =>
-                {
-                    if (null != sibling.Unit && sibling.Unit.Player == Player)
+            if (1 < HexHelper.GetDistance(oldIndex, tileIndex))
+            {
+                bool hasEnemySpearmanSibling = false;
+                bool hasEnemySibling = false;
+                Terrain.ForEachSibling(tileIndex, tile =>
                     {
-                        sibling.Unit.Hp += mHpIncrement;
-                    }
-                });
-        }
-    }
-    public class SupportAttBase : BattleUnit
-    {
-        Point mAttIncrement;
+                        if (!hasEnemySpearmanSibling && null != tile.Unit && tile.Unit.Player != Player)
+                        {
+                            if (tile.Unit is Spearman)
+                            {
+                                hasEnemySpearmanSibling = true;
+                            }
+                            hasEnemySibling = true;
+                        }
+                    });
 
-        public SupportAttBase(Point baseAttack, int baseDefense, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
-                Point attIncrement,
-                string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(baseAttack, baseDefense, baseMovementDistance, maxHp, isFlying, hasFirstStrike, imageFileName, player, terrain, tileIndex)
-        {
-            mAttIncrement = attIncrement;
-        }
-
-        protected override void OnTurnStartImpl(int turnNum)
-        {
-            base.OnTurnStartImpl(turnNum);
-
-            Terrain.ForEachSibling(TileIndex,
-                sibling =>
+                if (!hasEnemySpearmanSibling && hasEnemySibling)
                 {
-                    if (null != sibling.Unit && sibling.Unit.Player == Player)
-                    {
-                        sibling.Unit.AddSpellEffect(turnNum, new ConstIncAttackBattleUnitSpellEffect(mAttIncrement, 1));
-                    }
-                });
+                    AddSpellEffect(turnNum, new FirstStrikeBattleUnitSpellEffect(1));
+                }
+            }
         }
     }
-    public class SupportDefBase : BattleUnit
+
+    public class Spearman : BattleUnit
     {
-        int mDefIncrement;
-
-        public SupportDefBase(Point baseAttack, int baseDefense, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
-                int defIncrement,
-                string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(baseAttack, baseDefense, baseMovementDistance, maxHp, isFlying, hasFirstStrike, imageFileName, player, terrain, tileIndex)
-        {
-            mDefIncrement = defIncrement;
-        }
-
-        protected override void OnTurnStartImpl(int turnNum)
-        {
-            base.OnTurnStartImpl(turnNum);
-
-            Terrain.ForEachSibling(TileIndex,
-                sibling =>
-                {
-                    if (null != sibling.Unit && sibling.Unit.Player == Player)
-                    {
-                        sibling.Unit.AddSpellEffect(turnNum, new ConstIncDefenseBattleUnitSpellEffect(mDefIncrement, 1));
-                    }
-                });
-        }
-    }
-    #endregion Support base
-
-    public class SupportHeal : SupportHealBase
-    {
-        public SupportHeal(BattlePlayer player, HexTerrain terrain, Point tileIndex)
+        public Spearman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            new Point(5, 10) //attack
-            , 5 //defense
-            , 3 //movement distance
-            , 20 //maxHp
+            1 //movement distance
             , false //flying
             , false //first strike
-            , 3 //hpInc
-            , "VampiricTouchIcon.png" //image
+            , "Spearman.png" //image
             , player, terrain, tileIndex)
         { }
-    }
-    public class SupportAtt : SupportAttBase
-    {
-        public SupportAtt(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(
-            new Point(5, 10) //attack
-            , 5 //defense
-            , 3 //movement distance
-            , 20 //maxHp
-            , false //flying
-            , false //first strike,
-            , new Point(5, 5) //attInc
-            , "SpikesIcon.png" //image
-            , player, terrain, tileIndex)
-        { }
-    }
-    public class SupportDef : SupportDefBase
-    {
-        public SupportDef(BattlePlayer player, HexTerrain terrain, Point tileIndex)
-            : base(
-            new Point(5, 10) //attack
-            , 5 //defense
-            , 3 //movement distance
-            , 20 //maxHp
-            , false //flying
-            , false //first strike,
-            , 10 //defInc
-            , "PackReinforcementIcon.png" //image
-            , player, terrain, tileIndex)
-        { }
+
+        public override IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
+        {//temp
+            if (null == target) throw new ArgumentNullException("target");
+
+            if (!HasEnabledAttack || 1 != HexHelper.GetDistance(TileIndex, target.TileIndex))
+            {
+                return null;
+            }
+
+            Die die = (target is Cavalry) ? Die.D10 : Die.D6;
+
+            DieAttackRoll roll = new DieAttackRoll();
+            roll.Die = die;
+            roll.Num = die.Roll();
+            roll.IsHit = roll.Num >= 6;
+            return new DieAttackRoll[] { roll };
+        }
     }
 }
