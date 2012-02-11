@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2010 by Conquera Team
 //  Part of the Conquera Project
 //
@@ -16,22 +16,29 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////
 
-using System.Xml;
+using Ale.Input;
 
-namespace Ale.Content
+namespace Ale.Gui
 {
-    public class GuiPaletteContent
-    {
-        private XmlElement mPaletteRoot;
+    public delegate void PropertyChangedHandler<TOwner, TValue>(TOwner propertyOwner, TValue oldValue);
+    public delegate void MouseEventHandler(GuiNode guiNode, IMouseManager mouseManager);
 
-        public XmlElement PaletteRoot
+    public static class EventHelper
+    {
+        public static void RaiseEvent<TOwner, TValue>(PropertyChangedHandler<TOwner, TValue> handler, TOwner propertyOwner, TValue oldValue)
         {
-            get { return mPaletteRoot; }
+            if (handler != null)
+            {
+                handler(propertyOwner, oldValue);
+            }
         }
 
-        public GuiPaletteContent(XmlElement paletteRoot)
+        public static void RaiseEvent(MouseEventHandler handler, GuiNode guiNode, IMouseManager mouseManager)
         {
-            mPaletteRoot = paletteRoot;
+            if (handler != null)
+            {
+                handler(guiNode, mouseManager);
+            }
         }
     }
 }

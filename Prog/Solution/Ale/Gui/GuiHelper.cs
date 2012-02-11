@@ -16,14 +16,20 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////
 
-using Ale.Gui;
-using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 
-namespace Conquera.Gui
+namespace Ale.Gui
 {
-    public static class ConqueraFonts
+    public static class GuiHelper
     {
-        public static readonly GuiFont SpriteFont1 = new GuiFont(GuiManager.Instance.Content.Load<SpriteFont>("SpriteFont1"));
-        public static readonly GuiFont SpriteFontSmall = new GuiFont(GuiManager.Instance.Content.Load<SpriteFont>("SpriteFontSmall"));
+        public static Point ConvertVectorToPoint(Vector2 vector)
+        {
+            return new Point((int)vector.X, (int)vector.Y);
+        }
+
+        public static Vector2 ConvertPointToVector(Point point)
+        {
+            return new Vector2(point.X, point.Y);
+        }
     }
 }

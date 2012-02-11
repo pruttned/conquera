@@ -25,27 +25,14 @@ using Ale.Tools;
 using Microsoft.Xna.Framework;
 using Ale.Graphics;
 using Microsoft.Xna.Framework.Graphics;
-using Conquera.Gui;
 
 namespace Conquera
 {
     public class MindControlSpell : Spell
     {
-        private static GraphicElement mPictureGraphicElement = ConqueraPalette.SpellIconMindControl;
-        private static GraphicElement mIconGraphicElement = ConqueraPalette.SpellIconMindControl;
         private static float DivCoef = 3;
 
         private AnimationDelay mAttackDelay = new AnimationDelay();
-
-        public override GraphicElement Picture
-        {
-            get { return mPictureGraphicElement; }
-        }
-
-        public override GraphicElement Icon
-        {
-            get { return mIconGraphicElement; }
-        }
 
         public override string Name
         {
@@ -75,7 +62,7 @@ namespace Conquera
 
         protected override void BeforeAttackCastImpl()
         {
-            Target.BattleScene.FireTileNotificationLabel("", CellNotificationIcons.MindControl, Color.Red, Target.TileIndex);
+            //Target.BattleScene.FireTileNotificationLabel("", CellNotificationIcons.MindControl, Color.Red, Target.TileIndex);
         }
 
         protected override bool BeforeAttackUpdateImpl(AleGameTime time)

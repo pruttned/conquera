@@ -32,8 +32,6 @@ namespace Conquera
     {
         private bool mIsCasted = false;
 
-        public abstract GraphicElement Picture { get; }
-        public abstract GraphicElement Icon { get; }
         public abstract string Name { get; }
         public abstract string DisplayName { get; }
         public abstract string Description { get; }

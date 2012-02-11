@@ -210,20 +210,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GuiPalettes\CellNotificationPalette.plt">
-      <Name>CellNotificationPalette</Name>
-      <Importer>GuiPaletteImporter</Importer>
-      <Processor>GuiPaletteProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="GuiPalettes\PaletteDef.plt">
-      <Name>PaletteDef</Name>
-      <Importer>GuiPaletteImporter</Importer>
-      <Processor>GuiPaletteProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="MaterialEffects\ActiveBorderFx.fx">
       <Name>ActiveBorderFx</Name>
       <Importer>EffectImporter</Importer>

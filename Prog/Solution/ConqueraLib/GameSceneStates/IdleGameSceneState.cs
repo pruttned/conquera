@@ -24,7 +24,6 @@ using Ale.Input;
 using Ale.Gui;
 using Microsoft.Xna.Framework;
 using Ale;
-using Conquera.Gui;
 
 namespace Conquera
 {
@@ -45,8 +44,7 @@ namespace Conquera
                 mScene.State = mScene.GetGameSceneState(GameSceneStates.ReadyGameUnitSelected);
             }
             else
-            {
-                Ale.Gui.GuiManager.Instance.Cursor = AlCursors.Default;
+            {                
                 mScene.EnableMouseCameraControl = true;
             }
         }

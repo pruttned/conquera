@@ -362,7 +362,7 @@ namespace Conquera
                 
                 int realHealAmount = Hp-oldHp;
 
-                BattleScene.FireTileNotificationLabel(string.Format("+{0}", realHealAmount), CellNotificationIcons.Hearth, Color.Red, TileIndex);
+                //BattleScene.FireTileNotificationLabel(string.Format("+{0}", realHealAmount), CellNotificationIcons.Hearth, Color.Red, TileIndex);
             }
 
         }
@@ -378,7 +378,7 @@ namespace Conquera
             Hp = Math.Max(Hp - damage, 0);
             int realDamage = Hp - oldHp;
 
-            BattleScene.FireTileNotificationLabel(string.Format("-{0}", Math.Abs(realDamage)), CellNotificationIcons.BrokenHearth, Color.Red, TileIndex);
+            //BattleScene.FireTileNotificationLabel(string.Format("-{0}", Math.Abs(realDamage)), CellNotificationIcons.BrokenHearth, Color.Red, TileIndex);
             if (Hp == 0)
             {
                 BattleScene.KillUnit(this);

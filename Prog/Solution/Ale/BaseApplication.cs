@@ -152,8 +152,7 @@ namespace Ale
             get { return mSceneManager; }
         }
 
-        protected abstract string GuiPaletteName { get; }
-        protected abstract Ale.Gui.CursorInfo DefaultCursor { get; }
+        protected abstract string GuiPaletteName { get; }        
         protected bool ShowSysCursor
         {
             get
@@ -313,13 +312,11 @@ namespace Ale
                 BoundingBoxRenderable.Init(GraphicsDevice, Content.DefaultContentGroup);
 
                 mSceneManager = CreateSceneManager(GraphicsDeviceManager, null != mRenderControl ? mRenderControl : Control.FromHandle(mGame.Window.Handle));
-                Ale.Gui.GuiManager.Initialize(GraphicsDeviceManager, Content, SceneManager.MouseManager);
                 
                 if (mRenderControl == null)
                 {
-                    Ale.Gui.GuiManager.Instance.Cursor = DefaultCursor;
                     SceneManager.MouseManager.ClipRealCursor = AppSettingsManager.Default.GetSettings<CommonSettings>().ConstraintCursor;
-                    mGame.IsMouseVisible = false;
+                    mGame.IsMouseVisible = true;
                 }
 
                 mRenderWindow = Control.FromHandle(RenderWindowHwnd);

@@ -32,7 +32,6 @@ using Ale.Scene;
 using Microsoft.Xna.Framework.Content;
 using Ale.Content;
 using Ale.Gui;
-using Conquera.Gui;
 using Ale.SpecialEffects;
 
 namespace Conquera
@@ -42,11 +41,6 @@ namespace Conquera
         protected override string GuiPaletteName
         {
             get { return "PaletteDef"; }
-        }
-
-        protected override CursorInfo DefaultCursor
-        {
-            get { return AlCursors.Default; }
         }
 
         public Application()
