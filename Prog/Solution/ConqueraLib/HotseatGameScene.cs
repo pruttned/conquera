@@ -30,7 +30,6 @@ using SimpleOrmFramework;
 using Ale.Sound;
 using System.IO;
 using Ale.Scene;
-using Conquera.Gui;
 using Ale;
 namespace Conquera
 {

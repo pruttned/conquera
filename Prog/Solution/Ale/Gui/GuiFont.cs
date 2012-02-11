@@ -19,64 +19,52 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace Ale.Gui
 {
     public class GuiFont
     {
-        private SpriteFont mInnerFont;
-        private int mMaxCharWidth;
-        private int mAverageCharWidth;
-        private int mSpaceWidth;
-        private int mFirstLineHeight;
+        private static Dictionary<SpriteFont, GuiFont> mGuiFontCache = new Dictionary<SpriteFont, GuiFont>();
 
-        public SpriteFont InnerFont
-        {
-            get { return mInnerFont; }
-        }
-
-        public int MaxCharWidth
-        {
-            get { return mMaxCharWidth; }
-        }
-
-        public int AverageCharWidth
-        {
-            get { return mAverageCharWidth; }
-        }
-
-        public int SpaceWidth
-        {
-            get { return mSpaceWidth; }
-        }
-
-        public int FirstLineHeight
-        {
-            get { return mFirstLineHeight; }
-        }
-
+        public SpriteFont InnerFont { get; private set; }
+        public int MaxCharWidth { get; private set; }
+        public int AverageCharWidth { get; private set; }
+        public int SpaceWidth { get; private set; }
+        public int FirstLineHeight { get; private set; }
         public int FirstLineMargin { get; private set; } //first line has larger height than others - this is that delta
 
-        public GuiFont(SpriteFont innerFont)
+        private GuiFont(SpriteFont innerFont)
         {
-            mInnerFont = innerFont;
+            InnerFont = innerFont;
 
             Vector2 spaceSize = InnerFont.MeasureString(" ");
-            mSpaceWidth = (int)spaceSize.X;
-            mFirstLineHeight = (int)spaceSize.Y;
-            FirstLineMargin = mFirstLineHeight - InnerFont.LineSpacing;
+            SpaceWidth = (int)spaceSize.X;
+            FirstLineHeight = (int)spaceSize.Y;
+            FirstLineMargin = FirstLineHeight - InnerFont.LineSpacing;
 
             int charWidth;
-            mAverageCharWidth = 0;
-            mMaxCharWidth = 0;
+            AverageCharWidth = 0;
+            MaxCharWidth = 0;
             foreach (char character in InnerFont.Characters)
             {
                 charWidth = (int)InnerFont.MeasureString(character.ToString()).X;
                 
-                mAverageCharWidth += charWidth;
-                mMaxCharWidth = Math.Max(mMaxCharWidth, charWidth);
+                AverageCharWidth += charWidth;
+                MaxCharWidth = Math.Max(MaxCharWidth, charWidth);
             }
-            mAverageCharWidth /= InnerFont.Characters.Count;
+            AverageCharWidth /= InnerFont.Characters.Count;
+        }
+
+        public static GuiFont Get(SpriteFont spriteFont)
+        {
+            GuiFont guiFont;
+            if(!mGuiFontCache.TryGetValue(spriteFont, out guiFont))
+            {
+                guiFont = new GuiFont(spriteFont);
+                mGuiFontCache.Add(spriteFont, guiFont);
+            }
+            return guiFont;
         }
     }
 }

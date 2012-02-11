@@ -30,7 +30,6 @@ using SimpleOrmFramework;
 using Ale.Sound;
 using System.IO;
 using Ale.Scene;
-using Conquera.Gui;
 using Ale;
 
 namespace Conquera
@@ -57,15 +56,12 @@ namespace Conquera
 
         private HexTerrainTile mSelectedTile = null;
 
-        SoundEmitter2d mSoundEmitter = new SoundEmitter2d();
-        private GameGuiScene mGuiScene;
+        SoundEmitter2d mSoundEmitter = new SoundEmitter2d();        
 
         private IGameSceneState mState;
 
         private CellLabelManager mCellLabelManager;
-        private SpellSlot mActiveSpell = null;
-
-        private AleMessageBox mVictoryMessageBox;
+        private SpellSlot mActiveSpell = null;        
 
         private LavaRenderable mLavaRenderable;
 
@@ -348,8 +344,7 @@ namespace Conquera
 
         public override void Update(AleGameTime gameTime)
         {
-            base.Update(gameTime);
-            GuiManager.Instance.Update(gameTime);
+            base.Update(gameTime);            
             State.Update(gameTime);
 
             if (EnableMouseCameraControl)
@@ -366,7 +361,7 @@ namespace Conquera
         {
             var cellUnderCur = GetTileUnderCur();
             //3d cursor
-            if (null != cellUnderCur && !GuiManager.Instance.HandlesMouse)
+            if (null != cellUnderCur)
             {
                 mCursor3d.Position = cellUnderCur.CenterPos;
 
@@ -403,17 +398,8 @@ namespace Conquera
         public override void Draw(AleGameTime gameTime)
         {
             base.Draw(gameTime);
-            mCellLabelManager.Draw(gameTime);
-            GuiManager.Instance.Draw(gameTime);
-
-            //GuiManager.Instance.SpriteBatch.Begin();
-            //GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ShadowMap").Texture, new Rectangle(256, 0, 256, 192), Color.White);
-            // GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ScreenDepthMap").Texture, new Rectangle(256, 0, 256, 192), Color.White);
-            //GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ScreenNormalMap").Texture, new Rectangle(512, 0, 256, 192), Color.White);
-            //GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ScreenLightMap").Texture, new Rectangle(768, 0, 256, 192), Color.White);
-            //////            GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ScreenColorMap").Texture, new Rectangle(0, 0, 256, 192), Color.White);
-            //GuiManager.Instance.SpriteBatch.Draw(RenderTargetManager.GetRenderTarget("ScreenColorMap").Texture, new Rectangle(0, 0, 256, 192), Color.White);
-            //GuiManager.Instance.SpriteBatch.End();
+            mCellLabelManager.Draw(gameTime);            
+            
 
         }
 
@@ -446,21 +432,18 @@ namespace Conquera
         /// <param name="icon">Use CellNotificationIcons</param>
         /// <param name="textColor"></param>
         /// <param name="cell"></param>
-        public void FireTileNotificationLabel(string text, string icon, Color textColor, Point tileIndex)
+        public void FireTileNotificationLabel(string text, ImageDrawing icon, Color textColor, Point tileIndex)
         {
             mCellLabelManager.AddLabel(text, icon, textColor, Terrain[tileIndex].CenterPos);
         }
 
-        public void FireCellNotificationLabel(string text, string icon, Color textColor, Vector3 pos )
+        public void FireCellNotificationLabel(string text, ImageDrawing icon, Color textColor, Vector3 pos)
         {
             mCellLabelManager.AddLabel(text, icon, textColor, pos);
         }
 
         public virtual void OnVictory(BattlePlayer player)
-        {
-            mVictoryMessageBox = new ConqueraMessageBox(string.Format("Player {0} has won", player.Name));
-            mVictoryMessageBox.Closed += new EventHandler(msg_Closed);
-            mVictoryMessageBox.Show(true);
+        {            
         }
 
         public void PanCamera(Vector2 pan)
@@ -546,8 +529,8 @@ namespace Conquera
             SceneManager.MouseManager.MouseButtonUp += new MouseButtonEventHandler(MouseManager_MouseButtonUp);
             SceneManager.MouseManager.MouseButtonDown += new MouseButtonEventHandler(MouseManager_MouseButtonDown);
             
-            //todo
-            //GuiManager.Instance.ActiveScene = mGuiScene;
+
+            
         }
 
         protected override void OnDeactivateImpl()
@@ -557,8 +540,7 @@ namespace Conquera
             SceneManager.MouseManager.MouseButtonUp -= MouseManager_MouseButtonUp;
             SceneManager.MouseManager.MouseButtonDown -= MouseManager_MouseButtonDown;
 
-            //todo
-           // GuiManager.Instance.ActiveScene = DefaultGuiScene.Instance;
+           
         }
 
         protected BattleScene(SceneManager sceneManager, ContentGroup content, OrmManager ormManager, BattleSceneHeader settings, HexTerrain terrain)
@@ -594,34 +576,31 @@ namespace Conquera
         private void HandleCameraControl()
         {
             Vector2 curPos = SceneManager.MouseManager.CursorPosition;
-            
-            if (!GuiManager.Instance.HandlesMouse)
-            {
-                Vector3 mouseMovement = SceneManager.MouseManager.CursorPositionDelta;
 
-                //zoom
-                if (Math.Abs(mouseMovement.Z) > 0.00001f)
+            Vector3 mouseMovement = SceneManager.MouseManager.CursorPositionDelta;
+
+            //zoom
+            if (Math.Abs(mouseMovement.Z) > 0.00001f)
+            {
+                if (mouseMovement.Z > 0)
                 {
-                    if (mouseMovement.Z > 0)
-                    {
-                        GameCamera.IncZoomLevel();
-                    }
-                    else
-                    {
-                        GameCamera.DecZoomLevel();
-                    }
+                    GameCamera.IncZoomLevel();
                 }
                 else
                 {
-                    if (SceneManager.MouseManager.IsButtonDown(MouseButton.Middle))
-                    {//movement
-                        float scrollSpeed = mGameSettings.CameraScrollSpeed;
-                        PanCamera(new Vector2(mouseMovement.X * scrollSpeed, mouseMovement.Y * scrollSpeed));
-                    }
+                    GameCamera.DecZoomLevel();
+                }
+            }
+            else
+            {
+                if (SceneManager.MouseManager.IsButtonDown(MouseButton.Middle))
+                {//movement
+                    float scrollSpeed = mGameSettings.CameraScrollSpeed;
+                    PanCamera(new Vector2(mouseMovement.X * scrollSpeed, mouseMovement.Y * scrollSpeed));
                 }
             }
 
-            if (!SceneManager.MouseManager.IsButtonDown(MouseButton.Left) && !SceneManager.MouseManager.IsButtonDown(MouseButton.Right)&&
+            if (!SceneManager.MouseManager.IsButtonDown(MouseButton.Left) && !SceneManager.MouseManager.IsButtonDown(MouseButton.Right) &&
                 !SceneManager.MouseManager.IsButtonDown(MouseButton.Middle))
             {
                 float scrollSpeed = mGameSettings.CameraCornerScrollSpeed;
@@ -663,9 +642,7 @@ namespace Conquera
         }
 
         private void KeyboardManager_KeyDown(Microsoft.Xna.Framework.Input.Keys key, IKeyboardManager keyboardManager)
-        {
-            GuiManager.Instance.HandleKeyDown(key);
-
+        {            
             if (key == Microsoft.Xna.Framework.Input.Keys.S)
             {
                 ScenePass shadowPass = GetScenePass(ShadowScenePass.Name);
@@ -700,14 +677,6 @@ namespace Conquera
             if (key == Microsoft.Xna.Framework.Input.Keys.Escape)
             {
                 ExitToMainMenu();
-            }
-            if (key == Microsoft.Xna.Framework.Input.Keys.G)
-            {
-                mGuiScene.SidePanelsVisible = !mGuiScene.SidePanelsVisible;
-            }
-            if (key == Microsoft.Xna.Framework.Input.Keys.T)
-            {
-                mGuiScene.DebugTextVisible = !mGuiScene.DebugTextVisible;
             }
             if (key == Microsoft.Xna.Framework.Input.Keys.Space)
             {
@@ -752,8 +721,7 @@ namespace Conquera
         }
 
         private void KeyboardManager_KeyUp(Microsoft.Xna.Framework.Input.Keys key, IKeyboardManager keyboardManager)
-        {
-            GuiManager.Instance.HandleKeyUp(key);
+        {            
         }
 
         public void KillUnit(BattleUnit unit)
@@ -805,15 +773,11 @@ namespace Conquera
 
         private void MouseManager_MouseButtonUp(MouseButton button, IMouseManager mouseManager)
         {
-            if (!GuiManager.Instance.HandleMouseUp(button) && !GuiManager.Instance.HandlesMouse)
-            {
-                State.OnClickOnTile(GetTileUnderCur(), button);
-            }
+            State.OnClickOnTile(GetTileUnderCur(), button);            
         }
 
         private void MouseManager_MouseButtonDown(MouseButton button, IMouseManager mouseManager)
-        {
-            GuiManager.Instance.HandleMouseDown(button);
+        {            
         }
 
         private void unit_CellIndexChanged(BattleUnit obj, Point oldValue)

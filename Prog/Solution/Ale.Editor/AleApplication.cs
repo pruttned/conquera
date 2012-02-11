@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 using Ale.Scene;
-using Conquera.Gui;
 using System;
 using System.IO;
 using Microsoft.CSharp;
@@ -42,11 +41,6 @@ namespace Ale.Editor
         protected override string GuiPaletteName
         {
             get { return "PaletteDef"; }
-        }
-
-        protected override Ale.Gui.CursorInfo DefaultCursor
-        {
-            get { return AlCursors.Default; }
         }
 
         public AleApplication(AleRenderControl renderControl)
@@ -158,9 +152,7 @@ namespace Ale.Editor
 
         protected override void Draw(AleGameTime gameTime)
         {
-            base.Draw(gameTime);
-
-            GuiManager.Instance.Draw(gameTime);
+            base.Draw(gameTime);            
         }
 
         protected override void LoadContent()

@@ -33,8 +33,8 @@ namespace Conquera
 {
     internal class CellNotificationLabel
     {
-        private TextElement mTextElement;
-        private Image mImage;
+        private TextDrawing mTextDrawing;
+        private ImageDrawing mImage;
         private Point mScreenPos;
         private Vector3 mWorldPos;
         private float mFadeStartTime = -1;
@@ -42,10 +42,10 @@ namespace Conquera
         private FloatLinearAnimator mAnimator = new FloatLinearAnimator();
         private PointLinearAnimator mPosAnimator = new PointLinearAnimator();
 
-        public CellNotificationLabel(string text, Image image, GuiFont font, Color color, Vector3 worldPos)
+        public CellNotificationLabel(string text, ImageDrawing image, GuiFont font, Color color, Vector3 worldPos)
         {
-            mTextElement = new TextElement(font, color);
-            mTextElement.Text = text;
+            mTextDrawing = new TextDrawing(font, color);
+            mTextDrawing.Text = text;
             mImage = image;
             mWorldPos = worldPos;
 
@@ -62,15 +62,15 @@ namespace Conquera
             if (gameTime.TotalTime < mFadeStartTime || mAnimator.Update(gameTime))
             {
                 mPosAnimator.Update(gameTime);
-                mTextElement.Color = new Color(mTextElement.Color, mAnimator.CurrentValue);
-                mTextElement.Draw(spriteBatch, mPosAnimator.CurrentValue, gameTime);
+                mTextDrawing.Color = new Color(mTextDrawing.Color, mAnimator.CurrentValue);
+                mTextDrawing.Draw(spriteBatch, mPosAnimator.CurrentValue);
 
                 if (null != mImage)
                 {
                     Point imagePos = mPosAnimator.CurrentValue;
-                    imagePos.X -= mImage.SourceRectangle.Width;
+                    imagePos.X -= mImage.Width;
                     mImage.Color = new Color(1, 1, 1, mAnimator.CurrentValue);
-                    mImage.Draw(spriteBatch, imagePos, gameTime);
+                    mImage.Draw(spriteBatch, imagePos);
                 }
 
                 return true;
@@ -92,12 +92,12 @@ namespace Conquera
         private Point ProjectPos(Vector3 pos, Viewport viewport, ICamera camera)
         {
             Vector3 screenPos = viewport.Project(pos, camera.ProjectionTransformation, camera.ViewTransformation, Matrix.Identity);
-            screenPos.X -= mTextElement.Width / 2.0f;
-            screenPos.Y -= mTextElement.Height / 2.0f;
+            screenPos.X -= mTextDrawing.Width / 2.0f;
+            screenPos.Y -= mTextDrawing.Height / 2.0f;
 
             if (null != mImage)
             {
-                screenPos.X += mImage.SourceRectangle.Width / 2.0f;
+                screenPos.X += mImage.Width / 2.0f;
             }
             return new Point((int)screenPos.X, (int)screenPos.Y);
         }
@@ -112,13 +112,11 @@ namespace Conquera
         private bool mIsDisposed = false;
         private GraphicsDeviceManager mGraphicsDeviceManager;
         private Viewport mViewport;
-        private GuiFont mGuiFont;
-        private Palette mPalette;
+        private GuiFont mGuiFont;        
 
         public CellLabelManager(ICamera camera, GraphicsDeviceManager graphicsDeviceManager, ContentGroup content)
         {
-            mGuiFont = new GuiFont(content.Load<SpriteFont>("CellNotificationFont"));
-            mPalette = content.Load<Palette>("CellNotificationPalette");
+            mGuiFont = GuiFont.Get(content.Load<SpriteFont>("CellNotificationFont"));            
 
             mSpriteBatch = new SpriteBatch(graphicsDeviceManager.GraphicsDevice);
             mGraphicsDeviceManager = graphicsDeviceManager;
@@ -129,15 +127,9 @@ namespace Conquera
             AppSettingsManager.Default.AppSettingsCommitted += new AppSettingsManager.CommittedHandler(Default_AppSettingsCommitted);
         }
 
-        public void AddLabel(string text, string image, Color textColor, Vector3 worldPos)
+        public void AddLabel(string text, ImageDrawing image, Color textColor, Vector3 worldPos)
         {
-            Image img = null;
-            if (!string.IsNullOrEmpty(image))
-            {
-                img = (Image)mPalette.CreateGraphicElement(image);
-            }
-
-            var label = new CellNotificationLabel(text, img, mGuiFont, textColor, worldPos);
+            var label = new CellNotificationLabel(text, image, mGuiFont, textColor, worldPos);
             label.UpdateViewProjTransformation(mViewport, mCamera);
             mLabels.Add(label);
         }

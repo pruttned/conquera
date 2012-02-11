@@ -30,7 +30,6 @@ using SimpleOrmFramework;
 using Ale.Sound;
 using System.IO;
 using Ale.Scene;
-using Conquera.Gui;
 using Ale;
 
 
@@ -43,7 +42,6 @@ namespace Conquera
 
         private Vector3 mLightDir = new Vector3(-0.3333333f, -0.5f, 1f);
         private List<ParticleSystemMissile> mMissiles = new List<ParticleSystemMissile>();
-        private MainMenuGuiScene mGuiScene;
 
         public MainMenuScene(SceneManager sceneManager, ContentGroup content)
             : base(sceneManager, content, new BoundingBox(new Vector3(-100,-100,-100), new Vector3(100,100,100)))
@@ -55,15 +53,12 @@ namespace Conquera
             for (int i = 0; i < 20; ++i)
             {
                 mMissiles.Add(CreateMissile());
-            }
-
-            mGuiScene = new MainMenuGuiScene(this);
+            }            
         }
 
         public override void Update(AleGameTime gameTime)
         {
             base.Update(gameTime);
-            GuiManager.Instance.Update(gameTime);
 
             for (int i = 0; i < mMissiles.Count; ++i)
             {
@@ -78,7 +73,6 @@ namespace Conquera
         public override void Draw(AleGameTime gameTime)
         {
             base.Draw(gameTime);            
-            GuiManager.Instance.Draw(gameTime);
         }
 
         protected override List<ScenePass> CreateScenePasses(GraphicsDeviceManager graphicsDeviceManager, IRenderTargetManager renderTargetManager, ContentGroup content)
@@ -129,12 +123,10 @@ namespace Conquera
 
         protected override void OnActivatedImpl()
         {            
-            GuiManager.Instance.ActiveScene = mGuiScene;
         }
 
         protected override void OnDeactivateImpl()
         {
-            GuiManager.Instance.ActiveScene = DefaultGuiScene.Instance;
         }
 
         private ParticleSystemMissile CreateMissile()
@@ -165,12 +157,10 @@ namespace Conquera
 
         private void MouseManager_MouseButtonUp(MouseButton button, IMouseManager mouseManager)
         {
-            GuiManager.Instance.HandleMouseUp(button);
         }
 
         private void MouseManager_MouseButtonDown(MouseButton button, IMouseManager mouseManager)
         {
-            GuiManager.Instance.HandleMouseDown(button);
         }
     }
 }

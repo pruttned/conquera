@@ -24,12 +24,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Ale.Gui
 {
-    /// <summary>
-    /// Represents a text, which can be drawn and warp.
-    /// </summary>
-    public class TextElement : GraphicElement
+    public class TextDrawing
     {
-        #region Fields
+        public event PropertyChangedHandler<TextDrawing, int> WidthChanged;
+        public event PropertyChangedHandler<TextDrawing, int> HeightChanged;
 
         /// <summary>
         /// Base unchanged text.
@@ -105,10 +103,6 @@ namespace Ale.Gui
         /// If true, text is not warped.
         /// </summary>
         private bool mAutoSize;
-
-        #endregion Fields
-
-        #region Properties
 
         /// <summary>
         /// Gets or sets the text of this TextElement.
@@ -269,10 +263,6 @@ namespace Ale.Gui
             get { return mLineBeginnings.Count; }
         }
 
-        #endregion Properties
-
-        #region Constructors
-
         /// <summary>
         /// Constructs a new instance of TextElement with an empty text.
         /// </summary>
@@ -281,7 +271,7 @@ namespace Ale.Gui
         /// <param name="font">Font of this TextElement.</param>
         /// <param name="warp">Whether text warp is enabled. If true, text is warped.</param>
         /// <param name="color">Text color.</param>
-        public TextElement(int width, int height, GuiFont font, bool warp, Color color)
+        public TextDrawing(int width, int height, GuiFont font, bool warp, Color color)
         {
             Color = color;
 
@@ -299,7 +289,7 @@ namespace Ale.Gui
         /// </summary>
         /// <param name="font">Font of this TextElement.</param>
         /// <param name="color">Text color.</param>
-        public TextElement(GuiFont font, Color color)
+        public TextDrawing(GuiFont font, Color color)
         {
             Color = color;
 
@@ -310,9 +300,18 @@ namespace Ale.Gui
             mSuspendRefreshDrawSourceText = false;
         }
 
-        #endregion Constructors
+        public void Draw(SpriteBatch spriteBatch, Point positionOnScreen)
+        {
+            Draw(spriteBatch, GuiHelper.ConvertPointToVector(positionOnScreen));
+        }
 
-        #region Methods
+        public void Draw(SpriteBatch spriteBatch, Vector2 positionOnScreen)
+        {
+            if (!string.IsNullOrEmpty(mDrawText))
+            {
+                spriteBatch.DrawString(Font.InnerFont, mDrawText, positionOnScreen, Color);
+            }
+        }
 
         /// <summary>
         /// Appends a text into this TextElement.
@@ -635,53 +634,29 @@ namespace Ale.Gui
 
         private void SetWidth(int width, bool refreshDrawSourceText)
         {
-            if (width != Width)
+            int newWidth = Math.Max(Font.MaxCharWidth, width);
+            if (newWidth != mWidth)
             {
-                mWidth = Math.Max(Font.MaxCharWidth, width);
+                int oldWidth = mWidth;
+                mWidth = newWidth;
 
                 if (refreshDrawSourceText)
                 {
                     RefreshDrawSourceText();
                 }
-                RaiseSizeChanged();
+                EventHelper.RaiseEvent<TextDrawing, int>(WidthChanged, this, oldWidth);
             }
         }
 
         private void SetHeight(int height)
         {
-            if (height != Height)
+            int newHeight = Math.Max(0, height);
+            if (newHeight != mHeight)
             {
-                mHeight = Math.Max(0, height);
-                RaiseSizeChanged();
+                int oldHeight = mHeight;
+                mHeight = newHeight;
+                EventHelper.RaiseEvent<TextDrawing, int>(HeightChanged, this, oldHeight);
             }
         }
-
-        #endregion Methods
-
-        #region GraphicElement
-
-        /// <summary>
-        /// Gets the size of this TextElement.
-        /// </summary>
-        public override System.Drawing.SizeF Size
-        {
-            get { return new System.Drawing.Size(Width, Height); }
-        }
-
-        /// <summary>
-        /// Draws this TextElement.
-        /// </summary>
-        /// <param name="spriteBatch">SpriteBatch used to draw.</param>
-        /// <param name="screenLocation">Location, where to draw.</param>
-        /// <param name="gameTime">Current game time.</param>
-        public override void Draw(SpriteBatch spriteBatch, Point screenLocation, AleGameTime gameTime)
-        {
-            if (!string.IsNullOrEmpty(mDrawText))
-            {
-                spriteBatch.DrawString(Font.InnerFont, mDrawText, new Vector2((float)screenLocation.X, (float)screenLocation.Y), Color);
-            }
-        }
-
-        #endregion GraphicElement
     }
 }

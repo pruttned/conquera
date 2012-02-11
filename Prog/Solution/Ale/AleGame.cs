@@ -105,8 +105,7 @@ namespace Ale
             AleContentManager.RegisterAssetTypeDirectory(typeof(Texture2D), "Textures");
             AleContentManager.RegisterAssetTypeDirectory(typeof(TextureCube), "Textures");
             AleContentManager.RegisterAssetTypeDirectory(typeof(Texture3D), "Textures");
-            AleContentManager.RegisterAssetTypeDirectory(typeof(Ale.Graphics.MaterialEffect), "MaterialEffects");
-            AleContentManager.RegisterAssetTypeDirectory(typeof(Ale.Gui.Palette), "GuiPalettes");
+            AleContentManager.RegisterAssetTypeDirectory(typeof(Ale.Graphics.MaterialEffect), "MaterialEffects");            
             AleContentManager.RegisterAssetTypeDirectory(typeof(SpriteFont), "Fonts");
             AleContentManager.RegisterAssetTypeDirectory(typeof(Mesh), "Models");
             AleContentManager.RegisterAssetTypeDirectory(typeof(SpecialEffectDesc), "SpecialEffects");

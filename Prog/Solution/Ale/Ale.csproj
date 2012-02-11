@@ -143,31 +143,13 @@
     <Compile Include="Graphics\SimpleVertex\SimpleVertexList.cs" />
     <Compile Include="Graphics\SimpleVertex\SimpleVertexPositionEnumerator.cs" />
     <Compile Include="Graphics\SimpleVertex\SimpleVertexReadOnlyArray.cs" />
-    <Compile Include="Gui\AleMessageBox.cs" />
-    <Compile Include="Gui\ContentControl.cs" />
-    <Compile Include="Gui\Control.cs" />
-    <Compile Include="Gui\ControlCollection.cs" />
-    <Compile Include="Gui\ControlEvents.cs" />
-    <Compile Include="Gui\CursorInfo.cs" />
-    <Compile Include="Gui\Dialog.cs" />
-    <Compile Include="Gui\GraphicButton.cs" />
-    <Compile Include="Gui\GraphicElement\Animation.cs" />
-    <Compile Include="Gui\GraphicElement\AnimationFrameList.cs" />
-    <Compile Include="Gui\GraphicElement\GraphicElementContainer.cs" />
-    <Compile Include="Gui\GraphicElement\IGraphicElement.cs" />
-    <Compile Include="Gui\GraphicElement\Image.cs" />
-    <Compile Include="Gui\GraphicElement\TextElement.cs" />
     <Compile Include="Gui\GuiFont.cs" />
-    <Compile Include="Gui\GuiManager.cs" />
-    <Compile Include="Gui\GuiScene.cs" />
-    <Compile Include="Gui\ListBase.cs" />
-    <Compile Include="Gui\Palette\AnimationCreator.cs" />
-    <Compile Include="Gui\Palette\GraphicElementCreatorAttribute.cs" />
-    <Compile Include="Gui\Palette\GuiPaletteReader.cs" />
-    <Compile Include="Gui\Palette\IGraphicElementCreator.cs" />
-    <Compile Include="Gui\Palette\ImageCreator.cs" />
-    <Compile Include="Gui\Palette\Palette.cs" />
-    <Compile Include="Gui\TextButton.cs" />
+    <Compile Include="Gui\Drawing\ImageDrawing.cs" />
+    <Compile Include="Gui\Drawing\TextDrawing.cs" />
+    <Compile Include="Gui\Events.cs" />
+    <Compile Include="Gui\GuiHelper.cs" />
+    <Compile Include="Gui\GuiNode.cs" />
+    <Compile Include="Gui\GuiRoot.cs" />
     <Compile Include="Scene\ISceneDrawableComponent.cs" />
     <Compile Include="Scene\Octree\OctreeSceneDrawableComponent.cs" />
     <Compile Include="Scene\Octree\OctreeSceneObjectDescLoader.cs" />
@@ -409,6 +391,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Gui\ReadMe.txt" />
     <Content Include="ToDo.txt" />
   </ItemGroup>
   <ItemGroup>
