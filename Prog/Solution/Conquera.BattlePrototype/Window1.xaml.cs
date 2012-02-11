@@ -60,21 +60,21 @@ namespace Conquera.BattlePrototype
         //};
         Type[] mUnits1 = new Type[] 
         {
-            typeof(SoldierAtt),
-            typeof(SoldierAtt),
-            typeof(SoldierAtt),
-            typeof(SoldierAtt),
-            typeof(SoldierAtt),
-            typeof(SoldierAtt),
+            typeof(Swordsman),
+            typeof(Swordsman),
+            typeof(Swordsman),
+            typeof(Cavalry),
+            typeof(Archer),
+            typeof(Archer),
         };
         Type[] mUnits2 = new Type[] 
         {
-            typeof(SoldierAtt),
-            typeof(SoldierAtt),
-            typeof(SoldierAtt),
-            typeof(SoldierAtt),
-            typeof(SoldierAtt),
-            typeof(SoldierAtt),
+            typeof(Swordsman),
+            typeof(Spearman),
+            typeof(Spearman),
+            typeof(Swordsman),
+            typeof(Archer),
+            typeof(Cavalry),
         };
         private class SpellCardListBoxItem
         {
@@ -139,8 +139,8 @@ namespace Conquera.BattlePrototype
             mPlayers = new BattlePlayer[]{
                 new BattlePlayer(Colors.Blue, 0),
                 //new AiBattlePlayer(Colors.Blue, 0,this),
-              //  new BattlePlayer(Colors.Red, 1)};
-                new AiBattlePlayer(Colors.Red, 1, this)};
+                new BattlePlayer(Colors.Red, 1)};
+        //        new AiBattlePlayer(Colors.Red, 1, this)};
 
 
             InitializeComponent();
@@ -158,7 +158,7 @@ namespace Conquera.BattlePrototype
 
 
             ActivePlayer = mPlayers[0];
-            LoadMap("test2");
+            LoadMap("test");
 
             ////LoadTerrain();
             //mTerrain.SetTile(new Microsoft.Xna.Framework.Point(1, 2), "Outpost");
@@ -296,19 +296,37 @@ namespace Conquera.BattlePrototype
 
             foreach (var player in mPlayers)
             {
-                //if (player != ActivePlayer)
+                foreach (var targetUnit in player.Units)
                 {
-                    foreach (var unit in player.Units)
+                    bool isHit = false;
+                    foreach (var player2 in (from p in mPlayers where p != player select p))
                     {
-                        int damageFromEnemies = unit.ComputeDamageFromEnemies(isPrebatlePhase);
-                        if (damageFromEnemies >= unit.Defense)
+                        foreach (var attackingUnit in player2.Units)
                         {
-                            int damage = Math.Max(0, damageFromEnemies - unit.Defense);
-                            unit.Hp -= damage;
-                            if (unit.Hp <= 0)
+                            if ((isPrebatlePhase && attackingUnit.HasFirstStrike) || (!isPrebatlePhase && !attackingUnit.HasFirstStrike))
                             {
-                                unitsToKill.Add(unit);
+                                var rols = attackingUnit.RollDiceAgainst(targetUnit);
+                                if (null != rols)
+                                {
+                                    foreach (var roll in rols)
+                                    {
+                                        if (roll.IsHit)
+                                        {
+                                            isHit = true;
+                                            unitsToKill.Add(targetUnit);
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (isHit)
+                                {
+                                    break;
+                                }
                             }
+                        }
+                        if (isHit)
+                        {
+                            break;
                         }
                     }
                 }
@@ -564,7 +582,7 @@ namespace Conquera.BattlePrototype
                             if (tile.IsMoveIndicatorVisible)
                             {
                                 SetMoveIndicatorsVisibility(false);
-                                SelectedUnit.Move(tile.Index);
+                                SelectedUnit.Move(mTurnNum, tile.Index);
                             }
                         }
                     }

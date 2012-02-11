@@ -243,87 +243,7 @@ namespace Conquera.BattlePrototype
     //#endregion UnitCards
 
 
-    public class IncDecDefenseSpellCard : SpellCard
-    {
-        private int mCost;
-
-        public override string Name
-        {
-            get { return string.Format("Defense {0}{1} for {2} turn(s)", 0 < DefenseInc ? "+" : null, DefenseInc, Duration); }
-        }
-
-        public override string Description
-        {
-            get { return Name; }
-        }
-
-        public override int Cost
-        {
-            get { return mCost; }
-        }
-
-        public int Duration { get; private set; }
-        public int DefenseInc { get; private set; }
-
-        public IncDecDefenseSpellCard(int cost, int duration, int defenseInc)
-        {
-            mCost = cost;
-            Duration = duration;
-            DefenseInc = defenseInc;
-        }
-
-        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
-        {
-            return (null != tile.Unit && (player == tile.Unit.Player && 0 < DefenseInc || player != tile.Unit.Player && 0 > DefenseInc));
-        }
-
-        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
-        {
-            tile.Unit.AddSpellEffect(turnNum, new ConstIncDefenseBattleUnitSpellEffect(DefenseInc, Duration));
-        }
-    }
-    
-    public class IncDecAttackSpellCard : SpellCard
-    {
-        private int mCost;
-
-        public override string Name
-        {
-            get { return string.Format("Attack [{0}{1}]-[{2}{3}] for {4} turn(s)", (0 < AttackInc.X ? "+" : null), AttackInc.X, (0 < AttackInc.Y ? "+" : null), AttackInc.Y, Duration); }
-        }
-
-        public override string Description
-        {
-            get { return Name; }
-        }
-
-        public override int Cost
-        {
-            get { return mCost; }
-        }
-
-        public int Duration { get; private set; }
-        public Point AttackInc { get; private set; }
-
-        public IncDecAttackSpellCard(int cost, int duration, Point attackInc)
-        {
-            mCost = cost;
-            Duration = duration;
-            AttackInc = attackInc;
-        }
-
-        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
-        {
-//            return (null != tile.Unit && (player == tile.Unit.Player && 0 < AttackInc || player != tile.Unit.Player && 0 > AttackInc));
-            return (null != tile.Unit);
-        }
-
-        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
-        {
-            tile.Unit.AddSpellEffect(turnNum, new ConstIncAttackBattleUnitSpellEffect(AttackInc, Duration));
-        }
-    }
-    
+     
     public class IncDecMovementDistanceSpellCard : SpellCard
     {
         private int mCost;
@@ -489,85 +409,6 @@ namespace Conquera.BattlePrototype
         }
     }
 
-    public class HealSpellCard : SpellCard
-    {
-        int mCost;
-
-        public override string Name
-        {
-            get { return string.Format("Heals {0} HP", HpInc); }
-        }
-
-        public override string Description
-        {
-            get { return Name; }
-        }
-
-        public override int Cost
-        {
-            get { return mCost; }
-        }
-
-        public int HpInc { get; private set; }
-
-        public HealSpellCard(int cost, int hpInc)
-        {
-            mCost = cost;
-            HpInc = hpInc;
-        }
-
-        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
-        {
-            return (null != tile.Unit && player == tile.Unit.Player);
-        }
-
-        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
-        {
-            tile.Unit.Hp += HpInc;
-        }
-    }
-
-    public class DamageSpellCard : SpellCard
-    {
-        int mCost;
-
-        public override string Name
-        {
-            get { return string.Format("Removes {0} HP", HpDec); }
-        }
-
-        public override string Description
-        {
-            get { return Name; }
-        }
-
-        public override int Cost
-        {
-            get { return mCost; }
-        }
-
-        public int HpDec { get; private set; }
-
-        public DamageSpellCard(int cost, int hpDec)
-        {
-            mCost = cost;
-            HpDec = hpDec;
-        }
-
-        public override bool IsValidTarget(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
-        {
-            return (null != tile.Unit && player != tile.Unit.Player);
-        }
-
-        public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
-        {
-            tile.Unit.Hp -= HpDec;
-            if (0 >= tile.Unit.Hp)
-            {
-                tile.Unit.Kill();
-            }
-        }
-    }
 
     public class RemoveDisableMovementsSpellCard : SpellCard
     {
@@ -670,7 +511,8 @@ namespace Conquera.BattlePrototype
         public override void Cast(int turnNum, BattlePlayer player, HexTerrainTile tile, HexTerrain terrain, IList<BattlePlayer> players)
         {
             tile.Unit.AddSpellEffect(turnNum, new BerserkerBattleUnitSpellEffect(mDuration));
-            tile.Unit.AddSpellEffect(turnNum, new ConstIncAttackBattleUnitSpellEffect(new Point(AttInc,AttInc), mDuration));
+            throw new NotImplementedException();
+            //tile.Unit.AddSpellEffect(turnNum, new ConstIncAttackBattleUnitSpellEffect(new Point(AttInc,AttInc), mDuration));
 
         }
     }

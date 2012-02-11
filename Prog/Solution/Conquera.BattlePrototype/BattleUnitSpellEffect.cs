@@ -75,82 +75,6 @@ namespace Conquera.BattlePrototype
         #endregion
     }
 
-    public class ConstIncDefenseBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration, IBattleUnitDefenseModifier
-    {
-        private int mAmount;
-        private BattleUnit mUnit;
-
-        public override string EffectDescription
-        {
-            get { return string.Format("Defense {0}{1}", 0 < mAmount ? "+" : null, mAmount); }
-        }
-
-        public int GetModifier(BattleUnit unit)
-        {
-            return mAmount;
-        }
-
-        public ConstIncDefenseBattleUnitSpellEffect(int amount, int duration)
-            : base(duration)
-        {
-            mAmount = amount;
-        }
-
-        public override void OnEnd()
-        {
-            mUnit.RemoveDefenseModifier(this);
-        }
-
-        protected override void OnCastImpl(int turnNum, BattleUnit unit)
-        {
-            unit.AddDefenseModifier(this);
-            mUnit = unit;
-        }
-
-        protected override bool OnStartTurnImpl(int turnNum)
-        {
-            return true;
-        }
-    }
-
-    public class ConstIncAttackBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration, IBattleUnitAttackModifier
-    {
-        private Point mAmount;
-        private BattleUnit mUnit;
-
-        public override string EffectDescription
-        {
-            get { return string.Format("Attack [{0}{1}]-[{2}{3}]", (0 < mAmount.X ? "+" : null), mAmount.X, (0 < mAmount.Y ? "+" : null), mAmount.Y); }
-        }
-
-        public Point GetModifier(BattleUnit unit)
-        {
-            return mAmount;
-        }
-
-        public ConstIncAttackBattleUnitSpellEffect(Point amount, int duration)
-            : base(duration)
-        {
-            mAmount = amount;
-        }
-
-        public override void OnEnd()
-        {
-            mUnit.RemoveAttackModifier(this);
-        }
-
-        protected override void OnCastImpl(int turnNum, BattleUnit unit)
-        {
-            unit.AddAttackModifier(this);
-            mUnit = unit;
-        }
-
-        protected override bool OnStartTurnImpl(int turnNum)
-        {
-            return true;
-        }
-    }
-
     public class ConstIncMovementDistanceBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration, IBattleUnitMovementDistanceModifier
     {
         private int mAmount;
@@ -277,4 +201,37 @@ namespace Conquera.BattlePrototype
             return true;
         }
     }
+
+
+
+    public class FirstStrikeBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration
+    {
+        BattleUnit mUnit;
+        public override string EffectDescription
+        {
+            get { return "Firstrike"; }
+        }
+
+        public FirstStrikeBattleUnitSpellEffect(int duration)
+            : base(duration)
+        {
+        }
+
+        public override void OnEnd()
+        {
+            mUnit.FirstStrikeEnablerCnt--;
+        }
+
+        protected override void OnCastImpl(int turnNum, BattleUnit unit)
+        {
+            mUnit = unit;
+            unit.FirstStrikeEnablerCnt++;
+        }
+
+        protected override bool OnStartTurnImpl(int turnNum)
+        {
+            return true;
+        }
+    }
+
 }

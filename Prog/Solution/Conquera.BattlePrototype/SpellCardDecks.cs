@@ -66,15 +66,6 @@ namespace Conquera.BattlePrototype
             new BerserkerSpellCard(2,1,20),
             new BerserkerSpellCard(2,1,20),
 
-            new IncDecAttackSpellCard(2,1,new Point(10,10)),
-            new IncDecAttackSpellCard(2,1,new Point(10,10)),
-            new IncDecAttackSpellCard(2,1,new Point(10,10)),
-            new IncDecAttackSpellCard(2,1,new Point(10,10)),
-
-            new IncDecDefenseSpellCard(2,1, 30),
-            new IncDecDefenseSpellCard(2,1, 30),
-            new IncDecDefenseSpellCard(2,1, 30),
-            new IncDecDefenseSpellCard(2,1, 30),
    
             new DiscardCardsSpellCard(4, 1),
             new DiscardCardsSpellCard(4, 1),
