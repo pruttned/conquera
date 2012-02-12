@@ -125,6 +125,7 @@ namespace Conquera.BattlePrototype
         private ListBox mDieRollListBox;
         private UnitDamages mDamages;
         private System.Windows.Shapes.Rectangle mHasDamageIndicator;
+        private Line mDirecitonLine;
 
         public string ImageFileName { get; private set; }
 
@@ -334,20 +335,41 @@ namespace Conquera.BattlePrototype
             VerticalAlignment = System.Windows.VerticalAlignment.Center;
             HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
 
+            Canvas canvas = new Canvas()
+            {
+                Width = HexHelper.TileW,
+                Height = mTerrain[0, 0].GetCornerPosition(HexTileCorner.Top).Y - mTerrain[0, 0].GetCornerPosition(HexTileCorner.Down).Y,
+            };
+            Children.Add(canvas);
+            mDirecitonLine = new Line()
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 5,
+                X1 = canvas.Width / 2,
+                Y1 = canvas.Height / 2,
+            };
+            canvas.Children.Add(mDirecitonLine);
+
             mBorder = new Border();
+            mBorder.Width = 70;
+            mBorder.Height = 70;           
+            mBorder.BorderThickness = new System.Windows.Thickness(5);
+            Children.Add(mBorder);
+            Grid gridInBorder = new Grid();
+            mBorder.Child = gridInBorder;
+
             mPropertiesTextBlock = new TextBlock();
             mPropertiesTextBlock.Background = new SolidColorBrush(Color.FromArgb(255, player.Color.R, player.Color.G, player.Color.B));
             mPropertiesTextBlock.Foreground = Brushes.White;
             mPropertiesTextBlock.FontSize = 10;
-            mBorder.BorderThickness = new System.Windows.Thickness(5);
-            mBorder.Child = mPropertiesTextBlock;
-            Children.Add(mBorder);
+            gridInBorder.Children.Add(mPropertiesTextBlock);
+            
             UpdateGraphics();
 
             Image image = CreateImage();
             image.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             image.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            Children.Add(image);
+            gridInBorder.Children.Add(image);
 
             UpdateMovementDistance();
 
@@ -357,7 +379,7 @@ namespace Conquera.BattlePrototype
             levelTextBlock.Background = Brushes.Black;
             levelTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
             levelTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            Children.Add(levelTextBlock);
+            gridInBorder.Children.Add(levelTextBlock);            
 
             MouseEnter += new System.Windows.Input.MouseEventHandler(BattleUnit_MouseEnter);
             MouseLeave += new System.Windows.Input.MouseEventHandler(BattleUnit_MouseLeave);
