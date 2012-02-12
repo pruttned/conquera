@@ -122,6 +122,9 @@ namespace Conquera.BattlePrototype
         private List<IBattleUnitSpellEffect> mSpellEffects = new List<IBattleUnitSpellEffect>();
 
         private Line mMovementLine = null;
+        private ListBox mDieRollListBox;
+        private UnitDamages mDamages;
+        private System.Windows.Shapes.Rectangle mHasDamageIndicator;
 
         public string ImageFileName { get; private set; }
 
@@ -274,6 +277,28 @@ namespace Conquera.BattlePrototype
         public virtual int Level
         {
             get { return 1; }
+        }
+
+        public UnitDamages Damages
+        {
+            get { return mDamages; }
+            set
+            {
+                mDamages = value;
+
+                if (mDamages != null)
+                {
+                    mHasDamageIndicator = new System.Windows.Shapes.Rectangle();
+                    mHasDamageIndicator.Width = 15;
+                    mHasDamageIndicator.Height = 15;
+                    mHasDamageIndicator.Fill = Brushes.GreenYellow;
+                    Children.Add(mHasDamageIndicator);
+                }
+                else
+                {
+                    Children.Remove(mHasDamageIndicator);
+                }
+            }
         }
 
         public BattleUnit(int attackDistance, int baseMovementDistance, bool isFlying, bool hasFirstStrike,
@@ -683,7 +708,14 @@ namespace Conquera.BattlePrototype
 
         private void BattleUnit_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            if (PreviousTileIndex != null)
+            if (Damages != null)
+            {
+                foreach (UnitAttack attack in Damages.Attacks)
+                {
+                    attack.Attacker.ShowDieRolls(attack.AttackRolls);
+                }
+            }
+            else if (PreviousTileIndex != null)
             {
                 mMovementLine = new Line();
                 mMovementLine.StrokeThickness = 5;
@@ -703,10 +735,35 @@ namespace Conquera.BattlePrototype
 
         private void BattleUnit_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            if (mMovementLine != null)
+            if (Damages != null)
+            {
+                foreach (UnitAttack attack in Damages.Attacks)
+                {
+                    attack.Attacker.HideDieRolls();
+                }
+            }
+            else if (mMovementLine != null)
             {
                 GetParent<Canvas>(this).Children.Remove(mMovementLine);
             }
+        }
+
+        private void ShowDieRolls(IList<DieAttackRoll> rolls)
+        {
+            mDieRollListBox = new ListBox();
+            foreach (DieAttackRoll roll in rolls)
+            {
+                TextBlock block = new TextBlock();
+                block.Text = string.Format("{0} / D{1}", roll.Num, roll.Die.MaxNum);
+                block.Background = roll.IsHit ? Brushes.Red : Brushes.Transparent;
+                mDieRollListBox.Items.Add(block);
+            }
+            Children.Add(mDieRollListBox);
+        }
+
+        private void HideDieRolls()
+        {
+            Children.Remove(mDieRollListBox);
         }
 
         private T GetParent<T>(System.Windows.DependencyObject element) where T : System.Windows.DependencyObject
