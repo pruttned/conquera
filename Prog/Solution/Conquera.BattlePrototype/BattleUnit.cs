@@ -375,7 +375,15 @@ namespace Conquera.BattlePrototype
             };
             mCanvas.Children.Add(mDirectionLine);
             UpdateDirectionLine();
-            Direction = HexDirection.UperRight;
+
+            if (tileIndex.X > terrain.Width / 2)
+            {
+                Direction = HexDirection.Left;
+            }
+            else
+            {
+                Direction = HexDirection.Right;
+            }
 
             mBorder = new Border();
             mBorder.Width = 60;
@@ -707,7 +715,7 @@ namespace Conquera.BattlePrototype
         {
             mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
             mPropertiesTextBlock.Text += string.Format("[{0}{1}{2}{3}{4}]\n", (IsFlying ? " F" : null), (HasFirstStrike ? " Fs" : null), (!HasEnabledMovement ? " MD" : null), (!HasEnabledAttack ? " AD" : null), (IsBerserker ? " B" : null));
-            mPropertiesTextBlock.Text += string.Format("Hp = {0}/{1}\nM = {0}({1})", Hp, MaxHp, BaseMovementDistance, MovementDistance);
+            mPropertiesTextBlock.Text += string.Format("Hp = {0}/{1}\nM = {2}({3})", Hp, MaxHp, BaseMovementDistance, MovementDistance);
             mBorder.BorderBrush = (!HasMovedThisTurn && HasEnabledMovement && Player.IsActive && HasEnabledMovement ? Brushes.Yellow : Brushes.Black);
 
             if (mDirectionButtons != null)
@@ -929,8 +937,8 @@ namespace Conquera.BattlePrototype
     {
         public Swordsman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            1 //attakc distance
-            ,20 //movement distance
+            1 //attack distance
+            ,2 //movement distance
             ,1 //Hp
             , false //flying
             , false //first strike
@@ -948,8 +956,8 @@ namespace Conquera.BattlePrototype
     {
         public Archer(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            2 //attakc distance
-            ,20 //movement distance
+            2 //attack distance
+            ,2 //movement distance
             , 1 //Hp
             , false //flying
             , false //first strike
@@ -967,8 +975,8 @@ namespace Conquera.BattlePrototype
     {
         public Cavalry(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            1 //attakc distance
-            ,40 //movement distance
+            1 //attack distance
+            ,4 //movement distance
             , 1 //Hp
             , false //flying
             , false //first strike
@@ -1011,8 +1019,8 @@ namespace Conquera.BattlePrototype
     {
         public Spearman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            1 //attakc distance
-            ,20 //movement distance
+            1 //attack distance
+            ,2 //movement distance
             , 1 //Hp
             , false //flying
             , false //first strike
