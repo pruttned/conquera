@@ -245,6 +245,16 @@ namespace Conquera.BattlePrototype
             Vector2 cornerBasePosition = HexHelper.GetHexTileCornerPos2D(corner);
             return new System.Windows.Point(centerX + cornerBasePosition.X, centerY + cornerBasePosition.Y);
         }
+
+        public System.Windows.Point GetCornerPositionWpf(HexTileCorner corner)
+        {
+            double centerX = HexHelper.HalfTileW;
+            double centerY = HexHelper.TileR;
+
+            Vector2 cornerBasePosition = HexHelper.GetHexTileCornerPos2D(corner);
+            Vector2 cornerBasePositionWpf = new Vector2(cornerBasePosition.X, -cornerBasePosition.Y);
+            return new System.Windows.Point(centerX + cornerBasePositionWpf.X, centerY + cornerBasePositionWpf.Y);
+        }
     }
     
     [HexTerrainTile("Gap")]
