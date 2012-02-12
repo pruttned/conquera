@@ -237,7 +237,7 @@ namespace Conquera.BattlePrototype
         protected virtual void OnUnitEnter(BattleUnit unit)
         {}
 
-        private System.Windows.Point GetCornerPosition(HexTileCorner corner)
+        public System.Windows.Point GetCornerPosition(HexTileCorner corner)
         {
             double centerX = HexHelper.HalfTileW;
             double centerY = HexHelper.TileR;
