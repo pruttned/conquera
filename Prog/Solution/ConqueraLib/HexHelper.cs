@@ -362,8 +362,8 @@ namespace Conquera
         /// <returns></returns>
         public static HexDirection RotateDirection(HexDirection dir, int rot)
         {
-            int resDir = (int)dir + rot;
-            return (HexDirection)(resDir % 6);
+            int resDir = (((int)dir + rot) % 6);
+            return (0 <= resDir) ? (HexDirection)resDir : (HexDirection)(6 + resDir);
         }
 
         private static int Floor2(int X)

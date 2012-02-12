@@ -85,6 +85,8 @@ namespace Conquera.BattlePrototype
         public event CellIndexChangedHandler TileIndexChanged;
 
         protected static readonly string mBattleUnitImagesDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BattleUnitImages");
+        
+        private static int[] mAdditionalAttackPoints = new int[] { -2, 2 };
 
         //promoted collections
         private static HashSet<BattleUnit> CheckedUnits = new HashSet<BattleUnit>();
@@ -135,6 +137,10 @@ namespace Conquera.BattlePrototype
         public bool HasFirstStrike { get { return 0 < FirstStrikeEnablerCnt && 0 == FirstStrikePreventerCnt; } }
 
         public bool IsBerserker { get { return 0 < BerserkerEnablerCnt; } }
+
+        public HexDirection Direction { get; set; }
+
+        public int AttackDistance { get; private set; }
 
         public int FlyEnablerCnt
         {
@@ -270,7 +276,7 @@ namespace Conquera.BattlePrototype
             get { return 1; }
         }
 
-        public BattleUnit(int baseMovementDistance, bool isFlying, bool hasFirstStrike,
+        public BattleUnit(int attackDistance, int baseMovementDistance, bool isFlying, bool hasFirstStrike,
             string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
         {
             if (string.IsNullOrEmpty(imageFileName)) throw new ArgumentNullException("imageName");
@@ -281,6 +287,8 @@ namespace Conquera.BattlePrototype
 
             ImageFileName = imageFileName;
 
+            Direction = HexDirection.UperRight;
+            AttackDistance = attackDistance;
             IsKilled = false;
             Player = player;
             mTerrain = terrain;
@@ -363,20 +371,20 @@ namespace Conquera.BattlePrototype
 
             if (!IsKilled)
             {
-                //constraint movement  - temp? (Cavalry  without constraint ? )
-                bool hasEnemySibling = false;
-                Terrain.ForEachSibling(TileIndex,
-                    tile =>
-                    {
-                        if (!hasEnemySibling && null != tile.Unit && tile.Unit.Player != Player)
-                        {
-                             hasEnemySibling = true;
-                        }
-                    });
-                if (hasEnemySibling)
-                {
-                    AddSpellEffect(turnNum, new ConstIncMovementDistanceBattleUnitSpellEffect(-BaseMovementDistance + 1, 1)); 
-                }
+                ////constraint movement  - temp? (Cavalry  without constraint ? )
+                //bool hasEnemySibling = false;
+                //Terrain.ForEachSibling(TileIndex,
+                //    tile =>
+                //    {
+                //        if (!hasEnemySibling && null != tile.Unit && tile.Unit.Player != Player)
+                //        {
+                //             hasEnemySibling = true;
+                //        }
+                //    });
+                //if (hasEnemySibling)
+                //{
+                //    AddSpellEffect(turnNum, new ConstIncMovementDistanceBattleUnitSpellEffect(-BaseMovementDistance + 1, 1)); 
+                //}
 
 
 
@@ -550,12 +558,54 @@ namespace Conquera.BattlePrototype
         //    return damage;
         //}
 
+
         /// <summary>
-        /// All attack rols or null in case that the unit is not capable of attacking the specified target (out of range, ...)
+        /// All attack rolls or null in case that the unit is not capable of attacking the specified target (out of range, ...)
         /// </summary>
         /// <param name="unit"></param>
         /// <returns></returns>
-        public abstract IList<DieAttackRoll> RollDiceAgainst(BattleUnit target);
+        public IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
+        {
+            if (null == target) throw new ArgumentNullException("target");
+
+            if (!HasEnabledAttack || AttackDistance != HexHelper.GetDistance(TileIndex, target.TileIndex))
+            {
+                return null;
+            }
+
+            //get main attack point
+            Point mainAttackPoint = TileIndex;
+            for (int i = 0; i < AttackDistance; ++i)//todo cahce
+            {
+                mainAttackPoint = HexHelper.GetSibling(mainAttackPoint, Direction);
+            }
+            if (mainAttackPoint == target.TileIndex) //is main target
+            {
+                Die die = GetDieAgainst(target);
+                int rollNum1 = die.Roll();
+                int rollNum2 = die.Roll();
+                return new DieAttackRoll[]
+                {
+                    new DieAttackRoll() {Die = die, Num = rollNum1, IsHit = (6 <= rollNum1)},
+                    new DieAttackRoll() {Die = die, Num = rollNum2, IsHit = (6 <= rollNum2)},
+                };
+            }
+
+
+            //additional points
+            foreach (var additionalAttackPointRot in mAdditionalAttackPoints)
+            {
+                Point additionalAttackPoint = HexHelper.GetSibling(mainAttackPoint, HexHelper.RotateDirection(Direction, additionalAttackPointRot));
+                if (target.TileIndex == additionalAttackPoint)
+                {
+                    Die die = GetDieAgainst(target);
+                    int rollNum = die.Roll();
+                    return new DieAttackRoll[] { new DieAttackRoll() { Die = die, Num = rollNum, IsHit = (6 <= rollNum) } };
+                }
+            }
+
+            return null;
+        }
 
         public void Move(int turnNum, Point tileIndex)
         {
@@ -611,6 +661,8 @@ namespace Conquera.BattlePrototype
         }
 
         protected virtual void OnTurnStartImpl(int turnNum) { }
+
+        protected abstract Die GetDieAgainst(BattleUnit target);
 
         private void UpdateMovementDistance()
         {
@@ -688,27 +740,17 @@ namespace Conquera.BattlePrototype
     {
         public Swordsman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            1 //movement distance
+            1,
+            20 //movement distance
             , false //flying
             , false //first strike
             , "Swordsman.png" //image
             , player, terrain, tileIndex)
         { }
 
-        public override IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
-        {//temp
-            if (null == target) throw new ArgumentNullException("target");
-            
-            if (!HasEnabledAttack || 1 != HexHelper.GetDistance(TileIndex, target.TileIndex))
-            {
-                return null;
-            }
-
-            DieAttackRoll roll = new DieAttackRoll();
-            roll.Die = Die.D8;
-            roll.Num = Die.D8.Roll();
-            roll.IsHit = roll.Num >= 6;
-            return new DieAttackRoll[] { roll };
+        protected override Die GetDieAgainst(BattleUnit target)
+        {
+            return Die.D8;
         }
     }
 
@@ -716,27 +758,17 @@ namespace Conquera.BattlePrototype
     {
         public Archer(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            1 //movement distance
+            2,
+            20 //movement distance
             , false //flying
             , false //first strike
             , "Archer.png" //image
             , player, terrain, tileIndex)
         { }
 
-        public override IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
-        {//temp
-            if (null == target) throw new ArgumentNullException("target");
-
-            if (!HasEnabledAttack || 2 != HexHelper.GetDistance(TileIndex, target.TileIndex))
-            {
-                return null;
-            }
-
-            DieAttackRoll roll = new DieAttackRoll();
-            roll.Die = Die.D6;
-            roll.Num = Die.D6.Roll();
-            roll.IsHit = roll.Num >= 6;
-            return new DieAttackRoll[] { roll };
+        protected override Die GetDieAgainst(BattleUnit target)
+        {
+            return Die.D6;
         }
     }
 
@@ -744,27 +776,17 @@ namespace Conquera.BattlePrototype
     {
         public Cavalry(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            2 //movement distance
+            1,
+            40 //movement distance
             , false //flying
             , false //first strike
             , "Cavalry.png" //image
             , player, terrain, tileIndex)
         { }
 
-        public override IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
-        {//temp
-            if (null == target) throw new ArgumentNullException("target");
-
-            if (!HasEnabledAttack || 1 != HexHelper.GetDistance(TileIndex, target.TileIndex))
-            {
-                return null;
-            }
-
-            DieAttackRoll roll = new DieAttackRoll();
-            roll.Die = Die.D10;
-            roll.Num = Die.D10.Roll();
-            roll.IsHit = roll.Num >= 6;
-            return new DieAttackRoll[] { roll };
+        protected override Die GetDieAgainst(BattleUnit target)
+        {
+            return Die.D10;
         }
 
         protected override void OnMove(int turnNum, Point oldIndex, Point tileIndex)
@@ -797,29 +819,17 @@ namespace Conquera.BattlePrototype
     {
         public Spearman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            1 //movement distance
+            1,
+            20 //movement distance
             , false //flying
             , false //first strike
             , "Spearman.png" //image
             , player, terrain, tileIndex)
         { }
 
-        public override IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
-        {//temp
-            if (null == target) throw new ArgumentNullException("target");
-
-            if (!HasEnabledAttack || 1 != HexHelper.GetDistance(TileIndex, target.TileIndex))
-            {
-                return null;
-            }
-
-            Die die = (target is Cavalry) ? Die.D10 : Die.D6;
-
-            DieAttackRoll roll = new DieAttackRoll();
-            roll.Die = die;
-            roll.Num = die.Roll();
-            roll.IsHit = roll.Num >= 6;
-            return new DieAttackRoll[] { roll };
+        protected override Die GetDieAgainst(BattleUnit target)
+        {
+            return (target is Cavalry) ? Die.D10 : Die.D6;
         }
     }
 }

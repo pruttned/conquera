@@ -195,8 +195,8 @@ namespace Conquera.BattlePrototype
         public void EndTurn()
         {
             //Resolve battle
-            ResolveBattle(true);
-            ResolveBattle(false);
+            ResolveDamages(ResolveBattle(true));
+            ResolveDamages(ResolveBattle(false));
 
             mTurnNum++;
             ActivePlayer = mPlayers[mTurnNum % 2];
@@ -290,52 +290,101 @@ namespace Conquera.BattlePrototype
         /// 
         /// </summary>
         /// <param name="isPrebatlePhase">Only damage from units with first strike is considered</param>
-        private void ResolveBattle(bool isPrebatlePhase)
+        private List<UnitDamages> ResolveBattle(bool isPrebatlePhase)
         {
-            List<BattleUnit> unitsToKill = new List<BattleUnit>();
+            List<UnitDamages> unitDamages = new List<UnitDamages>();
 
             foreach (var player in mPlayers)
             {
                 foreach (var targetUnit in player.Units)
                 {
-                    bool isHit = false;
+                    UnitDamages unitDamage = null;
                     foreach (var player2 in (from p in mPlayers where p != player select p))
                     {
                         foreach (var attackingUnit in player2.Units)
                         {
                             if ((isPrebatlePhase && attackingUnit.HasFirstStrike) || (!isPrebatlePhase && !attackingUnit.HasFirstStrike))
                             {
-                                var rols = attackingUnit.RollDiceAgainst(targetUnit);
-                                if (null != rols)
+                                var rolls = attackingUnit.RollDiceAgainst(targetUnit);
+                                if (null != rolls)
                                 {
-                                    foreach (var roll in rols)
+                                    if (null == unitDamage)
                                     {
-                                        if (roll.IsHit)
-                                        {
-                                            isHit = true;
-                                            unitsToKill.Add(targetUnit);
-                                            break;
-                                        }
+                                        unitDamage = new UnitDamages(targetUnit);
                                     }
-                                }
-                                if (isHit)
-                                {
-                                    break;
+                                    unitDamage.Attacks.Add(new UnitAttack(attackingUnit, rolls));
                                 }
                             }
                         }
-                        if (isHit)
-                        {
-                            break;
-                        }
+                    }
+                    if(null != unitDamage)
+                    {
+                        unitDamages.Add(unitDamage);
                     }
                 }
             }
+            return unitDamages;
+                    
+            //        List<BattleUnit> unitsToKill = new List<BattleUnit>();
 
-            //kill units
-            foreach (var unit in unitsToKill)
+            //foreach (var player in mPlayers)
+            //{
+            //    foreach (var targetUnit in player.Units)
+            //    {
+            //        bool isHit = false;
+            //        foreach (var player2 in (from p in mPlayers where p != player select p))
+            //        {
+            //            foreach (var attackingUnit in player2.Units)
+            //            {
+            //                if ((isPrebatlePhase && attackingUnit.HasFirstStrike) || (!isPrebatlePhase && !attackingUnit.HasFirstStrike))
+            //                {
+            //                    var rols = attackingUnit.RollDiceAgainst(targetUnit);
+            //                    if (null != rols)
+            //                    {
+            //                        foreach (var roll in rols)
+            //                        {
+            //                            if (roll.IsHit)
+            //                            {
+            //                                isHit = true;
+            //                                unitsToKill.Add(targetUnit);
+            //                                break;
+            //                            }
+            //                        }
+            //                    }
+            //                    if (isHit)
+            //                    {
+            //                        break;
+            //                    }
+            //                }
+            //            }
+            //            if (isHit)
+            //            {
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
+
+            ////kill units
+            //foreach (var unit in unitsToKill)
+            //{
+            //    unit.Kill();
+            //}
+        }
+
+        public void ResolveDamages(List<UnitDamages> damages)
+        {
+            foreach (var damage in damages)
             {
-                unit.Kill();
+                int hitCnt = (from a in damage.Attacks select (from r in a.AttackRolls where r.IsHit select 1).Sum()).Sum();
+                if (hitCnt >= 2)
+                {
+                    damage.Target.Kill();
+                }
+                else if (hitCnt == 1)
+                {
+                    damage.Target.AddSpellEffect(mTurnNum, new DisableMovementBattleUnitSpellEffect(2));
+                }
             }
         }
 
@@ -783,6 +832,31 @@ namespace Conquera.BattlePrototype
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+    }
+
+
+
+    public class UnitDamages
+    {
+        public BattleUnit Target {get; private set;}
+        public List<UnitAttack> Attacks { get; private set; }
+
+        public UnitDamages(BattleUnit target)
+        {
+            Target = target;
+            Attacks = new List<UnitAttack>();
+        }
+    }
+    public class UnitAttack
+    {
+        public BattleUnit Attacker { get; private set; }
+        public IList<DieAttackRoll> AttackRolls { get; private set; }
+        
+        public UnitAttack(BattleUnit attacker, IList<DieAttackRoll> attackRolls)
+        {
+            Attacker = attacker;
+            AttackRolls = attackRolls;
         }
     }
 }
