@@ -70,7 +70,7 @@ namespace Conquera.BattlePrototype
                 int j = 0;
                 foreach (var tileElm in columnElement.Elements("tile"))
                 {
-                    HexTerrainTile tile = HexTerrainTileFactory.CreateTile(tileElm.Attribute("template").Value, new Point(i, j));
+                    HexTerrainTile tile = HexTerrainTileFactory.CreateTile(tileElm.Attribute("template").Value, new Point(i, j), Height);
                     if (tile is CapturableHexTerrainTile)
                     {
                         var owningPlayerAtt = tileElm.Attribute("owningPlayer");
@@ -96,7 +96,7 @@ namespace Conquera.BattlePrototype
             {
                 for (int j = 0; j < Height; ++j)
                 {
-                    mTiles[i, j] = new LandHexTerrainTile(new Point(i, j));
+                    mTiles[i, j] = new LandHexTerrainTile(new Point(i, j), height);
                 }
             }
         }
@@ -108,7 +108,7 @@ namespace Conquera.BattlePrototype
             var oldTile = mTiles[index.X, index.Y];
             if(!string.Equals(template, HexTerrainTileFactory.GetTemplateName(oldTile.GetType()), StringComparison.OrdinalIgnoreCase))
             {
-                var newTile = HexTerrainTileFactory.CreateTile(template, index);
+                var newTile = HexTerrainTileFactory.CreateTile(template, index, Height);
                 mTiles[index.X, index.Y] = newTile;
                 BattlePlayer owningPlayer = null;
 

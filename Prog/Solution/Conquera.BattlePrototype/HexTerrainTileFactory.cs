@@ -41,7 +41,7 @@ namespace Conquera.BattlePrototype
         private static Dictionary<string, ConstructorInfo> mTileCtors = new Dictionary<string, ConstructorInfo>(StringComparer.OrdinalIgnoreCase);
         private static Dictionary<Type, string> mTemplateNames = new Dictionary<Type, string>();
 
-        private static Type[] mCtorArgTypes = new Type[] { typeof(Point) };
+        private static Type[] mCtorArgTypes = new Type[] { typeof(Point) , typeof(int)};
 
         public static ICollection<string> TemplateNames
         {
@@ -70,10 +70,10 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        public static HexTerrainTile CreateTile(string templateName, Point index)
+        public static HexTerrainTile CreateTile(string templateName, Point index, int terrainHeight)
         {
             if (string.IsNullOrEmpty(templateName)) throw new ArgumentNullException("templateName");
-            return (HexTerrainTile)mTileCtors[templateName].Invoke(new object[] { index });
+            return (HexTerrainTile)mTileCtors[templateName].Invoke(new object[] { index, terrainHeight });
         }
 
         public static string GetTemplateName(Type type)

@@ -118,10 +118,11 @@ namespace Conquera.BattlePrototype
             set { mHighlightIndicator.Visibility = value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden; }
         }
 
-        public HexTerrainTile(Point index)
+        public HexTerrainTile(Point index, int terrainHeight)
         {
             Index = index;
             Vector2 topLeftPosAsVector = HexHelper.Get2DPosFromIndex(index);
+            topLeftPosAsVector.Y = ((terrainHeight-1) * HexHelper.TileH) - topLeftPosAsVector.Y;
             TopLeftPos = new System.Windows.Point(topLeftPosAsVector.X, topLeftPosAsVector.Y);
 
             mHexPolygon = new Polygon();
@@ -259,8 +260,8 @@ namespace Conquera.BattlePrototype
             get { return new SolidColorBrush(Color.FromArgb(255, 40, 40, 40)); }
         }
 
-        public GapHexTerrainTile(Point index)
-            : base(index)
+        public GapHexTerrainTile(Point index, int terrainHeight)
+            : base(index, terrainHeight)
         {
         }
     }
@@ -273,8 +274,8 @@ namespace Conquera.BattlePrototype
             get { return true; }
         }
 
-        public LandHexTerrainTile(Point index)
-            : base(index)
+        public LandHexTerrainTile(Point index, int terrainHeight)
+            : base(index, terrainHeight)
         {
         }
     }
@@ -318,9 +319,9 @@ namespace Conquera.BattlePrototype
         {
             get { return true; }
         }
- 
-        public CapturableHexTerrainTile(Point index)
-            : base(index)
+
+        public CapturableHexTerrainTile(Point index, int terrainHeight)
+            : base(index, terrainHeight)
         {
         }
 
@@ -355,8 +356,8 @@ namespace Conquera.BattlePrototype
             get { return Brushes.Brown; }
         }
 
-        public OutpostHexTerrainTile(Point index)
-            : base(index)
+        public OutpostHexTerrainTile(Point index, int terrainHeight)
+            : base(index, terrainHeight)
         {
         }
     }
@@ -369,8 +370,8 @@ namespace Conquera.BattlePrototype
             get { return Brushes.Plum; }
         }
 
-        public ManaShrineHexTerrainTile(Point index)
-            :base(index)
+        public ManaShrineHexTerrainTile(Point index, int terrainHeight)
+            : base(index, terrainHeight)
         {
         }
 
