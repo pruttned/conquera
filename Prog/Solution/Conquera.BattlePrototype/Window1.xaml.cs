@@ -133,6 +133,9 @@ namespace Conquera.BattlePrototype
 
         int mTurnNum = 0;
 
+        private enum EndTurnButtonActions { ResolvePrebattlePhase, KillAndResolveBattlePhase, KillAndEndTurn };
+        private EndTurnButtonActions mNextEndTurnButtonAction = EndTurnButtonActions.ResolvePrebattlePhase;
+        private List<UnitDamages> mUnitDamages;
 
         public Window1()
         {
@@ -192,12 +195,37 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        public void EndTurn()
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //Resolve battle
-            ResolveDamages(ResolveBattle(true));
-            ResolveDamages(ResolveBattle(false));
+            switch (mNextEndTurnButtonAction)
+            {
+                case EndTurnButtonActions.ResolvePrebattlePhase:
+                    mUnitDamages = ResolveBattle(true);
+                    VisualizeUnitDamages(mUnitDamages);
+                    mNextEndTurnButtonAction = EndTurnButtonActions.KillAndResolveBattlePhase;
+                    mEndTurnButton.Content = "Kill & Resolve Battle";
+                    break;
 
+                case EndTurnButtonActions.KillAndResolveBattlePhase:
+                    ResolveDamages(mUnitDamages);
+                    mUnitDamages = ResolveBattle(false);
+                    VisualizeUnitDamages(mUnitDamages);
+                    mNextEndTurnButtonAction = EndTurnButtonActions.KillAndEndTurn;
+                    mEndTurnButton.Content = "Kill & End Turn";
+                    break;
+
+                case EndTurnButtonActions.KillAndEndTurn:
+                    ResolveDamages(mUnitDamages);
+                    VisualizeUnitDamages(null);
+                    NextTurn();
+                    mNextEndTurnButtonAction = EndTurnButtonActions.ResolvePrebattlePhase;
+                    mEndTurnButton.Content = "Resolve Pre-Battle";
+                    break;
+            }
+        }
+
+        public void NextTurn()
+        {
             mTurnNum++;
             ActivePlayer = mPlayers[mTurnNum % 2];
 
@@ -212,6 +240,31 @@ namespace Conquera.BattlePrototype
             }
             NotifyTilesTurnStart();
         }
+
+        private void VisualizeUnitDamages(List<UnitDamages> unitDamages)
+        {
+            foreach (BattlePlayer player in mPlayers)
+            {
+                foreach (BattleUnit unit in player.Units)
+                {
+                    unit.Damages = null;
+                }
+            }
+
+            if (unitDamages != null)
+            {
+                foreach (UnitDamages damage in unitDamages)
+                {
+                    damage.Target.Damages = damage;
+                }
+            }
+        }
+
+
+
+
+
+
 
         private void Logger_Logged(object sender, Logger.LogEventArgs e)
         {
@@ -666,11 +719,6 @@ namespace Conquera.BattlePrototype
                 return parent as T;
             }
             return GetParent<T>(parent);
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            EndTurn();
         }
 
         private void mTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)

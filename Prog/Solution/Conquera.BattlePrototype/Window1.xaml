@@ -41,7 +41,7 @@
             <!--Game GUI-->
             <TabItem Header="Game" x:Name="mGameTabItem">
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="EndTurn" Click="Button_Click"/>
+                    <Button Content="Resolve Pre-Battle" Click="Button_Click" x:Name="mEndTurnButton"/>
                     <!--<ListBox ItemsSource="{Binding ActivePlayer.CardsInHand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />-->
                     
                     <ListBox x:Name="mCardsListBox" SelectionChanged="mCardsListBox_SelectionChanged">
