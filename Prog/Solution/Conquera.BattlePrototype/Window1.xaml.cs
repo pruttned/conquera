@@ -604,7 +604,7 @@ namespace Conquera.BattlePrototype
                         }
                         SetStartPosIndicatorsVisibility(true);
                     }
-                    else if (mTabControl.SelectedItem == mGameTabItem) //GAME
+                    else if (mTabControl.SelectedItem == mGameTabItem && !(e.Source is Button)) //GAME
                     {
                         if (e.LeftButton == MouseButtonState.Pressed)
                         {

@@ -127,7 +127,11 @@ namespace Conquera.BattlePrototype
         private ListBox mDieRollListBox;
         private UnitDamages mDamages;
         private System.Windows.Shapes.Rectangle mHasDamageIndicator;
-        private Line mDirecitonLine;
+        private Line mDirectionLine;
+        private Grid mGridInBorder;
+        private HexDirection mDirection;
+        private List<Button> mDirectionButtons;
+        private Canvas mCanvas;
 
         public string ImageFileName { get; private set; }
 
@@ -144,7 +148,15 @@ namespace Conquera.BattlePrototype
 
         public bool IsBerserker { get { return 0 < BerserkerEnablerCnt; } }
 
-        public HexDirection Direction { get; set; }
+        public HexDirection Direction
+        {
+            get { return mDirection;; }
+            set
+            {
+                mDirection = value;
+                UpdateDirectionLine();
+            }
+        }
 
         public int AttackDistance { get; private set; }
 
@@ -325,8 +337,7 @@ namespace Conquera.BattlePrototype
             BaseMovementDistance = baseMovementDistance;
 
             ImageFileName = imageFileName;
-
-            Direction = HexDirection.UperRight;
+            
             AttackDistance = attackDistance;
             IsKilled = false;
             Player = player;
@@ -349,41 +360,43 @@ namespace Conquera.BattlePrototype
             VerticalAlignment = System.Windows.VerticalAlignment.Center;
             HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
 
-            Canvas canvas = new Canvas()
+            mCanvas = new Canvas()
             {
                 Width = HexHelper.TileW,
                 Height = mTerrain[0, 0].GetCornerPosition(HexTileCorner.Top).Y - mTerrain[0, 0].GetCornerPosition(HexTileCorner.Down).Y,
             };
-            Children.Add(canvas);
-            mDirecitonLine = new Line()
+            Children.Add(mCanvas);
+            mDirectionLine = new Line()
             {
                 Stroke = Brushes.Black,
                 StrokeThickness = 5,
-                X1 = canvas.Width / 2,
-                Y1 = canvas.Height / 2,
+                X1 = mCanvas.Width / 2,
+                Y1 = mCanvas.Height / 2,
             };
-            canvas.Children.Add(mDirecitonLine);
+            mCanvas.Children.Add(mDirectionLine);
+            UpdateDirectionLine();
+            Direction = HexDirection.UperRight;
 
             mBorder = new Border();
-            mBorder.Width = 70;
-            mBorder.Height = 70;           
+            mBorder.Width = 60;
+            mBorder.Height = 60;           
             mBorder.BorderThickness = new System.Windows.Thickness(5);
             Children.Add(mBorder);
-            Grid gridInBorder = new Grid();
-            mBorder.Child = gridInBorder;
+            mGridInBorder = new Grid();
+            mBorder.Child = mGridInBorder;
 
             mPropertiesTextBlock = new TextBlock();
             mPropertiesTextBlock.Background = new SolidColorBrush(Color.FromArgb(255, player.Color.R, player.Color.G, player.Color.B));
             mPropertiesTextBlock.Foreground = Brushes.White;
             mPropertiesTextBlock.FontSize = 10;
-            gridInBorder.Children.Add(mPropertiesTextBlock);
+            mGridInBorder.Children.Add(mPropertiesTextBlock);
             
             UpdateGraphics();
 
             Image image = CreateImage();
             image.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             image.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            gridInBorder.Children.Add(image);
+            mGridInBorder.Children.Add(image);
 
             UpdateMovementDistance();
 
@@ -393,7 +406,17 @@ namespace Conquera.BattlePrototype
             levelTextBlock.Background = Brushes.Black;
             levelTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
             levelTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            gridInBorder.Children.Add(levelTextBlock);            
+            mGridInBorder.Children.Add(levelTextBlock);
+
+            mDirectionButtons = new List<Button>()
+            {
+                CreateDirectionButton(HexDirection.Left),
+                CreateDirectionButton(HexDirection.LowerLeft),
+                CreateDirectionButton(HexDirection.LowerRight),
+                CreateDirectionButton(HexDirection.Right),
+                CreateDirectionButton(HexDirection.UperLeft),
+                CreateDirectionButton(HexDirection.UperRight)
+            };
 
             MouseEnter += new System.Windows.Input.MouseEventHandler(BattleUnit_MouseEnter);
             MouseLeave += new System.Windows.Input.MouseEventHandler(BattleUnit_MouseLeave);
@@ -686,6 +709,14 @@ namespace Conquera.BattlePrototype
             mPropertiesTextBlock.Text += string.Format("[{0}{1}{2}{3}{4}]\n", (IsFlying ? " F" : null), (HasFirstStrike ? " Fs" : null), (!HasEnabledMovement ? " MD" : null), (!HasEnabledAttack ? " AD" : null), (IsBerserker ? " B" : null));
             mPropertiesTextBlock.Text += string.Format("Hp = {0}/{1}\nM = {0}({1})", Hp, MaxHp, BaseMovementDistance, MovementDistance);
             mBorder.BorderBrush = (!HasMovedThisTurn && HasEnabledMovement && Player.IsActive && HasEnabledMovement ? Brushes.Yellow : Brushes.Black);
+
+            if (mDirectionButtons != null)
+            {
+                foreach (Button button in mDirectionButtons)
+                {
+                    button.Visibility = IsSelected ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+                }
+            }
         }
 
         public void AddSpellEffect(int turnNum, IBattleUnitSpellEffect spellEffect)
@@ -794,12 +825,12 @@ namespace Conquera.BattlePrototype
                 block.Background = roll.IsHit ? Brushes.Red : Brushes.Transparent;
                 mDieRollListBox.Items.Add(block);
             }
-            Children.Add(mDieRollListBox);
+            mGridInBorder.Children.Add(mDieRollListBox);
         }
 
         private void HideDieRolls()
         {
-            Children.Remove(mDieRollListBox);
+            mGridInBorder.Children.Remove(mDieRollListBox);
         }
 
         private T GetParent<T>(System.Windows.DependencyObject element) where T : System.Windows.DependencyObject
@@ -826,6 +857,71 @@ namespace Conquera.BattlePrototype
                 panel.Children.Add(new TextBlock() { Text = effect.Description });
             }
             ToolTip = panel;
+        }
+
+        private void UpdateDirectionLine()
+        {
+            System.Windows.Point edgeCenter = GetEdgeCenter(Direction);
+            mDirectionLine.X2 = edgeCenter.X;
+            mDirectionLine.Y2 = edgeCenter.Y;
+        }
+
+        private Button CreateDirectionButton(HexDirection hexDirection)
+        {
+            double size = 20;
+
+            Button button = new Button();
+            button.Width = size;
+            button.Height = size;
+            button.Click += (s, e) => Direction = hexDirection;
+            //button.Visibility = System.Windows.Visibility.Hidden;
+
+            System.Windows.Point position = GetEdgeCenter(hexDirection);
+            Canvas.SetLeft(button, position.X - size / 2);
+            Canvas.SetTop(button, position.Y - size / 2);
+            
+            mCanvas.Children.Add(button);
+            return button;
+        }
+
+        private System.Windows.Point GetEdgeCenter(HexDirection direction)
+        {
+            HexTileCorner corner1;
+            HexTileCorner corner2;
+            switch (direction)
+            {
+                case HexDirection.Left:
+                    corner1 = HexTileCorner.LowerLeft;
+                    corner2 = HexTileCorner.UperLeft;
+                    break;
+                case HexDirection.LowerLeft:
+                    corner1 = HexTileCorner.LowerLeft;
+                    corner2 = HexTileCorner.Down;
+                    break;
+                case HexDirection.LowerRight:
+                    corner1 = HexTileCorner.Down;
+                    corner2 = HexTileCorner.LowerRight;
+                    break;
+                case HexDirection.Right:
+                    corner1 = HexTileCorner.LowerRight;
+                    corner2 = HexTileCorner.UperRight;
+                    break;
+                case HexDirection.UperRight:
+                    corner1 = HexTileCorner.Top;
+                    corner2 = HexTileCorner.UperRight;
+                    break;
+                case HexDirection.UperLeft:
+                default:
+                    corner1 = HexTileCorner.UperLeft;
+                    corner2 = HexTileCorner.Top;
+                    break;
+            }
+
+            HexTerrainTile tile = mTerrain[mTileIndex];
+            System.Windows.Point corner1Position = tile.GetCornerPositionWpf(corner1);
+            System.Windows.Point corner2Position = tile.GetCornerPositionWpf(corner2);
+
+            return new System.Windows.Point((corner1Position.X + corner2Position.X) / 2, (corner1Position.Y + corner2Position.Y) / 2);
         }
     }
 
