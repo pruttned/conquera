@@ -377,52 +377,6 @@ namespace Conquera.BattlePrototype
                 }
             }
             return unitDamages;
-                    
-            //        List<BattleUnit> unitsToKill = new List<BattleUnit>();
-
-            //foreach (var player in mPlayers)
-            //{
-            //    foreach (var targetUnit in player.Units)
-            //    {
-            //        bool isHit = false;
-            //        foreach (var player2 in (from p in mPlayers where p != player select p))
-            //        {
-            //            foreach (var attackingUnit in player2.Units)
-            //            {
-            //                if ((isPrebatlePhase && attackingUnit.HasFirstStrike) || (!isPrebatlePhase && !attackingUnit.HasFirstStrike))
-            //                {
-            //                    var rols = attackingUnit.RollDiceAgainst(targetUnit);
-            //                    if (null != rols)
-            //                    {
-            //                        foreach (var roll in rols)
-            //                        {
-            //                            if (roll.IsHit)
-            //                            {
-            //                                isHit = true;
-            //                                unitsToKill.Add(targetUnit);
-            //                                break;
-            //                            }
-            //                        }
-            //                    }
-            //                    if (isHit)
-            //                    {
-            //                        break;
-            //                    }
-            //                }
-            //            }
-            //            if (isHit)
-            //            {
-            //                break;
-            //            }
-            //        }
-            //    }
-            //}
-
-            ////kill units
-            //foreach (var unit in unitsToKill)
-            //{
-            //    unit.Kill();
-            //}
         }
 
         public void ResolveDamages(List<UnitDamages> damages)
@@ -430,11 +384,13 @@ namespace Conquera.BattlePrototype
             foreach (var damage in damages)
             {
                 int hitCnt = (from a in damage.Attacks select (from r in a.AttackRolls where r.IsHit select 1).Sum()).Sum();
-                if (hitCnt >= 2)
+                int hpLost = hitCnt / 2;
+                damage.Target.Hp -= hpLost;
+                if (damage.Target.Hp == 0)
                 {
                     damage.Target.Kill();
                 }
-                else if (hitCnt == 1)
+                else if (hitCnt >= 1)
                 {
                     damage.Target.AddSpellEffect(mTurnNum, new DisableMovementBattleUnitSpellEffect(2));
                 }

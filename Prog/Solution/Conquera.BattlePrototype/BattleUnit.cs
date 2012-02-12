@@ -97,6 +97,8 @@ namespace Conquera.BattlePrototype
 
         private Point mTileIndex;
 
+        private int mHp;
+
         private List<IBattleUnitDefenseModifier> mDefenseModifiers = new List<IBattleUnitDefenseModifier>();
         private List<IBattleUnitAttackModifier> mAttackModifiers = new List<IBattleUnitAttackModifier>();
         private List<IBattleUnitMovementDistanceModifier> mMovementDistanceModifiers = new List<IBattleUnitMovementDistanceModifier>();
@@ -145,6 +147,17 @@ namespace Conquera.BattlePrototype
         public HexDirection Direction { get; set; }
 
         public int AttackDistance { get; private set; }
+
+        public int MaxHp { get; private set; }
+        public int Hp
+        {
+            get { return mHp; }
+            set
+            {
+                mHp = MathExt.Clamp(value, 0, MaxHp);
+                UpdateGraphics();
+            }
+        }
 
         public int FlyEnablerCnt
         {
@@ -302,7 +315,7 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        public BattleUnit(int attackDistance, int baseMovementDistance, bool isFlying, bool hasFirstStrike,
+        public BattleUnit(int attackDistance, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
             string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
         {
             if (string.IsNullOrEmpty(imageFileName)) throw new ArgumentNullException("imageName");
@@ -321,6 +334,7 @@ namespace Conquera.BattlePrototype
             mTileIndex = tileIndex;
             mFlyEnablerCnt = isFlying ? 1 : 0;
             mFirstStrikeEnablerCnt = hasFirstStrike ? 1 : 0;
+            mHp = MaxHp = maxHp;
 
             if (null != terrain[tileIndex.X, tileIndex.Y].Unit)
             {
@@ -670,7 +684,7 @@ namespace Conquera.BattlePrototype
         {
             mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
             mPropertiesTextBlock.Text += string.Format("[{0}{1}{2}{3}{4}]\n", (IsFlying ? " F" : null), (HasFirstStrike ? " Fs" : null), (!HasEnabledMovement ? " MD" : null), (!HasEnabledAttack ? " AD" : null), (IsBerserker ? " B" : null));
-            mPropertiesTextBlock.Text += string.Format("M = {0}({1})", BaseMovementDistance, MovementDistance);
+            mPropertiesTextBlock.Text += string.Format("Hp = {0}/{1}\nM = {0}({1})", Hp, MaxHp, BaseMovementDistance, MovementDistance);
             mBorder.BorderBrush = (!HasMovedThisTurn && HasEnabledMovement && Player.IsActive && HasEnabledMovement ? Brushes.Yellow : Brushes.Black);
         }
 
@@ -819,8 +833,9 @@ namespace Conquera.BattlePrototype
     {
         public Swordsman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            1,
-            20 //movement distance
+            1 //attakc distance
+            ,20 //movement distance
+            ,1 //Hp
             , false //flying
             , false //first strike
             , "Swordsman.png" //image
@@ -837,8 +852,9 @@ namespace Conquera.BattlePrototype
     {
         public Archer(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            2,
-            20 //movement distance
+            2 //attakc distance
+            ,20 //movement distance
+            , 1 //Hp
             , false //flying
             , false //first strike
             , "Archer.png" //image
@@ -855,8 +871,9 @@ namespace Conquera.BattlePrototype
     {
         public Cavalry(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            1,
-            40 //movement distance
+            1 //attakc distance
+            ,40 //movement distance
+            , 1 //Hp
             , false //flying
             , false //first strike
             , "Cavalry.png" //image
@@ -898,8 +915,9 @@ namespace Conquera.BattlePrototype
     {
         public Spearman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
-            1,
-            20 //movement distance
+            1 //attakc distance
+            ,20 //movement distance
+            , 1 //Hp
             , false //flying
             , false //first strike
             , "Spearman.png" //image
