@@ -118,7 +118,7 @@ namespace Conquera.BattlePrototype
             /// <returns></returns>
             public bool MoveNext()
             {
-                if (mCollection.Count != mTraversedItemCnt)
+                if (mCollection.Count > mTraversedItemCnt)
                 {
                     while (null == mCollection.GetItem(++mId)) ;
                     

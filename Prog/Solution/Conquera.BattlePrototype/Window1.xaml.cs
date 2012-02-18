@@ -140,9 +140,9 @@ namespace Conquera.BattlePrototype
         public Window1()
         {
             mPlayers = new BattlePlayer[]{
-                new BattlePlayer(Colors.Blue, 0),
+                new BattlePlayer(this, Colors.Blue, 0),
                 //new AiBattlePlayer(Colors.Blue, 0,this),
-                new BattlePlayer(Colors.Red, 1)};
+                new BattlePlayer(this, Colors.Red, 1)};
         //        new AiBattlePlayer(Colors.Red, 1, this)};
 
 
@@ -396,6 +396,20 @@ namespace Conquera.BattlePrototype
             }
         }
 
+        public void SetMoveIndicatorsVisibility(bool isVisible)
+        {
+            if (!isVisible || (!SelectedUnit.HasMovedThisTurn && SelectedUnit.HasEnabledMovement))
+            {
+                List<Microsoft.Xna.Framework.Point> indices = new List<Microsoft.Xna.Framework.Point>();
+                SelectedUnit.GetPossibleMoves(indices);
+
+                foreach (Microsoft.Xna.Framework.Point index in indices)
+                {
+                    mTerrain[index].IsMoveIndicatorVisible = isVisible;
+                }
+            }
+        }
+
         private void NotifyTilesTurnStart()
         {
             for (int i = 0; i < mTerrain.Width; i++)
@@ -435,20 +449,6 @@ namespace Conquera.BattlePrototype
         private bool CanSelectUnit(BattleUnit unit)
         {
             return unit == null || unit.Player == ActivePlayer;
-        }
-
-        private void SetMoveIndicatorsVisibility(bool isVisible)
-        {
-            if (!isVisible || (!SelectedUnit.HasMovedThisTurn && SelectedUnit.HasEnabledMovement))
-            {
-                List<Microsoft.Xna.Framework.Point> indices = new List<Microsoft.Xna.Framework.Point>();
-                SelectedUnit.GetPossibleMoves(indices);
-
-                foreach (Microsoft.Xna.Framework.Point index in indices)
-                {
-                    mTerrain[index].IsMoveIndicatorVisible = isVisible;
-                }
-            }
         }
 
         private void LoadTerrain()
