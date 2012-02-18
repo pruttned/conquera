@@ -99,7 +99,6 @@ namespace Conquera.BattlePrototype
 
         private int mHp;
 
-        private List<IBattleUnitDefenseModifier> mDefenseModifiers = new List<IBattleUnitDefenseModifier>();
         private List<IBattleUnitAttackModifier> mAttackModifiers = new List<IBattleUnitAttackModifier>();
         private List<IBattleUnitMovementDistanceModifier> mMovementDistanceModifiers = new List<IBattleUnitMovementDistanceModifier>();
 
@@ -113,13 +112,9 @@ namespace Conquera.BattlePrototype
 
         private int mAttackPreventerCnt;
         private int mMovementPreventerCnt;
+        private int mDamagePreventerCnt;
 
-        private int mFlyEnablerCnt;
-        private int mFirstStrikeEnablerCnt;
-        private int mFlyPreventerCnt;
-        private int mFirstStrikePreventerCnt;
-
-        private int mBersekerEnablerCnt;
+        private int mDamage = 0;
 
         private List<IBattleUnitSpellEffect> mSpellEffects = new List<IBattleUnitSpellEffect>();
 
@@ -142,11 +137,6 @@ namespace Conquera.BattlePrototype
 
         public bool HasEnabledAttack { get { return 0 == AttackPreventerCnt; } }
         public bool HasEnabledMovement { get { return 0 == MovementPreventerCnt; } }
-
-        public bool IsFlying { get { return 0 < FlyEnablerCnt && 0 == FlyPreventerCnt; } }
-        public bool HasFirstStrike { get { return 0 < FirstStrikeEnablerCnt && 0 == FirstStrikePreventerCnt; } }
-
-        public bool IsBerserker { get { return 0 < BerserkerEnablerCnt; } }
 
         public HexDirection Direction
         {
@@ -171,42 +161,6 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        public int FlyEnablerCnt
-        {
-            get { return mFlyEnablerCnt; }
-            set
-            {
-                mFlyEnablerCnt = Math.Max(0, value);
-                UpdateGraphics();
-            }
-        }
-        public int FirstStrikeEnablerCnt
-        {
-            get { return mFirstStrikeEnablerCnt; }
-            set
-            {
-                mFirstStrikeEnablerCnt = Math.Max(0, value);
-                UpdateGraphics();
-            }
-        }
-        public int FlyPreventerCnt
-        {
-            get { return mFlyPreventerCnt; }
-            set
-            {
-                mFlyPreventerCnt = Math.Max(0, value);
-                UpdateGraphics();
-            }
-        }
-        public int FirstStrikePreventerCnt
-        {
-            get { return mFirstStrikePreventerCnt; }
-            set
-            {
-                mFirstStrikePreventerCnt = Math.Max(0, value);
-                UpdateGraphics();
-            }
-        }
         public int AttackPreventerCnt
         {
             get { return mAttackPreventerCnt; }
@@ -216,6 +170,7 @@ namespace Conquera.BattlePrototype
                 UpdateGraphics();
             }
         }
+
         public int MovementPreventerCnt
         {
             get { return mMovementPreventerCnt; }
@@ -225,12 +180,23 @@ namespace Conquera.BattlePrototype
                 UpdateGraphics();
             }
         }
-        public int BerserkerEnablerCnt
+
+        public int Damage
         {
-            get { return mBersekerEnablerCnt; }
+            get { return mDamage; }
             set
             {
-                mBersekerEnablerCnt = Math.Max(0, value);
+                mDamage = Math.Max(0, value);
+                UpdateGraphics();
+            }
+        }
+
+        public int DamagePreventerCnt
+        {
+            get { return mDamagePreventerCnt; }
+            set
+            {
+                mDamagePreventerCnt = Math.Max(0, value);
                 UpdateGraphics();
             }
         }
@@ -315,9 +281,11 @@ namespace Conquera.BattlePrototype
                 if (mDamages != null)
                 {
                     mHasDamageIndicator = new System.Windows.Shapes.Rectangle();
+                    mHasDamageIndicator.Stroke = Brushes.Black;
                     mHasDamageIndicator.Width = 15;
                     mHasDamageIndicator.Height = 15;
-                    mHasDamageIndicator.Fill = Brushes.GreenYellow;
+                    int hitCnt = value.GetHitCnt();
+                    mHasDamageIndicator.Fill = (2 <= hitCnt ? Brushes.OrangeRed : (1 == hitCnt ? Brushes.Yellow : Brushes.Gray));
                     Children.Add(mHasDamageIndicator);
                 }
                 else
@@ -327,7 +295,7 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        public BattleUnit(int attackDistance, int baseMovementDistance, int maxHp, bool isFlying, bool hasFirstStrike,
+        public BattleUnit(int attackDistance, int baseMovementDistance, int maxHp,
             string imageFileName, BattlePlayer player, HexTerrain terrain, Point tileIndex)
         {
             if (string.IsNullOrEmpty(imageFileName)) throw new ArgumentNullException("imageName");
@@ -343,8 +311,6 @@ namespace Conquera.BattlePrototype
             Player = player;
             mTerrain = terrain;
             mTileIndex = tileIndex;
-            mFlyEnablerCnt = isFlying ? 1 : 0;
-            mFirstStrikeEnablerCnt = hasFirstStrike ? 1 : 0;
             mHp = MaxHp = maxHp;
 
             if (null != terrain[tileIndex.X, tileIndex.Y].Unit)
@@ -386,8 +352,8 @@ namespace Conquera.BattlePrototype
             }
 
             mBorder = new Border();
-            mBorder.Width = 60;
-            mBorder.Height = 60;           
+            mBorder.Width = 80;
+            mBorder.Height = 80;           
             mBorder.BorderThickness = new System.Windows.Thickness(5);
             Children.Add(mBorder);
             mGridInBorder = new Grid();
@@ -539,7 +505,7 @@ namespace Conquera.BattlePrototype
                     sibling =>
                     {
                         Point index = sibling.Index;
-                        if ((sibling.IsPassableAndEmpty || IsFlying) && !CheckedPoints.Contains(index))
+                        if (sibling.IsPassableAndEmpty && !CheckedPoints.Contains(index))
                         {
                             if (sibling.IsPassableAndEmpty)
                             {
@@ -658,6 +624,7 @@ namespace Conquera.BattlePrototype
         /// <returns></returns>
         public IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
         {
+            int damageNum = 5;
             if (null == target) throw new ArgumentNullException("target");
 
             if (!HasEnabledAttack || AttackDistance != HexHelper.GetDistance(TileIndex, target.TileIndex))
@@ -678,8 +645,8 @@ namespace Conquera.BattlePrototype
                 int rollNum2 = die.Roll();
                 return new DieAttackRoll[]
                 {
-                    new DieAttackRoll() {Die = die, Num = rollNum1, IsHit = (6 <= rollNum1)},
-                    new DieAttackRoll() {Die = die, Num = rollNum2, IsHit = (6 <= rollNum2)},
+                    new DieAttackRoll() {Die = die, Num = rollNum1, IsHit = (damageNum <= rollNum1)},
+                    new DieAttackRoll() {Die = die, Num = rollNum2, IsHit = (damageNum <= rollNum2)},
                 };
             }
 
@@ -692,7 +659,7 @@ namespace Conquera.BattlePrototype
                 {
                     Die die = GetDieAgainst(target);
                     int rollNum = die.Roll();
-                    return new DieAttackRoll[] { new DieAttackRoll() { Die = die, Num = rollNum, IsHit = (6 <= rollNum) } };
+                    return new DieAttackRoll[] { new DieAttackRoll() { Die = die, Num = rollNum, IsHit = (damageNum <= rollNum) } };
                 }
             }
 
@@ -714,8 +681,8 @@ namespace Conquera.BattlePrototype
         public void UpdateGraphics()
         {
             mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
-            mPropertiesTextBlock.Text += string.Format("[{0}{1}{2}{3}{4}]\n", (IsFlying ? " F" : null), (HasFirstStrike ? " Fs" : null), (!HasEnabledMovement ? " MD" : null), (!HasEnabledAttack ? " AD" : null), (IsBerserker ? " B" : null));
-            mPropertiesTextBlock.Text += string.Format("Hp = {0}/{1}\nM = {2}({3})", Hp, MaxHp, BaseMovementDistance, MovementDistance);
+            mPropertiesTextBlock.Text += string.Format("[{0}{1}]\n", (!HasEnabledMovement ? " MD" : null), (!HasEnabledAttack ? " AD" : null));
+            mPropertiesTextBlock.Text += string.Format("Hp = {0}/{1}\nD = {2}({3})\nM = {4}({5})", Hp, MaxHp, Damage, DamagePreventerCnt, BaseMovementDistance, MovementDistance);
             mBorder.BorderBrush = (!HasMovedThisTurn && HasEnabledMovement && Player.IsActive && HasEnabledMovement ? Brushes.Yellow : Brushes.Black);
 
             if (mDirectionButtons != null)
@@ -938,10 +905,8 @@ namespace Conquera.BattlePrototype
         public Swordsman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             1 //attack distance
-            ,2 //movement distance
-            ,1 //Hp
-            , false //flying
-            , false //first strike
+            ,20 //movement distance
+            ,3 //Hp
             , "Swordsman.png" //image
             , player, terrain, tileIndex)
         { }
@@ -957,10 +922,8 @@ namespace Conquera.BattlePrototype
         public Archer(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             2 //attack distance
-            ,2 //movement distance
-            , 1 //Hp
-            , false //flying
-            , false //first strike
+            ,2//movement distance
+            , 3 //Hp
             , "Archer.png" //image
             , player, terrain, tileIndex)
         { }
@@ -977,9 +940,7 @@ namespace Conquera.BattlePrototype
             : base(
             1 //attack distance
             ,4 //movement distance
-            , 1 //Hp
-            , false //flying
-            , false //first strike
+            , 3 //Hp
             , "Cavalry.png" //image
             , player, terrain, tileIndex)
         { }
@@ -991,27 +952,27 @@ namespace Conquera.BattlePrototype
 
         protected override void OnMove(int turnNum, Point oldIndex, Point tileIndex)
         {
-            if (1 < HexHelper.GetDistance(oldIndex, tileIndex))
-            {
-                bool hasEnemySpearmanSibling = false;
-                bool hasEnemySibling = false;
-                Terrain.ForEachSibling(tileIndex, tile =>
-                    {
-                        if (!hasEnemySpearmanSibling && null != tile.Unit && tile.Unit.Player != Player)
-                        {
-                            if (tile.Unit is Spearman)
-                            {
-                                hasEnemySpearmanSibling = true;
-                            }
-                            hasEnemySibling = true;
-                        }
-                    });
+            //if (1 < HexHelper.GetDistance(oldIndex, tileIndex))
+            //{
+            //    bool hasEnemySpearmanSibling = false;
+            //    bool hasEnemySibling = false;
+            //    Terrain.ForEachSibling(tileIndex, tile =>
+            //        {
+            //            if (!hasEnemySpearmanSibling && null != tile.Unit && tile.Unit.Player != Player)
+            //            {
+            //                if (tile.Unit is Spearman)
+            //                {
+            //                    hasEnemySpearmanSibling = true;
+            //                }
+            //                hasEnemySibling = true;
+            //            }
+            //        });
 
-                if (!hasEnemySpearmanSibling && hasEnemySibling)
-                {
-                    AddSpellEffect(turnNum, new FirstStrikeBattleUnitSpellEffect(1));
-                }
-            }
+            //    if (!hasEnemySpearmanSibling && hasEnemySibling)
+            //    {
+            //        AddSpellEffect(turnNum, new FirstStrikeBattleUnitSpellEffect(1));
+            //    }
+            //}
         }
     }
 
@@ -1021,9 +982,7 @@ namespace Conquera.BattlePrototype
             : base(
             1 //attack distance
             ,2 //movement distance
-            , 1 //Hp
-            , false //flying
-            , false //first strike
+            , 3 //Hp
             , "Spearman.png" //image
             , player, terrain, tileIndex)
         { }

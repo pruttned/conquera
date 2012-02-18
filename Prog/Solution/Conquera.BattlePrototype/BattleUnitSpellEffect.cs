@@ -14,10 +14,6 @@ namespace Conquera.BattlePrototype
         bool OnStartTurn(int turnNum);        
     }
 
-    public interface IBattleUnitDefenseModifier
-    {
-        int GetModifier(BattleUnit unit);
-    }
     public interface IBattleUnitAttackModifier
     {
         Point GetModifier(BattleUnit unit);
@@ -172,28 +168,29 @@ namespace Conquera.BattlePrototype
         }
     }
 
-    public class BerserkerBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration
+    public class DamagePreventBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration
     {
         BattleUnit mUnit;
+        int mDamagePreventerCnt;
         public override string EffectDescription
         {
-            get { return "Berserker"; }
+            get { return string.Format("Prevents {0} damage", mDamagePreventerCnt); }
         }
 
-        public BerserkerBattleUnitSpellEffect(int duration)
+        public DamagePreventBattleUnitSpellEffect(int duration, int preventerCnt)
             : base(duration)
         {
         }
 
         public override void OnEnd()
         {
-            mUnit.BerserkerEnablerCnt--;
+            mUnit.DamagePreventerCnt--;
         }
 
         protected override void OnCastImpl(int turnNum, BattleUnit unit)
         {
             mUnit = unit;
-            unit.BerserkerEnablerCnt++;
+            unit.DamagePreventerCnt++;
         }
 
         protected override bool OnStartTurnImpl(int turnNum)
@@ -201,37 +198,4 @@ namespace Conquera.BattlePrototype
             return true;
         }
     }
-
-
-
-    public class FirstStrikeBattleUnitSpellEffect : BattleUnitSpellEffectWithDuration
-    {
-        BattleUnit mUnit;
-        public override string EffectDescription
-        {
-            get { return "Firstrike"; }
-        }
-
-        public FirstStrikeBattleUnitSpellEffect(int duration)
-            : base(duration)
-        {
-        }
-
-        public override void OnEnd()
-        {
-            mUnit.FirstStrikeEnablerCnt--;
-        }
-
-        protected override void OnCastImpl(int turnNum, BattleUnit unit)
-        {
-            mUnit = unit;
-            unit.FirstStrikeEnablerCnt++;
-        }
-
-        protected override bool OnStartTurnImpl(int turnNum)
-        {
-            return true;
-        }
-    }
-
 }
