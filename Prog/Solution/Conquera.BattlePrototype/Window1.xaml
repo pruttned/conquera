@@ -24,7 +24,7 @@
             
         <!--Main canvas-->
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Grid.Row="1">
-            <Canvas x:Name="mMainCanvas" PreviewMouseMove="mMainCanvas_PreviewMouseMove" PreviewMouseDown="mMainCanvas_PreviewMouseDown">
+            <Canvas x:Name="mMainCanvas" PreviewMouseMove="mMainCanvas_PreviewMouseMove" PreviewMouseDown="mMainCanvas_PreviewMouseDown" PreviewMouseUp="mMainCanvas_PreviewMouseUp">
                 <Canvas.RenderTransform>
                     <ScaleTransform ScaleX="{Binding Value, ElementName=mZoomSlider}" ScaleY="{Binding Value, ElementName=mZoomSlider}" />
                 </Canvas.RenderTransform>
