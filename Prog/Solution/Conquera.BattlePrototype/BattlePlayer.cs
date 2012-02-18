@@ -85,13 +85,14 @@ namespace Conquera.BattlePrototype
                 FillCardsInHand();
             }
         }
-        
+        public Window1 Window { get; private set; }
         public ObservableCollection<SpellCard> CardsInHand { get; set; }
 
         public SafeModifiableIterableCollection<BattleUnit> Units { get; private set; }
 
-        public BattlePlayer(Color color, int index)
+        public BattlePlayer( Window1 window, Color color, int index)
         {
+            Window = window;
             Color = color;
             Index = index;
 

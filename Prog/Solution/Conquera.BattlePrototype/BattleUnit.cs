@@ -28,6 +28,13 @@ using System.Windows.Shapes;
 
 namespace Conquera.BattlePrototype
 {
+    public enum AttackType
+    {
+        None,
+        Main,
+        Secondary
+    }
+
     public class Die
     {
         public static Die D6 { get; private set; }
@@ -144,6 +151,7 @@ namespace Conquera.BattlePrototype
             set
             {
                 mDirection = value;
+                HasMovedThisTurn = true;
                 UpdateDirectionLine();
             }
         }
@@ -631,6 +639,38 @@ namespace Conquera.BattlePrototype
             {
                 return null;
             }
+            switch (IsAttacking(target.TileIndex))
+            {
+                case AttackType.None:
+                    return null;
+                case AttackType.Main:
+                    {
+                        Die die = GetDieAgainst(target);
+                        int rollNum1 = die.Roll();
+                        int rollNum2 = die.Roll();
+                        return new DieAttackRoll[]
+                        {
+                            new DieAttackRoll() {Die = die, Num = rollNum1, IsHit = (damageNum <= rollNum1)},
+                            new DieAttackRoll() {Die = die, Num = rollNum2, IsHit = (damageNum <= rollNum2)},
+                        };
+                    }
+                case AttackType.Secondary:
+                    {
+                        Die die = GetDieAgainst(target);
+                        int rollNum = die.Roll();
+                        return new DieAttackRoll[] { new DieAttackRoll() { Die = die, Num = rollNum, IsHit = (damageNum <= rollNum) } };
+                    }
+                default:
+                    return null;
+            }    
+        }
+
+        public AttackType IsAttacking(Point pos)
+        {
+            if (AttackDistance != HexHelper.GetDistance(TileIndex, pos))
+            {
+                return AttackType.None;
+            }
 
             //get main attack point
             Point mainAttackPoint = TileIndex;
@@ -638,34 +678,26 @@ namespace Conquera.BattlePrototype
             {
                 mainAttackPoint = HexHelper.GetSibling(mainAttackPoint, Direction);
             }
-            if (mainAttackPoint == target.TileIndex) //is main target
+            if (mainAttackPoint == pos) //is main target
             {
-                Die die = GetDieAgainst(target);
-                int rollNum1 = die.Roll();
-                int rollNum2 = die.Roll();
-                return new DieAttackRoll[]
-                {
-                    new DieAttackRoll() {Die = die, Num = rollNum1, IsHit = (damageNum <= rollNum1)},
-                    new DieAttackRoll() {Die = die, Num = rollNum2, IsHit = (damageNum <= rollNum2)},
-                };
+                return AttackType.Main;
             }
-
-
-            //additional points
-            foreach (var additionalAttackPointRot in mAdditionalAttackPoints)
+            else
             {
-                Point additionalAttackPoint = HexHelper.GetSibling(mainAttackPoint, HexHelper.RotateDirection(Direction, additionalAttackPointRot));
-                if (target.TileIndex == additionalAttackPoint)
+                //additional points
+                foreach (var additionalAttackPointRot in mAdditionalAttackPoints)
                 {
-                    Die die = GetDieAgainst(target);
-                    int rollNum = die.Roll();
-                    return new DieAttackRoll[] { new DieAttackRoll() { Die = die, Num = rollNum, IsHit = (damageNum <= rollNum) } };
+                    Point additionalAttackPoint = HexHelper.GetSibling(mainAttackPoint, HexHelper.RotateDirection(Direction, additionalAttackPointRot));
+                    if (pos == additionalAttackPoint)
+                    {
+                        return AttackType.Secondary;
+                    }
                 }
             }
 
-            return null;
+            return AttackType.None; ;
         }
-
+        
         public void Move(int turnNum, Point tileIndex)
         {
             if(tileIndex != TileIndex)
@@ -680,16 +712,19 @@ namespace Conquera.BattlePrototype
 
         public void UpdateGraphics()
         {
-            mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
-            mPropertiesTextBlock.Text += string.Format("[{0}{1}]\n", (!HasEnabledMovement ? " MD" : null), (!HasEnabledAttack ? " AD" : null));
-            mPropertiesTextBlock.Text += string.Format("Hp = {0}/{1}\nD = {2}({3})\nM = {4}({5})", Hp, MaxHp, Damage, DamagePreventerCnt, BaseMovementDistance, MovementDistance);
-            mBorder.BorderBrush = (!HasMovedThisTurn && HasEnabledMovement && Player.IsActive && HasEnabledMovement ? Brushes.Yellow : Brushes.Black);
-
-            if (mDirectionButtons != null)
+            if (null != mPropertiesTextBlock)
             {
-                foreach (Button button in mDirectionButtons)
+                mPropertiesTextBlock.Text = IsSelected ? "[SELECTED]\n" : "[]\n";
+                mPropertiesTextBlock.Text += string.Format("       [{0}{1}]\n", (!HasEnabledMovement ? " dM" : null), (!HasEnabledAttack ? " dA" : null));
+                mPropertiesTextBlock.Text += string.Format("Hp = {0}/{1}\nD = {2}({3})\nM = {4}({5})", Hp, MaxHp, Damage, DamagePreventerCnt, BaseMovementDistance, MovementDistance);
+                mBorder.BorderBrush = (!HasMovedThisTurn && HasEnabledMovement && Player.IsActive && HasEnabledMovement ? Brushes.Yellow : Brushes.Black);
+
+                if (mDirectionButtons != null)
                 {
-                    button.Visibility = IsSelected ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+                    foreach (Button button in mDirectionButtons)
+                    {
+                        button.Visibility = (!HasMovedThisTurn & IsSelected ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden);
+                    }
                 }
             }
         }
@@ -848,7 +883,11 @@ namespace Conquera.BattlePrototype
             Button button = new Button();
             button.Width = size;
             button.Height = size;
-            button.Click += (s, e) => Direction = hexDirection;
+            button.Click += (s, e) =>
+                {
+                    Direction = hexDirection;
+                    Player.Window.SetMoveIndicatorsVisibility(false);
+                };
             //button.Visibility = System.Windows.Visibility.Hidden;
 
             System.Windows.Point position = GetEdgeCenter(hexDirection);
@@ -939,7 +978,7 @@ namespace Conquera.BattlePrototype
         public Cavalry(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             1 //attack distance
-            ,4 //movement distance
+            ,40 //movement distance
             , 3 //Hp
             , "Cavalry.png" //image
             , player, terrain, tileIndex)
@@ -952,27 +991,37 @@ namespace Conquera.BattlePrototype
 
         protected override void OnMove(int turnNum, Point oldIndex, Point tileIndex)
         {
-            //if (1 < HexHelper.GetDistance(oldIndex, tileIndex))
-            //{
-            //    bool hasEnemySpearmanSibling = false;
-            //    bool hasEnemySibling = false;
-            //    Terrain.ForEachSibling(tileIndex, tile =>
-            //        {
-            //            if (!hasEnemySpearmanSibling && null != tile.Unit && tile.Unit.Player != Player)
-            //            {
-            //                if (tile.Unit is Spearman)
-            //                {
-            //                    hasEnemySpearmanSibling = true;
-            //                }
-            //                hasEnemySibling = true;
-            //            }
-            //        });
+            if (1 < HexHelper.GetDistance(oldIndex, tileIndex)) //has moved at least 2 cells
+            {
+                Point attackPoint = HexHelper.GetSibling(TileIndex, Direction);
+                if(Terrain.IsInTerrain(attackPoint))
+                {
+                    var attackTile = Terrain[attackPoint];
+                    if(null != attackTile.Unit && attackTile.Unit.Player != Player) //has enemy unit ahead
+                    {
+                        bool hasEnemyAttackingSpearmanSibling = false;
+                        bool hasEnemySibling = false;
+                        Terrain.ForEachSibling(tileIndex, tile =>
+                            {
+                                if (!hasEnemyAttackingSpearmanSibling && null != tile.Unit && tile.Unit.Player != Player)
+                                {
+                                    if (tile.Unit is Spearman && tile.Unit.HasEnabledAttack && AttackType.None != tile.Unit.IsAttacking(TileIndex)) //spearman is attacking cavalry posisiton
+                                    {
+                                        hasEnemyAttackingSpearmanSibling = true;
+                                    }
+                                    hasEnemySibling = true;
+                                }
+                            });
 
-            //    if (!hasEnemySpearmanSibling && hasEnemySibling)
-            //    {
-            //        AddSpellEffect(turnNum, new FirstStrikeBattleUnitSpellEffect(1));
-            //    }
-            //}
+                        if (!hasEnemyAttackingSpearmanSibling && hasEnemySibling)
+                        {
+                            attackTile.Unit.AddSpellEffect(turnNum, new DisableAttackBattleUnitSpellEffect(1));
+                        }
+
+                    }
+                }
+    
+            }
         }
     }
 
