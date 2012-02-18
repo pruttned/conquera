@@ -189,6 +189,8 @@ namespace Conquera.BattlePrototype
             };
             Grid.SetZIndex(mHighlightIndicator, 99);
             Children.Add(mHighlightIndicator);
+
+
         }
 
         public void ShowCanCastCardIndicator(bool canCast)
@@ -254,6 +256,46 @@ namespace Conquera.BattlePrototype
             Vector2 cornerBasePosition = HexHelper.GetHexTileCornerPos2D(corner);
             Vector2 cornerBasePositionWpf = new Vector2(cornerBasePosition.X, -cornerBasePosition.Y);
             return new System.Windows.Point(centerX + cornerBasePositionWpf.X, centerY + cornerBasePositionWpf.Y);
+        }
+
+        public System.Windows.Point GetEdgeCenter(HexDirection direction, System.Windows.Vector offset)
+        {
+            HexTileCorner corner1;
+            HexTileCorner corner2;
+            switch (direction)
+            {
+                case HexDirection.Left:
+                    corner1 = HexTileCorner.LowerLeft;
+                    corner2 = HexTileCorner.UperLeft;
+                    break;
+                case HexDirection.LowerLeft:
+                    corner1 = HexTileCorner.LowerLeft;
+                    corner2 = HexTileCorner.Down;
+                    break;
+                case HexDirection.LowerRight:
+                    corner1 = HexTileCorner.Down;
+                    corner2 = HexTileCorner.LowerRight;
+                    break;
+                case HexDirection.Right:
+                    corner1 = HexTileCorner.LowerRight;
+                    corner2 = HexTileCorner.UperRight;
+                    break;
+                case HexDirection.UperRight:
+                    corner1 = HexTileCorner.Top;
+                    corner2 = HexTileCorner.UperRight;
+                    break;
+                case HexDirection.UperLeft:
+                default:
+                    corner1 = HexTileCorner.UperLeft;
+                    corner2 = HexTileCorner.Top;
+                    break;
+            }
+
+            System.Windows.Point corner1Position = GetCornerPositionWpf(corner1);
+            System.Windows.Point corner2Position = GetCornerPositionWpf(corner2);
+
+            System.Windows.Point center = new System.Windows.Point((corner1Position.X + corner2Position.X) / 2, (corner1Position.Y + corner2Position.Y) / 2);
+            return offset + center;
         }
     }
     

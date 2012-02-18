@@ -700,14 +700,14 @@ namespace Conquera.BattlePrototype
         
         public void Move(int turnNum, Point tileIndex)
         {
-            if(tileIndex != TileIndex)
-            {
+            //if(tileIndex != TileIndex)
+            //{
                 HasMovedThisTurn = true;
                 Point oldIndex = TileIndex;
                 TileIndex = tileIndex;
 
                 OnMove(turnNum, oldIndex, tileIndex);
-            }
+            //}
         }
 
         public void UpdateGraphics()

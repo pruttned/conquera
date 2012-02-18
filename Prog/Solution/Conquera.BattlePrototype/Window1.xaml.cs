@@ -27,6 +27,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Linq;
 using System.Linq;
+using System.Windows.Shapes;
 
 namespace Conquera.BattlePrototype
 {
@@ -39,6 +40,9 @@ namespace Conquera.BattlePrototype
 
         int mInitMana = 0;
         int mMaxMana = 99;
+        HexTerrainTile mMovementTargetTile;
+        Line mMoveDirectionIndicator;
+        HexDirection mMoveDirection;
 
         //Type[] mUnits1 = new Type[] 
         //{
@@ -193,6 +197,14 @@ namespace Conquera.BattlePrototype
             {
                 player.OnTurnStart(mTurnNum, (ActivePlayer == player));
             }
+
+            mMoveDirectionIndicator = new Line()
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 5,
+                Visibility = Visibility.Hidden
+            };
+            mMainCanvas.Children.Add(mMoveDirectionIndicator);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -402,6 +414,7 @@ namespace Conquera.BattlePrototype
             {
                 List<Microsoft.Xna.Framework.Point> indices = new List<Microsoft.Xna.Framework.Point>();
                 SelectedUnit.GetPossibleMoves(indices);
+                indices.Add(SelectedUnit.TileIndex);
 
                 foreach (Microsoft.Xna.Framework.Point index in indices)
                 {
@@ -551,15 +564,15 @@ namespace Conquera.BattlePrototype
 
         private void mMainCanvas_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            DoMouseAction(e);
+            DoMouseAction(e, false);
         }
 
         private void mMainCanvas_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            DoMouseAction(e);
+            DoMouseAction(e, true);
         }
 
-        private void DoMouseAction(MouseEventArgs e)
+        private void DoMouseAction(MouseEventArgs e, bool isFromMouseMoveEvent)
         {
             if (e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed)
             {
@@ -635,15 +648,53 @@ namespace Conquera.BattlePrototype
                         }
                         else if (e.RightButton == MouseButtonState.Pressed)
                         {
-                            //Move unit
-                            if (tile.IsMoveIndicatorVisible)
-                            {
+                            //Move unit                            
+                            if (!isFromMouseMoveEvent && tile.IsMoveIndicatorVisible) //mouse down on a move indicator
+                            {                                
                                 SetMoveIndicatorsVisibility(false);
-                                SelectedUnit.Move(mTurnNum, tile.Index);
+                                mMovementTargetTile = tile;
+
+                                Point tileCenter = new Point(Canvas.GetLeft(tile) + tile.ActualWidth / 2.0, Canvas.GetTop(tile) + tile.ActualHeight / 2.0);
+                                mMoveDirectionIndicator.X1 = tileCenter.X;
+                                mMoveDirectionIndicator.Y1 = tileCenter.Y;
+                                mMoveDirectionIndicator.Visibility = Visibility.Visible;
+                            }
+                            else if (isFromMouseMoveEvent && mMovementTargetTile != null)
+                            {
+                                Point movementTargetTileCenter = new Point(Canvas.GetLeft(mMovementTargetTile) + mMovementTargetTile.ActualWidth / 2.0, Canvas.GetTop(mMovementTargetTile) + mMovementTargetTile.ActualHeight / 2.0);
+                                Vector vector = Mouse.GetPosition(mMainCanvas) - movementTargetTileCenter;
+                                vector.Normalize();
+                                double angle = -Math.Atan2(vector.Y, vector.X) + 1.570;
+                                angle = Microsoft.Xna.Framework.MathHelper.ToDegrees((float)angle);                                
+                                int edgeIndex = (int)((angle + 60) / 60);
+
+                                mMoveDirection = HexDirection.Left;
+                                if (edgeIndex == 0) mMoveDirection = HexDirection.LowerLeft;
+                                if (edgeIndex == 1) mMoveDirection = HexDirection.LowerRight;
+                                if (edgeIndex == 2) mMoveDirection = HexDirection.Right;
+                                if (edgeIndex == 3) mMoveDirection = HexDirection.UperRight;
+                                if (edgeIndex == 4) mMoveDirection = HexDirection.UperLeft;
+                                if (edgeIndex == 5 || (angle < -60)) mMoveDirection = HexDirection.Left;
+
+                                Point edgeCenter = mMovementTargetTile.GetEdgeCenter(mMoveDirection, new Vector(Canvas.GetLeft(mMovementTargetTile), Canvas.GetTop(mMovementTargetTile)));
+                                mMoveDirectionIndicator.X2 = edgeCenter.X;
+                                mMoveDirectionIndicator.Y2 = edgeCenter.Y;                                
                             }
                         }
                     }
                 }
+            }
+        }
+
+        private void mMainCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (mMovementTargetTile != null)
+            {
+                SelectedUnit.Direction = mMoveDirection;
+                SelectedUnit.Move(mTurnNum, mMovementTargetTile.Index);
+
+                mMoveDirectionIndicator.Visibility = Visibility.Hidden;
+                mMovementTargetTile = null;
             }
         }
 
@@ -799,8 +850,6 @@ namespace Conquera.BattlePrototype
         {
             mLogBox.SelectedItem = null;
         }
-
-
     }
 
     public class ColorToBrushConverter : IValueConverter
