@@ -133,8 +133,8 @@ namespace Conquera.BattlePrototype
 
         int mTurnNum = 0;
 
-        private enum EndTurnButtonActions { ResolvePrebattlePhase, KillAndResolveBattlePhase, KillAndEndTurn };
-        private EndTurnButtonActions mNextEndTurnButtonAction = EndTurnButtonActions.ResolvePrebattlePhase;
+        private enum EndTurnButtonActions { ResolveBattlePhase, KillAndEndTurn };
+        private EndTurnButtonActions mNextEndTurnButtonAction = EndTurnButtonActions.ResolveBattlePhase;
         private List<UnitDamages> mUnitDamages;
 
         public Window1()
@@ -199,16 +199,8 @@ namespace Conquera.BattlePrototype
         {
             switch (mNextEndTurnButtonAction)
             {
-                case EndTurnButtonActions.ResolvePrebattlePhase:
-                    mUnitDamages = ResolveBattle(true);
-                    VisualizeUnitDamages(mUnitDamages);
-                    mNextEndTurnButtonAction = EndTurnButtonActions.KillAndResolveBattlePhase;
-                    mEndTurnButton.Content = "Kill & Resolve Battle";
-                    break;
-
-                case EndTurnButtonActions.KillAndResolveBattlePhase:
-                    ResolveDamages(mUnitDamages);
-                    mUnitDamages = ResolveBattle(false);
+                case EndTurnButtonActions.ResolveBattlePhase:
+                    mUnitDamages = ResolveBattle();
                     VisualizeUnitDamages(mUnitDamages);
                     mNextEndTurnButtonAction = EndTurnButtonActions.KillAndEndTurn;
                     mEndTurnButton.Content = "Kill & End Turn";
@@ -218,7 +210,7 @@ namespace Conquera.BattlePrototype
                     ResolveDamages(mUnitDamages);
                     VisualizeUnitDamages(null);
                     NextTurn();
-                    mNextEndTurnButtonAction = EndTurnButtonActions.ResolvePrebattlePhase;
+                    mNextEndTurnButtonAction = EndTurnButtonActions.ResolveBattlePhase;
                     mEndTurnButton.Content = "Resolve Pre-Battle";
                     break;
             }
@@ -342,8 +334,7 @@ namespace Conquera.BattlePrototype
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="isPrebatlePhase">Only damage from units with first strike is considered</param>
-        private List<UnitDamages> ResolveBattle(bool isPrebatlePhase)
+        private List<UnitDamages> ResolveBattle()
         {
             List<UnitDamages> unitDamages = new List<UnitDamages>();
 
@@ -356,21 +347,18 @@ namespace Conquera.BattlePrototype
                     {
                         foreach (var attackingUnit in player2.Units)
                         {
-                            if ((isPrebatlePhase && attackingUnit.HasFirstStrike) || (!isPrebatlePhase && !attackingUnit.HasFirstStrike))
+                            var rolls = attackingUnit.RollDiceAgainst(targetUnit);
+                            if (null != rolls)
                             {
-                                var rolls = attackingUnit.RollDiceAgainst(targetUnit);
-                                if (null != rolls)
+                                if (null == unitDamage)
                                 {
-                                    if (null == unitDamage)
-                                    {
-                                        unitDamage = new UnitDamages(targetUnit);
-                                    }
-                                    unitDamage.Attacks.Add(new UnitAttack(attackingUnit, rolls));
+                                    unitDamage = new UnitDamages(targetUnit);
                                 }
+                                unitDamage.Attacks.Add(new UnitAttack(attackingUnit, rolls));
                             }
                         }
                     }
-                    if(null != unitDamage)
+                    if (null != unitDamage)
                     {
                         unitDamages.Add(unitDamage);
                     }
@@ -383,16 +371,27 @@ namespace Conquera.BattlePrototype
         {
             foreach (var damage in damages)
             {
-                int hitCnt = (from a in damage.Attacks select (from r in a.AttackRolls where r.IsHit select 1).Sum()).Sum();
-                int hpLost = hitCnt / 2;
-                damage.Target.Hp -= hpLost;
-                if (damage.Target.Hp == 0)
+                damage.Target.Damage += damage.GetHitCnt();
+            }
+
+            foreach (var player in mPlayers)
+            {
+                foreach (var unit in player.Units)
                 {
-                    damage.Target.Kill();
-                }
-                else if (hitCnt >= 1)
-                {
-                    damage.Target.AddSpellEffect(mTurnNum, new DisableMovementBattleUnitSpellEffect(2));
+                    unit.Damage -= unit.DamagePreventerCnt;
+
+                    int hpLost = unit.Damage / 2;
+                    unit.Hp -= hpLost;
+                    if (unit.Hp == 0)
+                    {
+                        unit.Kill();
+                    }
+                    else if (unit.Damage >= 1)
+                    {
+                        unit.AddSpellEffect(mTurnNum, new DisableMovementBattleUnitSpellEffect(2));
+                    }
+
+                    unit.Damage = 0;
                 }
             }
         }
@@ -850,6 +849,11 @@ namespace Conquera.BattlePrototype
         {
             Target = target;
             Attacks = new List<UnitAttack>();
+        }
+    
+        public int GetHitCnt()
+        {
+            return (from a in Attacks select (from r in a.AttackRolls where r.IsHit select 1).Sum()).Sum();
         }
     }
     public class UnitAttack
