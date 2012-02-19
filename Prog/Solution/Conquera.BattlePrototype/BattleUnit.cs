@@ -944,7 +944,7 @@ namespace Conquera.BattlePrototype
         public Swordsman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             1 //attack distance
-            ,20 //movement distance
+            ,2 //movement distance
             ,3 //Hp
             , "Swordsman.png" //image
             , player, terrain, tileIndex)
@@ -978,7 +978,7 @@ namespace Conquera.BattlePrototype
         public Cavalry(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             1 //attack distance
-            ,40 //movement distance
+            ,4 //movement distance
             , 3 //Hp
             , "Cavalry.png" //image
             , player, terrain, tileIndex)
