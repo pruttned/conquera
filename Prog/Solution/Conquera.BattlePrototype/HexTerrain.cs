@@ -244,6 +244,34 @@ namespace Conquera.BattlePrototype
             return siblings;
         }
 
+        public void ShowOverlay()
+        {
+            foreach (HexTerrainTile tile in mTiles)
+            {
+                tile.IsOverlayVisible = true;
+            }
+        }
+
+        public void HideOverlay()
+        {
+            foreach (HexTerrainTile tile in mTiles)
+            {
+                tile.IsOverlayVisible = false;
+            }
+        }
+
+        public void SetOverlayVisibility(bool value)
+        {
+            if (value)
+            {
+                ShowOverlay();
+            }
+            else
+            {
+                HideOverlay();
+            }
+        }
+
         private void ForValidSibling(int i, int j, Action<HexTerrainTile> fun)
         {
             if (IsInTerrain(i, j))

@@ -36,6 +36,8 @@ namespace Conquera.BattlePrototype
         private Line mStartPosIndicator;
         private Polygon mCanCasCardIndicator;
         private Border mHighlightIndicator;
+        private Polygon mOverlayPolygon;
+        private TextBlock mOverlayTextBlock;
 
         public Point Index { get; private set; }
         
@@ -118,6 +120,29 @@ namespace Conquera.BattlePrototype
             set { mHighlightIndicator.Visibility = value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden; }
         }
 
+        public Brush OverlayBackground
+        {
+            get { return mOverlayPolygon.Fill; }
+            set { mOverlayPolygon.Fill = value; }
+        }
+
+        public string OverlayText
+        {
+            get { return mOverlayTextBlock.Text; }
+            set { mOverlayTextBlock.Text = value; }
+        }
+
+        public bool IsOverlayVisible
+        {
+            get { return mOverlayPolygon.IsVisible; }
+            set
+            {
+                System.Windows.Visibility visibility = value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+                mOverlayPolygon.Visibility = visibility;
+                mOverlayTextBlock.Visibility = visibility;
+            }
+        }
+
         public HexTerrainTile(Point index, int terrainHeight)
         {
             Index = index;
@@ -190,7 +215,29 @@ namespace Conquera.BattlePrototype
             Grid.SetZIndex(mHighlightIndicator, 99);
             Children.Add(mHighlightIndicator);
 
+            mOverlayPolygon = new Polygon();
+            mOverlayPolygon.Stroke = Brushes.Black;
+            mOverlayPolygon.StrokeThickness = 1.0;
+            OverlayBackground = new SolidColorBrush(Color.FromArgb(240, 0, 0, 0));
+            Grid.SetZIndex(mOverlayPolygon, 1000);
+            mOverlayPolygon.IsHitTestVisible = false;
+            mOverlayPolygon.Points.Add(GetCornerPosition(HexTileCorner.Top));
+            mOverlayPolygon.Points.Add(GetCornerPosition(HexTileCorner.UperRight));
+            mOverlayPolygon.Points.Add(GetCornerPosition(HexTileCorner.LowerRight));
+            mOverlayPolygon.Points.Add(GetCornerPosition(HexTileCorner.Down));
+            mOverlayPolygon.Points.Add(GetCornerPosition(HexTileCorner.LowerLeft));
+            mOverlayPolygon.Points.Add(GetCornerPosition(HexTileCorner.UperLeft));
+            Children.Add(mOverlayPolygon);
 
+            mOverlayTextBlock = new TextBlock();
+            mOverlayTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            mOverlayTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+            mOverlayTextBlock.Background = Brushes.White;            
+            Grid.SetZIndex(mOverlayTextBlock, 1001);
+            mOverlayTextBlock.IsHitTestVisible = false;
+            Children.Add(mOverlayTextBlock);
+
+            IsOverlayVisible = false;
         }
 
         public void ShowCanCastCardIndicator(bool canCast)

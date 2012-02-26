@@ -850,6 +850,11 @@ namespace Conquera.BattlePrototype
         {
             mLogBox.SelectedItem = null;
         }
+
+        private void CheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            Terrain.SetOverlayVisibility((bool)mOverlayVisibilityCheckBox.IsChecked);
+        }      
     }
 
     public class ColorToBrushConverter : IValueConverter
