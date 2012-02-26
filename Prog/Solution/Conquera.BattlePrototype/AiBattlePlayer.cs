@@ -367,259 +367,251 @@ namespace Conquera.BattlePrototype
     //    }
     //}
 
-    //class SimplePathFinder : PathFinder
-    //{
-    //    protected override bool IsTileValid(HexTerrainTile tile)
-    //    {
-    //        //ignores flying ability!!!
-    //        //return tile.IsPassableAndEmpty;
-    //        return tile.IsPassable;
-    //    }
-    //}
-
-    //abstract class PathFinder
-    //{
-    //    #region Types
-    //    class PathNode : IComparable<PathNode>
-    //    {
-    //        Point mPosition;
-    //        PathNode mParent;
-    //        float mF;
-    //        float mG;
-
-    //        public Point Position
-    //        {
-    //            get { return mPosition; }
-    //        }
-
-    //        public PathNode Parent
-    //        {
-    //            get { return mParent; }
-    //        }
-
-    //        public PathNode(Point position, PathNode parent, Point target)
-    //        {
-    //            mPosition = position;
-    //            mParent = parent;
-    //            if (null != parent)
-    //            {
-    //                mG = parent.mG + 1; //cellCosts[position.X, position.Y];
-    //            }
-    //            else
-    //            {
-    //                mG = 0;
-    //            }
-    //            int h = HexHelper.GetDistance(position, target);
-    //            mF = mG + h;
-    //        }
-
-    //        public int CompareTo(PathNode obj)
-    //        {
-    //            if (mF > obj.mF)
-    //            {
-    //                return -1;
-    //            }
-    //            if (mF < obj.mF)
-    //            {
-    //                return 1;
-    //            }
-    //            return 0;
-    //        }
-    //    }
-    //    #endregion Types
-
-    //    HashSet<Point> mClosedList = new HashSet<Point>();
-    //    PriorityQueue<PathNode> mOpenList = new PriorityQueue<PathNode>(30);
-
-    //    public List<Point> FindPath(Point start, Point end, HexTerrain hexTerrain)
-    //    {
-    //        if (end == start)
-    //        {
-    //            return null;
-    //        }
-
-    //        mClosedList.Clear();
-    //        mOpenList.Clear();
-
-    //        mOpenList.Push(new PathNode(start, null, end));
-
-    //        while (0 != mOpenList.Count)
-    //        {
-    //            var node = mOpenList.Pop();
-    //            if (!mClosedList.Contains(node.Position)) //not in closed list
-    //            {
-    //                if (node.Position == end) //found path
-    //                {
-    //                    List<Point> path = new List<Point>();
-    //                    //reconstruct
-    //                    while (null != node && null != node.Parent) //null != node.Parent -> start position is not stored in the path
-    //                    {
-    //                        path.Insert(0, node.Position);
-    //                        node = node.Parent;
-    //                    }
-    //                    return path;
-    //                }
-    //                else
-    //                {
-    //                    hexTerrain.ForEachSibling(node.Position, sibling =>
-    //                    {
-    //                        if (IsTileValid(sibling))
-    //                        {
-    //                            mOpenList.Push(new PathNode(sibling.Index, node, end));
-    //                        }
-    //                    });
-
-    //                    mClosedList.Add(node.Position);
-    //                }
-    //            }
-
-    //        }
-
-    //        return null;
-    //    }
-
-    //    protected abstract bool IsTileValid(HexTerrainTile tile);
-
-    //}
 
 
 
-    //class PriorityQueue<T> : ICollection<T> where T : IComparable<T>
-    //{
-    //    List<T> mInnerList;
+    public class AiBattlePlayer : BattlePlayer
+    {
+        Window1 mWindow;
+        SimplePathFinder mPathFinder = new SimplePathFinder();
+        InfluenceMap mInfluenceMap;
+        public AiBattlePlayer(Window1 window, Color color, int index)
+            : base(window, color, index)
+        {
+            mWindow = window;
+            mInfluenceMap = new InfluenceMap(window.Terrain.Width, window.Terrain.Height, this);
+        }
+        protected override void OnTurnStartImpl(int turnNum, bool isActive)
+        {
+            if (isActive)
+            {
+                Stopwatch stp = new Stopwatch();
+                stp.Start();
 
-    //    public int Count
-    //    {
-    //        get { return mInnerList.Count; }
-    //    }
-    //    public bool IsReadOnly
-    //    {
-    //        get { return false; ; }
-    //    }
+                var terrain = mWindow.Terrain;
 
-    //    public PriorityQueue()
-    //    {
-    //        mInnerList = new List<T>();
-    //    }
+                mInfluenceMap.UpdateMap(terrain);
 
-    //    public PriorityQueue(int capacity)
-    //    {
-    //        mInnerList = new List<T>(capacity);
-    //    }
+                for (int i = 0; i < terrain.Width; ++i)
+                {
+                    for (int j = 0; j < terrain.Height; ++j)
+                    {
+                        var infCell = mInfluenceMap[i, j];
+                        Color c = new Color();
+                        c.A = 255;
+                        c.R = (byte)Math.Min(infCell.EnemyPower * 255 * 2, 255);
+                        c.B = (byte)Math.Min(infCell.FirendlyPower * 255 * 2, 255);
 
-    //    public void Push(T item)
-    //    {
-    //        if (null == item) throw new ArgumentNullException("item");
+                        byte g = 0;
+                        byte g2 = 0;
+                        if (infCell.EnemyPower > 0.5f)
+                        {
+                            g = (byte)Math.Min((infCell.EnemyPower - 0.5f)*2 * 255, 255);
+                        }
+                        if (infCell.FirendlyPower > 0.5f)
+                        {
+                            g2 = (byte)Math.Min((infCell.FirendlyPower -0.5f)*2 * 255, 255);
+                        }
+                        c.G = Math.Max(g, g2);
+                        terrain[i,j].OverlayBackground = new SolidColorBrush(c);
+                        terrain[i, j].OverlayText = infCell.ToString();
+                    }
+                }
 
-    //        mInnerList.Insert(FindPosFor(item), item);
-    //    }
+                //rotate units
+                {
+                    foreach (var unit in Units)
+                    {
+                        Point rotTarget = new Point();
+                        float maxEnemyPower = 0;
+                        terrain.ForEachSibling(unit.TileIndex, tile =>
+                            {
+                                var tileIndex = tile.Index;
+                                var infCell = mInfluenceMap[tileIndex.X, tileIndex.Y];
+                                if (maxEnemyPower < infCell.EnemyPower)
+                                {
+                                    maxEnemyPower = infCell.EnemyPower;
+                                    rotTarget = tileIndex;
+                                }
+                            });
+                        if (0 < maxEnemyPower)
+                        {
+                            unit.Direction = HexHelper.GetDirectionToSibling(unit.TileIndex, rotTarget); 
+                        }
+                    }
+                }
+                stp.Stop();
+                Logger.Log(stp.ElapsedMilliseconds);
+            }
+        }
+    }
 
-    //    public T Pop()
-    //    {
-    //        int lastIndex = mInnerList.Count - 1;
-    //        T item = mInnerList[lastIndex];
-    //        mInnerList.RemoveAt(lastIndex);
-    //        return item;
-    //    }
 
-    //    public void Clear()
-    //    {
-    //        mInnerList.Clear();
-    //    }
+    public class InfluenceMap
+    {
+        InfluenceMapCell[,] mCells2;
+        InfluenceMapCell[,] mCells;
+        BattlePlayer mPlayer;
+        int mWidth;
+        int mHeight;
 
-    //    public IEnumerator<T> GetEnumerator()
-    //    {
-    //        return mInnerList.GetEnumerator();
-    //    }
+        public InfluenceMapCell this[int i, int j]
+        {
+            get
+            {
+                return mCells[i, j];
+            }
+        }
 
-    //    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-    //    {
-    //        return mInnerList.GetEnumerator();
-    //    }
 
-    //    public void Add(T item)
-    //    {
-    //        Push(item);
-    //    }
+        public InfluenceMap(int width, int height, BattlePlayer player)
+        {
+            mPlayer = player;
+            mWidth = width;
+            mHeight = height;
 
-    //    public bool Contains(T item)
-    //    {
-    //        return mInnerList.Contains(item);
-    //    }
+            mCells2 = new InfluenceMapCell[mWidth, mHeight];
+            mCells = new InfluenceMapCell[mWidth, mHeight];
+            for (int i = 0; i < mWidth; ++i)
+            {
+                for (int j = 0; j < mHeight; ++j)
+                {
+                    mCells2[i, j] = new InfluenceMapCell();
+                    mCells[i, j] = new InfluenceMapCell();
+                }
+            }
+        }
 
-    //    public void CopyTo(T[] array, int arrayIndex)
-    //    {
-    //        mInnerList.CopyTo(array, arrayIndex);
-    //    }
+        public void UpdateMap(HexTerrain terrain)
+        {
+            ResetMap(mCells2);
+            ResetMap(mCells);
 
-    //    public bool Remove(T item)
-    //    {
-    //        return mInnerList.Remove(item);
-    //    }
+            if (terrain.Width != mWidth || terrain.Height != mHeight)
+            {
+                throw new ArgumentException("Invalid terrain size");
+            }
 
-    //    private int FindPosFor(T item)
-    //    {
-    //        if (0 == mInnerList.Count)
-    //        {
-    //            return 0;
-    //        }
-    //        int cnt = mInnerList.Count;
-    //        if (10 > cnt)
-    //        {
-    //            for (int i = 0; i < cnt; ++i)
-    //            {
-    //                int cmpResult = item.CompareTo(mInnerList[i]);
-    //                if (0 == cmpResult)
-    //                {
-    //                    return i;
-    //                }
-    //                else
-    //                {
-    //                    if (-1 == cmpResult)
-    //                    {
-    //                        return i;
-    //                    }
-    //                }
-    //            }
-    //            return mInnerList.Count;
-    //        }
-    //        else
-    //        {
-    //            int start = 0;
-    //            //binary search
-    //            int end = cnt;
-    //            while (start <= end)
-    //            {
-    //                int middle = start + ((end - start) >> 1);
 
-    //                if (cnt <= middle)
-    //                {
-    //                    end = middle - 1;
-    //                }
-    //                else
-    //                {
-    //                    int cmpResult = item.CompareTo(mInnerList[middle]);
-    //                    if (0 == cmpResult)
-    //                    {
-    //                        return middle;
-    //                    }
-    //                    if (1 == cmpResult)
-    //                    {
-    //                        start = middle + 1;
-    //                    }
-    //                    else
-    //                    {
-    //                        end = middle - 1;
-    //                    }
-    //                }
-    //            }
-    //            return start;
-    //        }
-    //    }
-    //}
 
-    //class AiPlayerPlan
-    //{
+            float decay = 0.9f;
+            float momentum = 0.5f;
+            float baseV = 1f;
+            for (int k = 0; k < 5; ++k)
+            {
 
-    //}
+                //base values
+                for (int i = 0; i < mWidth; ++i)
+                {
+                    for (int j = 0; j < mHeight; ++j)
+                    {
+                        var unit = terrain[i, j].Unit;
+                        if (null != unit)
+                        {
+                            if (mPlayer == unit.Player) //friendly
+                            {
+                                mCells[i, j].FirendlyPower = baseV;
+                            }
+                            else //enemy
+                            {
+                                mCells[i, j].EnemyPower = baseV;
+                            }
+                        }
+                    }
+                }
+
+                //propagate
+                Point index = new Point();
+                for (; index.X < mWidth; ++index.X)
+                {
+                    for (index.Y = 0; index.Y < mHeight; ++index.Y)
+                    {
+                        if (terrain[index].IsPassable)
+                        {
+                            float maxEnemyPower = 0;
+                            float maxFriendlyPower = 0;
+                            terrain.ForEachSibling(index, tile =>
+                                {
+                                    if (tile.IsPassable)
+                                    {
+                                        var siblingIndex = tile.Index;
+                                        var siblingInfCell = mCells[siblingIndex.X, siblingIndex.Y];
+                                        
+                                        float enemyPower = siblingInfCell.EnemyPower * decay;
+                                        if (maxEnemyPower < enemyPower)
+                                        {
+                                            maxEnemyPower = enemyPower;
+                                        }
+
+                                        float friendlyPower = siblingInfCell.FirendlyPower * decay;
+                                        if (maxFriendlyPower < friendlyPower)
+                                        {
+                                            maxFriendlyPower = friendlyPower;
+                                        }
+                                    }
+                                });
+                            mCells2[index.X, index.Y].EnemyPower = MathHelper.Lerp(mCells[index.X, index.Y].EnemyPower, maxEnemyPower, momentum);
+                            mCells2[index.X, index.Y].FirendlyPower = MathHelper.Lerp(mCells[index.X, index.Y].FirendlyPower, maxFriendlyPower, momentum);
+                            //mCells2[index.X, index.Y].EnemyPower = mCells[index.X, index.Y].EnemyPower + maxEnemyPower*momentum;
+                            //mCells2[index.X, index.Y].FirendlyPower = mCells[index.X, index.Y].FirendlyPower + maxFriendlyPower* momentum;
+                        }
+                    }
+                }
+                 
+                //swap buffers
+                var auxCells = mCells;
+                mCells = mCells2;
+                mCells2 = auxCells;
+            }
+
+
+            //base values
+            for (int i = 0; i < mWidth; ++i)
+            {
+                for (int j = 0; j < mHeight; ++j)
+                {
+                    var unit = terrain[i, j].Unit;
+                    if (null != unit)
+                    {
+                        if (mPlayer == unit.Player) //friendly
+                        {
+                            mCells[i, j].FirendlyPower = baseV;
+                        }
+                        else //enemy
+                        {
+                            mCells[i, j].EnemyPower = baseV;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ResetMap(InfluenceMapCell[,] map)
+        {
+            for (int i = 0; i < mWidth; ++i)
+            {
+                for (int j = 0; j < mHeight; ++j)
+                {
+                    map[i, j].Reset();
+                }
+            }
+        }
+    }
+
+    public class InfluenceMapCell
+    {
+        public float FirendlyPower { get; set; }
+        public float EnemyPower { get; set; }
+
+        public void Reset()
+        {
+            FirendlyPower = 0.0f;
+            EnemyPower = 0.0f;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}/{1}", FirendlyPower.ToString(), EnemyPower.ToString());
+        }
+    }
 }

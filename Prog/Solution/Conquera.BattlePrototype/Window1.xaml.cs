@@ -146,8 +146,8 @@ namespace Conquera.BattlePrototype
             mPlayers = new BattlePlayer[]{
                 new BattlePlayer(this, Colors.Blue, 0),
                 //new AiBattlePlayer(Colors.Blue, 0,this),
-                new BattlePlayer(this, Colors.Red, 1)};
-        //        new AiBattlePlayer(Colors.Red, 1, this)};
+                //new BattlePlayer(this, Colors.Red, 1)};
+                new AiBattlePlayer(this, Colors.Red, 1)};
 
 
             InitializeComponent();
