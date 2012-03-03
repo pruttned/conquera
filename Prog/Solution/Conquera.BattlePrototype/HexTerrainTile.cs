@@ -38,6 +38,7 @@ namespace Conquera.BattlePrototype
         private Border mHighlightIndicator;
         private Polygon mOverlayPolygon;
         private TextBlock mOverlayTextBlock;
+        private byte mOverlayBackgroundAlpha = 255;
 
         public Point Index { get; private set; }
         
@@ -120,10 +121,33 @@ namespace Conquera.BattlePrototype
             set { mHighlightIndicator.Visibility = value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden; }
         }
 
-        public Brush OverlayBackground
+        /// <summary>
+        /// Alpha is ignored (Use OverlayBackgroundAlpha) 
+        /// </summary>
+        public Color OverlayBackground
         {
-            get { return mOverlayPolygon.Fill; }
-            set { mOverlayPolygon.Fill = value; }
+            get { return ((SolidColorBrush)mOverlayPolygon.Fill).Color; }
+            set 
+            {
+                value.A = OverlayBackgroundAlpha;
+                ((SolidColorBrush)mOverlayPolygon.Fill).Color = value; 
+            }
+        }
+
+        public byte OverlayBackgroundAlpha
+        {
+            get { return mOverlayBackgroundAlpha; }
+            set
+            {
+                if (value != mOverlayBackgroundAlpha)
+                {
+                    mOverlayBackgroundAlpha = value;
+                    SolidColorBrush brush = (SolidColorBrush)mOverlayPolygon.Fill;
+                    var color = brush.Color;
+                    color.A = mOverlayBackgroundAlpha;
+                    brush.Color = color;
+                }
+            }
         }
 
         public string OverlayText
@@ -218,7 +242,7 @@ namespace Conquera.BattlePrototype
             mOverlayPolygon = new Polygon();
             mOverlayPolygon.Stroke = Brushes.Black;
             mOverlayPolygon.StrokeThickness = 1.0;
-            OverlayBackground = new SolidColorBrush(Color.FromArgb(240, 0, 0, 0));
+            mOverlayPolygon.Fill = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
             Grid.SetZIndex(mOverlayPolygon, 1000);
             mOverlayPolygon.IsHitTestVisible = false;
             mOverlayPolygon.Points.Add(GetCornerPosition(HexTileCorner.Top));

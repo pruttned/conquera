@@ -28,6 +28,7 @@ using System.Windows.Media;
 using System.Xml.Linq;
 using System.Linq;
 using System.Windows.Shapes;
+using System.Reflection;
 
 namespace Conquera.BattlePrototype
 {
@@ -242,6 +243,9 @@ namespace Conquera.BattlePrototype
                 player.Mana = 0;
                 player.OnTurnStart(mTurnNum, (ActivePlayer == player));
             }
+
+            UpdateAiMapInfo();
+
             NotifyTilesTurnStart();
         }
 
@@ -263,7 +267,6 @@ namespace Conquera.BattlePrototype
                 }
             }
         }
-
 
 
 
@@ -851,10 +854,52 @@ namespace Conquera.BattlePrototype
             mLogBox.SelectedItem = null;
         }
 
-        private void CheckBox_Click(object sender, RoutedEventArgs e)
+
+        private void mAiMapInfoComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Terrain.SetOverlayVisibility((bool)mOverlayVisibilityCheckBox.IsChecked);
-        }      
+            UpdateAiMapInfo();
+        }
+
+        private void InitAiMapInfoComboBox()
+        {
+            mAiMapInfoComboBox.Items.Add("None");
+            Type iAiPlayerMapInformationDisplayType = typeof(IAiPlayerMapInformationDisplay);
+            foreach(var type in (from t in Assembly.GetExecutingAssembly().GetTypes() where t.IsClass && !t.IsAbstract && iAiPlayerMapInformationDisplayType.IsAssignableFrom(t) select t))
+            {
+                mAiMapInfoComboBox.Items.Add(Activator.CreateInstance(type));
+            }
+            mAiMapInfoComboBox.SelectedIndex = 0;
+        }
+
+        private void UpdateAiMapInfo()
+        {
+            if (0 < mAiMapInfoComboBox.SelectedIndex && mActivePlayer is AiBattlePlayer)
+            {
+                ((IAiPlayerMapInformationDisplay)mAiMapInfoComboBox.SelectedItem).UpdateMapDisplay((AiBattlePlayer)mActivePlayer, Terrain);
+                Terrain.SetOverlayVisibility(true);
+            }
+            else
+            {
+                Terrain.SetOverlayVisibility(false);
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitAiMapInfoComboBox();
+            mAiMapInfoAlphaSlider.Value = 230;
+        }
+
+        private void mAiMapInfoAlphaSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            for (int i = 0; i < mTerrain.Width; i++)
+            {
+                for (int j = 0; j < mTerrain.Height; j++)
+                {
+                    mTerrain[i, j].OverlayBackgroundAlpha = (byte)mAiMapInfoAlphaSlider.Value;
+                }
+            }
+        }
     }
 
     public class ColorToBrushConverter : IValueConverter
@@ -921,4 +966,6 @@ namespace Conquera.BattlePrototype
             AttackRolls = attackRolls;
         }
     }
+
+
 }
