@@ -375,6 +375,12 @@ namespace Conquera.BattlePrototype
         Window1 mWindow;
         SimplePathFinder mPathFinder = new SimplePathFinder();
         InfluenceMap mInfluenceMap;
+
+        public InfluenceMap InfluenceMap
+        {
+            get { return mInfluenceMap; }
+        }
+
         public AiBattlePlayer(Window1 window, Color color, int index)
             : base(window, color, index)
         {
@@ -391,32 +397,6 @@ namespace Conquera.BattlePrototype
                 var terrain = mWindow.Terrain;
 
                 mInfluenceMap.UpdateMap(terrain);
-
-                for (int i = 0; i < terrain.Width; ++i)
-                {
-                    for (int j = 0; j < terrain.Height; ++j)
-                    {
-                        var infCell = mInfluenceMap[i, j];
-                        Color c = new Color();
-                        c.A = 255;
-                        c.R = (byte)Math.Min(infCell.EnemyPower * 255 * 2, 255);
-                        c.B = (byte)Math.Min(infCell.FirendlyPower * 255 * 2, 255);
-
-                        byte g = 0;
-                        byte g2 = 0;
-                        if (infCell.EnemyPower > 0.5f)
-                        {
-                            g = (byte)Math.Min((infCell.EnemyPower - 0.5f)*2 * 255, 255);
-                        }
-                        if (infCell.FirendlyPower > 0.5f)
-                        {
-                            g2 = (byte)Math.Min((infCell.FirendlyPower -0.5f)*2 * 255, 255);
-                        }
-                        c.G = Math.Max(g, g2);
-                        terrain[i,j].OverlayBackground = new SolidColorBrush(c);
-                        terrain[i, j].OverlayText = infCell.ToString();
-                    }
-                }
 
                 //rotate units
                 {
@@ -436,7 +416,7 @@ namespace Conquera.BattlePrototype
                             });
                         if (0 < maxEnemyPower)
                         {
-                            unit.Direction = HexHelper.GetDirectionToSibling(unit.TileIndex, rotTarget); 
+                            unit.Direction = HexHelper.GetDirectionToSibling(unit.TileIndex, rotTarget);
                         }
                     }
                 }
@@ -462,7 +442,13 @@ namespace Conquera.BattlePrototype
                 return mCells[i, j];
             }
         }
-
+        public InfluenceMapCell this[Point index]
+        {
+            get
+            {
+                return mCells[index.X, index.Y];
+            }
+        }
 
         public InfluenceMap(int width, int height, BattlePlayer player)
         {
@@ -494,76 +480,8 @@ namespace Conquera.BattlePrototype
 
 
 
-            float decay = 0.9f;
-            float momentum = 0.5f;
+            float decay = 0.8f;
             float baseV = 1f;
-            for (int k = 0; k < 5; ++k)
-            {
-
-                //base values
-                for (int i = 0; i < mWidth; ++i)
-                {
-                    for (int j = 0; j < mHeight; ++j)
-                    {
-                        var unit = terrain[i, j].Unit;
-                        if (null != unit)
-                        {
-                            if (mPlayer == unit.Player) //friendly
-                            {
-                                mCells[i, j].FirendlyPower = baseV;
-                            }
-                            else //enemy
-                            {
-                                mCells[i, j].EnemyPower = baseV;
-                            }
-                        }
-                    }
-                }
-
-                //propagate
-                Point index = new Point();
-                for (; index.X < mWidth; ++index.X)
-                {
-                    for (index.Y = 0; index.Y < mHeight; ++index.Y)
-                    {
-                        if (terrain[index].IsPassable)
-                        {
-                            float maxEnemyPower = 0;
-                            float maxFriendlyPower = 0;
-                            terrain.ForEachSibling(index, tile =>
-                                {
-                                    if (tile.IsPassable)
-                                    {
-                                        var siblingIndex = tile.Index;
-                                        var siblingInfCell = mCells[siblingIndex.X, siblingIndex.Y];
-                                        
-                                        float enemyPower = siblingInfCell.EnemyPower * decay;
-                                        if (maxEnemyPower < enemyPower)
-                                        {
-                                            maxEnemyPower = enemyPower;
-                                        }
-
-                                        float friendlyPower = siblingInfCell.FirendlyPower * decay;
-                                        if (maxFriendlyPower < friendlyPower)
-                                        {
-                                            maxFriendlyPower = friendlyPower;
-                                        }
-                                    }
-                                });
-                            mCells2[index.X, index.Y].EnemyPower = MathHelper.Lerp(mCells[index.X, index.Y].EnemyPower, maxEnemyPower, momentum);
-                            mCells2[index.X, index.Y].FirendlyPower = MathHelper.Lerp(mCells[index.X, index.Y].FirendlyPower, maxFriendlyPower, momentum);
-                            //mCells2[index.X, index.Y].EnemyPower = mCells[index.X, index.Y].EnemyPower + maxEnemyPower*momentum;
-                            //mCells2[index.X, index.Y].FirendlyPower = mCells[index.X, index.Y].FirendlyPower + maxFriendlyPower* momentum;
-                        }
-                    }
-                }
-                 
-                //swap buffers
-                var auxCells = mCells;
-                mCells = mCells2;
-                mCells2 = auxCells;
-            }
-
 
             //base values
             for (int i = 0; i < mWidth; ++i)
@@ -581,6 +499,90 @@ namespace Conquera.BattlePrototype
                         {
                             mCells[i, j].EnemyPower = baseV;
                         }
+                    }
+                }
+            }
+
+            for (int k = 0; k < 5; ++k)
+            {
+                //propagate
+                Point index = new Point();
+                for (; index.X < mWidth; ++index.X)
+                {
+                    for (index.Y = 0; index.Y < mHeight; ++index.Y)
+                    {
+                        if (terrain[index].IsPassable)
+                        {
+                            float maxEnemyPower = 0;
+                            float maxFriendlyPower = 0;
+                            terrain.ForEachSibling(index, tile =>
+                                {
+                                    if (tile.IsPassable)
+                                    {
+                                        var siblingIndex = tile.Index;
+                                        var siblingInfCell = mCells[siblingIndex.X, siblingIndex.Y];
+
+                                        float enemyPower = siblingInfCell.EnemyPower * decay;
+                                        if (maxEnemyPower < enemyPower)
+                                        {
+                                            maxEnemyPower = enemyPower;
+                                        }
+
+                                        float friendlyPower = siblingInfCell.FirendlyPower * decay;
+                                        if (maxFriendlyPower < friendlyPower)
+                                        {
+                                            maxFriendlyPower = friendlyPower;
+                                        }
+                                    }
+                                });
+                            mCells2[index.X, index.Y].EnemyPower = Math.Max(mCells[index.X, index.Y].EnemyPower, maxEnemyPower);
+                            mCells2[index.X, index.Y].FirendlyPower = Math.Max(mCells[index.X, index.Y].FirendlyPower, maxFriendlyPower);
+                            //mCells2[index.X, index.Y].EnemyPower = mCells[index.X, index.Y].EnemyPower + maxEnemyPower*momentum;
+                            //mCells2[index.X, index.Y].FirendlyPower = mCells[index.X, index.Y].FirendlyPower + maxFriendlyPower* momentum;
+                        }
+                    }
+                }
+
+                //swap buffers
+                var auxCells = mCells;
+                mCells = mCells2;
+                mCells2 = auxCells;
+            }
+
+            foreach (var player in mPlayer.Window.Players)
+            {
+                if (player != mPlayer)
+                {
+                    foreach (var unit in player.Units)
+                    {
+                        unit.ForEachAttackPoint((tile, attackType) =>
+                            {
+                                var cell = this[tile.Index];
+                                if (unit is Spearman)
+                                {
+                                    cell.IsProtectedBySpearman = true;
+                                }
+                                int attackRollCnt = (AttackType.Main == attackType ? 2 : 1);
+                                float cavalryHitProbabilty = unit.GetDieAgainst(typeof(Cavalry)).HitProbability;
+                                float footUnitHitProbabilty = unit.GetDieAgainst(typeof(Swordsman)).HitProbability;
+                                if (0 == cell.AttackRollCnt)
+                                {
+                                    cell.HitProbabilityAgainstCavalryUnit = cavalryHitProbabilty;
+                                    cell.HitProbabilityAgainstFootUnit = footUnitHitProbabilty;
+                                }
+                                else
+                                {
+                                    cell.HitProbabilityAgainstCavalryUnit = (cell.HitProbabilityAgainstCavalryUnit + cavalryHitProbabilty) - (cell.HitProbabilityAgainstCavalryUnit * cavalryHitProbabilty);
+                                    cell.HitProbabilityAgainstFootUnit = (cell.HitProbabilityAgainstFootUnit + footUnitHitProbabilty) - (cell.HitProbabilityAgainstFootUnit * footUnitHitProbabilty);
+                                }
+                                if (AttackType.Main == attackType)
+                                {
+                                    cell.HitProbabilityAgainstCavalryUnit = (cell.HitProbabilityAgainstCavalryUnit + cavalryHitProbabilty) - (cell.HitProbabilityAgainstCavalryUnit * cavalryHitProbabilty);
+                                    cell.HitProbabilityAgainstFootUnit = (cell.HitProbabilityAgainstFootUnit + footUnitHitProbabilty) - (cell.HitProbabilityAgainstFootUnit * footUnitHitProbabilty);
+                                }
+
+                                cell.AttackRollCnt += attackRollCnt;
+                            });
                     }
                 }
             }
@@ -603,15 +605,158 @@ namespace Conquera.BattlePrototype
         public float FirendlyPower { get; set; }
         public float EnemyPower { get; set; }
 
+        public int AttackRollCnt { get; set; }
+        public bool IsProtectedBySpearman { get; set; }
+
+        public float HitProbabilityAgainstFootUnit { get; set; }
+        public float HitProbabilityAgainstCavalryUnit { get; set; }
+
         public void Reset()
         {
             FirendlyPower = 0.0f;
             EnemyPower = 0.0f;
+            AttackRollCnt = 0;
+            HitProbabilityAgainstFootUnit = 0;
+            HitProbabilityAgainstCavalryUnit = 0;
+            IsProtectedBySpearman = false;
         }
 
         public override string ToString()
         {
             return string.Format("{0}/{1}", FirendlyPower.ToString(), EnemyPower.ToString());
+        }
+    }
+
+
+    public interface IAiPlayerMapInformationDisplay
+    {
+        void UpdateMapDisplay(AiBattlePlayer player, HexTerrain terrain);
+    }
+
+    public abstract class BaseAiPlayerMapInformationDisplay : IAiPlayerMapInformationDisplay
+    {
+        private string mName;
+
+        public BaseAiPlayerMapInformationDisplay(string name)
+        {
+            mName = name;
+        }
+        public void UpdateMapDisplay(AiBattlePlayer player, HexTerrain terrain)
+        {
+            Point index = new Point();
+            for (; index.X < terrain.Width; ++index.X)
+            {
+                for (index.Y = 0; index.Y < terrain.Height; ++index.Y)
+                {
+                    UpdateCell(player, terrain[index]);
+                }
+            }
+        }
+
+        protected abstract void UpdateCell(AiBattlePlayer player, HexTerrainTile tile);
+
+        public override string ToString()
+        {
+            return mName;
+        }
+    }
+
+    public class PowerBalanceMapInformationDisplay : BaseAiPlayerMapInformationDisplay
+    {
+        public PowerBalanceMapInformationDisplay()
+            : base("Power Balance")
+        { }
+
+        protected override void UpdateCell(AiBattlePlayer player, HexTerrainTile tile)
+        {
+            Point index = tile.Index;
+
+            var infCell = player.InfluenceMap[index];
+            Color c = new Color();
+            c.R = (byte)Math.Min(infCell.EnemyPower * 255 * 2, 255);
+            c.B = (byte)Math.Min(infCell.FirendlyPower * 255 * 2, 255);
+
+            byte g = 0;
+            byte g2 = 0;
+            if (infCell.EnemyPower > 0.5f)
+            {
+                g = (byte)Math.Min((infCell.EnemyPower - 0.5f) * 2 * 255, 255);
+            }
+            if (infCell.FirendlyPower > 0.5f)
+            {
+                g2 = (byte)Math.Min((infCell.FirendlyPower - 0.5f) * 2 * 255, 255);
+            }
+            c.G = Math.Max(g, g2);
+            tile.OverlayBackground = c;
+            tile.OverlayText = infCell.ToString();
+        }
+    }
+
+    public class IsProtectedBySpearmanMapInformationDisplay : BaseAiPlayerMapInformationDisplay
+    {
+        public IsProtectedBySpearmanMapInformationDisplay()
+            : base("Is Protected By Spearman")
+        { }
+
+        protected override void UpdateCell(AiBattlePlayer player, HexTerrainTile tile)
+        {
+            Point index = tile.Index;
+
+            tile.OverlayText = null;
+            if (player.InfluenceMap[index].IsProtectedBySpearman)
+            {
+                tile.OverlayBackground = Color.FromRgb(255, 0, 0);
+            }
+            else
+            {
+                tile.OverlayBackground = Color.FromRgb(0, 255, 100);
+            }
+        }
+    }
+
+    public class DamageAgainstCavalryMapInformationDisplay : BaseAiPlayerMapInformationDisplay
+    {
+        public DamageAgainstCavalryMapInformationDisplay()
+            : base("Damage against cavalry")
+        { }
+
+        protected override void UpdateCell(AiBattlePlayer player, HexTerrainTile tile)
+        {
+            Point index = tile.Index;
+
+            var infCell = player.InfluenceMap[index];
+            Color c = new Color();
+            c.R = (byte)Math.Min(infCell.HitProbabilityAgainstCavalryUnit * 255 * 2, 255);
+
+            if (infCell.EnemyPower > 0.5f)
+            {
+                c.G = (byte)Math.Min((infCell.HitProbabilityAgainstCavalryUnit - 0.5f) * 2 * 255, 255);
+            }
+            tile.OverlayBackground = c;
+            tile.OverlayText = infCell.HitProbabilityAgainstCavalryUnit.ToString("0.000");
+        }
+    }
+
+    public class DamageAgainstFootUnitsMapInformationDisplay : BaseAiPlayerMapInformationDisplay
+    {
+        public DamageAgainstFootUnitsMapInformationDisplay()
+            : base("Damage against foot units")
+        { }
+
+        protected override void UpdateCell(AiBattlePlayer player, HexTerrainTile tile)
+        {
+            Point index = tile.Index;
+
+            var infCell = player.InfluenceMap[index];
+            Color c = new Color();
+            c.R = (byte)Math.Min(infCell.HitProbabilityAgainstFootUnit * 255 * 2, 255);
+
+            if (infCell.EnemyPower > 0.5f)
+            {
+                c.G = (byte)Math.Min((infCell.HitProbabilityAgainstFootUnit - 0.5f) * 2 * 255, 255);
+            }
+            tile.OverlayBackground = c;
+            tile.OverlayText = infCell.HitProbabilityAgainstFootUnit.ToString("0.000");
         }
     }
 }

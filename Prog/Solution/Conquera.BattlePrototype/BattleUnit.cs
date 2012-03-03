@@ -37,6 +37,11 @@ namespace Conquera.BattlePrototype
 
     public class Die
     {
+        /// <summary>
+        /// Min num when the roll is considered as a hit
+        /// </summary>
+        public const int HitNum = 5;
+
         public static Die D6 { get; private set; }
         public static Die D8 { get; private set; }
         public static Die D10 { get; private set; }
@@ -44,6 +49,7 @@ namespace Conquera.BattlePrototype
         public static Die D20 { get; private set; }
 
         public int MaxNum { get; private set; }
+        public float HitProbability { get; private set; }
 
         static Die()
         {
@@ -62,6 +68,7 @@ namespace Conquera.BattlePrototype
         private Die(int maxNum)
         {
             MaxNum = maxNum;
+            HitProbability = (1 + MaxNum - HitNum) / (float)MaxNum;
         }
     }
 
@@ -604,26 +611,6 @@ namespace Conquera.BattlePrototype
             return false;
         }
 
-        ///// <summary>
-        ///// No defense is considered here
-        ///// </summary>
-        ///// <param name="isPrebatlePhase">Take damage only from units with first strike</param>
-        ///// <returns></returns>
-        //public int ComputeDamageFromEnemies(bool isPrebatlePhase)
-        //{
-        //    int damage = 0;
-        //    //mTerrain.ForEachSibling(TileIndex,
-        //    //    sibling =>
-        //    //    {
-        //    //        if (null != sibling.Unit && (sibling.Unit.IsBerserker || sibling.Unit.Player != Player) && sibling.Unit.HasEnabledAttack && ((isPrebatlePhase && sibling.Unit.HasFirstStrike) || (!isPrebatlePhase && !sibling.Unit.HasFirstStrike)))
-        //    //        {
-        //    //            damage += MathExt.Random.Next(sibling.Unit.Attack.X, sibling.Unit.Attack.Y + 1);
-        //    //        }
-        //    //    });
-
-        //    return damage;
-        //}
-
 
         /// <summary>
         /// All attack rolls or null in case that the unit is not capable of attacking the specified target (out of range, ...)
@@ -632,7 +619,6 @@ namespace Conquera.BattlePrototype
         /// <returns></returns>
         public IList<DieAttackRoll> RollDiceAgainst(BattleUnit target)
         {
-            int damageNum = 5;
             if (null == target) throw new ArgumentNullException("target");
 
             if (!HasEnabledAttack || AttackDistance != HexHelper.GetDistance(TileIndex, target.TileIndex))
@@ -645,24 +631,50 @@ namespace Conquera.BattlePrototype
                     return null;
                 case AttackType.Main:
                     {
-                        Die die = GetDieAgainst(target);
+                        Die die = GetDieAgainst(target.GetType());
                         int rollNum1 = die.Roll();
                         int rollNum2 = die.Roll();
                         return new DieAttackRoll[]
                         {
-                            new DieAttackRoll() {Die = die, Num = rollNum1, IsHit = (damageNum <= rollNum1)},
-                            new DieAttackRoll() {Die = die, Num = rollNum2, IsHit = (damageNum <= rollNum2)},
+                            new DieAttackRoll() {Die = die, Num = rollNum1, IsHit = (Die.HitNum <= rollNum1)},
+                            new DieAttackRoll() {Die = die, Num = rollNum2, IsHit = (Die.HitNum <= rollNum2)},
                         };
                     }
                 case AttackType.Secondary:
                     {
-                        Die die = GetDieAgainst(target);
+                        Die die = GetDieAgainst(target.GetType());
                         int rollNum = die.Roll();
-                        return new DieAttackRoll[] { new DieAttackRoll() { Die = die, Num = rollNum, IsHit = (damageNum <= rollNum) } };
+                        return new DieAttackRoll[] { new DieAttackRoll() { Die = die, Num = rollNum, IsHit = (Die.HitNum <= rollNum) } };
                     }
                 default:
                     return null;
             }    
+        }
+
+        public abstract Die GetDieAgainst(Type targetType);
+
+        public void ForEachAttackPoint(Action<HexTerrainTile, AttackType> action)
+        {
+            //get main attack point
+            Point mainAttackPoint = TileIndex;
+            for (int i = 0; i < AttackDistance; ++i)//todo cahce
+            {
+                mainAttackPoint = HexHelper.GetSibling(mainAttackPoint, Direction);
+                if (Terrain.IsInTerrain(mainAttackPoint))
+                {
+                    action(Terrain[mainAttackPoint], AttackType.Main);
+                }
+            }
+
+            //additional points
+            foreach (var additionalAttackPointRot in mAdditionalAttackPoints)
+            {
+                Point additionalAttackPoint = HexHelper.GetSibling(mainAttackPoint, HexHelper.RotateDirection(Direction, additionalAttackPointRot));
+                if (Terrain.IsInTerrain(additionalAttackPoint))
+                {
+                    action(Terrain[additionalAttackPoint], AttackType.Secondary);
+                }
+            }
         }
 
         public AttackType IsAttacking(Point pos)
@@ -763,8 +775,6 @@ namespace Conquera.BattlePrototype
         }
 
         protected virtual void OnTurnStartImpl(int turnNum) { }
-
-        protected abstract Die GetDieAgainst(BattleUnit target);
 
         private void UpdateMovementDistance()
         {
@@ -950,7 +960,7 @@ namespace Conquera.BattlePrototype
             , player, terrain, tileIndex)
         { }
 
-        protected override Die GetDieAgainst(BattleUnit target)
+        public override Die GetDieAgainst(Type targetType)
         {
             return Die.D8;
         }
@@ -967,7 +977,7 @@ namespace Conquera.BattlePrototype
             , player, terrain, tileIndex)
         { }
 
-        protected override Die GetDieAgainst(BattleUnit target)
+        public override Die GetDieAgainst(Type targetType)
         {
             return Die.D6;
         }
@@ -984,7 +994,7 @@ namespace Conquera.BattlePrototype
             , player, terrain, tileIndex)
         { }
 
-        protected override Die GetDieAgainst(BattleUnit target)
+        public override Die GetDieAgainst(Type targetType)
         {
             return Die.D10;
         }
@@ -1027,6 +1037,8 @@ namespace Conquera.BattlePrototype
 
     public class Spearman : BattleUnit
     {
+        private static Type CavalryType = typeof(Cavalry);
+
         public Spearman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             1 //attack distance
@@ -1036,9 +1048,9 @@ namespace Conquera.BattlePrototype
             , player, terrain, tileIndex)
         { }
 
-        protected override Die GetDieAgainst(BattleUnit target)
+        public override Die GetDieAgainst(Type targetType)
         {
-            return (target is Cavalry) ? Die.D10 : Die.D6;
+            return (CavalryType.IsAssignableFrom(targetType)) ? Die.D10 : Die.D6;
         }
     }
 }
