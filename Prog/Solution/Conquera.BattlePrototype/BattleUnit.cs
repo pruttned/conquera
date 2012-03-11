@@ -571,7 +571,7 @@ namespace Conquera.BattlePrototype
         {
             if (index == TileIndex)
             {
-                return false;
+                return true;
             }
             HexTerrainTile srcCell = mTerrain[TileIndex];
             HexTerrainTile targetCell = mTerrain[index];
