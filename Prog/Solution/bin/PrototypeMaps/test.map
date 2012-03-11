@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<map>
+  <player index="0">
+    <startPos x="2" y="14" />
+  </player>
+  <player index="1">
+    <startPos x="14" y="14" />
+  </player>
+  <terrain width="20" height="20">
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="ManaShrine" owningPlayer="0" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="ManaShrine" owningPlayer="0" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="ManaShrine" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Outpost" />
+      <tile template="Outpost" />
+      <tile template="Outpost" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="ManaShrine" />
+      <tile template="Outpost" />
+      <tile template="Outpost" />
+      <tile template="Outpost" />
+      <tile template="ManaShrine" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Outpost" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="ManaShrine" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="ManaShrine" owningPlayer="1" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="ManaShrine" owningPlayer="1" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Land" />
+      <tile template="Gap" />
+      <tile template="Gap" />
+      <tile template="Gap" />
+      <tile template="Gap" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+    <column>
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+      <tile template="Land" />
+    </column>
+  </terrain>
+</map>
