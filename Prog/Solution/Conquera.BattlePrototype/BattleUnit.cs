@@ -79,6 +79,13 @@ namespace Conquera.BattlePrototype
         public bool IsHit;
     }
 
+    public enum OccupationIgnoreMode
+    {
+        None,
+        IgnoreFriendly,
+        IgnoreAll
+    }
+
     public abstract class BattleUnit : Grid
     {
         #region Types
@@ -486,28 +493,34 @@ namespace Conquera.BattlePrototype
 
         //}
 
-        public void ForEachEnemyInRange(Action<BattleUnit> action)
-        {
-            ForEachEnemyInRange(MovementDistance + 1, action);
-        }
+        //public void ForEachEnemyInRange(Action<BattleUnit> action)
+        //{
+        //    ForEachEnemyInRange(MovementDistance + 1, action);
+        //}
 
-        public void ForEachEnemyInRange(int range, Action<BattleUnit> action)
-        {
-            CheckedUnits.Clear();
-            ForEachPassableCellInRange(range,
-                index => Terrain.ForEachSibling(index,
-                    tile =>
-                    {
-                        if (null != tile.Unit && tile.Unit.Player != Player && !CheckedUnits.Contains(tile.Unit))
-                        {
-                            CheckedUnits.Add(tile.Unit);
-                            action(tile.Unit);
-                        }
-                    }));
-        }
+        //public void ForEachEnemyInRange(int range, Action<BattleUnit> action)
+        //{
+        //    CheckedUnits.Clear();
+        //    ForEachPassableCellInRange(range,
+        //        index => Terrain.ForEachSibling(index,
+        //            tile =>
+        //            {
+        //                if (null != tile.Unit && tile.Unit.Player != Player && !CheckedUnits.Contains(tile.Unit))
+        //                {
+        //                    CheckedUnits.Add(tile.Unit);
+        //                    action(tile.Unit);
+        //                }
+        //            }));
+        //}
 
-        public void ForEachPassableCellInRange(int range, Action<Point> action)
+
+        public void ForEachPassableCellInRange(int range, OccupationIgnoreMode ignoreOccupation, Action<Point> action)
         {
+            if (0 >= range)
+            {
+                return;
+            }
+
             Seeds.Clear();
             CheckedPoints.Clear();
 
@@ -520,12 +533,10 @@ namespace Conquera.BattlePrototype
                     sibling =>
                     {
                         Point index = sibling.Index;
-                        if (sibling.IsPassableAndEmpty && !CheckedPoints.Contains(index))
+                        bool isPassable = sibling.IsPassable && (sibling.IsEmpty || ignoreOccupation == OccupationIgnoreMode.IgnoreAll || (ignoreOccupation == OccupationIgnoreMode.IgnoreFriendly && sibling.Unit.Player == Player));
+                        if ( isPassable && !CheckedPoints.Contains(index))
                         {
-                            if (sibling.IsPassableAndEmpty)
-                            {
-                                action(index);
-                            }
+                            action(index);
                             CheckedPoints.Add(index);
                             if (0 < seed.Live - 1)
                             {
@@ -540,24 +551,24 @@ namespace Conquera.BattlePrototype
         /// Gets all poitions where is possible for unit to move
         /// </summary>
         /// <param name="points"></param>
-        public void GetPossibleMoves(List<Point> points)
+        /// <param name="ignoreOccupation"></param>
+        public void GetPossibleMoves(OccupationIgnoreMode ignoreOccupation, List<Point> points)
         {
-            ForEachPassableCellInRange(MovementDistance, index => points.Add(index));
+            ForEachPassableCellInRange(MovementDistance, ignoreOccupation, index => points.Add(index));
         }
 
         /// <summary>
         /// Gets all poitions where is possible for unit to move
         /// </summary>
         /// <param name="points"></param>
-        public void GetPossibleMoves(HashSet<Point> points)
+        /// <param name="ignoreOccupation"></param>
+        public void GetPossibleMoves(OccupationIgnoreMode ignoreOccupation, HashSet<Point> points)
         {
-            ForEachPassableCellInRange(MovementDistance, index => points.Add(index));
+            ForEachPassableCellInRange(MovementDistance, ignoreOccupation, index => points.Add(index));
         }
 
         public bool CanMoveTo(Point index)
         {
-            //todo  refactor a* / depth first
-
             if (index == TileIndex)
             {
                 return false;
@@ -570,47 +581,12 @@ namespace Conquera.BattlePrototype
                 return false;
             }
 
-            if (targetCell.IsPassable && MovementDistance >= HexHelper.GetDistance(srcCell.Index, targetCell.Index))
+            if (targetCell.IsPassableAndEmpty && MovementDistance >= HexHelper.GetDistance(srcCell.Index, targetCell.Index))
             {
-                Point targetIndex = targetCell.Index;
-
-                Seeds.Clear();
-                CheckedPoints.Clear();
-
-                Seeds.Enqueue(new HexTileSeed(srcCell, MovementDistance));
-                while (0 < Seeds.Count)
-                {
-                    bool found = false;
-                    var seed = Seeds.Dequeue();
-                    mTerrain.ForEachSibling(seed.Tile.Index,
-                        sibling =>
-                        {
-                            if (sibling.Index == targetIndex)
-                            {
-                                found = true;
-                            }
-                            else
-                            {
-                                Point siblingIndex = sibling.Index;
-                                if (sibling.IsPassable && !CheckedPoints.Contains(siblingIndex))
-                                {
-                                    CheckedPoints.Add(siblingIndex);
-                                    if (0 < seed.Live - 1)
-                                    {
-                                        Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
-                                    }
-                                }
-                            }
-                        });
-                    if (found)
-                    {
-                        return true;
-                    }
-                }
+                return SimplePathFinder.Default.CheckPathExistance(TileIndex, index, MovementDistance, Terrain);
             }
             return false;
         }
-
 
         /// <summary>
         /// All attack rolls or null in case that the unit is not capable of attacking the specified target (out of range, ...)
@@ -954,7 +930,7 @@ namespace Conquera.BattlePrototype
         public Swordsman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             1 //attack distance
-            ,2 //movement distance
+            ,20 //movement distance
             ,3 //Hp
             , "Swordsman.png" //image
             , player, terrain, tileIndex)
@@ -988,7 +964,7 @@ namespace Conquera.BattlePrototype
         public Cavalry(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             1 //attack distance
-            ,4 //movement distance
+            ,40 //movement distance
             , 3 //Hp
             , "Cavalry.png" //image
             , player, terrain, tileIndex)
@@ -1042,7 +1018,7 @@ namespace Conquera.BattlePrototype
         public Spearman(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             1 //attack distance
-            ,2 //movement distance
+            ,20 //movement distance
             , 3 //Hp
             , "Spearman.png" //image
             , player, terrain, tileIndex)

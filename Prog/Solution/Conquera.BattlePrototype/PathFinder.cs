@@ -16,6 +16,9 @@ namespace Conquera.BattlePrototype
             float mF;
             float mG;
 
+            public float DistanceFromStart { get { return mG; } }
+
+
             public Point Position
             {
                 get { return mPosition; }
@@ -60,11 +63,43 @@ namespace Conquera.BattlePrototype
         HashSet<Point> mClosedList = new HashSet<Point>();
         PriorityQueue<PathNode> mOpenList = new PriorityQueue<PathNode>(30);
 
-        public List<Point> FindPath(Point start, Point end, HexTerrain hexTerrain)
+        public List<Point> FindPath(Point start, Point end, int maxDistance, HexTerrain hexTerrain)
+        {
+
+            List<Point> path = null;
+            EecuteForPath(start, end, maxDistance, hexTerrain, node =>
+                {
+                    path = new List<Point>();
+                    //reconstruct
+                    while (null != node && null != node.Parent) //null != node.Parent -> start position is not stored in the path
+                    {
+                        path.Insert(0, node.Position);
+                        node = node.Parent;
+                    } 
+                });
+            return path;
+        }
+
+        /// <summary>
+        /// Gets whether exists a path from start to end, but the actual path is not constructed.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="hexTerrain"></param>
+        /// <param name="maxDistance">-1 = no distance constraint</param>
+        /// <returns></returns>
+        public bool CheckPathExistance(Point start, Point end, int maxDistance, HexTerrain hexTerrain)
+        {
+            bool found = false;
+            EecuteForPath(start, end, maxDistance, hexTerrain, node => found = true);
+            return found;
+        }
+
+        private void EecuteForPath(Point start, Point end, int maxDistance, HexTerrain hexTerrain, Action<PathNode> targetNode)
         {
             if (end == start)
             {
-                return null;
+                return;
             }
 
             mClosedList.Clear();
@@ -79,32 +114,28 @@ namespace Conquera.BattlePrototype
                 {
                     if (node.Position == end) //found path
                     {
-                        List<Point> path = new List<Point>();
-                        //reconstruct
-                        while (null != node && null != node.Parent) //null != node.Parent -> start position is not stored in the path
-                        {
-                            path.Insert(0, node.Position);
-                            node = node.Parent;
-                        }
-                        return path;
+                        targetNode(node);
+                        return;
                     }
                     else
                     {
-                        hexTerrain.ForEachSibling(node.Position, sibling =>
+                        if (-1 == maxDistance || node.DistanceFromStart < maxDistance)
                         {
-                            if (IsTileValid(sibling))
+                            hexTerrain.ForEachSibling(node.Position, sibling =>
                             {
-                                mOpenList.Push(new PathNode(sibling.Index, node, end));
-                            }
-                        });
-
+                                if (IsTileValid(sibling))
+                                {
+                                    mOpenList.Push(new PathNode(sibling.Index, node, end));
+                                }
+                            });
+                        }
                         mClosedList.Add(node.Position);
                     }
                 }
 
             }
 
-            return null;
+            return;
         }
 
         protected abstract bool IsTileValid(HexTerrainTile tile);
@@ -112,10 +143,42 @@ namespace Conquera.BattlePrototype
 
     class SimplePathFinder : PathFinder
     {
+        private static SimplePathFinder mDefault = null;
+
+        public static SimplePathFinder Default
+        {//Not thread safe - todo if necessary
+            get
+            {
+                if (mDefault == null)
+                {
+                    mDefault = new SimplePathFinder();
+                }
+                return mDefault;
+            }
+        }
         protected override bool IsTileValid(HexTerrainTile tile)
         {
-            //ignores flying ability!!!
-            //return tile.IsPassableAndEmpty;
+            return tile.IsPassableAndEmpty;
+        }
+    }
+
+    class OccupationIgnoringPathFinder : PathFinder
+    {
+        private static OccupationIgnoringPathFinder mDefault = null;
+
+        public static OccupationIgnoringPathFinder Default
+        {//Not thread safe - todo if necessary
+            get
+            {
+                if (mDefault == null)
+                {
+                    mDefault = new OccupationIgnoringPathFinder();
+                }
+                return mDefault;
+            }
+        }
+        protected override bool IsTileValid(HexTerrainTile tile)
+        {
             return tile.IsPassable;
         }
     }

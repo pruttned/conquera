@@ -403,7 +403,9 @@ namespace Conquera.BattlePrototype
                     }
                     else if (unit.Damage >= 1)
                     {
-                        unit.AddSpellEffect(mTurnNum, new DisableMovementBattleUnitSpellEffect(2));
+                        //unit.AddSpellEffect(mTurnNum, new DisableMovementBattleUnitSpellEffect(2));
+                        unit.AddSpellEffect(mTurnNum, new ConstIncMovementDistanceBattleUnitSpellEffect(-unit.BaseMovementDistance, 2)); 
+
                     }
 
                     unit.Damage = 0;
@@ -416,7 +418,7 @@ namespace Conquera.BattlePrototype
             if (!isVisible || (!SelectedUnit.HasMovedThisTurn && SelectedUnit.HasEnabledMovement))
             {
                 List<Microsoft.Xna.Framework.Point> indices = new List<Microsoft.Xna.Framework.Point>();
-                SelectedUnit.GetPossibleMoves(indices);
+                SelectedUnit.GetPossibleMoves(OccupationIgnoreMode.None, indices);
                 indices.Add(SelectedUnit.TileIndex);
 
                 foreach (Microsoft.Xna.Framework.Point index in indices)

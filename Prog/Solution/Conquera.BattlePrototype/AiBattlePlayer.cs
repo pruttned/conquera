@@ -375,6 +375,7 @@ namespace Conquera.BattlePrototype
         Window1 mWindow;
         SimplePathFinder mPathFinder = new SimplePathFinder();
         InfluenceMap mInfluenceMap;
+        List<UnitMove> mMovements = new List<UnitMove>();
 
         public InfluenceMap InfluenceMap
         {
@@ -387,6 +388,13 @@ namespace Conquera.BattlePrototype
             mWindow = window;
             mInfluenceMap = new InfluenceMap(window.Terrain.Width, window.Terrain.Height, this);
         }
+
+        private UnitMove CreateMovementPosition(BattleUnit unit, Point index)
+        {
+            float rate = index.X ;
+            return new UnitMove(unit, index, rate);
+        }
+
         protected override void OnTurnStartImpl(int turnNum, bool isActive)
         {
             if (isActive)
@@ -397,6 +405,47 @@ namespace Conquera.BattlePrototype
                 var terrain = mWindow.Terrain;
 
                 mInfluenceMap.UpdateMap(terrain);
+
+                mMovements.Clear();
+                int unitsToMove = Units.Count;
+
+                foreach (var unit in Units)
+                {
+                    mMovements.Add(CreateMovementPosition(unit, unit.TileIndex));
+                    if(unit.HasEnabledMovement && 0 < unit.MovementDistance)
+                    {
+                        unit.ForEachPassableCellInRange(unit.MovementDistance, OccupationIgnoreMode.IgnoreFriendly, index =>
+                            {
+                                mMovements.Add(CreateMovementPosition(unit, index));
+                            });
+                    }
+                }
+                mMovements.Sort();
+                
+                bool reset = false;
+                do
+                {
+                    reset = false;
+                    for (int i = mMovements.Count - 1; i >= 0 && 0 < unitsToMove && !reset; --i)
+                    {
+                        var movement = mMovements[i];
+                        if (movement.Unit.HasMovedThisTurn)
+                        {
+                            mMovements.RemoveAt(i);
+                        }
+                        else
+                        {
+                            if (mMovements[i].CheckMovementPossibility())
+                            {
+                                mMovements[i].Execute(turnNum);
+                                mMovements.RemoveAt(i);
+                                reset = true;
+                                unitsToMove--;
+                            }
+                        }
+                        //     mMovements[i]
+                    }
+                } while (reset);
 
                 //rotate units
                 {
@@ -426,6 +475,41 @@ namespace Conquera.BattlePrototype
         }
     }
 
+    public class UnitMove : IComparable<UnitMove>
+    {
+        public BattleUnit Unit{get; private set;}
+        public Point TargetIndex { get; private set; }
+        public float Priority { get; private set; }
+
+        public UnitMove(BattleUnit unit, Point targetIndex, float priority)
+        {
+            Unit = unit;
+            TargetIndex = targetIndex;
+            Priority = priority;
+        }
+
+        #region IComparable<UnitMove> Members
+
+        public int CompareTo(UnitMove other)
+        {
+            return Comparer<float>.Default.Compare(Priority, other.Priority);
+        }
+
+        public bool CheckMovementPossibility()
+        {
+            return Unit.CanMoveTo(TargetIndex);
+        }
+
+        /// <summary>
+        /// Possibility of the movement is not checked
+        /// </summary>
+        public void Execute(int turnNum)
+        {
+            Unit.Move(turnNum, TargetIndex);
+        }
+
+        #endregion
+    }
 
     public class InfluenceMap
     {
@@ -478,34 +562,21 @@ namespace Conquera.BattlePrototype
                 throw new ArgumentException("Invalid terrain size");
             }
 
-
-
-            float decay = 0.8f;
-            float baseV = 1f;
-
             //base values
-            for (int i = 0; i < mWidth; ++i)
             {
-                for (int j = 0; j < mHeight; ++j)
+                Point index = new Point();
+                for (; index.X < mWidth; ++index.X)
                 {
-                    var unit = terrain[i, j].Unit;
-                    if (null != unit)
+                    for (index.Y = 0; index.Y < mHeight; ++index.Y)
                     {
-                        if (mPlayer == unit.Player) //friendly
-                        {
-                            mCells[i, j].FirendlyPower = baseV;
-                        }
-                        else //enemy
-                        {
-                            mCells[i, j].EnemyPower = baseV;
-                        }
+                        mCells[index.X, index.Y].InitPropagatedValue(mPlayer, terrain[index], terrain);
                     }
                 }
             }
 
+            //propagate
             for (int k = 0; k < 5; ++k)
             {
-                //propagate
                 Point index = new Point();
                 for (; index.X < mWidth; ++index.X)
                 {
@@ -513,32 +584,15 @@ namespace Conquera.BattlePrototype
                     {
                         if (terrain[index].IsPassable)
                         {
-                            float maxEnemyPower = 0;
-                            float maxFriendlyPower = 0;
+                            mCells2[index.X, index.Y].CopyPropagatedValuesFrom(mCells[index.X, index.Y]);
                             terrain.ForEachSibling(index, tile =>
+                            {
+                                if (tile.IsPassable)
                                 {
-                                    if (tile.IsPassable)
-                                    {
-                                        var siblingIndex = tile.Index;
-                                        var siblingInfCell = mCells[siblingIndex.X, siblingIndex.Y];
-
-                                        float enemyPower = siblingInfCell.EnemyPower * decay;
-                                        if (maxEnemyPower < enemyPower)
-                                        {
-                                            maxEnemyPower = enemyPower;
-                                        }
-
-                                        float friendlyPower = siblingInfCell.FirendlyPower * decay;
-                                        if (maxFriendlyPower < friendlyPower)
-                                        {
-                                            maxFriendlyPower = friendlyPower;
-                                        }
-                                    }
-                                });
-                            mCells2[index.X, index.Y].EnemyPower = Math.Max(mCells[index.X, index.Y].EnemyPower, maxEnemyPower);
-                            mCells2[index.X, index.Y].FirendlyPower = Math.Max(mCells[index.X, index.Y].FirendlyPower, maxFriendlyPower);
-                            //mCells2[index.X, index.Y].EnemyPower = mCells[index.X, index.Y].EnemyPower + maxEnemyPower*momentum;
-                            //mCells2[index.X, index.Y].FirendlyPower = mCells[index.X, index.Y].FirendlyPower + maxFriendlyPower* momentum;
+                                    var sibblingIndex = tile.Index;
+                                    mCells2[index.X, index.Y].PropagateFrom(mCells[sibblingIndex.X, sibblingIndex.Y]);
+                                }
+                            });
                         }
                     }
                 }
@@ -549,6 +603,7 @@ namespace Conquera.BattlePrototype
                 mCells2 = auxCells;
             }
 
+            //after propagation
             foreach (var player in mPlayer.Window.Players)
             {
                 if (player != mPlayer)
@@ -557,31 +612,7 @@ namespace Conquera.BattlePrototype
                     {
                         unit.ForEachAttackPoint((tile, attackType) =>
                             {
-                                var cell = this[tile.Index];
-                                if (unit is Spearman)
-                                {
-                                    cell.IsProtectedBySpearman = true;
-                                }
-                                int attackRollCnt = (AttackType.Main == attackType ? 2 : 1);
-                                float cavalryHitProbabilty = unit.GetDieAgainst(typeof(Cavalry)).HitProbability;
-                                float footUnitHitProbabilty = unit.GetDieAgainst(typeof(Swordsman)).HitProbability;
-                                if (0 == cell.AttackRollCnt)
-                                {
-                                    cell.HitProbabilityAgainstCavalryUnit = cavalryHitProbabilty;
-                                    cell.HitProbabilityAgainstFootUnit = footUnitHitProbabilty;
-                                }
-                                else
-                                {
-                                    cell.HitProbabilityAgainstCavalryUnit = (cell.HitProbabilityAgainstCavalryUnit + cavalryHitProbabilty) - (cell.HitProbabilityAgainstCavalryUnit * cavalryHitProbabilty);
-                                    cell.HitProbabilityAgainstFootUnit = (cell.HitProbabilityAgainstFootUnit + footUnitHitProbabilty) - (cell.HitProbabilityAgainstFootUnit * footUnitHitProbabilty);
-                                }
-                                if (AttackType.Main == attackType)
-                                {
-                                    cell.HitProbabilityAgainstCavalryUnit = (cell.HitProbabilityAgainstCavalryUnit + cavalryHitProbabilty) - (cell.HitProbabilityAgainstCavalryUnit * cavalryHitProbabilty);
-                                    cell.HitProbabilityAgainstFootUnit = (cell.HitProbabilityAgainstFootUnit + footUnitHitProbabilty) - (cell.HitProbabilityAgainstFootUnit * footUnitHitProbabilty);
-                                }
-
-                                cell.AttackRollCnt += attackRollCnt;
+                                this[tile.Index].UpdateAsEnemyAttackPoint(unit, tile, attackType);
                             });
                     }
                 }
@@ -602,28 +633,153 @@ namespace Conquera.BattlePrototype
 
     public class InfluenceMapCell
     {
-        public float FirendlyPower { get; set; }
-        public float EnemyPower { get; set; }
+        public float FirendlyPower { get; private set; }
+        public float EnemyPower { get; private set; }
+        public float EnemySpearmanThreat { get; private set; }
+        public float EnemyCavalryThreat { get; private set; }
 
-        public int AttackRollCnt { get; set; }
-        public bool IsProtectedBySpearman { get; set; }
+        public int AttackRollCnt { get; private set; }
+        public bool IsProtectedBySpearman { get; private set; }
 
-        public float HitProbabilityAgainstFootUnit { get; set; }
-        public float HitProbabilityAgainstCavalryUnit { get; set; }
+        public float HitProbabilityAgainstFootUnit { get; private set; }
+        public float HitProbabilityAgainstCavalryUnit { get; private set; }
 
         public void Reset()
         {
             FirendlyPower = 0.0f;
             EnemyPower = 0.0f;
             AttackRollCnt = 0;
-            HitProbabilityAgainstFootUnit = 0;
-            HitProbabilityAgainstCavalryUnit = 0;
+            HitProbabilityAgainstFootUnit = 0.0f;
+            HitProbabilityAgainstCavalryUnit = 0.0f;
             IsProtectedBySpearman = false;
+            EnemySpearmanThreat = 0.0f;
+            EnemyCavalryThreat = 0.0f;
         }
 
-        public override string ToString()
+        public void InitPropagatedValue(BattlePlayer player, HexTerrainTile tile, HexTerrain terrain)
         {
-            return string.Format("{0}/{1}", FirendlyPower.ToString(), EnemyPower.ToString());
+            float baseV = 0.3f;
+            float siblingBaseV = 0.15f; 
+            
+            Point index = tile.Index;
+            float friendlyPower = 0;
+            float enemyPower = 0;
+            float enemySpearmanThreat = 0;
+            float enemyCavalryThreat = 0;
+
+            terrain.ForEachSibling(tile.Index, t =>
+            {
+                var siblingUnit = t.Unit;
+                if (null != siblingUnit)
+                {
+                    if (player == siblingUnit.Player) //friendly
+                    {
+                        friendlyPower += siblingBaseV;
+                    }
+                    else //enemy
+                    {
+                        if (siblingUnit is Spearman)
+                        {
+                            enemySpearmanThreat += siblingBaseV;
+                        }
+                        else if (siblingUnit is Cavalry)
+                        {
+                            enemyCavalryThreat += siblingBaseV;
+                        }
+                        enemyPower += siblingBaseV;
+                    }
+                }
+            });
+
+            var unit = terrain[index].Unit;
+            if (null != unit)
+            {
+                if (player == unit.Player) //friendly
+                {
+                    friendlyPower += baseV;
+                }
+                else //enemy
+                {
+                    enemyPower += baseV;
+                    if (unit is Spearman)
+                    {
+                        enemySpearmanThreat += baseV;
+                    }
+                    else if (unit is Cavalry)
+                    {
+                        enemyCavalryThreat += baseV;
+                    }
+                }
+            }
+            FirendlyPower = friendlyPower;
+            EnemyPower = enemyPower;
+            EnemySpearmanThreat = enemySpearmanThreat;
+            EnemyCavalryThreat = enemyCavalryThreat;
+        }
+
+        public void PropagateFrom(InfluenceMapCell influenceMapCell)
+        {
+            float decay = 0.7f;
+
+            float enemyPower = influenceMapCell.EnemyPower * decay;
+            if (EnemyPower < enemyPower)
+            {
+                EnemyPower = enemyPower;
+            }
+
+            float friendlyPower = influenceMapCell.FirendlyPower * decay;
+            if (FirendlyPower < friendlyPower)
+            {
+                FirendlyPower = friendlyPower;
+            }
+
+            float enemySpearmanThreat = influenceMapCell.EnemySpearmanThreat * decay;
+            if (EnemySpearmanThreat < enemySpearmanThreat)
+            {
+                EnemySpearmanThreat = enemySpearmanThreat;
+            }
+
+            float enemyCavalryThreat = influenceMapCell.EnemyCavalryThreat * decay;
+            if (EnemyCavalryThreat < enemyCavalryThreat)
+            {
+                EnemyCavalryThreat = enemyCavalryThreat;
+            }
+        }
+
+        internal void CopyPropagatedValuesFrom(InfluenceMapCell influenceMapCell)
+        {
+            EnemyPower = influenceMapCell.EnemyPower;
+            FirendlyPower = influenceMapCell.FirendlyPower;
+            EnemySpearmanThreat = influenceMapCell.EnemySpearmanThreat;
+            EnemyCavalryThreat = influenceMapCell.EnemyCavalryThreat;
+        }
+
+        public void UpdateAsEnemyAttackPoint(BattleUnit unit, HexTerrainTile tile, AttackType attackType)
+        {
+            if (unit is Spearman)
+            {
+                IsProtectedBySpearman = true;
+            }
+            int attackRollCnt = (AttackType.Main == attackType ? 2 : 1);
+            float cavalryHitProbabilty = unit.GetDieAgainst(typeof(Cavalry)).HitProbability;
+            float footUnitHitProbabilty = unit.GetDieAgainst(typeof(Swordsman)).HitProbability;
+            if (0 == AttackRollCnt)
+            {
+                HitProbabilityAgainstCavalryUnit = cavalryHitProbabilty;
+                HitProbabilityAgainstFootUnit = footUnitHitProbabilty;
+            }
+            else
+            {
+                HitProbabilityAgainstCavalryUnit = (HitProbabilityAgainstCavalryUnit + cavalryHitProbabilty) - (HitProbabilityAgainstCavalryUnit * cavalryHitProbabilty);
+                HitProbabilityAgainstFootUnit = (HitProbabilityAgainstFootUnit + footUnitHitProbabilty) - (HitProbabilityAgainstFootUnit * footUnitHitProbabilty);
+            }
+            if (AttackType.Main == attackType)
+            {
+                HitProbabilityAgainstCavalryUnit = (HitProbabilityAgainstCavalryUnit + cavalryHitProbabilty) - (HitProbabilityAgainstCavalryUnit * cavalryHitProbabilty);
+                HitProbabilityAgainstFootUnit = (HitProbabilityAgainstFootUnit + footUnitHitProbabilty) - (HitProbabilityAgainstFootUnit * footUnitHitProbabilty);
+            }
+
+            AttackRollCnt += attackRollCnt;
         }
     }
 
@@ -661,34 +817,83 @@ namespace Conquera.BattlePrototype
         }
     }
 
-    public class PowerBalanceMapInformationDisplay : BaseAiPlayerMapInformationDisplay
+    public abstract class RateMapInformationDisplay : BaseAiPlayerMapInformationDisplay
     {
-        public PowerBalanceMapInformationDisplay()
-            : base("Power Balance")
+        public RateMapInformationDisplay(string name)
+            : base(name)
         { }
+
+        protected abstract float GetValue(InfluenceMapCell cell);
+        
+        protected override void UpdateCell(AiBattlePlayer player, HexTerrainTile tile)
+        {
+            Point index = tile.Index;
+
+            var infCell = player.InfluenceMap[index];
+            float value = GetValue(infCell);
+            Color c = new Color();
+            c.R = (byte)Math.Min(value * 255 * 2, 255);
+
+            if (value > 0.5f)
+            {
+                c.G = (byte)Math.Min((value - 0.5f) * 2 * 255, 255);
+            }
+            tile.OverlayBackground = c;
+            tile.OverlayText = value.ToString("0.000");
+        }
+    }
+    
+    public abstract class BalanceMapInformationDisplay : BaseAiPlayerMapInformationDisplay
+    {
+        public BalanceMapInformationDisplay(string name)
+            : base(name)
+        { }
+
+        protected abstract float GetValue1(InfluenceMapCell cell);
+        protected abstract float GetValue2(InfluenceMapCell cell);
 
         protected override void UpdateCell(AiBattlePlayer player, HexTerrainTile tile)
         {
             Point index = tile.Index;
 
             var infCell = player.InfluenceMap[index];
+            float value1 = GetValue1(infCell);
+            float value2 = GetValue2(infCell);
+
             Color c = new Color();
-            c.R = (byte)Math.Min(infCell.EnemyPower * 255 * 2, 255);
-            c.B = (byte)Math.Min(infCell.FirendlyPower * 255 * 2, 255);
+            c.B = (byte)Math.Min(value1 * 255 * 2, 255);
+            c.R = (byte)Math.Min(value2 * 255 * 2, 255);
 
             byte g = 0;
             byte g2 = 0;
-            if (infCell.EnemyPower > 0.5f)
+            if (value1 > 0.5f)
             {
-                g = (byte)Math.Min((infCell.EnemyPower - 0.5f) * 2 * 255, 255);
+                g = (byte)Math.Min((value1 - 0.5f) * 2 * 255, 255);
             }
-            if (infCell.FirendlyPower > 0.5f)
+            if (value2 > 0.5f)
             {
-                g2 = (byte)Math.Min((infCell.FirendlyPower - 0.5f) * 2 * 255, 255);
+                g2 = (byte)Math.Min((value2 - 0.5f) * 2 * 255, 255);
             }
             c.G = Math.Max(g, g2);
             tile.OverlayBackground = c;
-            tile.OverlayText = infCell.ToString();
+            tile.OverlayText = string.Format("{0:0.000}/{1:0.000}", value1, value2);
+        }
+    }
+
+    public class PowerBalanceMapInformationDisplay : BalanceMapInformationDisplay
+    {
+        public PowerBalanceMapInformationDisplay()
+            : base("Power Balance")
+        { }
+
+        protected override float GetValue1(InfluenceMapCell cell)
+        {
+            return cell.FirendlyPower;
+        }
+
+        protected override float GetValue2(InfluenceMapCell cell)
+        {
+            return cell.EnemyPower;
         }
     }
 
@@ -714,49 +919,51 @@ namespace Conquera.BattlePrototype
         }
     }
 
-    public class DamageAgainstCavalryMapInformationDisplay : BaseAiPlayerMapInformationDisplay
+    public class DamageAgainstCavalryMapInformationDisplay : RateMapInformationDisplay
     {
         public DamageAgainstCavalryMapInformationDisplay()
             : base("Damage against cavalry")
         { }
-
-        protected override void UpdateCell(AiBattlePlayer player, HexTerrainTile tile)
+        
+        protected override float GetValue(InfluenceMapCell cell)
         {
-            Point index = tile.Index;
-
-            var infCell = player.InfluenceMap[index];
-            Color c = new Color();
-            c.R = (byte)Math.Min(infCell.HitProbabilityAgainstCavalryUnit * 255 * 2, 255);
-
-            if (infCell.EnemyPower > 0.5f)
-            {
-                c.G = (byte)Math.Min((infCell.HitProbabilityAgainstCavalryUnit - 0.5f) * 2 * 255, 255);
-            }
-            tile.OverlayBackground = c;
-            tile.OverlayText = infCell.HitProbabilityAgainstCavalryUnit.ToString("0.000");
+            return cell.HitProbabilityAgainstCavalryUnit;
         }
     }
 
-    public class DamageAgainstFootUnitsMapInformationDisplay : BaseAiPlayerMapInformationDisplay
+    public class DamageAgainstFootUnitsMapInformationDisplay : RateMapInformationDisplay
     {
         public DamageAgainstFootUnitsMapInformationDisplay()
             : base("Damage against foot units")
         { }
 
-        protected override void UpdateCell(AiBattlePlayer player, HexTerrainTile tile)
+        protected override float GetValue(InfluenceMapCell cell)
         {
-            Point index = tile.Index;
+            return cell.HitProbabilityAgainstFootUnit;
+        }
+    }
 
-            var infCell = player.InfluenceMap[index];
-            Color c = new Color();
-            c.R = (byte)Math.Min(infCell.HitProbabilityAgainstFootUnit * 255 * 2, 255);
+    public class CavalryThreatMapInformationDisplay : RateMapInformationDisplay
+    {
+        public CavalryThreatMapInformationDisplay()
+            : base("Cavalry threat")
+        { }
 
-            if (infCell.EnemyPower > 0.5f)
-            {
-                c.G = (byte)Math.Min((infCell.HitProbabilityAgainstFootUnit - 0.5f) * 2 * 255, 255);
-            }
-            tile.OverlayBackground = c;
-            tile.OverlayText = infCell.HitProbabilityAgainstFootUnit.ToString("0.000");
+        protected override float GetValue(InfluenceMapCell cell)
+        {
+            return cell.EnemyCavalryThreat;
+        }
+    }
+
+    public class SpearmanThreatMapInformationDisplay : RateMapInformationDisplay
+    {
+        public SpearmanThreatMapInformationDisplay()
+            : base("Spearman threat")
+        { }
+
+        protected override float GetValue(InfluenceMapCell cell)
+        {
+            return cell.EnemySpearmanThreat;
         }
     }
 }
