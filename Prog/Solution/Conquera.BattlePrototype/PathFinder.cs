@@ -121,7 +121,7 @@ namespace Conquera.BattlePrototype
                     {
                         if (-1 == maxDistance || node.DistanceFromStart < maxDistance)
                         {
-                            hexTerrain.ForEachSibling(node.Position, sibling =>
+                            hexTerrain.ForEachSibling(node.Position, (sibling, dir) =>
                             {
                                 if (IsTileValid(sibling))
                                 {

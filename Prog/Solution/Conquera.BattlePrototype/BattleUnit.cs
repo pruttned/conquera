@@ -93,11 +93,13 @@ namespace Conquera.BattlePrototype
         {
             public HexTerrainTile Tile;
             public int Live;
+            public HexDirection DirectionFromParent;
 
-            public HexTileSeed(HexTerrainTile tile, int live)
+            public HexTileSeed(HexTerrainTile tile, int live, HexDirection directionFromParent)
             {
                 Tile = tile;
                 Live = live;
+                DirectionFromParent = directionFromParent;
             }
         }
         #endregion Types
@@ -111,7 +113,7 @@ namespace Conquera.BattlePrototype
 
         //promoted collections
         private static HashSet<BattleUnit> CheckedUnits = new HashSet<BattleUnit>();
-        private static HashSet<Point> CheckedPoints = new HashSet<Point>();
+        private static HashSet<HexTerrainTile> CheckedTiles = new HashSet<HexTerrainTile>();
         private static Queue<HexTileSeed> Seeds = new Queue<HexTileSeed>();
 
         private HexTerrain mTerrain;
@@ -514,7 +516,7 @@ namespace Conquera.BattlePrototype
         //}
 
 
-        public void ForEachPassableCellInRange(int range, OccupationIgnoreMode ignoreOccupation, Action<Point> action)
+        public void ForEachPassableCellInRange(int range, OccupationIgnoreMode ignoreOccupation, Action<HexTerrainTile> action)
         {
             if (0 >= range)
             {
@@ -522,49 +524,36 @@ namespace Conquera.BattlePrototype
             }
 
             Seeds.Clear();
-            CheckedPoints.Clear();
+            CheckedTiles.Clear();
 
-            Seeds.Enqueue(new HexTileSeed(mTerrain[TileIndex], range));
+            //init siblings
+            range = range - 1;
+            mTerrain.ForEachSibling(TileIndex, (sibling, direction) =>
+                {
+                    if (sibling.IsPassable && (sibling.IsEmpty || ignoreOccupation == OccupationIgnoreMode.IgnoreAll || (ignoreOccupation == OccupationIgnoreMode.IgnoreFriendly && sibling.Unit.Player == Player)))
+                    {
+                        action(sibling);
+                        Seeds.Enqueue(new HexTileSeed(sibling, range, direction));
+                        CheckedTiles.Add(sibling);
+                    }
+                });
+
             while (0 < Seeds.Count)
             {
                 var seed = Seeds.Dequeue();
+                var index = seed.Tile.Index;
 
-                mTerrain.ForEachSibling(seed.Tile.Index,
-                    sibling =>
-                    {
-                        Point index = sibling.Index;
-                        bool isPassable = sibling.IsPassable && (sibling.IsEmpty || ignoreOccupation == OccupationIgnoreMode.IgnoreAll || (ignoreOccupation == OccupationIgnoreMode.IgnoreFriendly && sibling.Unit.Player == Player));
-                        if ( isPassable && !CheckedPoints.Contains(index))
-                        {
-                            action(index);
-                            CheckedPoints.Add(index);
-                            if (0 < seed.Live - 1)
-                            {
-                                Seeds.Enqueue(new HexTileSeed(sibling, seed.Live - 1));
-                            }
-                        }
-                    });
+                var siblingDirection = seed.DirectionFromParent;
+                int siblingLive = seed.Live - 1;
+                EnqueueSiblingIfValid(ignoreOccupation, action, index, siblingDirection, siblingLive);
+                EnqueueSiblingIfValid(ignoreOccupation, action, index, HexHelper.RotateDirection(siblingDirection, -1), siblingLive);
+                EnqueueSiblingIfValid(ignoreOccupation, action, index, HexHelper.RotateDirection(siblingDirection, 1), siblingLive);
             }
         }
 
-        /// <summary>
-        /// Gets all poitions where is possible for unit to move
-        /// </summary>
-        /// <param name="points"></param>
-        /// <param name="ignoreOccupation"></param>
-        public void GetPossibleMoves(OccupationIgnoreMode ignoreOccupation, List<Point> points)
+        public void ForEachPossibleMove(OccupationIgnoreMode ignoreOccupation, Action<HexTerrainTile> action)
         {
-            ForEachPassableCellInRange(MovementDistance, ignoreOccupation, index => points.Add(index));
-        }
-
-        /// <summary>
-        /// Gets all poitions where is possible for unit to move
-        /// </summary>
-        /// <param name="points"></param>
-        /// <param name="ignoreOccupation"></param>
-        public void GetPossibleMoves(OccupationIgnoreMode ignoreOccupation, HashSet<Point> points)
-        {
-            ForEachPassableCellInRange(MovementDistance, ignoreOccupation, index => points.Add(index));
+            ForEachPassableCellInRange(MovementDistance, ignoreOccupation, action);
         }
 
         public bool CanMoveTo(Point index)
@@ -628,14 +617,36 @@ namespace Conquera.BattlePrototype
         }
 
         public abstract Die GetDieAgainst(Type targetType);
+        
+        public void ForEachAttackTarget(Point unitPos, HexDirection unitDirection, Action<BattleUnit, AttackType> action)
+        {
+            ForEachAttackPoint(unitPos, unitDirection, (tile, attackType) =>
+                {
+                    if (null != tile.Unit && Player != tile.Unit.Player)
+                    {
+                        action(tile.Unit, attackType);
+                    }
+                });
+        }
 
-        public void ForEachAttackPoint(Action<HexTerrainTile, AttackType> action)
+        public void ForEachAttackTarget(Action<BattleUnit, AttackType> action)
+        {
+            ForEachAttackPoint((tile, attackType) =>
+            {
+                if (null != tile.Unit && Player != tile.Unit.Player)
+                {
+                    action(tile.Unit, attackType);
+                }
+            });
+        }
+
+        public void ForEachAttackPoint(Point unitPos, HexDirection unitDirection, Action<HexTerrainTile, AttackType> action)
         {
             //get main attack point
-            Point mainAttackPoint = TileIndex;
-            for (int i = 0; i < AttackDistance; ++i)//todo cahce
+            Point mainAttackPoint = unitPos;
+            for (int i = 0; i < AttackDistance; ++i)//todo cache
             {
-                mainAttackPoint = HexHelper.GetSibling(mainAttackPoint, Direction);
+                mainAttackPoint = HexHelper.GetSibling(mainAttackPoint, unitDirection);
                 if (Terrain.IsInTerrain(mainAttackPoint))
                 {
                     action(Terrain[mainAttackPoint], AttackType.Main);
@@ -645,12 +656,17 @@ namespace Conquera.BattlePrototype
             //additional points
             foreach (var additionalAttackPointRot in mAdditionalAttackPoints)
             {
-                Point additionalAttackPoint = HexHelper.GetSibling(mainAttackPoint, HexHelper.RotateDirection(Direction, additionalAttackPointRot));
+                Point additionalAttackPoint = HexHelper.GetSibling(mainAttackPoint, HexHelper.RotateDirection(unitDirection, additionalAttackPointRot));
                 if (Terrain.IsInTerrain(additionalAttackPoint))
                 {
                     action(Terrain[additionalAttackPoint], AttackType.Secondary);
                 }
             }
+        }
+
+        public void ForEachAttackPoint(Action<HexTerrainTile, AttackType> action)
+        {
+            ForEachAttackPoint(TileIndex, Direction, action);
         }
 
         public AttackType IsAttacking(Point pos)
@@ -751,6 +767,24 @@ namespace Conquera.BattlePrototype
         }
 
         protected virtual void OnTurnStartImpl(int turnNum) { }
+        
+        private void EnqueueSiblingIfValid(OccupationIgnoreMode ignoreOccupation, Action<HexTerrainTile> action, Point index, HexDirection siblingDirection, int siblingLive)
+        {
+            var sibling = Terrain.GetSibling(index, siblingDirection);
+            if (null != sibling)
+            {
+                bool isPassable = sibling.IsPassable && (sibling.IsEmpty || ignoreOccupation == OccupationIgnoreMode.IgnoreAll || (ignoreOccupation == OccupationIgnoreMode.IgnoreFriendly && sibling.Unit.Player == Player));
+                if (isPassable && !CheckedTiles.Contains(sibling))
+                {
+                    CheckedTiles.Add(sibling);
+                    action(sibling);
+                    if (0 < siblingLive)
+                    {
+                        Seeds.Enqueue(new HexTileSeed(sibling, siblingLive, siblingDirection));
+                    }
+                }
+            }
+        }
 
         private void UpdateMovementDistance()
         {
@@ -947,7 +981,7 @@ namespace Conquera.BattlePrototype
         public Archer(BattlePlayer player, HexTerrain terrain, Point tileIndex)
             : base(
             2 //attack distance
-            ,2//movement distance
+            ,20//movement distance
             , 3 //Hp
             , "Archer.png" //image
             , player, terrain, tileIndex)
@@ -987,7 +1021,7 @@ namespace Conquera.BattlePrototype
                     {
                         bool hasEnemyAttackingSpearmanSibling = false;
                         bool hasEnemySibling = false;
-                        Terrain.ForEachSibling(tileIndex, tile =>
+                        Terrain.ForEachSibling(tileIndex, (tile, dir) =>
                             {
                                 if (!hasEnemyAttackingSpearmanSibling && null != tile.Unit && tile.Unit.Player != Player)
                                 {

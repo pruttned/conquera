@@ -197,51 +197,27 @@ namespace Conquera.BattlePrototype
             return null;
         }
 
-        public void ForEachSibling(Point index, Action<HexTerrainTile> fun)
+        public void ForEachSibling(Point index, Action<HexTerrainTile, HexDirection> fun)
         {
             int i = index.X;
             int j = index.Y;
 
-            ForValidSibling(i - 1, j, fun);
-            ForValidSibling(i + 1, j, fun);
+            ForValidSibling(i - 1, j, HexDirection.Left, fun);
+            ForValidSibling(i + 1, j, HexDirection.Right, fun);
             if (0 != (j & 1))
             {
-                ForValidSibling(i, j - 1, fun);
-                ForValidSibling(i + 1, j - 1, fun);
-                ForValidSibling(i, j + 1, fun);
-                ForValidSibling(i + 1, j + 1, fun);
+                ForValidSibling(i, j - 1, HexDirection.LowerLeft, fun);
+                ForValidSibling(i + 1, j - 1, HexDirection.LowerRight, fun);
+                ForValidSibling(i, j + 1, HexDirection.UperLeft, fun);
+                ForValidSibling(i + 1, j + 1, HexDirection.UperRight, fun);
             }
             else
             {
-                ForValidSibling(i - 1, j - 1, fun);
-                ForValidSibling(i, j - 1, fun);
-                ForValidSibling(i - 1, j + 1, fun);
-                ForValidSibling(i, j + 1, fun);
+                ForValidSibling(i - 1, j - 1, HexDirection.LowerLeft, fun);
+                ForValidSibling(i, j - 1, HexDirection.LowerRight, fun);
+                ForValidSibling(i - 1, j + 1, HexDirection.UperLeft, fun);
+                ForValidSibling(i, j + 1, HexDirection.UperRight, fun);
             }
-        }
-
-        /// <summary>
-        /// Gets all siblings of a given tile
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="siblings"></param>
-        /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        public void GetSiblings(Point index, IList<HexTerrainTile> siblings)
-        {
-            ForEachSibling(index, point => siblings.Add(point));
-        }
-
-        /// <summary>
-        /// Gets all siblings of a given tile
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException">HexTerrain has not yet been initialized</exception>
-        public IList<HexTerrainTile> GetSiblings(Point index)
-        {
-            List<HexTerrainTile> siblings = new List<HexTerrainTile>();
-            GetSiblings(index, siblings);
-            return siblings;
         }
 
         public void ShowOverlay()
@@ -272,11 +248,11 @@ namespace Conquera.BattlePrototype
             }
         }
 
-        private void ForValidSibling(int i, int j, Action<HexTerrainTile> fun)
+        private void ForValidSibling(int i, int j, HexDirection direction, Action<HexTerrainTile, HexDirection> fun)
         {
             if (IsInTerrain(i, j))
             {
-                fun(mTiles[i, j]);
+                fun(mTiles[i, j], direction);
             }
         }
     }

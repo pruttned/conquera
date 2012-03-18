@@ -417,14 +417,11 @@ namespace Conquera.BattlePrototype
         {
             if (!isVisible || (!SelectedUnit.HasMovedThisTurn && SelectedUnit.HasEnabledMovement))
             {
-                List<Microsoft.Xna.Framework.Point> indices = new List<Microsoft.Xna.Framework.Point>();
-                SelectedUnit.GetPossibleMoves(OccupationIgnoreMode.None, indices);
-                indices.Add(SelectedUnit.TileIndex);
-
-                foreach (Microsoft.Xna.Framework.Point index in indices)
-                {
-                    mTerrain[index].IsMoveIndicatorVisible = isVisible;
-                }
+                SelectedUnit.ForEachPossibleMove(OccupationIgnoreMode.None, tile =>
+                    {
+                        tile.IsMoveIndicatorVisible = isVisible;
+                    });
+                mTerrain[SelectedUnit.TileIndex].IsMoveIndicatorVisible = isVisible;
             }
         }
 

@@ -389,12 +389,6 @@ namespace Conquera.BattlePrototype
             mInfluenceMap = new InfluenceMap(window.Terrain.Width, window.Terrain.Height, this);
         }
 
-        private UnitMove CreateMovementPosition(BattleUnit unit, Point index)
-        {
-            float rate = index.X ;
-            return new UnitMove(unit, index, rate);
-        }
-
         protected override void OnTurnStartImpl(int turnNum, bool isActive)
         {
             if (isActive)
@@ -411,12 +405,12 @@ namespace Conquera.BattlePrototype
 
                 foreach (var unit in Units)
                 {
-                    mMovements.Add(CreateMovementPosition(unit, unit.TileIndex));
-                    if(unit.HasEnabledMovement && 0 < unit.MovementDistance)
+                    ResolvePossibleDirections(unit, terrain[unit.TileIndex]);
+                    if (unit.HasEnabledMovement && 0 < unit.MovementDistance)
                     {
-                        unit.ForEachPassableCellInRange(unit.MovementDistance, OccupationIgnoreMode.IgnoreFriendly, index =>
+                        unit.ForEachPassableCellInRange(unit.MovementDistance, OccupationIgnoreMode.IgnoreFriendly, tile =>
                             {
-                                mMovements.Add(CreateMovementPosition(unit, index));
+                                ResolvePossibleDirections(unit, tile);
                             });
                     }
                 }
@@ -453,7 +447,7 @@ namespace Conquera.BattlePrototype
                     {
                         Point rotTarget = new Point();
                         float maxEnemyPower = 0;
-                        terrain.ForEachSibling(unit.TileIndex, tile =>
+                        terrain.ForEachSibling(unit.TileIndex, (tile, dir) =>
                             {
                                 var tileIndex = tile.Index;
                                 var infCell = mInfluenceMap[tileIndex.X, tileIndex.Y];
@@ -473,19 +467,47 @@ namespace Conquera.BattlePrototype
                 Logger.Log(stp.ElapsedMilliseconds);
             }
         }
+
+        //temp
+        private void ResolvePossibleDirections(BattleUnit unit, HexTerrainTile tile)
+        {
+            //todo cache attack targets based on unit's type
+            for (int i = 0; i <= 5; ++i)
+            {
+                HexDirection direction = (HexDirection)i;
+                float attackDamage = 0;
+                unit.ForEachAttackTarget(tile.Index, direction, (targetUnit, attType) =>
+                {
+                    float subAttackDamage = unit.GetDieAgainst(targetUnit.GetType()).HitProbability;
+                    if (AttackType.Main == attType)
+                    {
+                        subAttackDamage *= 2;
+                    }
+                    attackDamage += subAttackDamage;
+                }); 
+                float hitProbability = (unit is Cavalry ? mInfluenceMap[tile.Index].HitProbabilityAgainstCavalryUnit : mInfluenceMap[tile.Index].HitProbabilityAgainstFootUnit);
+                float priority = attackDamage - hitProbability;
+                if (0 < attackDamage)
+                {
+                    mMovements.Add(new UnitMove(unit, tile, direction, priority));
+                }
+            }
+        }
     }
 
     public class UnitMove : IComparable<UnitMove>
     {
-        public BattleUnit Unit{get; private set;}
-        public Point TargetIndex { get; private set; }
+        public BattleUnit Unit { get; private set; }
+        public HexDirection Direction { get; private set; }
+        public HexTerrainTile TargetTile { get; private set; }
         public float Priority { get; private set; }
 
-        public UnitMove(BattleUnit unit, Point targetIndex, float priority)
+        public UnitMove(BattleUnit unit, HexTerrainTile targetTile, HexDirection direction, float priority)
         {
             Unit = unit;
-            TargetIndex = targetIndex;
+            TargetTile = targetTile;
             Priority = priority;
+            Direction = direction;
         }
 
         #region IComparable<UnitMove> Members
@@ -497,7 +519,7 @@ namespace Conquera.BattlePrototype
 
         public bool CheckMovementPossibility()
         {
-            return Unit.CanMoveTo(TargetIndex);
+            return Unit.CanMoveTo(TargetTile.Index);
         }
 
         /// <summary>
@@ -505,7 +527,7 @@ namespace Conquera.BattlePrototype
         /// </summary>
         public void Execute(int turnNum)
         {
-            Unit.Move(turnNum, TargetIndex);
+            Unit.Move(turnNum, TargetTile.Index);
         }
 
         #endregion
@@ -569,6 +591,13 @@ namespace Conquera.BattlePrototype
                 {
                     for (index.Y = 0; index.Y < mHeight; ++index.Y)
                     {
+                        terrain.ForEachSibling(index, (t, d) =>
+                            {
+                                if (HexHelper.GetDirectionToSibling(index, t.Index) != d)
+                                {
+                                    throw new Exception();
+                                }
+                            });
                         mCells[index.X, index.Y].InitPropagatedValue(mPlayer, terrain[index], terrain);
                     }
                 }
@@ -585,7 +614,7 @@ namespace Conquera.BattlePrototype
                         if (terrain[index].IsPassable)
                         {
                             mCells2[index.X, index.Y].CopyPropagatedValuesFrom(mCells[index.X, index.Y]);
-                            terrain.ForEachSibling(index, tile =>
+                            terrain.ForEachSibling(index, (tile, dir) =>
                             {
                                 if (tile.IsPassable)
                                 {
@@ -667,7 +696,7 @@ namespace Conquera.BattlePrototype
             float enemySpearmanThreat = 0;
             float enemyCavalryThreat = 0;
 
-            terrain.ForEachSibling(tile.Index, t =>
+            terrain.ForEachSibling(tile.Index, (t, dir) =>
             {
                 var siblingUnit = t.Unit;
                 if (null != siblingUnit)
