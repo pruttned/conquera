@@ -1,0 +1,14 @@
+﻿-SkeletalAnimation - Tags in animtaions - events based on animation time
+
+-mazanie objektov z octree - nezabudni kontrolovat outside objekty
+
+-treba setovat aspect ratio
+
+- SofFramework - Prepracovat throwowanie exception
+
+-Treba prejst vsetky efekty a setovat vsade nastavenia ktore sa niekde menia napr CullMode
+
+
+-POZOR  nezabudni, ze na shadovanie (solid/smooth) treba pouzivat modifikator EdgeSplit a hrnay oznacovat ako Mark Sharp .. inak je vsetko Smooth
+
+-Resize GUI pri win formach (len to, ze to tam nie je)
