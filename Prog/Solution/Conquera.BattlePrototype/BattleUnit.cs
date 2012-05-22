@@ -989,7 +989,7 @@ namespace Conquera.BattlePrototype
 
         public override Die GetDieAgainst(Type targetType)
         {
-            return Die.D6;
+            return Die.D8;
         }
     }
 

@@ -71,7 +71,7 @@ namespace SimpleOrmFramework
                 catch(BadImageFormatException){} 
                 if (null != assembly)
                 {
-                    GetDataObjectTypes(Assembly.LoadFile(file));
+                    GetDataObjectTypes(assembly);
                 }
             }
         }
