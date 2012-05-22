@@ -78,9 +78,10 @@ namespace SimpleOrmFramework
 
         private void GetDataObjectTypes(Assembly assembly)
         {
+            Type dataObjType = typeof(IDataObject);
             foreach (Type type in assembly.GetTypes())
             {
-                if (type.IsAssignableFrom(type) && null != AttributeHelper.FindAttribute<DataObjectAttribute>(type, false))
+                if (dataObjType.IsAssignableFrom(type) && null != AttributeHelper.FindAttribute<DataObjectAttribute>(type, false))
                 {
                     mTypes.Add(string.Format("{0}, {1}", type.FullName, type.Assembly.GetName().Name), type);
                 }
